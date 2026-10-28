@@ -45,8 +45,9 @@ Written by the reconcile pass over 00-08 (2026-10-27) and rerun over 00-09 on 20
 - Tax ids (organization.federal_tax_id_number, vendor.tax_id): plain TEXT, no encryption, masking or extra access rule (demo). Recorded in 01 D-09, 04, 07 BR-IMPORT-02 and an 08 field-level policy row; the security-review question on them is closed.
 - UI stack (owner decision, 2026-10-28): server-rendered HTML, no React or TypeScript. Tauri 2 window on a local axum server on 127.0.0.1 (askama, htmx, Alpine.js for small bits, Tailwind + DaisyUI, Chart.js; rusqlite with plain SQL). 05: every one of the 51 commands has a route (3 are internal) and returns a page or an htmx fragment. 06: every screen UI-01..UI-21 has a page route; UI-21 is the static chat mock. 08: AP-01/02/03/09/10 rewritten for routes; new AP-13 (local server guard, I1); test T-08-14. OD-05-01 closed. 02: React/TypeScript items removed from the stack, the risks and the spikes; new R-07, R-08 and S-05.
 - Owner change (2026-10-28): no LAN sharing. The host-mode increment I7 and everything added for it are removed (AP-14, BR-ADMIN-06, OP-ADMIN-06/07, UI-22, T-08-15, OD-08-02, the LAN risk). The app is single-user on one computer; the server listens on 127.0.0.1 only.
+- Owner answers (2026-10-28): 27 D- questions answered (D-03, D-07, D-09, D-10..D-13, D-15..D-30, D-33, D-37..D-39) and every open OD closed (OD-02-02, OD-03-01, OD-04-01, OD-04-03, OD-06-01, OD-07-01..OD-07-07, OD-08-01). Still open: D-14 for the non-Twilio integrations, D-31, D-32. Schema: foreign keys enforced (9 needs-profile ones added; 6 reversed primary-key references and 4 references on polymorphic or list columns removed); merge_field_config dropped; book_close_date and alert_ind/completed_ind dropped; task.completed_at, tax_rate_bp (settings and per transaction) added; *_sha256 became *_path. Rules: BR-SALES-04 and AP-04 removed (kept as removed rows); BR-SALES-18 and OP-SALES-12 (Apply Retainer) added; OP-PARTY-04 is party_archive. Demo seed: 04_demo_seed.sql, checked against design/.
 
-## Check results (2026-10-28, over 00-09, after the LAN-sharing removal)
+## Check results (2026-10-28, over 00-09, after the owner answers)
 
 - unknown ids: 0
 - ODs missing from their owner: 0
@@ -57,6 +58,8 @@ Written by the reconcile pass over 00-08 (2026-10-27) and rerun over 00-09 on 20
 - object paths missing: 0
 - tier1 rules not in exactly one increment: 0
 - policies not in exactly one increment: 0
+- removed policies still in an increment: 0
+- removed rules still in an increment: 0
 - commands not in an increment: 0
 - screens not in an increment: 0
 - QBO mentions not marked removed/stub: 0
@@ -73,5 +76,10 @@ Written by the reconcile pass over 00-08 (2026-10-27) and rerun over 00-09 on 20
 - screens without a page route: 0
 - ops with no rule in 07: 0
 - host-mode / LAN wording left (owner change 2026-10-28): 0
+- book-close / hard-delete wording left: 0
+- active rows citing AP-04 / BR-SALES-04 / T-08-04: 0
+- needs-profile FKs still pending in 04: 0
+- sha256 / alert_ind / completed_ind / merge_field_config columns in 04: 0
+- demo seed (04_demo_seed.sql) applies and matches design/: 0
 
-The 5 `table.column` references reported on 2026-10-27 are relationship rows that say "has no target column"; the check now skips them. The UI-stack checks were added on 2026-10-28, and the host-mode/LAN check after the owner dropped LAN sharing the same day.
+The owner-answer checks (removed rules and policies out of the increments, no book-close or hard-delete wording, no pending needs-profile FK, no hash or alert columns, and the demo seed loading with foreign keys on and reproducing the design/ numbers) were added on 2026-10-28.

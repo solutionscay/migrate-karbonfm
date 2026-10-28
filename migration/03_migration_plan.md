@@ -4,33 +4,33 @@
 
 | Item | Value/status |
 |---|---|
-| Source implementations/files | core: karbon_kontacts, karbon_kontroller, karbon_data; supporting: Picker Module, karbon_log, karbon_charts (D-01). Out: Generator, Build, tester, dev (D-01), ZeitGeist, konnector (D-03), LedgerLink/QuickBooks Online removed, stub only (owner, 2026-10-27; D-02); Twilio SMS/chat removed (owner, 2026-10-28; OD-05-02) |
+| Source implementations/files | core: karbon_kontacts, karbon_kontroller, karbon_data; supporting: Picker Module, karbon_log, karbon_charts (D-01). Out: Generator, Build, tester, dev (D-01), ZeitGeist, konnector (D-03), LedgerLink/QuickBooks Online removed, stub only (owner, 2026-10-27; D-02); Twilio SMS/chat removed (owner, 2026-10-28; OD-05-02); time tracking (Project, Milestone, WorkEffort, TimeEntry, TimeLog, Timesheet) out of scope (owner, 2026-10-28; D-03) |
 | DDR export and `objects/index.tsv` | DDR of 2026-10-27, FileMaker 26.0.3; 4,768 objects; verify passes for 9 explorers (00) |
 | In-scope workflows/data/history | 9 domains (PARTY, CONTACT, ACTIVITY, SALES, FILE, TEMPLATE, ADMIN, INTEG, IMPORT); all records of the user's export, with stamps (D-39) |
 | Target stack/architecture decision | Tauri 2 window on a local Rust axum server; server-rendered HTML: askama templates, htmx, Alpine.js (small bits only), Tailwind + DaisyUI, Chart.js; SQLite via rusqlite with plain SQL, no ORM; no React or TypeScript (02; D-36; owner, 2026-10-28) |
 | Parallel-operation/cutover model | per-install import, repeatable; no server cutover, no write-back (D-34, D-40) |
-| Unavailable evidence/open decisions | OD-02-02, OD-04-01, OD-04-03, OD-06-01, OD-07-01, OD-07-02, OD-07-03, OD-07-04, OD-07-05, OD-07-06, OD-07-07, OD-08-01, OD-03-01 |
+| Unavailable evidence/open decisions | none: every open decision was closed by the owner on 2026-10-28 (register below) |
 
 A new DDR export needs a new explode and new catalogs; `catalog_contract.py verify` fails on a catalog made from the old one.
 
 ## Release increments
 
-Increments set build order. The app is released to users after I5 (I6 can follow), because the domains share core tables (party, activity, sales_transaction) and FileMaker gets no write-back, so a partial release would make users keep two systems of record (D-34).
+Increments set build order. The demo runs on invented seed data (04_demo_seed.sql, matching design/), so it is complete after I1, I2, I4 and I5; I3 import is a nice-to-have (owner, 2026-10-28; OD-03-01). The app is released to users after I5 (I6 can follow), because the domains share core tables (party, activity, sales_transaction) and FileMaker gets no write-back, so a partial release would make users keep two systems of record (D-34).
 
 | Increment | Outcome | Object files (first source per command) | Schema/operations/UI | Authorization | Dependencies | Size | Exit evidence | Rollback |
 |---|---|---|---|---|---|---|---|---|
-| I1 | Foundation: Tauri window on the local axum server (127.0.0.1, per-launch session cookie), askama base layout with the vendored htmx, Alpine.js, Chart.js and the Tailwind/DaisyUI CSS embedded, schema, seeds, settings, setup. The server listens on 127.0.0.1 only; the app is single-user on one computer | `objects/karbon_kontacts.fmp12/scripts/482-Create_Welcome_Initial_Parties.txt`; `objects/karbon_kontroller.fmp12/scripts/375-Get_User_Object_By_AccountName_AccountName.txt`; `objects/karbon_kontroller.fmp12/scripts/502-Get_System.txt`; `objects/karbon_kontroller.fmp12/scripts/660-Update_Activity_Types.txt` (+1 more, 05 appendix) | 5 commands (OP-ADMIN-01, OP-ADMIN-02, OP-ADMIN-03, OP-ADMIN-04, OP-ADMIN-05); UI UI-01, UI-17 | AP-01, AP-02, AP-03, AP-10, AP-11, AP-13 | none | M | app starts on macOS and Linux; schema applies; setup creates the user; secrets in keychain; T-08-01..03, 10, 14; route tests render every I1 page | discard the build; no user data exists before release |
+| I1 | Foundation: Tauri window on the local axum server (127.0.0.1, per-launch session cookie), askama base layout with the vendored htmx, Alpine.js, Chart.js and the Tailwind/DaisyUI CSS embedded, schema, seeds, settings, setup. The server listens on 127.0.0.1 only; the app is single-user on one computer | `objects/karbon_kontacts.fmp12/scripts/482-Create_Welcome_Initial_Parties.txt`; `objects/karbon_kontroller.fmp12/scripts/375-Get_User_Object_By_AccountName_AccountName.txt`; `objects/karbon_kontroller.fmp12/scripts/502-Get_System.txt`; `objects/karbon_kontroller.fmp12/scripts/660-Update_Activity_Types.txt` (+1 more, 05 appendix) | 5 commands (OP-ADMIN-01, OP-ADMIN-02, OP-ADMIN-03, OP-ADMIN-04, OP-ADMIN-05); UI UI-01, UI-17 | AP-01, AP-02, AP-03, AP-10, AP-11, AP-13 | none | M | app starts on macOS (macOS first; Linux later, owner, 2026-10-28; D-37); the demo seed loads (04_demo_seed.sql); schema applies; setup creates the user; secrets in keychain; T-08-01..03, 10, 14; route tests render every I1 page | discard the build; no user data exists before release |
 | I2 | Parties and contact methods | `objects/karbon_kontacts.fmp12/scripts/393-Create_Parties.txt`; `objects/karbon_kontroller.fmp12/scripts/182-Set_Primary_Phone_Id_PartyId.txt`; `objects/karbon_kontroller.fmp12/scripts/185-Toggle_Contact_Method_Purpose_ContactMethodId_ContactMethodP.txt`; `objects/karbon_kontroller.fmp12/scripts/186-Get_Party_data.txt` (+11 more, 05 appendix) | 15 commands (OP-PARTY-01, OP-PARTY-02, OP-PARTY-03, OP-PARTY-04, OP-PARTY-05, OP-PARTY-06, OP-PARTY-07, OP-PARTY-08, OP-PARTY-09, OP-PARTY-10, OP-PARTY-11, OP-CONTACT-01, OP-CONTACT-02, OP-CONTACT-03, OP-CONTACT-04); UI UI-03, UI-04, UI-05, UI-06 | AP-07 | I1 | L | party and contact rules pass (BR-PARTY-*, BR-CONTACT-*); T-08-07 | discard the build; no user data exists before release |
-| I3 | Import of a FileMaker export | new | 2 commands (OP-IMPORT-01, OP-IMPORT-02); UI UI-18 | AP-09 | I2 | L | a real export imports with a report; rerun gives the same counts; T-08-09, T-08-13 | discard the build; no user data exists before release |
+| I3 | Import of a FileMaker export (nice-to-have, owner, 2026-10-28; OD-03-01: one CSV per table) | new | 2 commands (OP-IMPORT-01, OP-IMPORT-02); UI UI-18 | AP-09 | I2 | L | a real export imports with a report; rerun gives the same counts; T-08-09, T-08-13 | discard the build; no user data exists before release |
 | I4 | Activities, discussions, email, templates, files | `objects/karbon_kontroller.fmp12/scripts/376-Create_ActivityParty_json.txt`; `objects/karbon_kontroller.fmp12/scripts/377-Create_Activity.txt`; `objects/karbon_kontroller.fmp12/scripts/421-Create_Discussion_v2.txt`; `objects/karbon_kontroller.fmp12/scripts/422-Create_ActivityComment.txt` (+11 more, 05 appendix) | 15 commands (OP-ACTIVITY-01, OP-ACTIVITY-02, OP-ACTIVITY-03, OP-ACTIVITY-04, OP-ACTIVITY-05, OP-ACTIVITY-06, OP-ACTIVITY-07, OP-ACTIVITY-08, OP-ACTIVITY-09, OP-INTEG-01, OP-TEMPLATE-01, OP-TEMPLATE-02, OP-FILE-01, OP-FILE-02, OP-FILE-03); UI UI-02, UI-07, UI-08, UI-09, UI-16, UI-19, UI-21 (static chat mock) | AP-08 | I2 | XL | activity, email, template and file rules pass; SMTP contract test; T-08-08 | discard the build; no user data exists before release |
-| I5 | Opportunities and sales | `objects/karbon_kontroller.fmp12/scripts/395-Create_or_Update_Invoice_invoice.txt`; `objects/karbon_kontroller.fmp12/scripts/404-Create_or_Update_Payment_Payment.txt`; `objects/karbon_kontroller.fmp12/scripts/412-Create_or_Update_Item_Item.txt`; `objects/karbon_kontroller.fmp12/scripts/428-Create_or_Update_SalesReceipt_SalesReceipt.txt` (+7 more, 05 appendix) | 11 commands (OP-SALES-01, OP-SALES-02, OP-SALES-03, OP-SALES-04, OP-SALES-05, OP-SALES-06, OP-SALES-07, OP-SALES-08, OP-SALES-09, OP-SALES-10, OP-SALES-11); UI UI-10, UI-11, UI-12, UI-13, UI-14, UI-15, UI-20 | AP-04, AP-05, AP-06 | I2, I4 | XL | sales rules pass with money fixtures; T-08-04..06; PDF matches totals | discard the build; no user data exists before release |
-| I6 | Optional integrations and packaging | `objects/Picker_Module.fmp12/scripts/115-HTTP_request.txt`; `objects/karbon_kontroller.fmp12/scripts/746-FullContact_Person_Enrich.txt` | 3 commands (OP-INTEG-02, OP-INTEG-03, OP-INTEG-04); UI none | AP-12 | I4 | M | integrations off by default; T-08-02, T-08-12; signed installers | discard the build; no user data exists before release |
+| I5 | Opportunities and sales | `objects/karbon_kontroller.fmp12/scripts/395-Create_or_Update_Invoice_invoice.txt`; `objects/karbon_kontroller.fmp12/scripts/404-Create_or_Update_Payment_Payment.txt`; `objects/karbon_kontroller.fmp12/scripts/412-Create_or_Update_Item_Item.txt`; `objects/karbon_kontroller.fmp12/scripts/428-Create_or_Update_SalesReceipt_SalesReceipt.txt` (+7 more, 05 appendix) | 12 commands (OP-SALES-01, OP-SALES-02, OP-SALES-03, OP-SALES-04, OP-SALES-05, OP-SALES-06, OP-SALES-07, OP-SALES-08, OP-SALES-09, OP-SALES-10, OP-SALES-11, OP-SALES-12); UI UI-10, UI-11, UI-12, UI-13, UI-14, UI-15, UI-20 | AP-05, AP-06 | I2, I4 | XL | sales rules pass with money fixtures; T-08-05, T-08-06; PDF matches totals | discard the build; no user data exists before release |
+| I6 | Optional integrations and packaging | `objects/Picker_Module.fmp12/scripts/115-HTTP_request.txt`; `objects/karbon_kontroller.fmp12/scripts/746-FullContact_Person_Enrich.txt` | 3 commands (OP-INTEG-02, OP-INTEG-03, OP-INTEG-04); UI none | AP-12 | I4 | M | integrations off by default; T-08-02, T-08-12; unsigned macOS build for the demo (owner, 2026-10-28; OD-02-02) | discard the build; no user data exists before release |
 
 Each increment implements its command-layer invariants and the negative tests of its policies before its screens are wired.
 
 ## Foundation gates
 
-- [ ] Rust stable pinned; the Tailwind standalone CLI with the DaisyUI plugin and the vendored htmx, Alpine.js and Chart.js files pinned by version (no Node toolchain, S-05); CI builds macOS (universal) and Linux on every commit; gates: cargo test (rules and routes), clippy, askama templates compile.
+- [ ] Rust stable pinned; the Tailwind standalone CLI with the DaisyUI plugin and the vendored htmx, Alpine.js and Chart.js files pinned by version (no Node toolchain, S-05); CI builds macOS (universal) on every commit, Linux later (owner, 2026-10-28; D-37); demo builds are unsigned (OD-02-02); gates: cargo test (rules and routes), clippy, askama templates compile.
 - [ ] Schema 04 applied by refinery migrations; source ids kept; timezone policy D-05; containers D-17.
 - [ ] Single-user setup, the route list and the local server guard (session cookie, Host and Origin checks) exist before any data command (AP-01, AP-13, BR-ADMIN-01).
 - [ ] Audit stamps (BR-PARTY-07) and log masking (AP-03, D-30) in place.
@@ -47,36 +47,36 @@ Every tier1 rule and every policy lands in exactly one increment (the first that
 | I2 | BR-PARTY-01, BR-PARTY-02, BR-PARTY-03, BR-PARTY-04, BR-PARTY-05, BR-PARTY-06, BR-PARTY-08, BR-PARTY-09, BR-PARTY-10, BR-PARTY-11, BR-CONTACT-01, BR-CONTACT-02, BR-CONTACT-03, BR-CONTACT-04, BR-CONTACT-05 | AP-07 | D-07, D-15, D-16, D-39 |
 | I3 | BR-IMPORT-01, BR-IMPORT-02 | AP-09 | D-05, D-09, D-16, D-17, D-34, D-39, D-40 |
 | I4 | BR-ACTIVITY-01, BR-ACTIVITY-02, BR-ACTIVITY-03, BR-ACTIVITY-04, BR-ACTIVITY-05, BR-ACTIVITY-06, BR-ACTIVITY-07, BR-ACTIVITY-08, BR-ACTIVITY-09, BR-ACTIVITY-10, BR-ACTIVITY-11, BR-FILE-01, BR-FILE-02, BR-FILE-03, BR-TEMPLATE-01, BR-TEMPLATE-02, BR-INTEG-01 | AP-08 | D-14, D-17, D-21, D-29 |
-| I5 | BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-04, BR-SALES-05, BR-SALES-06, BR-SALES-07, BR-SALES-08, BR-SALES-09, BR-SALES-10, BR-SALES-11, BR-SALES-12, BR-SALES-13, BR-SALES-14, BR-SALES-15, BR-SALES-16, BR-SALES-17 | AP-04, AP-05, AP-06 | D-02, D-07, D-13, D-18, D-20, D-24 |
+| I5 | BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-05, BR-SALES-06, BR-SALES-07, BR-SALES-08, BR-SALES-09, BR-SALES-10, BR-SALES-11, BR-SALES-12, BR-SALES-13, BR-SALES-14, BR-SALES-15, BR-SALES-16, BR-SALES-17, BR-SALES-18 | AP-05, AP-06 | D-02, D-07, D-13, D-18, D-20, D-24 |
 | I6 | BR-INTEG-02, BR-INTEG-03 | AP-12 | D-14, D-36 |
 
 ## UI implementation
 
 | Screen/flow | Evidence readiness | Data/operations | States/errors/accessibility | Source trace | Acceptance test |
 |---|---|---|---|---|---|
-| UI-01 Welcome setup | behavior-ready | OP-ADMIN-01, OP-ADMIN-02 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/133-Welcome_Wizard.txt` | workflow test in 06 |
-| UI-02 Home | inventory-only | OP-ACTIVITY-08, OP-ACTIVITY-09, OP-ACTIVITY-05 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/10-Home.txt`, `objects/karbon_kontacts.fmp12/layouts/101-User_Home.txt` | design pass first (OD-06-01) |
-| UI-03 Parties | behavior-ready | OP-PARTY-05 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/47-Parties.txt`, `objects/karbon_kontacts.fmp12/layouts/40-Customers.txt` | workflow test in 06 |
-| UI-04 Party detail | behavior-ready | OP-PARTY-03, OP-PARTY-04, OP-PARTY-07, OP-PARTY-08, OP-PARTY-09, OP-PARTY-10, OP-CONTACT-01, OP-CONTACT-02, OP-CONTACT-03, OP-CONTACT-04, OP-ACTIVITY-08, OP-FILE-02 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/50-Party_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt` | workflow test in 06 |
-| UI-05 Create party | behavior-ready | OP-PARTY-11, OP-PARTY-05 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/124-Card_-_UtilityParty.txt` | workflow test in 06 |
-| UI-06 Pickers | behavior-ready | OP-PARTY-06, OP-INTEG-02 | loading/empty/error; typed errors; WCAG AA | `objects/Picker_Module.fmp12/layouts/1-Contact_Picker_-_No_Results_With_Selection.txt`, `objects/Picker_Module.fmp12/layouts/13-Contact_Picker_-_No_Results_No_Selection.txt` | workflow test in 06 |
-| UI-07 Activity detail | behavior-ready | OP-ACTIVITY-01, OP-ACTIVITY-02, OP-ACTIVITY-03, OP-ACTIVITY-04, OP-ACTIVITY-05 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/78-Card_-_Utility_Note.txt`, `objects/karbon_kontacts.fmp12/layouts/79-Note_Detail.txt` | workflow test in 06 |
-| UI-08 Email message | behavior-ready | OP-ACTIVITY-01, OP-ACTIVITY-02, OP-ACTIVITY-04, OP-INTEG-01, OP-TEMPLATE-01 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt`, `objects/karbon_kontacts.fmp12/layouts/106-Card_-_Utility_EmailMessage_-_Send.txt` | workflow test in 06 |
-| UI-09 Discussion | behavior-ready | OP-ACTIVITY-06, OP-ACTIVITY-07, OP-ACTIVITY-04 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/93-Discussion_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/187-Card_-_Manage_Subscribers.txt` | workflow test in 06 |
-| UI-10 Opportunities | behavior-ready | OP-SALES-03, OP-SALES-02 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/153-Opportunities.txt`, `objects/karbon_kontacts.fmp12/layouts/165-Opportunity_Find.txt` | workflow test in 06 |
-| UI-11 Opportunity detail | behavior-ready | OP-SALES-01, OP-SALES-02, OP-ACTIVITY-01 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/162-Opportunity_Detail_-_Card.txt` | workflow test in 06 |
-| UI-12 Invoice and sales receipt | behavior-ready | OP-SALES-04, OP-SALES-05, OP-SALES-06, OP-SALES-07, OP-SALES-08 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/69-Invoice.txt`, `objects/karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt` | workflow test in 06 |
-| UI-13 Sales and payments lists | inventory-only | OP-SALES-04, OP-SALES-09 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/84-Sales_List.txt`, `objects/karbon_kontacts.fmp12/layouts/126-Payments_List.txt` | design pass first (OD-06-01) |
-| UI-14 New payment | behavior-ready | OP-SALES-09 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/85-Card_-_New_Payment.txt` | workflow test in 06 |
-| UI-15 Items | inventory-only | OP-SALES-10 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/86-Items.txt`, `objects/karbon_kontacts.fmp12/layouts/135-Card_-_Items.txt` | design pass first (OD-06-01) |
-| UI-16 Templates | inventory-only | OP-TEMPLATE-01, OP-TEMPLATE-02 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/111-Templates.txt`, `objects/karbon_kontacts.fmp12/layouts/112-Template_Detail.txt` | design pass first (OD-06-01) |
-| UI-17 Settings | inventory-only | OP-ADMIN-03, OP-ADMIN-04 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/70-Admin_Dashboard.txt`, `objects/karbon_kontacts.fmp12/layouts/71-Admin_User_List.txt` | design pass first (OD-06-01) |
-| UI-18 Import | implementation-ready | OP-IMPORT-01, OP-IMPORT-02 | loading/empty/error; typed errors; WCAG AA | new | workflow test in 06 |
-| UI-19 Files | inventory-only | OP-FILE-01, OP-FILE-02, OP-FILE-03 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/142-Card_-_FilesList.txt`, `objects/karbon_kontacts.fmp12/layouts/185-Thumbnails.txt` | design pass first (OD-06-01) |
-| UI-20 Invoice PDF and charts | inventory-only | OP-SALES-04, OP-SALES-03, OP-SALES-11 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/103-SalesLine_pdf.txt`, `objects/karbon_charts.fmp12/layouts/25-SalesOpp_Chart.txt` | design pass first (OD-06-01) |
-| UI-21 Chat (static mock) | implementation-ready (static) | none: one template with sample data, no database access | populated only; banner "SMS is not available"; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt` | route test: page renders, no form posts |
+| UI-01 Welcome setup | behavior-ready | OP-ADMIN-01, OP-ADMIN-02 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/133-Welcome_Wizard.txt` | workflow test in 06 |
+| UI-02 Home | implementation-ready (design/) | OP-ACTIVITY-08, OP-ACTIVITY-09, OP-ACTIVITY-05 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/10-Home.txt`, `objects/karbon_kontacts.fmp12/layouts/101-User_Home.txt` | workflow test in 06; built from the design/ components |
+| UI-03 Parties | implementation-ready (design/) | OP-PARTY-05 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/47-Parties.txt`, `objects/karbon_kontacts.fmp12/layouts/40-Customers.txt` | workflow test in 06 |
+| UI-04 Party detail | implementation-ready (design/) | OP-PARTY-03, OP-PARTY-04, OP-PARTY-07, OP-PARTY-08, OP-PARTY-09, OP-PARTY-10, OP-CONTACT-01, OP-CONTACT-02, OP-CONTACT-03, OP-CONTACT-04, OP-ACTIVITY-08, OP-FILE-02 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/50-Party_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt` | workflow test in 06 |
+| UI-05 Create party | behavior-ready | OP-PARTY-11, OP-PARTY-05 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/124-Card_-_UtilityParty.txt` | workflow test in 06 |
+| UI-06 Pickers | behavior-ready | OP-PARTY-06, OP-INTEG-02 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/Picker_Module.fmp12/layouts/1-Contact_Picker_-_No_Results_With_Selection.txt`, `objects/Picker_Module.fmp12/layouts/13-Contact_Picker_-_No_Results_No_Selection.txt` | workflow test in 06 |
+| UI-07 Activity detail | implementation-ready (design/) | OP-ACTIVITY-01, OP-ACTIVITY-02, OP-ACTIVITY-03, OP-ACTIVITY-04, OP-ACTIVITY-05 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/78-Card_-_Utility_Note.txt`, `objects/karbon_kontacts.fmp12/layouts/79-Note_Detail.txt` | workflow test in 06 |
+| UI-08 Email message | behavior-ready | OP-ACTIVITY-01, OP-ACTIVITY-02, OP-ACTIVITY-04, OP-INTEG-01, OP-TEMPLATE-01 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt`, `objects/karbon_kontacts.fmp12/layouts/106-Card_-_Utility_EmailMessage_-_Send.txt` | workflow test in 06 |
+| UI-09 Discussion | implementation-ready (design/) | OP-ACTIVITY-06, OP-ACTIVITY-07, OP-ACTIVITY-04 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/93-Discussion_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/187-Card_-_Manage_Subscribers.txt` | workflow test in 06 |
+| UI-10 Opportunities | behavior-ready | OP-SALES-03, OP-SALES-02 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/153-Opportunities.txt`, `objects/karbon_kontacts.fmp12/layouts/165-Opportunity_Find.txt` | workflow test in 06 |
+| UI-11 Opportunity detail | behavior-ready | OP-SALES-01, OP-SALES-02, OP-ACTIVITY-01 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/162-Opportunity_Detail_-_Card.txt` | workflow test in 06 |
+| UI-12 Invoice and sales receipt | implementation-ready (design/) | OP-SALES-04, OP-SALES-05, OP-SALES-06, OP-SALES-07, OP-SALES-08 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/69-Invoice.txt`, `objects/karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt` | workflow test in 06 |
+| UI-13 Sales and payments lists | inventory-only | OP-SALES-04, OP-SALES-09 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/84-Sales_List.txt`, `objects/karbon_kontacts.fmp12/layouts/126-Payments_List.txt` | workflow test in 06; built from the design/ components |
+| UI-14 New payment | implementation-ready (design/) | OP-SALES-09 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/85-Card_-_New_Payment.txt` | workflow test in 06 |
+| UI-15 Items | inventory-only | OP-SALES-10 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/86-Items.txt`, `objects/karbon_kontacts.fmp12/layouts/135-Card_-_Items.txt` | workflow test in 06; built from the design/ components |
+| UI-16 Templates | inventory-only | OP-TEMPLATE-01, OP-TEMPLATE-02 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/111-Templates.txt`, `objects/karbon_kontacts.fmp12/layouts/112-Template_Detail.txt` | workflow test in 06; built from the design/ components |
+| UI-17 Settings | inventory-only | OP-ADMIN-03, OP-ADMIN-04 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/70-Admin_Dashboard.txt`, `objects/karbon_kontacts.fmp12/layouts/71-Admin_User_List.txt` | workflow test in 06; built from the design/ components |
+| UI-18 Import | implementation-ready | OP-IMPORT-01, OP-IMPORT-02 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | new | workflow test in 06 |
+| UI-19 Files | inventory-only | OP-FILE-01, OP-FILE-02, OP-FILE-03 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/142-Card_-_FilesList.txt`, `objects/karbon_kontacts.fmp12/layouts/185-Thumbnails.txt` | workflow test in 06; built from the design/ components |
+| UI-20 Invoice PDF and monthly sales summary | inventory-only | OP-SALES-04, OP-SALES-03, OP-SALES-11 | loading/empty/error; message on screen, empty state for not found (D-25); keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/103-SalesLine_pdf.txt`, `objects/karbon_charts.fmp12/layouts/25-SalesOpp_Chart.txt` | workflow test in 06; built from the design/ components |
+| UI-21 Chat (static mock) | implementation-ready (static) | none: one template with sample data, no database access | populated only; banner "SMS is not available"; keyboard and good contrast (D-38) | `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt` | route test: page renders, no form posts |
 
-Inventory-only screens are not scheduled as complete until a design pass or screenshots exist (OD-06-01).
+The visual design is design/ ("Carbon & Ember"; owner, 2026-10-28; OD-06-01). Screens it mocks up are implementation-ready; the others reuse its partials and components.
 
 ## Integration and reporting plan
 
@@ -88,7 +88,7 @@ Inventory-only screens are not scheduled as complete until a design pass or scre
 | EXT-04 QuickBooks Online (accounting) | none | stubbed, not implemented: no-op command returning NotImplemented | none | n/a | stubbed, not implemented (owner, D-02) |
 | EXT-05 Twilio SMS / chat | none | removed, not implemented | none | n/a | removed: out of scope (owner, 2026-10-28; OD-05-02) |
 | Monthly revenue view (BR-SALES-17) | internal | sales_summary_by_month | n/a | n/a | equals sum of posted lines |
-| Invoice/receipt PDF | local file | UI-20 | n/a | n/a | PDF totals equal the record |
+| Invoice PDF (the only print output; owner, 2026-10-28; D-38) | local file | UI-20 | n/a | n/a | PDF totals equal the record |
 
 No inbound endpoint exists (05).
 
@@ -96,7 +96,7 @@ No inbound endpoint exists (05).
 
 ### Extract and stage
 
-- [ ] The user exports every core table from FileMaker in the agreed format (OD-03-01; default: one UTF-8 CSV per base table with field names as headers, plus the external container folder `karbon_data/Container/`).
+- [ ] The user exports every core table from FileMaker as one UTF-8 CSV per base table with field names as headers (owner, 2026-10-28; OD-03-01), plus the external container folder `karbon_data/Container/`.
 - [ ] The importer records each file's name, size, SHA-256, row count and encoding in import_batch.
 - [ ] Stable source ids (UUID `Id` fields, serial ids of lookup tables) and relationship keys are exported unchanged.
 - [ ] Container files are inventoried with size and hash; missing or unreadable files are reported, not dropped.
@@ -109,13 +109,13 @@ No inbound endpoint exists (05).
 |---|---|---|---|---|---|
 | karbon_data base tables (57 kept) | 04 tables | snake_case names; columns per 04 appendix | empty text -> NULL; dates and timestamps to ISO 8601 local civil time (D-05); UTF-8 | bad type or duplicate key -> rejected row | source ids kept as primary keys |
 | ActivityMessage, Note, Meeting | activity, event | folded (D-15) | message joined by ActivityId | orphan message -> rejected | activity.id = ActivityMessage.ActivityId |
-| Container fields | file store + *_sha256 columns | copy file, hash, store (D-17) | missing file -> column NULL + report | reported | hash -> original file name in file row |
+| Container fields | app data folder + *_path columns | copy the file into the app data folder and store its path (owner, 2026-10-28; D-17) | missing file -> column NULL + report | reported | path -> original file name in file row |
 | Secret/PII columns | none | skipped (BR-IMPORT-02) | n/a | n/a | none |
-| Cached and summary values | recomputed | BR-PARTY-06, BR-SALES-02, BR-SALES-06 after load (D-39) | n/a | difference to the export logged | n/a |
+| Cached and summary values | recomputed | BR-PARTY-06, BR-SALES-02, BR-SALES-06 after load; line amounts = qty x unit price (BR-SALES-01) (owner, 2026-10-28; D-39, D-18) | n/a | difference to the export logged | n/a |
 | user rows | user | the chosen "me" row becomes the local user (BR-ADMIN-04) | n/a | none | kept |
 
 - Load order: reference tables (country, phone_format, activity_type, activity_party_role, party_role_type, contact_method_purpose_type, external_link_type, opportunity_status, entity_type, activity_purpose_type) -> party -> person, organization -> contact_method -> address, phone, network_address, contact_method_purpose -> party_role -> customer, vendor, employee, lead -> party_relation -> user, system_setting -> item -> activity and subtypes -> activity_party (+ email, event) -> discussion, activity_comment, notification -> opportunity -> sales_transaction -> invoice, sales_receipt, sales_line -> payment, payment_line -> file, file_attachment -> template, merge_field_config, merge_field.
-- Foreign-key cycles (for example party <-> system_setting.owner_id, user <-> party): load with `PRAGMA defer_foreign_keys = ON` inside the import transaction; check `PRAGMA foreign_key_check` before commit; orphans become rejected rows.
+- Foreign keys are enforced from day one (owner, 2026-10-28; OD-04-01). Cycles (for example party <-> system_setting.owner_id, user <-> party) load with `PRAGMA defer_foreign_keys = ON` inside the import transaction; `PRAGMA foreign_key_check` runs before commit; orphans become rejected rows.
 - Serial counters (lookup ids, template ids) continue from the source maximum: the next id is MAX(id) + 1.
 - The import is one transaction per run into a new database file, so a failed or cancelled run leaves nothing (repeatable, D-34).
 
@@ -128,7 +128,7 @@ No inbound endpoint exists (05).
 | Stable-value hashes | hash of sorted id lists per table | same hash | exact | import report |
 | Candidate-key duplicates and orphans | profile (D-16) | foreign_key_check | all rejected rows explained | import report |
 | Containers: count/bytes/hashes | export folder inventory | file store | exact | import report |
-| Encoding/decimal/timezone edge cases | fixtures: non-ASCII names, 7-dp unit price rounded to cents, half-cent amounts, midnight timestamps | same values; money as integer cents (OD-04-02) | exact; rounded unit prices listed | cargo test |
+| Encoding/decimal/timezone edge cases | fixtures: non-ASCII names, 7-dp unit price rounded to cents, half-cent amounts, midnight timestamps | same values; money as integer cents (OD-04-02); line amounts recomputed | exact; rounded unit prices and changed line amounts listed | cargo test |
 | Ownership/authorization attributes | creation/modification user ids | kept | exact | import report |
 | Business totals | invoice totals, balances, retainer balance per customer in FileMaker | recomputed values in integer cents | exact to the cent; differences listed | import report |
 | Rejected/changed rows | n/a | import_rejected_row | every row has a reason | import report |
@@ -137,7 +137,7 @@ No inbound endpoint exists (05).
 ## Test strategy
 
 - Semantic fixtures for each tier1 rule (07 "Semantic tests" column), built from the object files and non-secret sample data, run as cargo tests against an in-memory SQLite.
-- Unit tests for the money rules (BR-SALES-01, 02, 06, 07) on integer cents (OD-04-02), including the half-cent rounding of the unit price and of the import conversion.
+- Unit tests for the money rules (BR-SALES-01, 02, 06, 07, 18) on integer cents (OD-04-02), including half-cent rounding of line amounts and tax and of the import conversion. The demo seed is a fixture: loading it reproduces every balance shown in design/.
 - Integration tests: transaction rollback on a failing second write (D-08), idempotent retries, SMTP against a local test server.
 - Authorization tests T-08-01..T-08-14 through HTTP to the local server.
 - Route tests in Rust for every page and fragment: call the axum router in process against an in-memory database, then check the status, `HX-*` headers and the HTML (scraper crate: fields, labels, error messages, totals). WebDriver smoke tests on Linux through tauri-driver; macOS manual checklist (R-03).
@@ -235,26 +235,67 @@ Kept as data: activity.chat_ind, activity_type 9 (SMS) and phone.sms_ind, so imp
 | UI stack | Server-rendered HTML for simplicity, no React or TypeScript: Rust + axum serves askama templates; htmx for interaction; Alpine.js only for small client-side bits; Tailwind + DaisyUI; Chart.js; rusqlite with plain SQL (no ORM); Tauri 2 wraps the local server in a desktop window. Single user on one computer: the local server listens on 127.0.0.1 only; no LAN sharing (owner change, 2026-10-28). The SMS chat screen stays as a static mock (UI-21). OD-05-01 closed. | 02, 03, 05, 06, 07, 08 |
 | Tax ids (organization.federal_tax_id_number, vendor.tax_id) | Plain TEXT, no encryption, masking or extra access rule; this is a demo. Closes the security-review question on them (D-09). | 01, 04, 07 BR-IMPORT-02, 08 |
 
+## Owner answers (2026-10-28)
+
+The owner answered the remaining questions ("it is a demo: keep everything simple"). Each is recorded in 01 as "Answered by the owner, 2026-10-28".
+
+| Topic | Answer | Ids | Where recorded |
+|---|---|---|---|
+| Scope and cleanup | Time tracking is out of scope. Every object with no caller or user, every live link to a deleted target and the custom menus are dropped. Data-source bindings, plugins and outside starters (server schedules, Data API, OData) do not carry over. Custom functions are rewritten once in Rust; UI globals are screen state. Per-object notes are settled while building. | D-03, D-10, D-11, D-12, D-13, D-22, D-23, D-24, D-28, D-33 | 01, 06, 07 |
+| Data | Keep schema 04; foreign keys are constraints from day one; repeating fields become child rows; attachments are copied into the app data folder and the table stores the path; hard-coded ids become seed rows plus Rust enums; a constant default beats an auto-enter calculation; every record is imported with its stamps and caches are recomputed; import is one CSV per table and a nice-to-have. | D-15, D-16, D-17, D-19, D-27, D-39, OD-03-01, OD-04-01, OD-04-03 | 04, 04 appendix, 04_demo_seed.sql, 07 BR-IMPORT-01 |
+| Business rules | Build what a buggy script clearly intends and note the bug. Money is integer cents; line amount = qty x unit price; totals from lines. One tax rate in settings, editable per invoice. Saving a posted transaction is refused. Retainer balance counts posted transactions only. Apply Retainer adds a credit line. No hard party delete. Client-only rules are enforced in Rust; the book-close date is dropped. Templates use fixed placeholders. AlertInd becomes task.completed_at. US phone formatting. | D-07, D-18, D-20, D-21, D-29, OD-07-01 .. OD-07-07 | 07, 05, 08, 04 |
+| App behavior | Errors show as a message; not found shows an empty state. Always-hidden objects are dropped; there is no Find mode. A local log file and stamps, no audit trail. Keys in the keychain, no card data, no passcode or encryption. Desktop only, macOS first. Invoice PDF only; the monthly summary is a screen; full keyboard use and good contrast. The design is design/. Unsigned demo builds. | D-09, D-25, D-26, D-30, D-37, D-38, OD-02-02, OD-06-01, OD-08-01 | 02, 05, 06, 08 |
+
+Changes the answers forced in the plan:
+
+- **Book-close lock removed:** BR-SALES-04 and AP-04 are kept as "removed" rows; the column system_setting.book_close_date and its negative test are removed.
+- **Apply Retainer rebuilt:** new rule BR-SALES-18 and command OP-SALES-12 `retainer_apply` (I5); script kontacts 223 is now "keep".
+- **Archive instead of delete:** OP-PARTY-04 is `party_archive` (`POST /parties/{id}/archive`).
+- **New columns:** system_setting.tax_rate_bp and sales_transaction.tax_rate_bp (OD-07-06); task.completed_at replaces task.completed_ind; activity.alert_ind is dropped (D-29); *_path replaces *_sha256 (D-17).
+- **Foreign keys (04 FK pass):** 9 needs-profile foreign keys enforced; 6 primary-key references that pointed from a parent at its subtype removed (with foreign keys on, they made every activity, party, party role, contact method, activity party and sales transaction insert fail); 4 references on columns that hold ids of several tables or a list removed; merge_field_config dropped (D-21).
+
+Still open from 01: D-14 for the integrations other than Twilio, which is removed (SMTP stays; SmartyStreets, Google Places and FullContact stay optional, off by default, as the 2026-10-27 default says), D-31 (Party_Merge_Utility, no DDR) and D-32 (Karbon.fmp12 launcher, no DDR). None blocks the demo.
+
+## Demo seed data (owner, 2026-10-28; OD-03-01)
+
+The demo runs on invented data, not on an import. `04_demo_seed.sql` (next to 04) applies after the schema on an empty database, with foreign keys on:
+
+```bash
+sqlite3 demo.db < migration/04_database_schema.sql && sqlite3 demo.db < migration/04_demo_seed.sql
+```
+
+| Content | Rows | Matches design/ |
+|---|---|---|
+| Reference seeds: activity_type 1-10, activity_party_role 50-65, opportunity_status 1-8, entity_type 10-14, party_role_type 2 and 4, contact_method_purpose_type 1-3 (BR-ADMIN-02) | 44 | the source ids |
+| Ellison Studio (the owner organization), Mara Ellison (user and employee), settings with tax 5.5% (550 bp) | 1 settings row | invoice.html header, index.html greeting |
+| 14 customers (12 organizations, 2 people; Marigold Events inactive), contact people, phones, emails, the Halden & Pryce billing address | 14 customers | customers.html: every row, status and balance |
+| Items: SVC-WORKSHOP, SVC-SURVEY, SVC-HOURLY, PRD-PRINT-A1 (taxable), SVC-DESIGN, Retainer | 6 | invoice.html lines |
+| 16 posted sales transactions with lines and payments: Halden & Pryce's 6 (INV-1027, RET-0042, INV-1035, SR-0311, INV-1042, INV-1048), one open invoice for each of 7 other customers, 3 retainer deposits | 16 | balance due $29,619.05; overdue $4,457.40 at 3 customers (oldest 41 days); retainers $4,450.00 at 4 customers; INV-1048 balance $2,057.15 |
+| 7 opportunities | 7 | customer.html tab (pipeline $24,500.00) and the index.html list |
+| Halden & Pryce activities: the lighting discussion with comments, the "Send revised fit-out quote" task due today, the phase 2 walkthrough meeting, the INV-1048 email; 4 file rows | 4 activities | customer.html activity and files |
+
+Checked on 2026-10-28: the seed loads with foreign keys on, `PRAGMA foreign_key_check` is empty, and queries reproduce every number above. Differences from design/ are listed at the top of the file: an applied retainer is a negative "Retainer" line, so total_amt is after the credit; dashboard aggregates are illustrative and not reproduced; customers.html says "across 9 customers" while its rows show 8; ids are readable keys instead of UUIDs. The chat screen is a static mock (UI-21) and needs no rows.
+
 ## Risk and decision register
 
 | ID | Risk/open decision | Evidence | Likelihood/impact | Mitigation/proof | Owner/status |
 |---|---|---|---|---|---|
-| OD-02-02 | Code signing and notarization: Apple Developer ID for macOS; Linux package formats (AppImage, .deb, .rpm) and the update channel. | D-36 | medium | decide before the increment that needs it | Product owner / open |
-| OD-04-01 | needs-profile foreign keys (15 in the core schema) are enforced only after the import profile passes; decide whether to add them as constraints for new installs with no import. | D-16 | medium | decide before the increment that needs it | Tech lead / open |
+| OD-02-02 | Code signing and notarization: Apple Developer ID for macOS; Linux package formats (AppImage, .deb, .rpm) and the update channel. **Decided (owner, 2026-10-28):** unsigned builds for the demo. | D-36 | n/a | n/a | Owner / closed |
+| OD-04-01 | needs-profile foreign keys (15 in the core schema) are enforced only after the import profile passes; decide whether to add them as constraints for new installs with no import. **Decided (owner, 2026-10-28):** keep schema 04; enforce foreign keys as constraints from day one (04 FK pass). | D-16 | n/a | n/a | Owner / closed |
 | OD-04-02 | Money storage. **Decided (owner, 2026-10-28):** integer minor units. Every money column is an INTEGER of cents; arithmetic in Rust on integers; conversion only at the UI and import edges (04, BR-SALES-01, BR-IMPORT-01). | D-18 | n/a | 22 money columns in 04 | Owner / closed |
-| OD-04-03 | Repeating fields, if any reach the core tables, become child rows or JSON. | D-27 | medium | decide before the increment that needs it | Tech lead / open |
+| OD-04-03 | Repeating fields, if any reach the core tables, become child rows or JSON. **Decided (owner, 2026-10-28):** repeating fields become child rows (karbon_data has none). | D-27 | n/a | n/a | Owner / closed |
 | OD-05-01 | Typed bindings for a TypeScript frontend. **Closed (owner, 2026-10-28):** no TypeScript; templates are Rust (askama), so there is nothing to generate. | D-36 | n/a | n/a | Owner / closed |
 | OD-05-02 | SMS/chat without a server. **Decided (owner, 2026-10-28):** dropped, out of scope; it cannot work in the desktop client without a server. Removed like QuickBooks (section above). | D-14 | n/a | removed from 04-08 | Owner / closed |
-| OD-06-01 | Visual design and density: no screenshots exist; every inventory-only screen needs a design pass or screenshots. | D-37 | medium | decide before the increment that needs it | Product owner / open |
-| OD-07-01 | Hard party delete: the DDR cascades it to contact methods, relations, roles and the person/organization row; decide what happens to the uncascaded activity parties, attachments, opportunities and sales transactions (corrected by audit A-01, 09). | D-12 | medium | decide before the increment that needs it | Domain expert / open |
-| OD-07-02 | Phone formatting outside the US: the country-code prefix is a TODO in the source. | D-19 | medium | decide before the increment that needs it | Domain expert / open |
-| OD-07-03 | Which merge_field_config resolvers are in use in real exports (script names, fields). | D-21 | medium | decide before the increment that needs it | Domain expert / open |
-| OD-07-04 | Apply Retainer (kontacts 223) calls a deleted kontroller script (328): rebuild, or drop the button. | D-12 | medium | decide before the increment that needs it | Accounting owner / open |
-| OD-07-05 | Saving a posted invoice or sales receipt: refuse (default) or unpost, save and repost as the source API does (BR-SALES-08; audit A-15, 09). | D-18 | high | decide before I5 | Accounting owner / open |
-| OD-07-06 | How total_tax is computed with QBO out; default: entered and kept as imported (BR-SALES-02; audit A-11, 09). | D-18 | high | decide before I5 | Accounting owner / open |
-| OD-07-07 | Retainer balance: locked transactions only (default) or all transactions (BR-SALES-06; audit A-14, 09). | D-18 | medium | decide before I5 | Accounting owner / open |
-| OD-08-01 | Optional app passcode or encrypted database (SQLCipher) for a shared or unencrypted machine. | D-04 | medium | decide before the increment that needs it | Product owner / open |
-| OD-03-01 | FileMaker export format for the import: one CSV/XLSX per table with field names in the header (default), or FileMaker XML (FMPXMLRESULT); and how container files are exported. | D-34 | medium | decide before the increment that needs it | Operator / open |
+| OD-06-01 | Visual design and density: no screenshots exist; every inventory-only screen needs a design pass or screenshots. **Decided (owner, 2026-10-28):** the visual design is design/ ("Carbon & Ember"). | D-37 | n/a | n/a | Owner / closed |
+| OD-07-01 | Hard party delete: the DDR cascades it to contact methods, relations, roles and the person/organization row; decide what happens to the uncascaded activity parties, attachments, opportunities and sales transactions (corrected by audit A-01, 09). **Decided (owner, 2026-10-28):** no hard party delete; archive only (BR-PARTY-01). | D-12 | n/a | n/a | Owner / closed |
+| OD-07-02 | Phone formatting outside the US: the country-code prefix is a TODO in the source. **Decided (owner, 2026-10-28):** US phone formatting; other numbers stored as typed (BR-CONTACT-04). | D-19 | n/a | n/a | Owner / closed |
+| OD-07-03 | Which merge_field_config resolvers are in use in real exports (script names, fields). **Decided (owner, 2026-10-28):** fixed {{field}} placeholders; no script, Set Field By Name or Evaluate (BR-TEMPLATE-01). | D-21 | n/a | n/a | Owner / closed |
+| OD-07-04 | Apply Retainer (kontacts 223) calls a deleted kontroller script (328): rebuild, or drop the button. **Decided (owner, 2026-10-28):** Apply Retainer rebuilt as a "Retainer applied" credit line (BR-SALES-18, OP-SALES-12). | D-12 | n/a | n/a | Owner / closed |
+| OD-07-05 | Saving a posted invoice or sales receipt: refuse (default) or unpost, save and repost as the source API does (BR-SALES-08; audit A-15, 09). **Decided (owner, 2026-10-28):** saving a posted invoice or sales receipt is refused; unpost first (BR-SALES-05). | D-18 | n/a | n/a | Owner / closed |
+| OD-07-06 | How total_tax is computed with QBO out; default: entered and kept as imported (BR-SALES-02; audit A-11, 09). **Decided (owner, 2026-10-28):** one tax rate in settings, applied to taxable lines, editable per invoice (BR-SALES-02). | D-18 | n/a | n/a | Owner / closed |
+| OD-07-07 | Retainer balance: locked transactions only (default) or all transactions (BR-SALES-06; audit A-14, 09). **Decided (owner, 2026-10-28):** retainer balance counts posted transactions only (BR-SALES-06). | D-18 | n/a | n/a | Owner / closed |
+| OD-08-01 | Optional app passcode or encrypted database (SQLCipher) for a shared or unencrypted machine. **Decided (owner, 2026-10-28):** no passcode and no database encryption (AP-11). | D-04 | n/a | n/a | Owner / closed |
+| OD-03-01 | FileMaker export format for the import: one CSV/XLSX per table with field names in the header (default), or FileMaker XML (FMPXMLRESULT); and how container files are exported. **Decided (owner, 2026-10-28):** one CSV per table; import is a nice-to-have; the demo runs on 04_demo_seed.sql. | D-34 | n/a | n/a | Owner / closed |
 | R-01..R-08 | technical risks | 02 | see 02 | spikes S-01..S-05 | Tech lead / open |
 
 ## Completion gate
@@ -262,6 +303,6 @@ Kept as data: activity.chat_ind, activity_type 9 (SMS) and phone.sms_ind, so imp
 - [x] `catalog_contract.py verify` passes for every explorer.
 - [x] Every logic-bearing catalog has a disposition (07, 06, 04 appendices).
 - [x] Every source security dimension has an enforcement owner and negative test (08).
-- [ ] Every relationship predicate and target key is resolved or explicitly open (open: OD-04-01).
+- [x] Every relationship predicate and target key is resolved: foreign keys enforced from day one (OD-04-01, 04 FK pass).
 - [ ] Data validation beyond counts with all rejects explained: needs a real export (R-04).
 - [ ] Rollback, restore and import rehearsal evidence recorded: after I3.

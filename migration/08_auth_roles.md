@@ -27,7 +27,7 @@ One user per install, data local to the machine, no remote server (D-04, D-35, D
 
 | Source privilege set/rule | Target role/capability | Permission boundary | Explicit denies | Source evidence | Approval owner |
 |---|---|---|---|---|---|
-| [Full Access] | ROLE-OWNER: every command of 05 | the commands behind the registered routes (AP-01) | AP-04, AP-05, AP-07, AP-08 still refuse | `objects/karbon_data.fmp12/privilege-sets/1-Full_Access.txt` | Product owner |
+| [Full Access] | ROLE-OWNER: every command of 05 | the commands behind the registered routes (AP-01) | AP-05, AP-07, AP-08 still refuse | `objects/karbon_data.fmp12/privilege-sets/1-Full_Access.txt` | Product owner |
 | [Data Entry Only], [Read-Only Access] | none | n/a | n/a | built-in, held by no active account | n/a |
 | Bot | none | n/a | n/a | `objects/karbon_tester.fmp12/privilege-sets/4-Bot.txt` | n/a |
 
@@ -37,10 +37,10 @@ ROLE-OWNER may run every command; the conditions below are the only denials. Ful
 
 | Entity/domain | Role | Create | View/query | Edit | Delete | Bulk/export/admin | Enforcement owner |
 |---|---|---|---|---|---|---|---|
-| PARTY | ROLE-OWNER | allow | allow (deleted parties hidden) | allow | conditional: hard delete needs confirmation (AP-07) | none | Rust commands |
+| PARTY | ROLE-OWNER | allow | allow (archived parties hidden) | allow | archive only: no hard delete (owner, 2026-10-28; OD-07-01) | none | Rust commands |
 | CONTACT | ROLE-OWNER | allow | allow | allow | conditional (AP-07) | none | Rust commands |
 | ACTIVITY | ROLE-OWNER | allow | allow | conditional: sent email read-only (AP-08) | conditional (AP-07) | none | Rust commands |
-| SALES | ROLE-OWNER | allow | allow | conditional: not locked, not on/before book close (AP-04, AP-05); payments only via payment_save (AP-06) | conditional: AP-04, AP-05, AP-07 | no bulk delete (menus removed Delete All Records) | Rust commands |
+| SALES | ROLE-OWNER | allow | allow | conditional: not locked (AP-05); payments only via payment_save (AP-06) | conditional: AP-05, AP-07 | no bulk delete (menus removed Delete All Records) | Rust commands |
 | FILE | ROLE-OWNER | conditional: 20 MB, dialog paths only (AP-09) | allow | n/a | detach only | none | Rust commands |
 | TEMPLATE | ROLE-OWNER | allow | allow | allow | allow | none | Rust commands |
 | ADMIN | ROLE-OWNER | setup once | allow (secrets masked, AP-03) | allow | none | reference seed on fresh DB only | Rust commands |
@@ -51,7 +51,7 @@ ROLE-OWNER may run every command; the conditions below are the only denials. Ful
 
 | Policy id | Entity/operation | Exact source predicate | Target predicate and fields | Null/edge semantics | Enforcement owner | Tests |
 |---|---|---|---|---|---|---|
-| AP-04 | sales_transaction unlock/edit/delete | `Selected_SalesTransaction::date ≤ System::BookCloseDate` (`objects/karbon_kontacts.fmp12/scripts/335-btn_Unlock_Sales_Transaction_Id.txt` step 9; `objects/karbon_kontroller.fmp12/scripts/461-Delete_a_SalesTransaction_From_QBO_data.txt` step 68) | sales_transaction.date <= system_setting.book_close_date -> refuse | empty book_close_date -> no lock | Rust | T-08-04 |
+| AP-04 | removed (owner, 2026-10-28; D-20) | `objects/karbon_kontacts.fmp12/scripts/335-btn_Unlock_Sales_Transaction_Id.txt` step 9 (source check, not migrated) | none: no book-close date | n/a | n/a | none |
 | AP-05 | sales_transaction edit/delete | `SalesTransaction::LockedInd` (`objects/karbon_kontroller.fmp12/scripts/560-Delete_SalesTransaction_SalesTransactionId.txt` steps 55-56; the qbo_id check of steps 50-51 is removed with QBO, D-02) | locked_ind = 1 -> refuse | locked_ind empty = unlocked | Rust | T-08-05 |
 | AP-08 | email message edit/send | already sent (`objects/karbon_kontroller.fmp12/scripts/522-Edit_EmailMessage_data.txt` steps 123-125) | email message sent flag set -> refuse | n/a | Rust | T-08-08 |
 
@@ -73,7 +73,7 @@ Every 05 command is allowed to ROLE-OWNER through its registered route (AP-01, A
 
 | Route/page/channel | Source layout/extended privilege | Allowed | Underlying rules | Direct-access test |
 |---|---|---|---|---|
-| All page and fragment routes (06 UI-01..UI-21, routes in 05) | layouts of kontacts, Picker | ROLE-OWNER from the app window (AP-13) | command rules | a hand-made request with the session cookie still hits AP-04..AP-08 in the command |
+| All page and fragment routes (06 UI-01..UI-21, routes in 05) | layouts of kontacts, Picker | ROLE-OWNER from the app window (AP-13) | command rules | a hand-made request with the session cookie still hits AP-05..AP-08 in the command |
 | fmapp, fmwebdirect, fmxml, fmrest, fmphp, fmxdbc, fmurlscript, fmreauthenticate10, fmextscriptaccess | `objects/*/extended-privileges/` | none | no remote server (D-36) | loopback listener only (AP-10, AP-13) |
 
 ## UI visibility and exceptions
@@ -114,14 +114,14 @@ Hide rules gate no sensitive data in the core layouts (the explorers found none 
 | AP-01 | Command-only data access | The page receives HTML only and has no SQL, file-system or shell access. Only the commands of 07, called by the registered axum routes of 05, read or write SQLite; each route parses a typed form and each command runs its own transaction. | all commands | router lists exactly the 05 routes (unknown path 404); no Tauri IPC permission and no sql/fs/shell plugin is granted to the window | T-08-01 |
 | AP-02 | Default-deny capabilities and network | The window gets no Tauri IPC permission at all: native dialogs and the keychain are used from Rust only. Outbound network calls happen only in Rust, only to the SMTP host and the integration hosts the user enabled. | OP-INTEG-01..03 | capability file; Rust HTTP client with a host allowlist | T-08-02 |
 | AP-03 | Secrets never reach the UI or SQLite | SMTP passwords and API keys are written to the OS keychain by OP-ADMIN-03 and read only inside Rust commands; the settings page renders a has_secret flag, never the value, and a secret field is write-only. | OP-ADMIN-03, OP-INTEG-01..03 | keychain crate; templates have no secret field to render | T-08-03 |
-| AP-04 | Book-close lock | Commands that unlock, change or delete a sales transaction refuse when its date <= system_setting.book_close_date (BR-SALES-04). | OP-SALES-04..08 | command precondition | T-08-04 |
+| AP-04 | Removed: book-close lock | Removed (owner, 2026-10-28; D-20): there is no book-close date, so no command refuses a transaction for its date (BR-SALES-04 removed). | none | none | none |
 | AP-05 | Posted transactions are immutable | A locked transaction (locked_ind = 1) cannot be changed or deleted (BR-SALES-05). | OP-SALES-04, 05, 07, 08 | command precondition | T-08-05 |
 | AP-06 | Payments only through payment_save | Payment and payment-line rows are written only by OP-SALES-09, which checks BR-SALES-09; replaces the $$allow_commit commit guard. | OP-SALES-09 | no other command writes payment tables | T-08-06 |
-| AP-07 | Destructive actions need confirmation | Hard party delete, transaction delete, activity discard, relation delete and contact-method delete require confirm = true; without it the command returns ConfirmationRequired and the route renders a confirmation dialog with a summary of what would be deleted. | OP-PARTY-04, OP-PARTY-09, OP-CONTACT-04, OP-ACTIVITY-03, OP-SALES-07, OP-SALES-08 | two-step command (05 Confirmations) | T-08-07 |
+| AP-07 | Destructive actions need confirmation | Transaction delete, activity discard, relation delete and contact-method delete require confirm = true; without it the command returns ConfirmationRequired and the route renders a confirmation dialog with a summary of what would be deleted. | OP-PARTY-09, OP-CONTACT-04, OP-ACTIVITY-03, OP-SALES-07, OP-SALES-08 | two-step command (05 Confirmations) | T-08-07 |
 | AP-08 | Sent email is read-only | An email message marked sent cannot be edited or re-sent (BR-ACTIVITY-08). | OP-ACTIVITY-02, OP-INTEG-01 | command precondition | T-08-08 |
 | AP-09 | File access is scoped | Stored files live only in the app data directory. file_add takes an uploaded multipart body, never a path. The import folder is chosen in a native dialog that the server opens in the desktop process; the route gets back a handle, not a path. No route takes a free path or URL from the page except the enrichment photo download (BR-FILE-01 limits apply). | OP-FILE-01, OP-IMPORT-01 | upload body or dialog handle only; canonicalize and check prefix | T-08-09 |
 | AP-10 | No remote command entry | The app registers no URL scheme handler and no IPC listener that runs commands (the fmp:// Commander script is not migrated). Its only listener is the axum server on 127.0.0.1 (AP-13); nothing listens on another interface. | none | no deep-link plugin; loopback bind address only | T-08-10 |
-| AP-11 | Optional app lock | Open: an optional passcode or encrypted database (OD-08-01). Default: none; the OS account protects the data. | app start | OD-08-01 | T-08-11 |
+| AP-11 | No app lock | No passcode and no database encryption (owner, 2026-10-28; OD-08-01): the OS account protects the data. No card data is stored; SMTP and optional API keys are in the system keychain (AP-03; D-09). | app start | none | T-08-11 |
 | AP-13 | Local server accepts only the app window | The server binds 127.0.0.1 on a random free port. At start the window opens `/session/{one-time token}`, which sets an HttpOnly, SameSite=Strict session cookie and redirects. Every route needs that cookie; the `Host` header must be `127.0.0.1:<port>` (DNS rebinding); a non-GET request needs a matching `Origin`. Another local process or a web page in a browser gets 401 or 403. | all routes | axum middleware; the token is random per launch and works once | T-08-14 |
 | AP-12 | Integrations off by default | Each optional integration is enabled by the user in settings, with its key stored by AP-03; a disabled integration makes no network call. | OP-INTEG-02, OP-INTEG-03 | settings flag checked in the command | T-08-12 |
 
@@ -132,14 +132,13 @@ Hide rules gate no sensitive data in the core layouts (the explorers found none 
 | T-08-01 | page script | request an unregistered route, or call Tauri IPC or the SQL plugin | 404; IPC not available to the window | HTTP, IPC | AP-01 |
 | T-08-02 | command | HTTP call to a host not enabled | refused, logged | Rust HTTP client | AP-02 |
 | T-08-03 | page | open the settings page | no secret value in the HTML | template | AP-03 |
-| T-08-04 | ROLE-OWNER | unlock a transaction dated on the close date | BookClosed error | command | AP-04 |
 | T-08-05 | ROLE-OWNER | edit or delete a locked transaction | Locked error | command | AP-05 |
 | T-08-06 | ROLE-OWNER | write payment rows through invoice_save | not possible: no field accepted | command input schema | AP-06 |
-| T-08-07 | ROLE-OWNER | hard delete without confirm | ConfirmationRequired | command | AP-07 |
+| T-08-07 | ROLE-OWNER | delete a sales transaction without confirm; try to delete a party for good | ConfirmationRequired; no such route (404): parties are only archived | command, HTTP | AP-07 |
 | T-08-08 | ROLE-OWNER | edit a sent email | AlreadySent error | command | AP-08 |
 | T-08-09 | page | file_add or import with a path in the form instead of an upload or dialog handle | refused | route | AP-09 |
 | T-08-10 | other process | open an fmp:// or custom URL; connect to the app port from another computer | nothing handles it; connection refused (loopback bind) | OS, socket | AP-10 |
-| T-08-11 | n/a | app lock (if OD-08-01 adopts it) | locked until passcode | app start | AP-11 |
+| T-08-11 | n/a | start the app | opens without a passcode; the database is plain SQLite in the app data folder | app start | AP-11 |
 | T-08-12 | ROLE-OWNER | address suggestion with the integration disabled | no network call | command | AP-12 |
 | T-08-13 | import | export containing SSN/card columns | columns absent after import | import | BR-IMPORT-02 |
 | T-08-14 | other local process / web page | request a route without the session cookie, with a foreign `Host`, or a POST with a foreign `Origin` | 401 / 403; nothing changes | HTTP middleware | AP-13 |
@@ -148,15 +147,15 @@ Hide rules gate no sensitive data in the core layouts (the explorers found none 
 
 | ID | Missing/conflicting evidence | Security impact | Required proof/owner | Status |
 |---|---|---|---|---|
-| OD-08-01 | Optional app passcode or encrypted database (SQLCipher) for a shared or unencrypted machine. | data at rest on a shared machine | Product owner | open |
+| OD-08-01 | Optional app passcode or encrypted database (SQLCipher). **Decided:** no passcode, no encryption (AP-11). | data at rest protected only by the OS account | Owner | closed (owner, 2026-10-28) |
 
 ## Completion gate
 
 - [x] Every privilege-set dimension maps to target enforcement (built-in sets only; ROLE-OWNER or retired).
 - [x] Every extended privilege has a retirement decision (no server).
-- [x] Every request defaults deny outside the registered routes and the session check (AP-01, AP-13), with conditional rules AP-04..AP-08.
+- [x] Every request defaults deny outside the registered routes and the session check (AP-01, AP-13), with conditional rules AP-05..AP-08.
 - [x] Field restrictions (secrets) are enforced before serialization (AP-03).
-- [x] Record predicates reference real target columns (sales_transaction.date, sales_transaction.locked_ind, system_setting.book_close_date).
+- [x] Record predicates reference real target columns (sales_transaction.locked_ind, the customer and invoice columns used by AP-05 and AP-06).
 - [x] Hide/CF rules are secondary UI evidence only.
 - [x] Identity provisioning covers the single user, retired accounts and the absence of service principals.
 - [x] Negative tests go through HTTP to the local server, not only the UI.

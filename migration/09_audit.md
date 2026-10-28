@@ -12,8 +12,8 @@ Labels follow the skill: **fact** (from an object file), **inference**, **produc
 | Graph rows (`meaning`, `fk_candidate`) | 30 sampled, **2 wrong (6.7%)**. A full re-derivation of all 683 relationships found about 8 wrong rows. None feeds a foreign key in 04. 4 cells fixed. |
 | Layout rows (hide rules, conditional formats) | 30 lines sampled, **0 wrong (0%)**. Line counts match the objects on all 382 layouts. |
 | Script `callers` cells | 30 sampled (15 from the panes that shared the overwritten `callers.json`), **1 wrong (3.3%)**, and not from those panes. A sweep of all 309 `none found` cells found 2 more with a live caller. 3 cells and 2 appendix rows fixed. |
-| Gaps the plan still does not understand | **56 listed** (59 at the audit; OD-04-02, OD-05-01 and OD-05-02 were closed by owner decisions on 2026-10-28): 30 unanswered D- questions, 13 open OD- decisions (3 new from this audit), 13 object gap groups (G-01 to G-13). |
-| Blocks the plan? | Nothing blocks I1, I2 or I4. **I5 (sales) should not start** until the Accounting owner confirms or replaces the defaults of OD-07-05, OD-07-06 and OD-07-07. The I3 recompute of retainer balances also waits on OD-07-07. See "What should block". |
+| Gaps the plan still does not understand | **5 listed after the owner answers of 2026-10-28** (59 at the audit): D-14 for the integrations other than Twilio, D-31, D-32, G-11, and G-12 as accepted. Every OD is closed. See "Status after the owner answers". |
+| Blocks the plan? | **Nothing blocks.** At the audit, I5 waited on OD-07-05, OD-07-06 and OD-07-07; the owner decided all three on 2026-10-28, and Apply Retainer is rebuilt (BR-SALES-18). See "What should block". |
 
 ## Method
 
@@ -173,17 +173,34 @@ The catalogs mark 86 targets `unresolved` (tables 7, layouts 28, value lists 6, 
 
 Gap count: 30 + 13 + 13 = **56** (59 at the audit, before the 2026-10-28 owner decisions). The 488 rows sum as 1 + 15 + 17 + 85 + 74 + 38 + 74 + 184.
 
+## Status after the owner answers (2026-10-28)
+
+The owner answered 27 D- questions and closed every open OD (03 "Owner answers (2026-10-28)"). The audit text above is kept as it was found; this table says where each gap stands now.
+
+| Gap | Status | How |
+|---|---|---|
+| 30 unanswered D- questions (3a) | 3 left | answered: D-03, D-07, D-09, D-10..D-13, D-15..D-30 (D-14 for Twilio only), D-33, D-37..D-39. Left: D-14 for SMTP, SmartyStreets, Google Places and FullContact (the 2026-10-27 default stands: SMTP kept, the others optional and off by default), D-31, D-32 |
+| 13 open OD- decisions (3b) | 0 left | OD-02-02, OD-03-01, OD-04-01, OD-04-03, OD-06-01, OD-07-01..OD-07-07 and OD-08-01 decided (owner, 2026-10-28) |
+| G-01 Apply Retainer | resolved | rebuilt simply: BR-SALES-18, OP-SALES-12 (OD-07-04) |
+| G-02 live objects calling deleted scripts | resolved | dropped (D-12); custom menus dropped (D-28) |
+| G-03 karbon_reports / SumaryByMonth | resolved | moot (D-13); the monthly summary is a query and a screen (BR-SALES-17, D-38) |
+| G-04 time tracking | resolved | out of scope (D-03) |
+| G-05, G-07, G-10 deleted fields, empty slots, unresolved layouts | resolved | dropped (D-11, D-12) |
+| G-06 transaction plumbing | resolved | replaced by one SQLite transaction per command (D-08) |
+| G-08 dynamic calls and merge resolvers | resolved | fixed placeholders, no Perform Script by name or Evaluate (D-21, OD-07-03) |
+| G-09 extended privileges | resolved | moot: no outside starter (D-10) |
+| G-11 Party_Merge_Utility | open | D-31: no DDR; no merge command is planned |
+| G-12 out-of-scope files | accepted | not migrated (D-01, D-02, D-03) |
+| G-13 PostSalesTransactions gate | resolved | moot: no gate (D-24) |
+
+Remaining gaps: **5** (D-14 in part, D-31, D-32, G-11; G-12 accepted).
+
 ## What should block
 
-- **I5 (opportunities and sales) waits on OD-07-05 and OD-07-06**, and on OD-07-07 for its tests. Each default changes what the source did with money:
-  - OD-07-05: no automatic repost on save.
-  - OD-07-06: no computed tax.
-  - OD-07-07: one of two disagreeing balance sums.
+Nothing blocks the plan after the owner answers of 2026-10-28.
 
-  These are tier1 rules, and the Accounting owner has not answered D-18.
-- **The I3 recompute** (BR-IMPORT-01 recomputes retainer balances) gives different numbers under the two OD-07-07 options. Decide it before the first real import is accepted.
-- **OD-07-04 / G-01 (Apply Retainer)** cannot be rebuilt from the DDR. Either the owner describes the behavior, or UI-12 ships without the button. It does not block I1-I4.
-- Nothing found here blocks I1, I2, I4 or I6. Those gaps all have recorded defaults the operator can accept.
+- The I5 blockers found here (OD-07-05, OD-07-06, OD-07-07) and the I3 retainer recompute are decided: a posted transaction cannot be saved, one tax rate applies, and the retainer balance counts posted transactions only.
+- Apply Retainer (G-01) is rebuilt from the owner's description (BR-SALES-18), not from the DDR; its tests are the owner's examples.
 - Not a blocker, but a risk: 28% of tier1 rules were wrong, and the tier2 and tier3 rules have not had a second reader. The sales and party tier2 rules (BR-SALES-10, -15, -16, BR-PARTY-02, -06, -10) rest on the same API-script patterns.
 
 ## Changes made by this audit

@@ -8,13 +8,13 @@
 --   source data profile: none yet. Each install profiles its own export at import time (D-16, D-05)
 --   target database/version: SQLite 3.45+ through rusqlite (bundled), WAL mode, PRAGMA foreign_keys = ON
 --   timezone/DST decision: D-05 (local civil time of the user's machine, stored as ISO 8601 text, no offset)
---   unresolved blockers: OD-04-01 (needs-profile foreign keys), OD-04-03 (repeating fields). OD-04-02 (money storage) is
+--   unresolved blockers: none. OD-04-01 (foreign keys), OD-04-02 (money storage) and OD-04-03 (repeating fields) are
 --     decided (owner, 2026-10-28).
 --
 -- Conventions (product decisions, 2026-10-27; owner decisions 2026-10-28):
 --   * Names: snake_case of the FileMaker name (SKILL.md rule). Source names are kept in the appendix register.
 --   * Types: Text -> TEXT, Number -> NUMERIC (money -> INTEGER cents, below), Date/Time/TimeStamp -> TEXT (ISO 8601),
---     Container -> TEXT holding the
+--     Container -> TEXT holding the path of a file copied into the app data folder (owner, 2026-10-28; D-17); formerly the
 --     SHA-256 of a file stored in the app data directory (D-17).
 --   * Money (owner decision, 2026-10-28; OD-04-02): every money column is an INTEGER of cents (minor units, USD).
 --     Arithmetic is in Rust on integers (i64); SQL SUM() over these columns is exact. Values are converted only at the
@@ -27,7 +27,14 @@
 --     until the import profile of an install proves it (D-27, D-16). Only primary keys are NOT NULL.
 --   * Primary keys: the UUID or serial key fields the table explorer proved (auto-enter UUID or serial, parent side of
 --     Equal predicates). 1:1 subtype tables use the parent key (D-15).
---   * Foreign keys: only relationships with fk_candidate = yes. needs-profile ones stay commented (OD-04-01).
+--   * Foreign keys: enforced as constraints from day one (owner, 2026-10-28; OD-04-01): the fk_candidate = yes relationships plus 9
+--     needs-profile ones. A pass on 2026-10-28 removed 6 primary-key references that pointed from a parent at its subtype
+--     (activity -> call, activity_party -> activity_party_email, contact_method -> phone, party -> person, party_role -> lead,
+--     sales_transaction -> sales_receipt), which made every parent insert fail, and 4 references on columns that hold ids of
+--     several tables or a list. The import rejects a row whose parent is missing (BR-IMPORT-01).
+--   * Repeating fields become child rows (owner, 2026-10-28; OD-04-03). The karbon_data tables have none (no maxRepetition > 1).
+--   * A field with both a constant default and an auto-enter calculation takes the constant (owner, 2026-10-28; D-27).
+--   * Hard-coded ids are seed rows plus Rust enums with the same ids (owner, 2026-10-28; D-19). Demo data: 04_demo_seed.sql.
 --     ON DELETE is NO ACTION: deletes go through commands that remove children explicitly (07, D-08).
 --   * Single user, no tenant column (D-35).
 --   * QuickBooks Online is out of scope (owner, 2026-10-27; D-02): the karbon_LedgerLink mirror tables are not migrated and
@@ -91,7 +98,7 @@ CREATE TABLE value_list_item (
 -- Source: objects/karbon_data.fmp12/tables/142-Activity.txt, objects/karbon_data.fmp12/tables/143-ActivityMessage.txt, objects/karbon_data.fmp12/tables/149-Note.txt
 -- Role (table explorer): entity; key: id
 CREATE TABLE activity (
-  id TEXT PRIMARY KEY NOT NULL REFERENCES call(id), -- #1 primary key: UUID auto-enter
+  id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter; no reference to call: the subtype points at this table, not the reverse (FK pass, owner, 2026-10-28; OD-04-01)
   date_display TEXT, -- #56 ISO date YYYY-MM-DD
   time_display TEXT, -- #76 HH:MM:SS
   subject TEXT, -- #22
@@ -101,7 +108,6 @@ CREATE TABLE activity (
   note_ind NUMERIC, -- #73
   activity_purpose_id TEXT REFERENCES activity_purpose(id), -- #99
   activity_type_id NUMERIC REFERENCES activity_type(id), -- #100
-  alert_ind NUMERIC, -- #107
   task_ind NUMERIC, -- #171
   comment_ind NUMERIC, -- #178
   creation_account_name TEXT, -- #180
@@ -111,7 +117,7 @@ CREATE TABLE activity (
   activity_group_id TEXT REFERENCES activity_group(id), -- #191
   creation_user_id TEXT, -- #193
   modification_user_id TEXT, -- #194
-  template_id NUMERIC, -- #195; FK -> template(id) waits on OD-04-01 (needs-profile)
+  template_id NUMERIC REFERENCES template(id), -- #195; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
   creator_cached TEXT, -- #197
   parties_cached TEXT, -- #198
   call_ind NUMERIC, -- #201
@@ -148,8 +154,8 @@ CREATE TABLE activity_entity (
   modification_account_name TEXT, -- #13
   modification_timestamp TEXT, -- #14 local civil time YYYY-MM-DD HH:MM:SS (D-05)
   activity_id TEXT REFERENCES activity(id), -- #15
-  entity_type_id TEXT, -- #16; FK -> entity_type(id) waits on OD-04-01 (needs-profile)
-  entity_id TEXT REFERENCES activity(id) -- #17
+  entity_type_id NUMERIC REFERENCES entity_type(id), -- #16; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
+  entity_id TEXT -- #17; not a foreign key: holds the id of the linked entity (entity_type_id says which) (FK pass, owner, 2026-10-28)
 );
 
 -- Source: objects/karbon_data.fmp12/tables/155-ActivityGroup.txt
@@ -171,7 +177,7 @@ CREATE TABLE activity_party (
   activity_id TEXT REFERENCES activity(id), -- #6
   party_id TEXT REFERENCES party(id), -- #7
   party_name_cached TEXT, -- #13
-  id TEXT PRIMARY KEY NOT NULL REFERENCES activity_party_email(id), -- #23 primary key: UUID auto-enter
+  id TEXT PRIMARY KEY NOT NULL, -- #23 primary key: UUID auto-enter; no reference to activity_party_email: the subtype points at this table, not the reverse (FK pass, owner, 2026-10-28; OD-04-01)
   activity_party_role_id NUMERIC REFERENCES activity_party_role(id), -- #24
   contact_method_id TEXT, -- #28
   party_initials TEXT, -- #29
@@ -206,7 +212,7 @@ CREATE TABLE activity_party_event (
 -- Role (table explorer): lookup; key: id
 CREATE TABLE activity_party_role (
   name TEXT, -- #8
-  activity_type_ids TEXT REFERENCES activity_type(id), -- #9
+  activity_type_ids TEXT, -- #9; not a foreign key: holds a list of activity type ids (FK pass, owner, 2026-10-28)
   description TEXT, -- #10
   creation_account_name TEXT, -- #12
   creation_timestamp TEXT, -- #13 local civil time YYYY-MM-DD HH:MM:SS (D-05)
@@ -293,7 +299,7 @@ CREATE TABLE call (
 -- Source: objects/karbon_data.fmp12/tables/132-ContactMethod.txt
 -- Role (table explorer): entity; key: id
 CREATE TABLE contact_method (
-  id TEXT PRIMARY KEY NOT NULL REFERENCES phone(id), -- #1 primary key: UUID auto-enter
+  id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter; no reference to phone: the subtype points at this table, not the reverse (FK pass, owner, 2026-10-28; OD-04-01)
   phone_ind NUMERIC, -- #8
   address_ind NUMERIC, -- #9
   network_address_ind NUMERIC, -- #10
@@ -320,7 +326,7 @@ CREATE TABLE contact_method_purpose (
   creation_timestamp TEXT, -- #36 local civil time YYYY-MM-DD HH:MM:SS (D-05)
   modification_account_name TEXT, -- #37
   modification_timestamp TEXT, -- #39 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  contact_method_purpose_type_id NUMERIC, -- #47; FK -> contact_method_purpose_type(id) waits on OD-04-01 (needs-profile)
+  contact_method_purpose_type_id NUMERIC REFERENCES contact_method_purpose_type(id), -- #47; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
   creation_user_id TEXT, -- #50
   modification_user_id TEXT -- #51
 );
@@ -372,13 +378,13 @@ CREATE TABLE customer (
   resale_num TEXT, -- #47
   sales_term_ref TEXT, -- #40
   taxable NUMERIC, -- #31
-  billing_email_ids_cached TEXT, -- #51; FK -> network_address(id) waits on OD-04-01 (needs-profile)
-  billing_address_ids_cached TEXT, -- #53; FK -> address(id) waits on OD-04-01 (needs-profile)
+  billing_email_ids_cached TEXT, -- #51; list of network_address ids (a cache), not a foreign key (owner, 2026-10-28; OD-04-01)
+  billing_address_ids_cached TEXT, -- #53; list of address ids (a cache), not a foreign key (owner, 2026-10-28; OD-04-01)
   retainer_balance_cached INTEGER, -- #55; money: integer cents (OD-04-02, owner 2026-10-28)
   retainer_adjustment INTEGER, -- #56; money: integer cents (OD-04-02, owner 2026-10-28)
   creation_user_id TEXT, -- #58
   modification_user_id TEXT, -- #59
-  shipping_address_ids_cached TEXT, -- #60; FK -> address(id) waits on OD-04-01 (needs-profile)
+  shipping_address_ids_cached TEXT, -- #60; list of address ids (a cache), not a foreign key (owner, 2026-10-28; OD-04-01)
   tax_exempt_reason_id NUMERIC -- #61
 );
 
@@ -424,7 +430,7 @@ CREATE TABLE employee (
   estimated_hourly_cost INTEGER, -- #38; money: integer cents (OD-04-02, owner 2026-10-28)
   default_hourly_rate INTEGER, -- #39; money: integer cents (OD-04-02, owner 2026-10-28)
   type TEXT, -- #45
-  avatar_sha256 TEXT, -- #46 content hash of a file in the app data directory (D-17); stored calculation, maintained by the command layer (07)
+  avatar_path TEXT, -- #46 path of the copied file, relative to the app data folder (owner, 2026-10-28; D-17); stored calculation, maintained by the command layer (07)
   employee_number NUMERIC, -- #48
   billable_time NUMERIC, -- #49
   creation_user_id TEXT, -- #52
@@ -467,12 +473,12 @@ CREATE TABLE event (
 -- Role (table explorer): join; key: id
 CREATE TABLE external_link (
   id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter
-  internal_id TEXT REFERENCES party_role(id), -- #2
+  internal_id TEXT, -- #2; not a foreign key: holds the id of the linked record of any type (FK pass, owner, 2026-10-28)
   creation_account_name TEXT, -- #3
   creation_timestamp TEXT, -- #4 local civil time YYYY-MM-DD HH:MM:SS (D-05)
   modification_account_name TEXT, -- #5
   modification_timestamp TEXT, -- #7 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  external_link_type_id NUMERIC, -- #9; FK -> external_link_type(id) waits on OD-04-01 (needs-profile)
+  external_link_type_id NUMERIC REFERENCES external_link_type(id), -- #9; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
   external_id TEXT, -- #10
   creation_user_id TEXT, -- #19
   modification_user_id TEXT -- #20
@@ -508,8 +514,8 @@ CREATE TABLE file (
   category TEXT, -- #11
   tag TEXT, -- #12
   thumbnail_temp_download_uri TEXT, -- #16
-  container_sha256 TEXT, -- #17 content hash of a file in the app data directory (D-17)
-  thumbnail_sha256 TEXT, -- #24 content hash of a file in the app data directory (D-17)
+  container_path TEXT, -- #17 path of the copied file, relative to the app data folder (owner, 2026-10-28; D-17)
+  thumbnail_path TEXT, -- #24 path of the copied file, relative to the app data folder (owner, 2026-10-28; D-17)
   file_size NUMERIC, -- #27
   extension TEXT -- #30
 );
@@ -523,7 +529,7 @@ CREATE TABLE file_attachment (
   modification_timestamp TEXT, -- #4 local civil time YYYY-MM-DD HH:MM:SS (D-05); FM validation: not empty (enforced in the command layer, D-27)
   modified_by TEXT, -- #5 FM validation: not empty (enforced in the command layer, D-27)
   entity_type TEXT, -- #6
-  entity_id TEXT REFERENCES sales_transaction(id), -- #7
+  entity_id TEXT, -- #7; not a foreign key: holds the id of a party, sales transaction or opportunity (entity_type_id says which) (FK pass, owner, 2026-10-28)
   attachment_id TEXT REFERENCES file(id), -- #8
   include_on_send NUMERIC, -- #9
   entity_type_id NUMERIC -- #14
@@ -586,7 +592,7 @@ CREATE TABLE lead (
 -- Role (table explorer): entity; key: id
 CREATE TABLE merge_field (
   id NUMERIC PRIMARY KEY NOT NULL, -- #19 primary key: serial
-  template_id NUMERIC, -- #41; FK -> template(id) waits on OD-04-01 (needs-profile)
+  template_id NUMERIC REFERENCES template(id), -- #41; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
   required_ind NUMERIC, -- #44
   creation_account_name TEXT, -- #50
   creation_timestamp TEXT, -- #51 local civil time YYYY-MM-DD HH:MM:SS (D-05)
@@ -594,36 +600,13 @@ CREATE TABLE merge_field (
   modification_account_name TEXT, -- #53
   modification_timestamp TEXT, -- #55 local civil time YYYY-MM-DD HH:MM:SS (D-05)
   modification_user_id TEXT, -- #56
-  name TEXT, -- #58; FK -> merge_field_config(id) waits on OD-04-01 (needs-profile)
+  name TEXT, -- #58; placeholder name from the fixed list in Rust (owner, 2026-10-28; D-21); merge_field_config is not migrated
   activity_party_role_id TEXT, -- #60
   override_ind NUMERIC, -- #61
   value TEXT, -- #62
   activity_id TEXT -- #63
 );
 
--- Source: objects/karbon_data.fmp12/tables/189-MergeFieldConfig.txt
--- Role (table explorer): lookup; key: id
-CREATE TABLE merge_field_config (
-  id NUMERIC PRIMARY KEY NOT NULL, -- #19 primary key: serial
-  acitivity_role_type_id TEXT, -- #22
-  name TEXT, -- #31
-  activity_type_id TEXT, -- #46
-  foreign_field_name TEXT, -- #51
-  foreign_table_occurrence_name TEXT, -- #52
-  db_transactions_field_name TEXT, -- #53
-  modification_user_id TEXT, -- #55
-  modification_timestamp TEXT, -- #56 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  modification_account_name TEXT, -- #58
-  creation_user_id TEXT, -- #59
-  creation_timestamp TEXT, -- #60 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  creation_account_name TEXT, -- #61
-  script_name TEXT, -- #63
-  db_transactions_field_value TEXT, -- #64
-  resolve_script_ind NUMERIC, -- #65
-  resolve_field_reference_ind NUMERIC, -- #66
-  resolve_activity_party_ind NUMERIC, -- #67
-  activity_party_pluck TEXT -- #68
-);
 
 -- Source: objects/karbon_data.fmp12/tables/135-NetworkAddress.txt
 -- Role (table explorer): entity; key: id
@@ -651,7 +634,7 @@ CREATE TABLE notification (
   modification_timestamp TEXT, -- #14 local civil time YYYY-MM-DD HH:MM:SS (D-05)
   read_ind NUMERIC, -- #15
   sent_ind NUMERIC, -- #18
-  entity_id TEXT, -- #20; FK -> discussion(id) waits on OD-04-01 (needs-profile)
+  entity_id TEXT, -- #20; not a foreign key: holds the id of the notified entity of any type (owner, 2026-10-28; OD-04-01)
   date TEXT, -- #21 ISO date YYYY-MM-DD
   description TEXT, -- #23
   entity_type_id NUMERIC, -- #24
@@ -677,7 +660,7 @@ CREATE TABLE opportunity (
   start_date TEXT, -- #57 ISO date YYYY-MM-DD
   end_date TEXT, -- #58 ISO date YYYY-MM-DD
   active_ind NUMERIC, -- #59
-  lead_id TEXT, -- #60; FK -> lead(id) waits on OD-04-01 (needs-profile)
+  lead_id TEXT REFERENCES lead(id), -- #60; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
   opportunity_status_id NUMERIC REFERENCES opportunity_status(id), -- #61
   type_display TEXT, -- #62 stored calculation, maintained by the command layer (07)
   party_name_cached TEXT, -- #64
@@ -718,10 +701,10 @@ CREATE TABLE organization (
 CREATE TABLE party (
   comments TEXT, -- #44
   deleted_ind NUMERIC, -- #62
-  id TEXT PRIMARY KEY NOT NULL REFERENCES person(id), -- #1 primary key: UUID auto-enter
+  id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter; no reference to person: the subtype points at this table, not the reverse (FK pass, owner, 2026-10-28; OD-04-01)
   name_cached TEXT, -- #19
   organization_ind NUMERIC, -- #18
-  photo_sha256 TEXT, -- #32 content hash of a file in the app data directory (D-17)
+  photo_path TEXT, -- #32 path of the copied file, relative to the app data folder (owner, 2026-10-28; D-17)
   deleted_reason TEXT, -- #103
   creation_account_name TEXT, -- #105
   creation_timestamp TEXT, -- #106 local civil time YYYY-MM-DD HH:MM:SS (D-05)
@@ -768,7 +751,7 @@ CREATE TABLE party_relation (
 -- Source: objects/karbon_data.fmp12/tables/151-PartyRole.txt
 -- Role (table explorer): join; key: id
 CREATE TABLE party_role (
-  id TEXT PRIMARY KEY NOT NULL REFERENCES lead(id), -- #16 primary key: UUID auto-enter
+  id TEXT PRIMARY KEY NOT NULL, -- #16 primary key: UUID auto-enter; no reference to lead: the subtype points at this table, not the reverse (FK pass, owner, 2026-10-28; OD-04-01)
   from_date TEXT, -- #20 ISO date YYYY-MM-DD
   thru_date TEXT, -- #21 ISO date YYYY-MM-DD
   current_ind NUMERIC, -- #22
@@ -778,7 +761,7 @@ CREATE TABLE party_role (
   employee_ind NUMERIC, -- #43
   vendor_ind NUMERIC, -- #44
   party_id TEXT REFERENCES party(id), -- #45
-  party_role_type_id NUMERIC, -- #46; FK -> party_role_type(id) waits on OD-04-01 (needs-profile)
+  party_role_type_id NUMERIC REFERENCES party_role_type(id), -- #46; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
   lead_ind NUMERIC, -- #49
   creation_user_id TEXT, -- #50
   modification_user_id TEXT -- #51
@@ -795,7 +778,7 @@ CREATE TABLE party_role_type (
 -- Role (table explorer): entity; key: id
 CREATE TABLE payment (
   id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter, unique validation; FM validation: not empty (enforced in the command layer, D-27)
-  id_customer TEXT, -- #2; FK -> customer(id) waits on OD-04-01 (needs-profile)
+  id_customer TEXT REFERENCES customer(id), -- #2; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
   date TEXT, -- #3 ISO date YYYY-MM-DD
   amount INTEGER, -- #4; money: integer cents (OD-04-02, owner 2026-10-28)
   id_deposit_account TEXT, -- #5
@@ -904,11 +887,11 @@ CREATE TABLE sales_receipt (
 -- Source: objects/karbon_data.fmp12/tables/177-SalesTransaction.txt
 -- Role (table explorer): entity; key: id
 CREATE TABLE sales_transaction (
-  id TEXT PRIMARY KEY NOT NULL REFERENCES sales_receipt(id), -- #1 primary key: UUID auto-enter, unique validation; FM validation: not empty (enforced in the command layer, D-27)
+  id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter, unique validation; FM validation: not empty (enforced in the command layer, D-27); no reference to sales_receipt: the subtype points at this table, not the reverse (FK pass, owner, 2026-10-28; OD-04-01)
   doc_number TEXT, -- #4
   date TEXT, -- #5 ISO date YYYY-MM-DD
   private_note TEXT, -- #6
-  id_customer TEXT, -- #7; FK -> customer(id) waits on OD-04-01 (needs-profile)
+  id_customer TEXT REFERENCES customer(id), -- #7; foreign key enforced from day one (owner, 2026-10-28; OD-04-01)
   bill_address_line_1 TEXT, -- #8
   bill_address_line_2 TEXT, -- #9
   bill_address_city TEXT, -- #10
@@ -920,6 +903,7 @@ CREATE TABLE sales_transaction (
   balance INTEGER, -- #26; money: integer cents (OD-04-02, owner 2026-10-28)
   customer_memo TEXT, -- #27
   bill_email_address TEXT, -- #29
+  tax_rate_bp INTEGER, -- new: tax rate of this transaction in basis points, copied from system_setting and editable per invoice (owner, 2026-10-28; OD-07-06)
   total_tax INTEGER, -- #30; money: integer cents (OD-04-02, owner 2026-10-28)
   id_tax_code TEXT, -- #31
   deleted NUMERIC, -- #32
@@ -977,10 +961,10 @@ CREATE TABLE system_setting (
   authentication_method TEXT, -- #59
   creation_user_id TEXT, -- #60
   modification_user_id TEXT, -- #61
-  book_close_date TEXT, -- #62 ISO date YYYY-MM-DD
+  tax_rate_bp INTEGER, -- new: the one sales tax rate in basis points (550 = 5.5%), applied to taxable lines (owner, 2026-10-28; OD-07-06)
   default_email_signature_template TEXT, -- #63
   initial_setup_done_ind NUMERIC, -- #65
-  logo_sha256 TEXT, -- #67 content hash of a file in the app data directory (D-17)
+  logo_path TEXT, -- #67 path of the copied file, relative to the app data folder (owner, 2026-10-28; D-17)
   system_email_sender TEXT, -- #72
   ms_graph_tennent_id TEXT -- #73
 );
@@ -992,10 +976,9 @@ CREATE TABLE task (
   from_cached TEXT, -- #23
   to_cached TEXT, -- #24
   due_date TEXT, -- #25 ISO date YYYY-MM-DD
-  completion_timestamp TEXT, -- #26 local civil time YYYY-MM-DD HH:MM:SS (D-05)
+  completed_at TEXT, -- #26 local civil time YYYY-MM-DD HH:MM:SS (D-05); NULL = open task; replaces completed_ind and activity.alert_ind (owner, 2026-10-28; D-29)
   completed_by_cached TEXT, -- #27
   due_time TEXT, -- #28 HH:MM:SS
-  completed_ind NUMERIC, -- #29
   priority TEXT -- #30
 );
 
@@ -1102,7 +1085,7 @@ CREATE INDEX ix_file_attachment_attachment_id ON file_attachment (attachment_id)
 CREATE INDEX ix_file_attachment_entity_id ON file_attachment (entity_id); -- join sales_transaction.id (yes; objects/karbon_data.fmp12/relationships/82-FileAttachment_SalesTransaction.txt)
 CREATE INDEX ix_invoice_id ON invoice (id); -- join sales_transaction.id (yes; objects/karbon_kontroller.fmp12/relationships/168-Invoice_SalesTransaction.txt)
 CREATE INDEX ix_lead_id ON lead (id); -- join party_role.id (yes; objects/karbon_data.fmp12/relationships/39-Lead_PartyRole.txt)
-CREATE INDEX ix_merge_field_name ON merge_field (name); -- join merge_field_config.id (needs-profile; objects/karbon_kontacts.fmp12/relationships/126-Template_TemplateMergeField_Template_TemplateMergeField_Merg.txt)
+CREATE INDEX ix_merge_field_name ON merge_field (name); -- placeholder lookup; merge_field_config is not migrated (D-21; was objects/karbon_kontacts.fmp12/relationships/126-Template_TemplateMergeField_Template_TemplateMergeField_Merg.txt)
 CREATE INDEX ix_merge_field_template_id ON merge_field (template_id); -- join template.id (needs-profile; objects/karbon_data.fmp12/relationships/72-MergeField_Template.txt)
 CREATE INDEX ix_network_address_id ON network_address (id); -- join contact_method.id (yes; objects/karbon_kontroller.fmp12/relationships/39-ContactMethod_byPartyId_NetworkAddress_ContactMethod_byParty.txt)
 CREATE INDEX ix_notification_entity_id ON notification (entity_id); -- join discussion.id (needs-profile; objects/karbon_kontacts.fmp12/relationships/101-User_Notification_PartyId_Discussion_User_Notification_Party.txt)
