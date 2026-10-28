@@ -137,7 +137,7 @@ OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were de
 
 | Id | Decision | Affects |
 |---|---|---|
-| OD-02-02 | Code signing, Linux packages, update channel | 02, I6 |
+| OD-02-02 | Code signing (macOS, Windows), Linux packages, update channel | 02, I6 |
 | OD-03-01 | FileMaker export format and container export | I3, BR-IMPORT-01 |
 | OD-04-01 | needs-profile foreign keys as constraints | 04 (15 FKs), I3 |
 | OD-04-03 | Repeating fields | 04 |

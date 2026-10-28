@@ -1,6 +1,6 @@
 # Technology and Architecture Recommendation
 
-The owner fixed the platform: a downloadable desktop app for macOS and Linux, Tauri with SQLite, one user per install, local data, no remote server (D-06, D-36; answered 2026-10-27); macOS first, Linux later, and unsigned builds for the demo (owner, 2026-10-28; D-37, OD-02-02). The visual design is design/ ("Carbon & Ember", OD-06-01). On 2026-10-28 the owner also fixed the UI stack: server-rendered HTML, for simplicity, with no React or TypeScript. This file checks those choices against the decision matrix and confirms the choices made in 04 (SQLite dialect) and 05 (axum routes that return HTML).
+The owner fixed the platform: a downloadable desktop app, Tauri with SQLite, one user per install, local data, no remote server (D-06, D-36; answered 2026-10-27), on all three desktop platforms, macOS, Windows and Linux, from one Tauri codebase, with unsigned builds for the demo (owner, 2026-10-28; D-37, OD-02-02). The visual design is design/ ("Carbon & Ember", OD-06-01). On 2026-10-28 the owner also fixed the UI stack: server-rendered HTML, for simplicity, with no React or TypeScript. This file checks those choices against the decision matrix and confirms the choices made in 04 (SQLite dialect) and 05 (axum routes that return HTML).
 
 ## Decision basis
 
@@ -10,13 +10,13 @@ No stakeholder weights were given, so the candidates are ranked by hard gates, t
 |---|---|---|---|---|
 | Existing repository compatibility | n/a | no target repository exists (D-36) | n/a | n/a |
 | Owner-fixed stack | hard gate | D-36; owner, 2026-10-28 (UI stack) | pass | fail (not the chosen stack) |
-| macOS (first) and Linux (later) downloadable app, offline, local data | hard gate | D-06, D-37 (owner, 2026-10-28) | pass: native bundles (.app/.dmg, AppImage/.deb/.rpm), system webview, all assets embedded in the binary | pass |
+| macOS, Windows and Linux downloadable app, offline, local data | hard gate | D-06, D-37 (owner, 2026-10-28) | pass: one codebase, native bundles (.app/.dmg, .msi/NSIS .exe, AppImage/.deb/.rpm), system webview, all assets embedded in the binary | pass |
 | Single user, no remote server | hard gate | D-35, D-36 | pass: embedded SQLite; the HTTP server runs inside the app process on 127.0.0.1 | pass |
 | Team/delivery fit | unweighted | team unknown (D-36) | one language (Rust) for logic, routes and templates; HTML with htmx attributes; no JavaScript build | JavaScript/TypeScript for the whole Electron app |
 | Authorization coverage | unweighted | 08 AP-01..AP-13 | strong: the page gets HTML only; every write goes through a Rust handler; the window has no Tauri IPC permission | weaker: Node integration must be locked down by hand |
-| Client/offline/accessibility needs | unweighted | D-37, D-38 | system webview (WebKit on macOS and Linux); semantic HTML with DaisyUI components | bundled Chromium: one engine on both platforms |
+| Client/offline/accessibility needs | unweighted | D-37, D-38 | system webview (WKWebView on macOS, WebView2 on Windows, WebKitGTK on Linux); semantic HTML with DaisyUI components | bundled Chromium: one engine on all three platforms |
 | Data/reporting/integration needs | unweighted | 04 (57 tables), 07 (money rules), EXT-01..03 | rusqlite with plain SQL (money as i64 cents, OD-04-02) + lettre (SMTP) + keyring; Chart.js for charts | better-sqlite3 + decimal.js + nodemailer + keytar |
-| Deployment/operations/compliance | unweighted | OD-02-02 | small installers (system webview); unsigned macOS builds for the demo (owner, 2026-10-28); signing only for a real release | larger installers (~100 MB+) |
+| Deployment/operations/compliance | unweighted | OD-02-02 | small installers (system webview); unsigned builds on all three platforms for the demo (owner, 2026-10-28); signing only for a real release | larger installers (~100 MB+) |
 | Reversal/migration cost | unweighted | owner decision 2026-10-28 | templates and routes are Rust; the command layer does not depend on them | n/a |
 
 ## Recommendation
@@ -25,7 +25,7 @@ Confirms 04 (SQLite dialect, D-36) and 05 (axum routes returning HTML, owner dec
 
 | Layer | Primary | Alternative | Rationale / tradeoff |
 |---|---|---|---|
-| Architecture/deployment unit | one Tauri 2 app per platform: macOS universal binary first, Linux AppImage and .deb later (owner, 2026-10-28; D-37). At start it runs an axum server on 127.0.0.1 (random free port) inside the same process and opens one window on it | Electron app | owner choice; one process, loopback only, no network surface |
+| Architecture/deployment unit | one Tauri 2 codebase built for each platform: macOS universal binary (.app/.dmg), Windows x64 (.msi and NSIS .exe; WebView2 bootstrapper), Linux AppImage and .deb (owner, 2026-10-28; D-37). At start it runs an axum server on 127.0.0.1 (random free port) inside the same process and opens one window on it | Electron app | owner choice; one process, loopback only, no network surface |
 | Runtime/framework | Rust (stable): axum on tokio; one module per domain (PARTY, CONTACT, ACTIVITY, SALES, FILE, TEMPLATE, ADMIN, INTEG, IMPORT) with `commands/<domain>.rs` (the rules, 07) and `routes/<domain>.rs` (the handlers, 05) | Node.js main process | type-safe handlers and commands, single writer to SQLite |
 | UI/rendering/client | **Server-rendered HTML** (owner, 2026-10-28): askama templates compiled into the binary; htmx for interaction (requests return HTML fragments that htmx swaps in); Alpine.js only for small client-side bits (open/close, tabs, a confirm toggle); Tailwind CSS + DaisyUI for styling; Chart.js for charts. No React, no TypeScript, no JavaScript build step | none | see "UI stack" below |
 | Database/data access | SQLite through rusqlite (bundled) with plain SQL, no ORM; WAL, foreign_keys on; refinery migrations | tauri-plugin-sql | the plugin would give the page SQL access, which AP-01 forbids |
@@ -35,10 +35,10 @@ Confirms 04 (SQLite dialect, D-36) and 05 (axum routes returning HTML, owner dec
 | Static assets | htmx, Alpine.js, Chart.js and the built Tailwind/DaisyUI CSS are vendored at pinned versions and embedded in the binary; no CDN | CDN links | the app works offline |
 | Authentication/identity provider | none; single local user on one computer (D-04); the local server listens on 127.0.0.1 only and is protected by a per-launch session cookie (AP-13); optional passcode (OD-08-01) | OS login only | owner answer |
 | Hosting/compliance | none; data stays on the machine (D-36); keys in the OS keychain (D-09) | n/a | no PCI data stored (D-09) |
-| Document/PDF generation | invoice askama template (the only print output, owner, 2026-10-28; D-38) printed to PDF by the webview, or `printpdf` in Rust (spike S-02) | headless Chromium | WebKitGTK print support varies on Linux |
+| Document/PDF generation | invoice askama template (the only print output, owner, 2026-10-28; D-38) printed to PDF by the webview, or `printpdf` in Rust (spike S-02) | headless Chromium | print support differs between the three webviews (WebKitGTK on Linux most of all) |
 | Integrations and secrets | lettre (SMTP), reqwest with rustls (HTTPS), keyring crate (Keychain / Secret Service) | nodemailer, keytar | all outbound from Rust (AP-02) |
 | Authorization enforcement | route guards (session, Host and Origin checks, AP-13) + command preconditions (08) | n/a | default deny |
-| Testing/observability/deployment | cargo test with an in-memory SQLite per rule fixture; route tests that call the axum router in process and check the HTML with the `scraper` crate; WebDriver (tauri-driver) smoke tests on Linux; tracing to a rotating log file (D-30); GitHub Actions matrix build | Playwright on Electron | tauri-driver has no macOS WebDriver; macOS UI checks are manual (risk R-03) |
+| Testing/observability/deployment | cargo test with an in-memory SQLite per rule fixture; route tests that call the axum router in process and check the HTML with the `scraper` crate; WebDriver (tauri-driver) smoke tests on Windows and Linux; tracing to a rotating log file (D-30); GitHub Actions matrix build | Playwright on Electron | tauri-driver has no macOS WebDriver; macOS UI checks are manual (risk R-03) |
 
 ### UI stack: server-rendered HTML (owner decision, 2026-10-28)
 
@@ -77,12 +77,12 @@ Per-install import, not a cutover (D-34). Increments in 03 set build order; the 
 
 | Claim affecting choice | Primary source/version | Access date | Fact or inference |
 |---|---|---|---|
-| Tauri 2 is stable and builds for macOS and Linux with the system webview (WKWebView, WebKitGTK) | Tauri 2.x documentation (tauri.app) | not re-checked online on 2026-10-28; from model knowledge | inference until re-verified (spike S-01) |
+| Tauri 2 is stable and builds for macOS, Windows and Linux with the system webview (WKWebView, WebView2, WebKitGTK) | Tauri 2.x documentation (tauri.app) | not re-checked online on 2026-10-28; from model knowledge | inference until re-verified (spike S-01) |
 | A Tauri window can load a localhost URL served by the same process, with no IPC permission granted to it | Tauri 2 security/capabilities docs | same | inference until re-verified (spike S-01) |
 | axum, askama and rusqlite build on stable Rust and embed into a Tauri app | docs.rs | same | inference until re-verified |
 | The Tailwind standalone CLI can build DaisyUI styles without Node | Tailwind and DaisyUI docs | same | inference until re-verified (spike S-05) |
 | tauri-driver WebDriver testing works on Linux and Windows, not macOS | Tauri testing docs | same | inference until re-verified |
-| keyring supports macOS Keychain and Linux Secret Service | crates.io / docs.rs | same | inference until re-verified |
+| keyring supports macOS Keychain, Windows Credential Manager and Linux Secret Service | crates.io / docs.rs | same | inference until re-verified |
 
 Re-check these against the current releases before I1 starts (spikes S-01, S-05).
 
@@ -92,18 +92,18 @@ The React and TypeScript items are gone with the 2026-10-28 decision: the TanSta
 
 | Risk/unknown | Impact | Proof/spike | Owner | Decision deadline |
 |---|---|---|---|---|
-| R-01 WebKitGTK differences on Linux (rendering, print, fonts) | UI defects on Linux; lower now that macOS comes first (owner, 2026-10-28; D-37) | S-01: a Tauri window on the local axum server with an htmx-paged DaisyUI table, a `<dialog>` modal, a Chart.js chart and print-to-PDF, on Ubuntu LTS and Fedora | Tech lead | before the Linux build |
+| R-01 Webview differences between the three platforms (WKWebView, WebView2, WebKitGTK: rendering, print, fonts) | UI defects on one platform, most likely Linux | S-01: a Tauri window on the local axum server with an htmx-paged DaisyUI table, a `<dialog>` modal, a Chart.js chart and print-to-PDF, on macOS, Windows 11, Ubuntu LTS and Fedora (owner, 2026-10-28; D-37) | Tech lead | before I1 |
 | R-02 Money conversion at the edges | wrong cents from dollar input or from the FileMaker decimal export | Closed as a storage risk: money is INTEGER cents (owner, 2026-10-28; OD-04-02), so sums are exact. S-03 tests only the edges: dollar parsing in the form handlers, formatting in the templates, and import rounding half away from zero, including 7-decimal unit prices (BR-SALES-01, BR-IMPORT-01) | Tech lead | before I3 |
-| R-03 No macOS WebDriver | manual UI testing on macOS | route tests cover the HTML on both platforms in process; Linux WebDriver smoke tests + macOS checklist | Tech lead | I1 |
+| R-03 No macOS WebDriver | manual UI testing on macOS | route tests cover the HTML on all three platforms in process; Windows and Linux WebDriver smoke tests + macOS checklist | Tech lead | I1 |
 | R-04 FileMaker export shape per install | import fails on real data | S-04: export one real file set (OD-03-01) and dry-run the importer | Operator | before I3 |
-| R-05 Code signing / notarization | macOS Gatekeeper warns on an unsigned app | Closed for the demo: unsigned builds (owner, 2026-10-28; OD-02-02); the user opens it with right-click > Open. Apple Developer ID and notarization only for a real release | Product owner | closed |
+| R-05 Code signing / notarization | macOS Gatekeeper and Windows SmartScreen warn on an unsigned app | Closed for the demo: unsigned builds on all three platforms (owner, 2026-10-28; OD-02-02); on macOS the user opens it with right-click > Open, on Windows with "More info" > "Run anyway". Apple Developer ID with notarization and a Windows code-signing certificate only for a real release | Product owner | closed |
 | R-06 PDF generation quality | invoices print badly | S-02: webview print vs printpdf | Tech lead | before I5 |
 | R-07 Local server reachable by other local processes or by web pages (cross-site requests, DNS rebinding) | another program reads or changes data | AP-13: bind 127.0.0.1 only, per-launch session cookie (HttpOnly, SameSite=Strict), Host and Origin checks on every request; T-08-14 | Tech lead | I1 |
-| R-08 Tailwind/DaisyUI build without Node | CSS build breaks or needs Node in CI | S-05: build the DaisyUI theme with the Tailwind standalone CLI in CI on macOS and Linux | Tech lead | before I1 |
+| R-08 Tailwind/DaisyUI build without Node | CSS build breaks or needs Node in CI | S-05: build the DaisyUI theme with the Tailwind standalone CLI in CI on macOS, Windows and Linux | Tech lead | before I1 |
 
 ## Rejected alternative
 
-Electron + SQLite fails the owner's hard gate (Tauri was chosen) and would ship a full Chromium and Node runtime per install. It wins on one point: the same rendering engine on macOS and Linux, which removes R-01 and R-03. If the Linux WebKitGTK spike (S-01) fails badly, that is the case for reopening D-36. A React or Svelte single-page frontend was the earlier recommendation; the owner replaced it on 2026-10-28 with server-rendered HTML for simplicity.
+Electron + SQLite fails the owner's hard gate (Tauri was chosen) and would ship a full Chromium and Node runtime per install. It wins on one point: the same rendering engine on all three platforms, which removes R-01 and R-03. If the webview spike (S-01) fails badly on one platform, that is the case for reopening D-36. A React or Svelte single-page frontend was the earlier recommendation; the owner replaced it on 2026-10-28 with server-rendered HTML for simplicity.
 
 ## Open decisions
 

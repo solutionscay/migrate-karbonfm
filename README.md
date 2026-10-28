@@ -2,7 +2,7 @@
 
 # migrate-karbonfm
 
-A demo of migrating [KarbonFM](https://gh.ali360.cloudns.ch/karbonfm/karbonfm), an open-source FileMaker CRM, to a desktop app for macOS and Linux.
+A demo of migrating [KarbonFM](https://gh.ali360.cloudns.ch/karbonfm/karbonfm), an open-source FileMaker CRM, to a desktop app for macOS, Windows and Linux.
 
 The repo holds the original FileMaker source, the full migration plan, and clickable mockups of the rebuilt app. The app itself is not built yet.
 
@@ -93,7 +93,7 @@ Visual direction: a dark sidebar with a warm, light work area, an orange accent,
 
 ## Key decisions
 
-- **Platform:** Tauri 2 desktop app, Rust core, SQLite database.
+- **Platform:** Tauri 2 desktop app for macOS, Windows and Linux from one codebase, Rust core, SQLite database. Unsigned builds for the demo.
 - **UI:** server-rendered HTML from a local server, with htmx, Alpine.js, Tailwind CSS and DaisyUI. No React or TypeScript.
 - **Money:** stored as integer cents.
 - **Users:** a single user on one computer. The local server listens on 127.0.0.1 only.
