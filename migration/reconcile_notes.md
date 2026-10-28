@@ -1,6 +1,6 @@
 # Reconcile notes
 
-Written by the reconcile pass over 00-08. Rerun after any artifact change.
+Written by the reconcile pass over 00-08 (2026-10-27) and rerun over 00-09 on 2026-10-28 after three owner decisions. Rerun after any artifact change.
 
 ## QuickBooks Online removal (owner decision, 2026-10-27; D-02)
 
@@ -38,19 +38,33 @@ Written by the reconcile pass over 00-08. Rerun after any artifact change.
 - Rules changed: BR-SALES-02, BR-SALES-04, BR-SALES-05, BR-SALES-11, BR-SALES-15; policy AP-05. Rule added: BR-INTEG-03 (stub).
 - Stub kept: EXT-04 "stubbed, not implemented", OP-INTEG-04 `accounting_integration_status` (I6). OD-02-01 closed.
 
-## Check results
+## Owner decisions, 2026-10-28
+
+- Money storage (OD-04-02, closed): integer minor units. The 22 money columns in 04 are INTEGER cents (customer 4, employee 2, item 2, opportunity 1, payment 1, payment_line 1, sales_line 3, sales_transaction 7, vendor 1). Arithmetic in Rust on integers; conversion only at the UI and import edges (BR-IMPORT-01, half away from zero). BR-SALES-01 changed: unit prices are cents, so the source's 7-decimal unit price is not kept. 02 R-02/S-03, 03 tests and validation matrix, 05 money contract, 01 D-18 updated.
+- Twilio SMS/chat (OD-05-02, closed; EXT-05): dropped, out of scope, removed like QuickBooks (03 "Removed: Twilio SMS/chat"). 04: tables chat, chat_consent, chat_message, 2 indexes and 3 system_setting Twilio columns removed; 04 appendix: 3 tables, 51 fields, 12 relationships marked removed. 07 appendix: 15 scripts and 24 table-logic lines marked removed. 06 appendix: 6 layouts marked removed. 08 appendix: 3 table rows removed. activity.chat_ind, activity_type 9 and phone.sms_ind stay as data.
+- Tax ids (organization.federal_tax_id_number, vendor.tax_id): plain TEXT, no encryption, masking or extra access rule (demo). Recorded in 01 D-09, 04, 07 BR-IMPORT-02 and an 08 field-level policy row; the security-review question on them is closed.
+
+## Check results (2026-10-28, over 00-09)
 
 - unknown ids: 0
-- ids missing from their owner: 0
-- table.column refs not in 04: 5 - ('04_database_schema_appendix.md', 'activity.activity_id'); ('04_database_schema_appendix.md', 'activity_comment.user_id_deprecated'); ('04_database_schema_appendix.md', 'customer.one'); ('04_database_schema_appendix.md', 'discussion.entity_id_deprecated'); ('04_database_schema_appendix.md', 'discussion.one')
+- ODs missing from their owner: 0
+- closed ODs still listed open in 03: 0
+- open ODs missing from the 03 list: 0
+- 03 register rows still "open" for closed ODs: 0
+- table.column refs not in 04: 0
 - object paths missing: 0
 - tier1 rules not in exactly one increment: 0
 - policies not in exactly one increment: 0
 - commands not in an increment: 0
 - screens not in an increment: 0
-- rules citing unknown commands: 0
-- screens citing unknown commands: 0
-- commands with no rule: 0
 - QBO mentions not marked removed/stub: 0
+- SMS/chat mentions not marked removed: 0
+- "deferred" SMS/chat dispositions left: 0
+- chat tables or Twilio columns in 04: 0
 - QBO columns left in 04: 0
 - stub present: 0
+- money columns not INTEGER: 0
+- decimal-money wording left (rust_decimal, REAL, 7-dp storage): 0
+- tax id columns not plain TEXT: 0
+
+The 5 `table.column` references reported on 2026-10-27 are relationship rows that say "has no target column"; the check now skips them.

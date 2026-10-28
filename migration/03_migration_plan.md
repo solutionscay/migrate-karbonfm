@@ -4,12 +4,12 @@
 
 | Item | Value/status |
 |---|---|
-| Source implementations/files | core: karbon_kontacts, karbon_kontroller, karbon_data; supporting: Picker Module, karbon_log, karbon_charts (D-01). Out: Generator, Build, tester, dev (D-01), ZeitGeist, konnector (D-03), LedgerLink/QuickBooks Online removed, stub only (owner, 2026-10-27; D-02) |
+| Source implementations/files | core: karbon_kontacts, karbon_kontroller, karbon_data; supporting: Picker Module, karbon_log, karbon_charts (D-01). Out: Generator, Build, tester, dev (D-01), ZeitGeist, konnector (D-03), LedgerLink/QuickBooks Online removed, stub only (owner, 2026-10-27; D-02); Twilio SMS/chat removed (owner, 2026-10-28; OD-05-02) |
 | DDR export and `objects/index.tsv` | DDR of 2026-10-27, FileMaker 26.0.3; 4,768 objects; verify passes for 9 explorers (00) |
 | In-scope workflows/data/history | 9 domains (PARTY, CONTACT, ACTIVITY, SALES, FILE, TEMPLATE, ADMIN, INTEG, IMPORT); all records of the user's export, with stamps (D-39) |
 | Target stack/architecture decision | Tauri 2 + Rust + SQLite + React/TypeScript (02; D-36) |
 | Parallel-operation/cutover model | per-install import, repeatable; no server cutover, no write-back (D-34, D-40) |
-| Unavailable evidence/open decisions | OD-02-02, OD-04-01, OD-04-02, OD-04-03, OD-05-01, OD-05-02, OD-06-01, OD-07-01, OD-07-02, OD-07-03, OD-07-04, OD-07-05, OD-07-06, OD-07-07, OD-08-01, OD-03-01 |
+| Unavailable evidence/open decisions | OD-02-02, OD-04-01, OD-04-03, OD-05-01, OD-06-01, OD-07-01, OD-07-02, OD-07-03, OD-07-04, OD-07-05, OD-07-06, OD-07-07, OD-08-01, OD-03-01 |
 
 A new DDR export needs a new explode and new catalogs; `catalog_contract.py verify` fails on a catalog made from the old one.
 
@@ -85,7 +85,7 @@ Inventory-only screens are not scheduled as complete until a design pass or scre
 | EXT-02 Google Places / SmartyStreets address suggestions | outbound | HTTPS JSON | keychain: google_places, smartystreets | no retry; UI shows no suggestions | optional (I6) |
 | EXT-03 FullContact enrichment | outbound | HTTPS JSON, bearer key | keychain: fullcontact | no retry | optional (I6) |
 | EXT-04 QuickBooks Online (accounting) | none | stubbed, not implemented: no-op command returning NotImplemented | none | n/a | stubbed, not implemented (owner, D-02) |
-| EXT-05 Twilio SMS / chat | bidirectional | Twilio REST + status webhooks | n/a | n/a | deferred (D-14, OD-05-02) |
+| EXT-05 Twilio SMS / chat | none | removed, not implemented | none | n/a | removed: out of scope (owner, 2026-10-28; OD-05-02) |
 | Monthly revenue view (BR-SALES-17) | internal | sales_summary_by_month | n/a | n/a | equals sum of posted lines |
 | Invoice/receipt PDF | local file | UI-20 | n/a | n/a | PDF totals equal the record |
 
@@ -127,16 +127,16 @@ No inbound endpoint exists (05).
 | Stable-value hashes | hash of sorted id lists per table | same hash | exact | import report |
 | Candidate-key duplicates and orphans | profile (D-16) | foreign_key_check | all rejected rows explained | import report |
 | Containers: count/bytes/hashes | export folder inventory | file store | exact | import report |
-| Encoding/decimal/timezone edge cases | fixtures: non-ASCII names, 7-dp unit price, midnight timestamps | same values | exact | cargo test |
+| Encoding/decimal/timezone edge cases | fixtures: non-ASCII names, 7-dp unit price rounded to cents, half-cent amounts, midnight timestamps | same values; money as integer cents (OD-04-02) | exact; rounded unit prices listed | cargo test |
 | Ownership/authorization attributes | creation/modification user ids | kept | exact | import report |
-| Business totals | invoice totals, balances, retainer balance per customer in FileMaker | recomputed values | exact to 2 dp; differences listed | import report |
+| Business totals | invoice totals, balances, retainer balance per customer in FileMaker | recomputed values in integer cents | exact to the cent; differences listed | import report |
 | Rejected/changed rows | n/a | import_rejected_row | every row has a reason | import report |
 | Target constraints/negative cases | n/a | AP tests | all pass | CI |
 
 ## Test strategy
 
 - Semantic fixtures for each tier1 rule (07 "Semantic tests" column), built from the object files and non-secret sample data, run as cargo tests against an in-memory SQLite.
-- Unit tests for the money rules (BR-SALES-01, 02, 06, 07) with rust_decimal, including rounding boundaries.
+- Unit tests for the money rules (BR-SALES-01, 02, 06, 07) on integer cents (OD-04-02), including the half-cent rounding of the unit price and of the import conversion.
 - Integration tests: transaction rollback on a failing second write (D-08), idempotent retries, SMTP against a local test server.
 - Authorization tests T-08-01..T-08-13 through the IPC layer.
 - UI tests (Vitest + Testing Library) only for behavior-ready screens; WebDriver smoke tests on Linux; macOS manual checklist (R-03).
@@ -208,16 +208,41 @@ Dropped columns:
 - `sales_transaction.qbo_error  <- SalesTransaction::qbo_error (objects/karbon_data.fmp12/tables/177-SalesTransaction.txt #35)`
 - `system_setting.using_qbo_ind  <- System::UsingQBOInd (objects/karbon_data.fmp12/tables/165-System.txt #64)`
 
+## Removed: Twilio SMS/chat (owner decision, 2026-10-28)
+
+Twilio SMS and chat are out of scope (OD-05-02, D-14): delivery status and inbound messages need a reachable server, and the desktop client has none. Removed from every Step 5 artifact, as QuickBooks was. No increment, command or screen carries them.
+
+| What | Removed | Where recorded |
+|---|---|---|
+| Tables | Chat, ChatConsent, ChatMessage; not migrated, not imported (the FileMaker export keeps them) | 04 and its appendix, BR-IMPORT-01 |
+| Columns | system_setting.twilio_account_sid, twilio_format_option, twilio_sms_from_phone_number (TwilioAuthToken was already excluded, D-09) | 04 and its appendix |
+| Relationships | 12 chat relationships (karbon_data, kontacts, kontroller) | 04 appendix |
+| Scripts | 15: send SMS, chat activity and message create, status update, phone lookup and its request helper (9, before "deferred"), and 6 chat-screen scripts | 07 appendix ("removed") |
+| Layouts | the Chat screen (kontacts 184, before "deferred") and 5 chat script-context layouts | 06 appendix |
+| Integration | EXT-05 changed from "deferred" to "removed" | 05, 08, this file |
+| Rules | BR-FILE-03 (chat-message attachments), BR-IMPORT-01 (chat rows not imported) | 07 |
+| Discovery | D-14 SMS part answered; OD-05-02 closed | 01, this file |
+
+Kept as data: activity.chat_ind, activity_type 9 (SMS) and phone.sms_ind, so imported SMS activities keep their activity row without messages.
+
+## Owner decisions (2026-10-28)
+
+| Decision | Answer | Where recorded |
+|---|---|---|
+| Money storage (OD-04-02) | Integer minor units: every money column is an INTEGER of cents; Rust integer arithmetic; conversion only at the UI and import edges. The source's 7-decimal unit price is not kept (BR-SALES-01). | 04, 02 R-02/S-03, 05, 07, this file |
+| Chat / Twilio SMS (OD-05-02, EXT-05) | Dropped, out of scope (section above). | 01, 04-08, this file |
+| Tax ids (organization.federal_tax_id_number, vendor.tax_id) | Plain TEXT, no encryption, masking or extra access rule; this is a demo. Closes the security-review question on them (D-09). | 01, 04, 07 BR-IMPORT-02, 08 |
+
 ## Risk and decision register
 
 | ID | Risk/open decision | Evidence | Likelihood/impact | Mitigation/proof | Owner/status |
 |---|---|---|---|---|---|
 | OD-02-02 | Code signing and notarization: Apple Developer ID for macOS; Linux package formats (AppImage, .deb, .rpm) and the update channel. | D-36 | medium | decide before the increment that needs it | Product owner / open |
 | OD-04-01 | needs-profile foreign keys (15 in the core schema) are enforced only after the import profile passes; decide whether to add them as constraints for new installs with no import. | D-16 | medium | decide before the increment that needs it | Tech lead / open |
-| OD-04-02 | Money storage: NUMERIC (REAL) with rust_decimal arithmetic and rounding on write, or TEXT decimal / integer minor units. | D-18 | medium | decide before the increment that needs it | Tech lead / open |
+| OD-04-02 | Money storage. **Decided (owner, 2026-10-28):** integer minor units. Every money column is an INTEGER of cents; arithmetic in Rust on integers; conversion only at the UI and import edges (04, BR-SALES-01, BR-IMPORT-01). | D-18 | n/a | 22 money columns in 04 | Owner / closed |
 | OD-04-03 | Repeating fields, if any reach the core tables, become child rows or JSON. | D-27 | medium | decide before the increment that needs it | Tech lead / open |
 | OD-05-01 | Whether commands use typed bindings generated from Rust (specta/tauri-specta) or hand-written TypeScript types. | D-36 | medium | decide before the increment that needs it | Tech lead / open |
-| OD-05-02 | SMS/chat without a server: poll Twilio for status and inbound messages, or drop the chat feature. | D-14 | medium | decide before the increment that needs it | Product owner / open |
+| OD-05-02 | SMS/chat without a server. **Decided (owner, 2026-10-28):** dropped, out of scope; it cannot work in the desktop client without a server. Removed like QuickBooks (section above). | D-14 | n/a | removed from 04-08 | Owner / closed |
 | OD-06-01 | Visual design and density: no screenshots exist; every inventory-only screen needs a design pass or screenshots. | D-37 | medium | decide before the increment that needs it | Product owner / open |
 | OD-07-01 | Hard party delete: the DDR cascades it to contact methods, relations, roles and the person/organization row; decide what happens to the uncascaded activity parties, attachments, opportunities and sales transactions (corrected by audit A-01, 09). | D-12 | medium | decide before the increment that needs it | Domain expert / open |
 | OD-07-02 | Phone formatting outside the US: the country-code prefix is a TODO in the source. | D-19 | medium | decide before the increment that needs it | Domain expert / open |

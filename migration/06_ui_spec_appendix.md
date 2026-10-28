@@ -252,10 +252,10 @@
 | `objects/karbon_data.fmp12/layouts/71-OpportunityStatus.txt` | karbon_data.fmp12 | OpportunityStatus | developer | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
 | `objects/karbon_data.fmp12/layouts/72-ActivityEntity.txt` | karbon_data.fmp12 | ActivityEntity | developer | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
 | `objects/karbon_data.fmp12/layouts/73-Call.txt` | karbon_data.fmp12 | Call | developer | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
-| `objects/karbon_data.fmp12/layouts/74-Chat.txt` | karbon_data.fmp12 | Chat | developer | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
+| `objects/karbon_data.fmp12/layouts/74-Chat.txt` | karbon_data.fmp12 | Chat | developer | script-context | 0 | 0 | 0 | 0 | removed: Twilio SMS/chat, out of scope (owner, 2026-10-28; OD-05-02) |
 | `objects/karbon_data.fmp12/layouts/75-Chat_deprecated.txt` | karbon_data.fmp12 | Chat_deprecated | developer | drop-candidate | 0 | 0 | 0 | 0 | retire: no reference / developer (D-11) |
-| `objects/karbon_data.fmp12/layouts/76-ChatMessage.txt` | karbon_data.fmp12 | ChatMessage | developer | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
-| `objects/karbon_data.fmp12/layouts/77-ChatConsent.txt` | karbon_data.fmp12 | ChatConsent | developer | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
+| `objects/karbon_data.fmp12/layouts/76-ChatMessage.txt` | karbon_data.fmp12 | ChatMessage | developer | script-context | 0 | 0 | 0 | 0 | removed: Twilio SMS/chat, out of scope (owner, 2026-10-28; OD-05-02) |
+| `objects/karbon_data.fmp12/layouts/77-ChatConsent.txt` | karbon_data.fmp12 | ChatConsent | developer | script-context | 0 | 0 | 0 | 0 | removed: Twilio SMS/chat, out of scope (owner, 2026-10-28; OD-05-02) |
 | `objects/karbon_dev.fmp12/layouts/1-Splash.txt` | karbon_dev.fmp12 | Splash | navigation | drop-candidate | 0 | 0 | 0 | 0 | retire: tooling (D-01) |
 | `objects/karbon_dev.fmp12/layouts/2-Timesheet.txt` | karbon_dev.fmp12 | Timesheet | developer | unresolved | 0 | 0 | 0 | 0 | retire: tooling (D-01) |
 | `objects/karbon_konnector.fmp12/layouts/1-Splash.txt` | karbon_konnector.fmp12 | Splash | navigation | drop-candidate | 0 | 0 | 0 | 0 | retire: time tracking/shell (D-03) |
@@ -325,14 +325,14 @@
 | `objects/karbon_kontacts.fmp12/layouts/167-Email_Message_-_View_Only.txt` | karbon_kontacts.fmp12 | Email Message - View Only | dialog | modal | 3 | 0 | 1 | 11 | UI-08 |
 | `objects/karbon_kontacts.fmp12/layouts/170-UtilityCall.txt` | karbon_kontacts.fmp12 | UtilityCall | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
 | `objects/karbon_kontacts.fmp12/layouts/171-Call_Detail.txt` | karbon_kontacts.fmp12 | Call Detail | dialog | modal | 3 | 1 | 2 | 8 | UI-07 |
-| `objects/karbon_kontacts.fmp12/layouts/173-UtilityChat.txt` | karbon_kontacts.fmp12 | UtilityChat | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
+| `objects/karbon_kontacts.fmp12/layouts/173-UtilityChat.txt` | karbon_kontacts.fmp12 | UtilityChat | utility | script-context | 0 | 0 | 0 | 0 | removed: Twilio SMS/chat, out of scope (owner, 2026-10-28; OD-05-02) |
 | `objects/karbon_kontacts.fmp12/layouts/174-Card_-_Discussion_Detail_deprecated.txt` | karbon_kontacts.fmp12 | Card - Discussion Detail_deprecated | dialog | drop-candidate | 0 | 0 | 0 | 5 | retire: no reference / developer (D-11) |
 | `objects/karbon_kontacts.fmp12/layouts/175-Theme_Buttons.txt` | karbon_kontacts.fmp12 | Theme Buttons | developer | drop-candidate | 0 | 1 | 2 | 18 | retire: no reference / developer (D-11) |
 | `objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt` | karbon_kontacts.fmp12 | Email Message - Edit | dialog | modal | 8 | 6 | 2 | 27 | UI-08 |
 | `objects/karbon_kontacts.fmp12/layouts/177-Party_Find.txt` | karbon_kontacts.fmp12 | Party Find | utility | page | 5 | 1 | 3 | 8 | UI-03 |
 | `objects/karbon_kontacts.fmp12/layouts/178-Customer_Find.txt` | karbon_kontacts.fmp12 | Customer Find | utility | page | 5 | 1 | 3 | 8 | UI-03 |
 | `objects/karbon_kontacts.fmp12/layouts/180-UtilityDiscussion.txt` | karbon_kontacts.fmp12 | UtilityDiscussion | utility | unresolved | 0 | 0 | 0 | 0 | retire by the D-11 default (no reference found; confirm) |
-| `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt` | karbon_kontacts.fmp12 | Chat | form | page | 11 | 3 | 5 | 7 | deferred: SMS/chat (D-14, OD-05-02) |
+| `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt` | karbon_kontacts.fmp12 | Chat | form | page | 11 | 3 | 5 | 7 | removed: Twilio SMS/chat, out of scope (owner, 2026-10-28; OD-05-02) |
 | `objects/karbon_kontacts.fmp12/layouts/185-Thumbnails.txt` | karbon_kontacts.fmp12 | Thumbnails | dialog | modal | 0 | 0 | 0 | 3 | UI-19 |
 | `objects/karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt` | karbon_kontacts.fmp12 | Customer Detail#sliderDesign | form | drop-candidate | 48 | 3 | 4 | 68 | retire: no reference / developer (D-11) |
 | `objects/karbon_kontacts.fmp12/layouts/187-Card_-_Manage_Subscribers.txt` | karbon_kontacts.fmp12 | Card - Manage Subscribers | dialog | modal | 1 | 0 | 0 | 6 | UI-09 |
@@ -354,7 +354,7 @@
 | `objects/karbon_kontroller.fmp12/layouts/27-f_SummaryByMonth.txt` | karbon_kontroller.fmp12 | f_SummaryByMonth | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
 | `objects/karbon_kontroller.fmp12/layouts/28-f_SalesTransaction.txt` | karbon_kontroller.fmp12 | f_SalesTransaction | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
 | `objects/karbon_kontroller.fmp12/layouts/31-f_Phone.txt` | karbon_kontroller.fmp12 | f_Phone | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
-| `objects/karbon_kontroller.fmp12/layouts/32-f_Chat.txt` | karbon_kontroller.fmp12 | f_Chat | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
+| `objects/karbon_kontroller.fmp12/layouts/32-f_Chat.txt` | karbon_kontroller.fmp12 | f_Chat | utility | script-context | 0 | 0 | 0 | 0 | removed: Twilio SMS/chat, out of scope (owner, 2026-10-28; OD-05-02) |
 | `objects/karbon_kontroller.fmp12/layouts/33-f_ActivityEntity.txt` | karbon_kontroller.fmp12 | f_ActivityEntity | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
 | `objects/karbon_kontroller.fmp12/layouts/35-f_Opportunity.txt` | karbon_kontroller.fmp12 | f_Opportunity | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |
 | `objects/karbon_kontroller.fmp12/layouts/36-f_ActivityPartyRole.txt` | karbon_kontroller.fmp12 | f_ActivityPartyRole | utility | script-context | 0 | 0 | 0 | 0 | no screen: FileMaker script context |

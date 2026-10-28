@@ -12,7 +12,7 @@ Labels follow the skill: **fact** (from an object file), **inference**, **produc
 | Graph rows (`meaning`, `fk_candidate`) | 30 sampled, **2 wrong (6.7%)**. A full re-derivation of all 683 relationships found about 8 wrong rows. None feeds a foreign key in 04. 4 cells fixed. |
 | Layout rows (hide rules, conditional formats) | 30 lines sampled, **0 wrong (0%)**. Line counts match the objects on all 382 layouts. |
 | Script `callers` cells | 30 sampled (15 from the panes that shared the overwritten `callers.json`), **1 wrong (3.3%)**, and not from those panes. A sweep of all 309 `none found` cells found 2 more with a live caller. 3 cells and 2 appendix rows fixed. |
-| Gaps the plan still does not understand | **59 listed**: 30 unanswered D- questions, 16 open OD- decisions (3 new from this audit), 13 object gap groups (G-01 to G-13). |
+| Gaps the plan still does not understand | **57 listed** (59 at the audit; OD-04-02 and OD-05-02 were decided by the owner on 2026-10-28): 30 unanswered D- questions, 14 open OD- decisions (3 new from this audit), 13 object gap groups (G-01 to G-13). |
 | Blocks the plan? | Nothing blocks I1, I2 or I4. **I5 (sales) should not start** until the Accounting owner confirms or replaces the defaults of OD-07-05, OD-07-06 and OD-07-07. The I3 recompute of retainer balances also waits on OD-07-07. See "What should block". |
 
 ## Method
@@ -100,16 +100,16 @@ All 30 have a recorded default in `01_discovery_answers.md`. The plan uses those
 |---|---|---|
 | D-03 | Time-tracking module (retired by default) | 04, 06, 07 appendix; BR-SALES-11 time unlinking; G-04 |
 | D-07 | Source defects: build intended behavior | Cited by 9 tier1 rules (BR-PARTY-01, -03, -05, BR-SALES-02, -05, -06, -08, -11, BR-FILE-01); every "source defect" note in 07 |
-| D-09 | Secrets and PII (keychain, excluded columns) | BR-IMPORT-02, AP-03, 04 exclusions |
+| D-09 | Secrets and PII (keychain, excluded columns); tax ids answered 2026-10-28: plain text | BR-IMPORT-02, AP-03, 04 exclusions |
 | D-10 | No-caller entry points, external clients | 05 (no external API), G-09 extended privileges |
 | D-11 | Drop objects with no caller | 532 retired scripts in the 07 appendix, 04/06 appendices |
 | D-12 | Live objects pointing at deleted targets | OD-07-01, OD-07-04; G-01, G-02, G-05 |
 | D-13 | Run-time data sources, karbon_reports | BR-SALES-06, BR-SALES-17; G-03 |
-| D-14 | Integrations kept (SMTP yes, SMS deferred) | BR-INTEG-01/02, EXT list in 05, I6 |
+| D-14 | Integrations kept (SMTP yes; Twilio SMS/chat dropped by the owner, 2026-10-28) | BR-INTEG-01/02, EXT list in 05, I6 |
 | D-15 | Supertype/subtype tables | 04 core design, 05 resource shapes |
 | D-16 | needs-profile joins (100) | OD-04-01, 04 foreign keys, I3 import profile |
 | D-17 | Container files | BR-FILE-01/02, I3 file copy |
-| D-18 | Money rules | **BR-SALES-01..08, OD-07-05/06/07, I5** |
+| D-18 | Money rules (storage decided 2026-10-28: integer cents, OD-04-02) | **BR-SALES-01..08, OD-07-05/06/07, I5** |
 | D-19 | Hard-coded ids as seeds | BR-ACTIVITY-01/02, BR-ADMIN-02 (three seed tables without values), I1 |
 | D-20 | Client-only rules become command invariants | BR-SALES-04, BR-SALES-09, AP-04..06 |
 | D-21 | Data-driven merge (Perform Script by name, Evaluate) | BR-TEMPLATE-01, OD-07-03, G-08 |
@@ -131,17 +131,17 @@ All 30 have a recorded default in `01_discovery_answers.md`. The plan uses those
 
 `00_app_summary.md` still lists OD-00-01 to OD-00-06 as open. OD-00-04, -05 and -06 are settled by D-01, D-02 and D-05. OD-00-01, -02 and -03 are D-32, D-31 and D-13.
 
-### 3b. Open decisions (16)
+### 3b. Open decisions (14)
+
+OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were decided by the owner on 2026-10-28 and are no longer gaps (03).
 
 | Id | Decision | Affects |
 |---|---|---|
 | OD-02-02 | Code signing, Linux packages, update channel | 02, I6 |
 | OD-03-01 | FileMaker export format and container export | I3, BR-IMPORT-01 |
 | OD-04-01 | needs-profile foreign keys as constraints | 04 (15 FKs), I3 |
-| OD-04-02 | Money storage type | 04 sales columns, BR-SALES-01/02 |
 | OD-04-03 | Repeating fields | 04 |
 | OD-05-01 | Generated TypeScript bindings | 05 |
-| OD-05-02 | SMS/chat without a server | BR-INTEG deferrals, 06 chat |
 | OD-06-01 | Visual design (no screenshots) | every inventory-only screen in 06 |
 | OD-07-01 | Hard party delete: the uncascaded children (reworded, A-01) | BR-PARTY-01, OP-PARTY-04, I2 |
 | OD-07-02 | Non-US phone prefix | BR-CONTACT-04 |
@@ -172,7 +172,7 @@ The catalogs mark 86 targets `unresolved` (tables 7, layouts 28, value lists 6, 
 | G-12 | Out-of-scope files (LedgerLink 84, Generator 63, tester 23, Build 8, ZeitGeist 2, dev 2, konnector 2) | `objects/unresolved.tsv` | 184 | none (D-01, D-02) |
 | G-13 | **PostSalesTransactions** is a function missing from the DDR (plugin or deleted custom function) that gates every post. The plan assumes it is on. | `objects/karbon_kontroller.fmp12/scripts/576-Post_Unpost_Internal_Id_Post.txt` step 39 | 0 | BR-SALES-06, BR-SALES-15, D-24 |
 
-Gap count: 30 + 16 + 13 = **59**. The 488 rows sum as 1 + 15 + 17 + 85 + 74 + 38 + 74 + 184.
+Gap count: 30 + 14 + 13 = **57** (59 at the audit, before the 2026-10-28 owner decisions). The 488 rows sum as 1 + 15 + 17 + 85 + 74 + 38 + 74 + 184.
 
 ## What should block
 

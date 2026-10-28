@@ -15,7 +15,7 @@ No stakeholder weights were given, so the candidates are ranked by hard gates, t
 | Team/delivery fit | unweighted | team unknown (D-36) | Rust for the command layer, TypeScript for the UI | TypeScript only |
 | Authorization coverage | unweighted | 08 AP-01..AP-12 | strong: capability allowlist per window, Rust-only DB access | weaker: Node integration must be locked down by hand |
 | Client/offline/accessibility needs | unweighted | D-37, D-38 | system webview (WebKit on macOS and Linux); WCAG via the component library | bundled Chromium: one engine on both platforms |
-| Data/reporting/integration needs | unweighted | 04 (57 tables), 07 (money rules), EXT-01..03 | rusqlite + rust_decimal + lettre (SMTP) + keyring | better-sqlite3 + decimal.js + nodemailer + keytar |
+| Data/reporting/integration needs | unweighted | 04 (57 tables), 07 (money rules), EXT-01..03 | rusqlite (money as i64 cents, OD-04-02) + lettre (SMTP) + keyring | better-sqlite3 + decimal.js + nodemailer + keytar |
 | Deployment/operations/compliance | unweighted | OD-02-02 | small installers (system webview); updater plugin; code signing needed | larger installers (~100 MB+) |
 | Reversal/migration cost | unweighted | frontend is web tech in both | UI code moves; Rust commands would need a rewrite | n/a |
 
@@ -87,7 +87,7 @@ Re-check these against the current releases before I1 starts (spike S-01).
 | Risk/unknown | Impact | Proof/spike | Owner | Decision deadline |
 |---|---|---|---|---|
 | R-01 WebKitGTK differences on Linux (rendering, print, fonts) | UI defects on Linux | S-01: hello-world with TanStack Table, a dialog and print-to-PDF on Ubuntu LTS and Fedora | Tech lead | before I1 |
-| R-02 Money in SQLite REAL | rounding drift in sums | S-03: rust_decimal round-trip and report sums on 10k lines (OD-04-02) | Tech lead | before I5 |
+| R-02 Money conversion at the edges | wrong cents from dollar input or from the FileMaker decimal export | Closed as a storage risk: money is INTEGER cents (owner, 2026-10-28; OD-04-02), so sums are exact. S-03 now tests only the edges: UI dollar parsing and formatting, and import rounding half away from zero, including 7-decimal unit prices (BR-SALES-01, BR-IMPORT-01) | Tech lead | before I3 |
 | R-03 No macOS WebDriver | manual UI testing on macOS | test plan with Linux automation + macOS checklist | Tech lead | I1 |
 | R-04 FileMaker export shape per install | import fails on real data | S-04: export one real file set (OD-03-01) and dry-run the importer | Operator | before I3 |
 | R-05 Code signing / notarization | macOS Gatekeeper blocks the app | Apple Developer ID; CI notarization (OD-02-02) | Product owner | before first release |

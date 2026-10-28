@@ -63,6 +63,7 @@ No ownership predicate exists in the source; none is invented (single user).
 |---|---|---|---|---|---|---|---|
 | system_setting email account password; user SMTP password; API keys | ROLE-OWNER | never (has_secret flag only) | keychain only | keychain only | omitted from every response and log | none in source (plain fields, D-09) | T-08-03 |
 | Employee SSN, card/bank numbers | ROLE-OWNER | no column | no column | no column | not imported (BR-IMPORT-02) | none in source | T-08-13 |
+| organization.federal_tax_id_number, vendor.tax_id | ROLE-OWNER | allow | allow | allow | none: plain TEXT, no encryption, masking or extra access rule (owner, 2026-10-28; demo; D-09) | none in source | none (no rule to test) |
 
 ## Operation, script, and value-list access
 
@@ -104,7 +105,7 @@ Hide rules gate no sensitive data in the core layouts (the explorers found none 
 | Google Places / SmartyStreets address suggestions | outbound | OP-INTEG-02 | keychain: google_places, smartystreets | HTTPS JSON | no retry; UI shows no suggestions |
 | FullContact enrichment | outbound | OP-INTEG-03 | keychain: fullcontact | HTTPS JSON, bearer key | no retry |
 | QuickBooks Online (accounting) | none | OP-INTEG-04 | none | stubbed, not implemented: no-op command returning NotImplemented | n/a |
-| Twilio SMS / chat | bidirectional | none (deferred) | n/a | Twilio REST + status webhooks | n/a |
+| Twilio SMS / chat | none | none | n/a | removed: out of scope (owner, 2026-10-28; OD-05-02) | n/a |
 
 ## Policies
 

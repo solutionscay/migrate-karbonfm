@@ -8,14 +8,19 @@
 --   source data profile: none yet. Each install profiles its own export at import time (D-16, D-05)
 --   target database/version: SQLite 3.45+ through rusqlite (bundled), WAL mode, PRAGMA foreign_keys = ON
 --   timezone/DST decision: D-05 (local civil time of the user's machine, stored as ISO 8601 text, no offset)
---   unresolved blockers: OD-04-01 (needs-profile foreign keys), OD-04-02 (decimal storage), OD-04-03 (repeating fields)
+--   unresolved blockers: OD-04-01 (needs-profile foreign keys), OD-04-03 (repeating fields). OD-04-02 (money storage) is
+--     decided (owner, 2026-10-28).
 --
--- Conventions (product decisions, 2026-10-27):
+-- Conventions (product decisions, 2026-10-27; owner decisions 2026-10-28):
 --   * Names: snake_case of the FileMaker name (SKILL.md rule). Source names are kept in the appendix register.
---   * Types: Text -> TEXT, Number -> NUMERIC, Date/Time/TimeStamp -> TEXT (ISO 8601), Container -> TEXT holding the
+--   * Types: Text -> TEXT, Number -> NUMERIC (money -> INTEGER cents, below), Date/Time/TimeStamp -> TEXT (ISO 8601),
+--     Container -> TEXT holding the
 --     SHA-256 of a file stored in the app data directory (D-17).
---   * Money: NUMERIC column; all arithmetic in Rust with rust_decimal, rounded on write (2 dp amounts, 7 dp unit
---     price; BR-SALES-01). SQL SUM() over REAL is used only for display charts (OD-04-02).
+--   * Money (owner decision, 2026-10-28; OD-04-02): every money column is an INTEGER of cents (minor units, USD).
+--     Arithmetic is in Rust on integers (i64); SQL SUM() over these columns is exact. Values are converted only at the
+--     edges: the UI parses and formats dollars, and the import converts the FileMaker decimal to cents, rounding half
+--     away from zero as FileMaker Round() does (BR-IMPORT-01). Unit prices are cents too, so the source's 7-decimal
+--     unit price is not kept (BR-SALES-01). The 22 money columns carry the comment "money: integer cents".
 --   * Globals, summary fields, unstored calculations, JSON serializers and join anchors (ONE, z_xJoin) have no
 --     column (appendix gives each a disposition). Secrets and PII listed in D-09 have no column.
 --   * FileMaker "not empty" and "unique" validation is enforced in the command layer (07), not by NOT NULL/UNIQUE,
@@ -28,6 +33,11 @@
 --   * QuickBooks Online is out of scope (owner, 2026-10-27; D-02): the karbon_LedgerLink mirror tables are not migrated and
 --     the QBO sync-state columns (qbo_*, *sync*, item account refs) are dropped. A later integration links records through
 --     external_link (external_link_type id 5 = QBO) behind the stub command accounting_integration_status (05 OP-INTEG-04).
+--   * Twilio SMS/chat is out of scope (owner, 2026-10-28; OD-05-02, D-14): the Chat, ChatConsent and ChatMessage tables
+--     and the system_setting Twilio columns are not migrated. activity.chat_ind and phone.sms_ind stay as data, so imported
+--     SMS activities (activity_type 9) keep their activity row, without messages.
+--   * Tax ids (organization.federal_tax_id_number, vendor.tax_id) are plain TEXT with no encryption, masking or extra
+--     access rule (owner, 2026-10-28; demo data; D-09).
 
 PRAGMA foreign_keys = ON;
 
@@ -280,56 +290,6 @@ CREATE TABLE call (
   result TEXT -- #19
 );
 
--- Source: objects/karbon_data.fmp12/tables/203-Chat.txt
--- Role (table explorer): entity; key: id
-CREATE TABLE chat (
-  id TEXT PRIMARY KEY NOT NULL REFERENCES activity(id), -- #6 primary key: 1:1 subtype of Activity (D-15)
-  creation_account_name TEXT, -- #21
-  creation_timestamp TEXT, -- #22 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  creation_user_id TEXT, -- #23
-  modification_account_name TEXT, -- #24
-  modification_timestamp TEXT, -- #26 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  modification_user_id TEXT, -- #27
-  phone_list TEXT -- #28
-);
-
--- Source: objects/karbon_data.fmp12/tables/206-ChatConsent.txt
--- Role (table explorer): entity; key: id
-CREATE TABLE chat_consent (
-  id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter, unique validation; FM validation: not empty (enforced in the command layer, D-27)
-  creation_timestamp TEXT, -- #2 local civil time YYYY-MM-DD HH:MM:SS (D-05); FM validation: not empty (enforced in the command layer, D-27)
-  created_by TEXT, -- #3 FM validation: not empty (enforced in the command layer, D-27)
-  modification_timestamp TEXT, -- #4 local civil time YYYY-MM-DD HH:MM:SS (D-05); FM validation: not empty (enforced in the command layer, D-27)
-  modified_by TEXT, -- #5 FM validation: not empty (enforced in the command layer, D-27)
-  phone TEXT -- #9
-);
-
--- Source: objects/karbon_data.fmp12/tables/205-ChatMessage.txt
--- Role (table explorer): entity; key: id
-CREATE TABLE chat_message (
-  activity_id TEXT, -- #6; FK -> chat(id) waits on OD-04-01 (needs-profile)
-  creation_account_name TEXT, -- #7
-  creation_timestamp TEXT, -- #8 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  creation_user_id TEXT, -- #9
-  direction TEXT, -- #10
-  id TEXT PRIMARY KEY NOT NULL, -- #11 primary key: UUID auto-enter
-  message TEXT, -- #12
-  modification_account_name TEXT, -- #13
-  modification_timestamp TEXT, -- #15 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  modification_user_id TEXT, -- #16
-  delivered_timestamp TEXT, -- #19 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  external_message_id TEXT, -- #20
-  incoming_ind NUMERIC, -- #21
-  outgoing_ind NUMERIC, -- #22
-  status_accepted_ind NUMERIC, -- #23
-  status_delivered_ind NUMERIC, -- #24
-  status_failed_ind NUMERIC, -- #25
-  status_queued_ind NUMERIC, -- #26
-  status_received_ind NUMERIC, -- #27
-  status_sent_ind NUMERIC, -- #28
-  status_undelivered_ind NUMERIC -- #29
-);
-
 -- Source: objects/karbon_data.fmp12/tables/132-ContactMethod.txt
 -- Role (table explorer): entity; key: id
 CREATE TABLE contact_method (
@@ -390,8 +350,8 @@ CREATE TABLE country (
 -- Source: objects/karbon_data.fmp12/tables/140-Customer.txt
 -- Role (table explorer): entity; key: id
 CREATE TABLE customer (
-  balance NUMERIC, -- #42
-  balance_with_jobs NUMERIC, -- #44
+  balance INTEGER, -- #42; money: integer cents (OD-04-02, owner 2026-10-28)
+  balance_with_jobs INTEGER, -- #44; money: integer cents (OD-04-02, owner 2026-10-28)
   bill_with_parent NUMERIC, -- #37
   currency_ref TEXT, -- #45
   default_tax_code_ref TEXT, -- #34
@@ -414,8 +374,8 @@ CREATE TABLE customer (
   taxable NUMERIC, -- #31
   billing_email_ids_cached TEXT, -- #51; FK -> network_address(id) waits on OD-04-01 (needs-profile)
   billing_address_ids_cached TEXT, -- #53; FK -> address(id) waits on OD-04-01 (needs-profile)
-  retainer_balance_cached NUMERIC, -- #55
-  retainer_adjustment NUMERIC, -- #56
+  retainer_balance_cached INTEGER, -- #55; money: integer cents (OD-04-02, owner 2026-10-28)
+  retainer_adjustment INTEGER, -- #56; money: integer cents (OD-04-02, owner 2026-10-28)
   creation_user_id TEXT, -- #58
   modification_user_id TEXT, -- #59
   shipping_address_ids_cached TEXT, -- #60; FK -> address(id) waits on OD-04-01 (needs-profile)
@@ -461,8 +421,8 @@ CREATE TABLE employee (
   creation_timestamp TEXT, -- #33 local civil time YYYY-MM-DD HH:MM:SS (D-05)
   modification_account_name TEXT, -- #34
   modification_timestamp TEXT, -- #36 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  estimated_hourly_cost NUMERIC, -- #38
-  default_hourly_rate NUMERIC, -- #39
+  estimated_hourly_cost INTEGER, -- #38; money: integer cents (OD-04-02, owner 2026-10-28)
+  default_hourly_rate INTEGER, -- #39; money: integer cents (OD-04-02, owner 2026-10-28)
   type TEXT, -- #45
   avatar_sha256 TEXT, -- #46 content hash of a file in the app data directory (D-17); stored calculation, maintained by the command layer (07)
   employee_number NUMERIC, -- #48
@@ -591,14 +551,14 @@ CREATE TABLE item (
   active NUMERIC, -- #4
   description TEXT, -- #5
   name TEXT, -- #7
-  purchase_cost NUMERIC, -- #8
+  purchase_cost INTEGER, -- #8; money: integer cents (OD-04-02, owner 2026-10-28)
   purchase_desc TEXT, -- #9
   qty_on_hand NUMERIC, -- #13
   sub_item NUMERIC, -- #17
   taxable NUMERIC, -- #19
   track_qty_on_hand NUMERIC, -- #20
   item_type TEXT, -- #21
-  unit_price NUMERIC, -- #22
+  unit_price INTEGER, -- #22; money: integer cents (OD-04-02, owner 2026-10-28)
   level NUMERIC, -- #24
   inv_start_date TEXT, -- #27 ISO date YYYY-MM-DD
   sku TEXT, -- #29
@@ -710,7 +670,7 @@ CREATE TABLE opportunity (
   status_cached TEXT, -- #50
   creation_user_id TEXT, -- #51
   modification_user_id TEXT, -- #52
-  value NUMERIC, -- #53
+  value INTEGER, -- #53; money: integer cents (OD-04-02, owner 2026-10-28)
   probability TEXT, -- #54
   party_id TEXT REFERENCES party(id), -- #55
   salesperson_id TEXT, -- #56
@@ -747,7 +707,7 @@ CREATE TABLE organization (
   creation_timestamp TEXT, -- #106 local civil time YYYY-MM-DD HH:MM:SS (D-05)
   modification_account_name TEXT, -- #107
   modification_timestamp TEXT, -- #109 local civil time YYYY-MM-DD HH:MM:SS (D-05)
-  federal_tax_id_number TEXT, -- #130
+  federal_tax_id_number TEXT, -- #130 plain text: no encryption, masking or extra access rule (owner, 2026-10-28; D-09)
   company_type TEXT, -- #131
   creation_user_id TEXT, -- #135
   modification_user_id TEXT -- #136
@@ -837,7 +797,7 @@ CREATE TABLE payment (
   id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter, unique validation; FM validation: not empty (enforced in the command layer, D-27)
   id_customer TEXT, -- #2; FK -> customer(id) waits on OD-04-01 (needs-profile)
   date TEXT, -- #3 ISO date YYYY-MM-DD
-  amount NUMERIC, -- #4
+  amount INTEGER, -- #4; money: integer cents (OD-04-02, owner 2026-10-28)
   id_deposit_account TEXT, -- #5
   private_note TEXT, -- #6
   payment_ref_num TEXT, -- #7
@@ -849,7 +809,7 @@ CREATE TABLE payment (
 CREATE TABLE payment_line (
   id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter, unique validation; FM validation: not empty (enforced in the command layer, D-27)
   id_payment TEXT REFERENCES payment(id), -- #2
-  amount NUMERIC, -- #4
+  amount INTEGER, -- #4; money: integer cents (OD-04-02, owner 2026-10-28)
   id_invoice TEXT REFERENCES sales_transaction(id), -- #7
   id_journal_entry TEXT, -- #8
   id_customer TEXT -- #15
@@ -923,13 +883,13 @@ CREATE TABLE phone_format (
 CREATE TABLE sales_line (
   id TEXT PRIMARY KEY NOT NULL, -- #1 primary key: UUID auto-enter, unique validation; FM validation: not empty (enforced in the command layer, D-27)
   description TEXT, -- #5
-  amount NUMERIC, -- #6
-  unit_price NUMERIC, -- #7
+  amount INTEGER, -- #6; money: integer cents (OD-04-02, owner 2026-10-28)
+  unit_price INTEGER, -- #7; money: integer cents (OD-04-02, owner 2026-10-28)
   qty NUMERIC, -- #8
   item_id TEXT REFERENCES item(id), -- #9
   sales_transaction_id TEXT REFERENCES sales_transaction(id), -- #10 FM validation: not empty (enforced in the command layer, D-27)
   taxable NUMERIC, -- #11
-  amount_taxable NUMERIC, -- #12 stored calculation, maintained by the command layer (07)
+  amount_taxable INTEGER, -- #12 stored calculation, maintained by the command layer (07); money: integer cents (OD-04-02, owner 2026-10-28)
   test TEXT -- #20
 );
 
@@ -956,20 +916,20 @@ CREATE TABLE sales_transaction (
   bill_address_postal_code TEXT, -- #14
   bill_address_state TEXT, -- #15
   due_date TEXT, -- #22 ISO date YYYY-MM-DD
-  total_amt NUMERIC, -- #25
-  balance NUMERIC, -- #26
+  total_amt INTEGER, -- #25; money: integer cents (OD-04-02, owner 2026-10-28)
+  balance INTEGER, -- #26; money: integer cents (OD-04-02, owner 2026-10-28)
   customer_memo TEXT, -- #27
   bill_email_address TEXT, -- #29
-  total_tax NUMERIC, -- #30
+  total_tax INTEGER, -- #30; money: integer cents (OD-04-02, owner 2026-10-28)
   id_tax_code TEXT, -- #31
   deleted NUMERIC, -- #32
-  subtotal NUMERIC, -- #33
-  taxable_subtotal NUMERIC, -- #34
+  subtotal INTEGER, -- #33; money: integer cents (OD-04-02, owner 2026-10-28)
+  taxable_subtotal INTEGER, -- #34; money: integer cents (OD-04-02, owner 2026-10-28)
   period NUMERIC, -- #36 stored calculation, maintained by the command layer (07)
   tracking_num TEXT, -- #38
   ship_date TEXT, -- #39 ISO date YYYY-MM-DD
   ship_method TEXT, -- #40
-  ship_amt NUMERIC, -- #41
+  ship_amt INTEGER, -- #41; money: integer cents (OD-04-02, owner 2026-10-28)
   ship_address_city TEXT, -- #42
   ship_address_country TEXT, -- #43
   ship_address_line_1 TEXT, -- #44
@@ -980,7 +940,7 @@ CREATE TABLE sales_transaction (
   id_department TEXT, -- #50
   deposit TEXT, -- #51
   paid_ind NUMERIC, -- #57 stored calculation, maintained by the command layer (07)
-  retainer NUMERIC, -- #62 stored calculation, maintained by the command layer (07)
+  retainer INTEGER, -- #62 stored calculation, maintained by the command layer (07); money: integer cents (OD-04-02, owner 2026-10-28)
   status TEXT, -- #68
   invoice_ind NUMERIC, -- #73
   sales_receipt_ind NUMERIC, -- #74
@@ -1021,11 +981,8 @@ CREATE TABLE system_setting (
   default_email_signature_template TEXT, -- #63
   initial_setup_done_ind NUMERIC, -- #65
   logo_sha256 TEXT, -- #67 content hash of a file in the app data directory (D-17)
-  twilio_account_sid TEXT, -- #68
-  twilio_format_option TEXT, -- #70
   system_email_sender TEXT, -- #72
-  ms_graph_tennent_id TEXT, -- #73
-  twilio_sms_from_phone_number TEXT -- #74
+  ms_graph_tennent_id TEXT -- #73
 );
 
 -- Source: objects/karbon_data.fmp12/tables/150-Task.txt
@@ -1090,8 +1047,8 @@ CREATE TABLE user (
 CREATE TABLE vendor (
   id TEXT PRIMARY KEY NOT NULL REFERENCES party_role(id), -- #7 primary key: 1:1 subtype of PartyRole (D-15)
   terms_id TEXT, -- #13
-  credit_limit TEXT, -- #14
-  tax_id TEXT, -- #15
+  credit_limit INTEGER, -- #14; money: integer cents (OD-04-02, owner 2026-10-28)
+  tax_id TEXT, -- #15 plain text: no encryption, masking or extra access rule (owner, 2026-10-28; D-09)
   eligible_1099_ind NUMERIC, -- #16
   creation_account_name TEXT, -- #23
   creation_timestamp TEXT, -- #24 local civil time YYYY-MM-DD HH:MM:SS (D-05)
@@ -1127,8 +1084,6 @@ CREATE INDEX ix_activity_purpose_activity_id ON activity_purpose (activity_id); 
 CREATE INDEX ix_activity_purpose_activity_purpose_type_id ON activity_purpose (activity_purpose_type_id); -- join activity_purpose_type.id (yes; objects/karbon_data.fmp12/relationships/22-ActivityPurposeType_ActivityPurpose.txt)
 CREATE INDEX ix_address_id ON address (id); -- join contact_method.id (yes; objects/karbon_kontroller.fmp12/relationships/8-Address_ContactMethod.txt)
 CREATE INDEX ix_call_id ON call (id); -- join activity.id (yes; objects/karbon_kontacts.fmp12/relationships/253-Call_Activity.txt)
-CREATE INDEX ix_chat_id ON chat (id); -- join activity.id (yes; objects/karbon_kontacts.fmp12/relationships/255-Chat_Activity.txt)
-CREATE INDEX ix_chat_message_activity_id ON chat_message (activity_id); -- join chat.id (needs-profile; objects/karbon_data.fmp12/relationships/96-ChatMessage_Chat.txt)
 CREATE INDEX ix_contact_method_id ON contact_method (id); -- join phone.id (yes; objects/karbon_kontroller.fmp12/relationships/6-ContactMethod_Phone.txt)
 CREATE INDEX ix_contact_method_party_id ON contact_method (party_id); -- join party.id (yes; objects/karbon_kontroller.fmp12/relationships/90-f_ContactMethod_f_Party.txt)
 CREATE INDEX ix_contact_method_purpose_contact_method_id ON contact_method_purpose (contact_method_id); -- join contact_method.id (yes; objects/karbon_data.fmp12/relationships/37-ContactMethod_ContactMethodPurpose.txt)
@@ -1202,5 +1157,5 @@ COMMIT;
 -- [ ] Every source field and relationship predicate has a disposition (appendix: generated, complete).
 -- [ ] Candidate keys profiled on each install's export at import time; duplicates/orphans go to import_rejected_row.
 -- [ ] Constraint strengthening (NOT NULL / UNIQUE) approved per D-27 and tested against a real export.
--- [ ] Timezone (local civil), decimal (rust_decimal), encoding (UTF-8), container (hash) fixtures pass.
+-- [ ] Timezone (local civil), money (integer cents, import rounding), encoding (UTF-8), container (hash) fixtures pass.
 -- [ ] Business totals (invoice totals, balances, retainer balance) reconcile after a rehearsal import.

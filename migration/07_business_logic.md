@@ -15,14 +15,14 @@ One domain list for every artifact: `PARTY`, `CONTACT`, `ACTIVITY`, `SALES`, `FI
 | FILE | Files and file attachments |
 | TEMPLATE | Templates and merge fields |
 | ADMIN | Setup, single local user, system settings, reference seeds, logging |
-| INTEG | Outbound integrations: SMTP email, address suggestions, enrichment; accounting (QBO) stub; deferred SMS |
+| INTEG | Outbound integrations: SMTP email, address suggestions, enrichment; accounting (QBO) stub. Twilio SMS/chat is removed (owner, 2026-10-28; OD-05-02) |
 | IMPORT | Per-install import of a FileMaker export |
 
 ## Evidence and coverage
 
 | Logic | Object kind | Explorer | Count | Disposition coverage | Unresolved |
 |---|---|---|---|---|---|
-| Scripts | scripts | script | 1369 | all rows in 07_business_logic_appendix.md: keep 176, client 295, replace 11, deferred 9, removed (QBO) 345, retire 532 | 1 (listed below) |
+| Scripts | scripts | script | 1369 | all rows in 07_business_logic_appendix.md: keep 176, client 289, replace 11, removed (QBO) 345, removed (SMS/chat) 15, retire 532 | 1 (listed below) |
 | Calculated fields, validation, auto-enter | tables | table | 1439 logic lines (664 in karbon_data) | karbon_data lines in the appendix; other files have no target table (04 appendix) | see D-27 |
 | Custom functions | custom-functions | function | 594 | appendix: domain-rule functions cited, the rest replaced by the Rust/TypeScript standard library | QBO maps removed (D-02) |
 | Value lists | value-lists | value list | 116 | 04 appendix (value_list_item, query or UI constant) | D-11 |
@@ -33,7 +33,7 @@ One domain list for every artifact: `PARTY`, `CONTACT`, `ACTIVITY`, `SALES`, `FI
 | File triggers | file | file | 13 | OnFirstWindowOpen / OnLastWindowClose scripts retired (session plumbing, D-04); startup becomes app start (UI-01/UI-02) | none |
 | Security predicates/restrictions | privilege-sets | security | 40 | 08 (single local user; no record predicates exist in the source) | none |
 
-Every source identity maps to a rule, command, UI behavior, an approved retirement (with its D- id), a deferral, or `unresolved`. The full script list is in `07_business_logic_appendix.md`.
+Every source identity maps to a rule, command, UI behavior, an approved retirement or removal (with its D- or OD- id), or `unresolved`. The full script list is in `07_business_logic_appendix.md`.
 
 ## Domain invariants and operations: PARTY
 
@@ -87,10 +87,12 @@ Activities: notes, tasks, events/meetings, calls, email messages, discussions, c
 
 Opportunities, sales transactions (invoices, sales receipts), lines, payments, items, posting.
 
+Every money value in this domain is an integer number of cents (owner decision, 2026-10-28; OD-04-02; 04 conventions). The commands do all money arithmetic on integers in Rust; dollars appear only in the UI and in the import.
+
 | Rule id | Tier | Invariant | Started by (commands) | Object files | Semantic tests | Open question |
 |---|---|---|---|---|---|---|
-| BR-SALES-01 | tier1 | A sales line amount is rounded to 2 decimals. When the unit price is not empty and quantity times unit price, rounded to 2 decimals, differs from the amount, the unit price is recomputed to 7 decimals as amount / quantity. An empty quantity counts as 1. *Audit fix A-10 (09).* | OP-SALES-04, OP-SALES-05 | `objects/karbon_kontacts.fmp12/scripts/270-SalesLine_Amount_OnObjectExit_Trigger.txt` (steps 4-13) | qty 3 x 33.333 amount 100.00; empty unit price; empty quantity | D-18 |
-| BR-SALES-02 | tier1 | Transaction totals: subtotal = sum of line amounts; taxable_subtotal = sum of taxable line amounts; total_amt = subtotal + total_tax + ship_amt; balance = total_amt - total paid. Recomputed by the command on every line or header change. Source facts: the layout triggers (kontacts 376, 270 steps 19-30) recompute from the lines, but the API save (kontroller 585 steps 137, 202-205) stores the totals passed in and sets subtotal = total_amt - total_tax. No core script computes total_tax: tax was left to QBO (270 steps 22-28 are disabled, "let QBO calc taxes"). With QBO out (D-02), total_tax is kept as entered or imported until OD-07-06 decides how tax is computed. The source also sets the QBO dirty flag qbo_send = true; that column is not migrated (D-02). *Audit fix A-11 (09).* | OP-SALES-04, OP-SALES-05, OP-SALES-09 | `objects/karbon_kontacts.fmp12/scripts/376-On_Commit_-_Sales_Transactions.txt` (steps 3-11); `objects/karbon_kontacts.fmp12/scripts/270-SalesLine_Amount_OnObjectExit_Trigger.txt` (steps 19-30); `objects/karbon_kontroller.fmp12/scripts/585-Create_or_Update_Invoice_invoice.txt` (steps 137, 202-205); `objects/karbon_data.fmp12/tables/177-SalesTransaction.txt` (fields 25, 26, 30, 33, 34, 58) | totals after add/remove line, tax, shipping, payment; totals passed in are ignored | D-02, D-18, OD-07-06 |
+| BR-SALES-01 | tier1 | A sales line amount is a whole number of cents. When the unit price is not empty and quantity times unit price, rounded to cents, differs from the amount, the unit price is recomputed as amount / quantity, rounded to cents half away from zero. An empty quantity counts as 1. Source fact: the source rounds the amount to 2 decimals and recomputes the unit price to 7 decimals (steps 4-13). Product decision (owner, 2026-10-28; OD-04-02): unit prices are integer cents too, so the 7-decimal unit price is not kept. The amount stays as entered; quantity times unit price can differ from it by less than one cent per unit. Import rounds a source unit price to cents and lists each changed line in the import report (BR-IMPORT-01). *Audit fix A-10 (09).* | OP-SALES-04, OP-SALES-05 | `objects/karbon_kontacts.fmp12/scripts/270-SalesLine_Amount_OnObjectExit_Trigger.txt` (steps 4-13) | qty 3, amount 10000 cents -> unit price 3333; unit price 0.5 cent rounds up; empty unit price; empty quantity; import of 33.3333333 -> 3333 | D-18, OD-04-02 |
+| BR-SALES-02 | tier1 | Transaction totals: subtotal = sum of line amounts; taxable_subtotal = sum of taxable line amounts; total_amt = subtotal + total_tax + ship_amt; balance = total_amt - total paid. All terms are integer cents, so the sums are exact (OD-04-02). Recomputed by the command on every line or header change. Source facts: the layout triggers (kontacts 376, 270 steps 19-30) recompute from the lines, but the API save (kontroller 585 steps 137, 202-205) stores the totals passed in and sets subtotal = total_amt - total_tax. No core script computes total_tax: tax was left to QBO (270 steps 22-28 are disabled, "let QBO calc taxes"). With QBO out (D-02), total_tax is kept as entered or imported until OD-07-06 decides how tax is computed. The source also sets the QBO dirty flag qbo_send = true; that column is not migrated (D-02). *Audit fix A-11 (09).* | OP-SALES-04, OP-SALES-05, OP-SALES-09 | `objects/karbon_kontacts.fmp12/scripts/376-On_Commit_-_Sales_Transactions.txt` (steps 3-11); `objects/karbon_kontacts.fmp12/scripts/270-SalesLine_Amount_OnObjectExit_Trigger.txt` (steps 19-30); `objects/karbon_kontroller.fmp12/scripts/585-Create_or_Update_Invoice_invoice.txt` (steps 137, 202-205); `objects/karbon_data.fmp12/tables/177-SalesTransaction.txt` (fields 25, 26, 30, 33, 34, 58) | totals after add/remove line, tax, shipping, payment; totals passed in are ignored | D-02, D-18, OD-07-06 |
 | BR-SALES-03 | tier2 | A transaction's period is the year and two-digit month of its date (YYYYMM). | OP-SALES-04, OP-SALES-05 | `objects/karbon_data.fmp12/tables/177-SalesTransaction.txt` (field 36) | January and December | none |
 | BR-SALES-04 | tier1 | A sales transaction dated on or before system_setting.book_close_date cannot be unlocked, edited or deleted. Source fact: only the Unlock button checks the date (kontacts 335 steps 9-11); the delete command (560) and the API save (395, 428) do not. (The same check in the QBO delete script, kontroller 461 steps 67-68, is removed with QBO, D-02.) Product decision (D-18, D-20): the target checks the date in the unlock, save and delete commands. *Audit fix A-12 (09).* | OP-SALES-04, OP-SALES-05, OP-SALES-06, OP-SALES-07 | `objects/karbon_kontacts.fmp12/scripts/335-btn_Unlock_Sales_Transaction_Id.txt` (steps 9-11); `objects/karbon_kontroller.fmp12/scripts/560-Delete_SalesTransaction_SalesTransactionId.txt` (steps 48-82) | date equal to the close date is refused for unlock, save and delete | D-18, D-20 |
 | BR-SALES-05 | tier1 | A locked (posted) transaction cannot be changed or deleted until it is unlocked. The source also refuses to delete a transaction that has a qbo_id; with QBO out of scope there is no qbo_id and that check is not migrated (D-02). The source API save (395, 428) unposts before it saves, so it bypasses this check; the target does not (BR-SALES-08, OD-07-05). | OP-SALES-04, OP-SALES-05, OP-SALES-07 | `objects/karbon_kontroller.fmp12/scripts/585-Create_or_Update_Invoice_invoice.txt` (step 157); `objects/karbon_kontroller.fmp12/scripts/560-Delete_SalesTransaction_SalesTransactionId.txt` (steps 50-56) | edit/delete of locked refused | none |
@@ -115,7 +117,7 @@ Files and file attachments.
 |---|---|---|---|---|---|---|
 | BR-FILE-01 | tier1 | A file is refused when its size in kilobytes (bytes / 1000, rounded to 2 decimals) is over 20480: 20,480,005 bytes or more is refused. The source uses a FileSize passed by the caller when there is one (steps 82, 103-104); the target computes the size from the bytes (D-07). *Audit fix A-19 (09): the earlier "20 MB" boundary was not the source's.* | OP-FILE-01 | `objects/karbon_kontroller.fmp12/scripts/617-Create_File_data_v2.txt` (steps 103-111) | 20,480,004 bytes accepted; 20,480,005 refused; a passed size is ignored | D-07, D-17 |
 | BR-FILE-02 | tier2 | Adding a file records name, extension, content type, size, category (Image or Document) and, for images, a thumbnail; the bytes are stored in the app data directory under their SHA-256. | OP-FILE-01 | `objects/karbon_kontroller.fmp12/scripts/617-Create_File_data_v2.txt`; `objects/karbon_data.fmp12/tables/195-File.txt` | image and PDF | D-17 |
-| BR-FILE-03 | tier2 | A file attachment links one file to one entity (party, sales transaction, opportunity, chat message); detaching removes only the link. | OP-FILE-02, OP-FILE-03 | `objects/karbon_kontroller.fmp12/scripts/616-Create_FileAttachment_data_v2.txt`; `objects/karbon_kontroller.fmp12/scripts/612-Delete_FileAttachment_data.txt`; `objects/karbon_data.fmp12/tables/196-FileAttachment.txt` | detach keeps the file | none |
+| BR-FILE-03 | tier2 | A file attachment links one file to one entity (party, sales transaction, opportunity); detaching removes only the link. The source also attaches files to chat messages; those attachments are not migrated with chat (OD-05-02). | OP-FILE-02, OP-FILE-03 | `objects/karbon_kontroller.fmp12/scripts/616-Create_FileAttachment_data_v2.txt`; `objects/karbon_kontroller.fmp12/scripts/612-Delete_FileAttachment_data.txt`; `objects/karbon_data.fmp12/tables/196-FileAttachment.txt` | detach keeps the file | none |
 
 ## Domain invariants and operations: TEMPLATE
 
@@ -140,7 +142,7 @@ Setup, single local user, system settings, reference seeds, logging.
 
 ## Domain invariants and operations: INTEG
 
-Outbound integrations: SMTP email, address suggestions, enrichment; accounting (QBO) stub; deferred SMS.
+Outbound integrations: SMTP email, address suggestions, enrichment; accounting (QBO) stub. Twilio SMS/chat (send, delivery status, inbound messages, phone lookup) is removed, out of scope (owner, 2026-10-28; OD-05-02): it cannot work in the desktop client without a server. It has no rule, command or screen.
 
 | Rule id | Tier | Invariant | Started by (commands) | Object files | Semantic tests | Open question |
 |---|---|---|---|---|---|---|
@@ -154,8 +156,8 @@ Per-install import of a FileMaker export.
 
 | Rule id | Tier | Invariant | Started by (commands) | Object files | Semantic tests | Open question |
 |---|---|---|---|---|---|---|
-| BR-IMPORT-01 | tier1 | Import loads a FileMaker export into a new database: source ids are kept, tables load in dependency order, each row passes type and key checks or goes to import_rejected_row with a reason, then caches and totals are recomputed (BR-PARTY-06, BR-SALES-02, BR-SALES-06). | OP-IMPORT-01, OP-IMPORT-02 | `objects/karbon_data.fmp12/tables/136-Party.txt`; `objects/karbon_data.fmp12/tables/177-SalesTransaction.txt` | rerun into a fresh database gives the same result | D-34, D-39, D-40, D-16 |
-| BR-IMPORT-02 | tier1 | Import skips the secret and PII columns listed in D-09 (passwords, tokens, API keys, SSN, card and bank data). | OP-IMPORT-01 | `objects/karbon_data.fmp12/tables/165-System.txt`; `objects/karbon_data.fmp12/tables/130-User.txt`; `objects/karbon_data.fmp12/tables/141-Employee.txt` | no excluded column present after import | D-09 |
+| BR-IMPORT-01 | tier1 | Import loads a FileMaker export into a new database: source ids are kept, tables load in dependency order, each row passes type and key checks or goes to import_rejected_row with a reason, then caches and totals are recomputed (BR-PARTY-06, BR-SALES-02, BR-SALES-06). Money values are converted from the FileMaker decimal to integer cents, rounding half away from zero (FileMaker Round()); a value that changes in the conversion is listed in the report. vendor.credit_limit is Text in the source: a value that is not a number imports as NULL and is listed (OD-04-02, owner 2026-10-28). Chat, ChatConsent and ChatMessage rows and chat-message file attachments are not imported (OD-05-02); the FileMaker export keeps them. SMS activities (activity_type 9) import as activity rows without their messages. | OP-IMPORT-01, OP-IMPORT-02 | `objects/karbon_data.fmp12/tables/136-Party.txt`; `objects/karbon_data.fmp12/tables/177-SalesTransaction.txt` | rerun into a fresh database gives the same result | D-34, D-39, D-40, D-16 |
+| BR-IMPORT-02 | tier1 | Import skips the secret and PII columns listed in D-09 (passwords, tokens, API keys, SSN, card and bank data). Tax ids (organization.federal_tax_id_number, vendor.tax_id) are not on that list: they import as plain text with no encryption or masking (owner, 2026-10-28; D-09). | OP-IMPORT-01 | `objects/karbon_data.fmp12/tables/165-System.txt`; `objects/karbon_data.fmp12/tables/130-User.txt`; `objects/karbon_data.fmp12/tables/141-Employee.txt` | no excluded column present after import | D-09 |
 
 ## Target ownership
 
@@ -222,10 +224,10 @@ All 1369 scripts are in `07_business_logic_appendix.md` with a disposition. Summ
 | Disposition | Scripts | Meaning |
 |---|---|---|
 | keep | 176 | source of a command (OP id) |
-| client | 295 | UI behavior of a 06 screen (navigation, dialogs, cards) |
+| client | 289 | UI behavior of a 06 screen (navigation, dialogs, cards) |
 | replace | 11 | transaction and HTTP plumbing replaced by the command layer (D-08) |
-| deferred | 9 | SMS/chat (D-14) |
 | removed | 345 | QuickBooks Online, out of scope (owner, 2026-10-27; D-02) |
+| removed | 15 | Twilio SMS/chat, out of scope (owner, 2026-10-28; OD-05-02): the 9 chat, SMS and phone-lookup scripts and the 6 chat-screen scripts |
 | retire | 532 | tooling, time tracking, session plumbing, no caller (D-01, D-03, D-04, D-11) |
 | unresolved | 1 | no command assigned yet (listed below) |
 

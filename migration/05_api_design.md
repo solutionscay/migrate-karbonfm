@@ -11,7 +11,7 @@ There is no server (D-36). The interface is a set of **Tauri commands**: Rust fu
 | Consumers/clients/integrations | the app's own webview only; outbound SMTP and optional HTTPS integrations from Rust |
 | Authentication mechanism | none: single local user (D-04); OD-08-01 optional app lock |
 | Authorization design reference | `08_auth_roles.md` (AP-01..AP-12) |
-| Unavailable/open contracts | QBO is a stub only (EXT-04, OP-INTEG-04; out of scope, D-02); SMS (EXT-05, OD-05-02); binding generation (OD-05-01) |
+| Unavailable/open contracts | QBO is a stub only (EXT-04, OP-INTEG-04; out of scope, D-02); SMS/chat removed (EXT-05, out of scope, owner 2026-10-28; OD-05-02); binding generation (OD-05-01) |
 
 ## Use-case operation catalog
 
@@ -207,9 +207,9 @@ There are no bulk mutations. `Replace Field Contents` has no translation (07).
 | EXT-02 | Google Places / SmartyStreets address suggestions | outbound | OP-INTEG-02 | HTTPS JSON | keychain: google_places, smartystreets | no retry; UI shows no suggestions | optional (I6) |
 | EXT-03 | FullContact enrichment | outbound | OP-INTEG-03 | HTTPS JSON, bearer key | keychain: fullcontact | no retry | optional (I6) |
 | EXT-04 | QuickBooks Online (accounting) | none | OP-INTEG-04 | stubbed, not implemented: no-op command returning NotImplemented | none | n/a | stubbed, not implemented (owner, D-02) |
-| EXT-05 | Twilio SMS / chat | bidirectional | none (deferred) | Twilio REST + status webhooks | n/a | n/a | deferred (D-14, OD-05-02) |
+| EXT-05 | Twilio SMS / chat | none | none | removed, not implemented | none | n/a | removed: out of scope (owner, 2026-10-28; OD-05-02) |
 
-There is no inbound endpoint. Twilio status webhooks (kontroller 731) need a receiver, which a desktop app does not have (OD-05-02).
+There is no inbound endpoint. Twilio SMS/chat needed one for its status and inbound-message webhooks (kontroller 731), which a desktop app does not have, so it is removed (owner, 2026-10-28; OD-05-02). No command, type or stub exists for it.
 
 ## Accounting integration stub (QBO)
 
@@ -251,7 +251,8 @@ Two-step destructive commands (AP-07): the first call without `confirm` returns 
 | Idempotency | post/unpost and role add are idempotent (BR-SALES-06, BR-PARTY-05); creates take a client-generated UUID so a retried create is a no-op |
 | Rate/size/pagination limits | file 20 MB (BR-FILE-01); list pages 50-100 |
 | Audit actor/reason/correlation | creation/modification stamps (BR-PARTY-07); log line per error with command name (BR-ADMIN-03) |
-| Sensitive-field logging/masking | secrets never logged (AP-03, D-30) |
+| Sensitive-field logging/masking | secrets never logged (AP-03, D-30); tax ids are ordinary text fields with no masking (owner, 2026-10-28; D-09) |
+| Money values | every money field of every command input and output is an integer number of cents (`i64`, JSON number); the UI converts dollars to cents and back; no command takes or returns a decimal (OD-04-02, owner 2026-10-28) |
 
 ## Traceability and tests
 
@@ -262,5 +263,4 @@ Each command lists its source scripts in the appendix and its rules in 07. Requi
 | Source behavior | Missing evidence | Risk | Required proof/owner |
 |---|---|---|---|
 | Whether commands use typed bindings generated from Rust (specta/tauri-specta) or hand-written TypeScript types. | not in the DDR | feature gap | OD-05-01, Tech lead |
-| SMS/chat without a server: poll Twilio for status and inbound messages, or drop the chat feature. | not in the DDR | feature gap | OD-05-02, Product owner |
 | btn: Apply Retainer (`objects/karbon_kontacts.fmp12/scripts/223-btn_Apply_Retainer.txt`) | no command assigned; the called kontroller script 328 is deleted and no other object holds the logic (09, G-01) | behavior lost | OD-07-04, Accounting owner |
