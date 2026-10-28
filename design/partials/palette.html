@@ -1,0 +1,28 @@
+<div x-data="palette" @keydown.window="onKey($event)" @open-palette.window="show()">
+  <div class="palette-backdrop" x-show="open" x-cloak x-transition.opacity @click.self="hide()" @keydown.escape.window="hide()">
+    <div class="palette" role="dialog" aria-label="Command palette">
+      <div class="relative">
+        <svg class="i absolute left-4 top-[18px] muted"><use href="#i-search"/></svg>
+        <input x-ref="q" x-model="q" @input="active = 0" @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.enter.prevent="run()" placeholder="Type a command or search…" aria-label="Search">
+      </div>
+      <div class="overflow-y-auto pb-2 scroll">
+        <template x-for="g in groups()" :key="g">
+          <div>
+            <div class="group" x-text="g"></div>
+            <template x-for="item in results.filter(i => i.group === g)" :key="item.label">
+              <div class="item" :class="{ active: results.indexOf(item) === active }" @mouseenter="active = results.indexOf(item)" @click="run(item)">
+                <svg class="i muted"><use :href="'#i-' + item.icon"/></svg>
+                <span x-text="item.label"></span>
+                <span class="ml-auto text-[11.5px] muted" x-text="item.hint"></span>
+              </div>
+            </template>
+          </div>
+        </template>
+        <div class="px-4 py-8 text-center muted" x-show="results.length === 0">No matches</div>
+      </div>
+      <div class="flex gap-4 px-4 py-2 border-t hairline text-[11.5px] muted">
+        <span><span class="kbd-hint">↑↓</span> move</span><span><span class="kbd-hint">↵</span> open</span><span><span class="kbd-hint">esc</span> close</span>
+      </div>
+    </div>
+  </div>
+</div>
