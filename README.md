@@ -65,11 +65,15 @@ See the skill's `SKILL.md` for the full steps.
 
 ## Status
 
-| Step | Status |
-|---|---|
-| 1. Extract | Done: 4,768 objects in 13 files. |
-| 2. Inventory | Done: `migration/00_app_summary.md`. |
-| 3. Read every object | Done: all explorers verified. |
-| 4. Discovery questions | In progress: `migration/01_discovery_answers.md`, `migration/01_discovery_signals.tsv`. |
-| 5. Migration plan | Next. |
-| 6. Audit | Next. |
+The migrate-filemaker run is done: steps 1-9, with 4,768 objects in 13 files and all explorers verified. The plan files:
+
+- [00_app_summary.md](migration/00_app_summary.md): inventory of files, objects and references
+- [01_discovery_answers.md](migration/01_discovery_answers.md): discovery questions and default answers
+- [02_recommendations.md](migration/02_recommendations.md): target stack
+- [03_migration_plan.md](migration/03_migration_plan.md): increments, data migration and cutover
+- [04_database_schema.sql](migration/04_database_schema.sql): target schema
+- [05_api_design.md](migration/05_api_design.md): commands and integrations
+- [06_ui_spec.md](migration/06_ui_spec.md): screens
+- [07_business_logic.md](migration/07_business_logic.md): business rules
+- [08_auth_roles.md](migration/08_auth_roles.md): roles and access policies
+- [09_audit.md](migration/09_audit.md): audit of the plan and open gaps
