@@ -1,3 +1,5 @@
+<img src="design/brand/readme-banner.png" alt="KarbonFM migration banner: an old FileMaker layout breaking into blocks that rebuild as the new desktop app dashboard" width="100%">
+
 # migrate-karbonfm
 
 A demo of migrating [KarbonFM](https://gh.ali360.cloudns.ch/karbonfm/karbonfm), an open-source FileMaker CRM, to a desktop app for macOS and Linux.
