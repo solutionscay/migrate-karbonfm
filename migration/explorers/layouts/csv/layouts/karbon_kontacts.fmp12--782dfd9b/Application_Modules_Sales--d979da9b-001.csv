@@ -1,0 +1,329 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+karbon_kontacts.fmp12/layouts/40-Customers.txt,4268d39e07a91cc03c87ce26f54a430da327a52190bea73328d8fc18fd8cba39,layouts,karbon_kontacts.fmp12,40,Customers,list,"Party_PartyRole_Customer (base Customer, karbon_data.fmp12)","key 129 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 131 button ""(icon)"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 139 text ""Showing {{FoundCount}} of {{TotalRecordCount}} Records"" | hidden when every record is in the found set (nothing omitted)
+key 140 button ""Show All"" | hidden when every record is in the found set (nothing omitted)","key 119 button ""=BrowserNav.Tooltip ( ""backward"" )"" | when the browser-style navigation history is being saved (BrowserNav.SaveNavHistory is true) | none
+key 123 field Globals::RecordNav#31 | when the record-number field holds something other than the current record number (user is typing a new number) | style","key 123 field Globals::RecordNav#31 | OnObjectEnter | script 382 Record Nav | record-number box navigation (Record Nav) | param puts the current record number into the record-number field and selects it
+key 123 field Globals::RecordNav#31 | OnObjectExit | script 382 Record Nav | record-number box navigation (Record Nav) | param jumps to the record number typed in the field (capped at the found count) and clears the field
+key 146 popover FindPopover | OnObjectEnter | script 248 Trigger: Set Up QuickFind Popover | clears the QuickFind global (with triggers off during the commit) and puts the cursor in the QuickFind field
+key 147 field Globals::QuickFind#1 | OnObjectSave | script 250 Perform QuickFind | runs Perform Quick Find on Globals::QuickFind when triggers are allowed and the field is not empty","key 117 (icon) | script 105 Display Main Nav
+key 119 (calc) BrowserNav.Tooltip ( ""backward"" ) | script 466 Browser Nav (forward or backward) | param go back in the navigation history
+key 120 (calc) BrowserNav.Tooltip ( ""forward"" ) | script 466 Browser Nav (forward or backward) | param go forward in the navigation history
+key 121 Nav.RecordNumberField | no step
+key 122 Nav.RecordNumberField | no step
+key 125 (icon) | script 382 Record Nav | param previous record
+key 126 (icon) | script 382 Record Nav | param next record
+key 128 (calc) record count, found count and sort state | script 382 Record Nav | param toggle between the found set and the omitted records
+key 38 (icon) | script 501 Go to Customer Detail {Id} | param JSON {Id: Party_PartyRole_Customer::Id}
+key 131 (icon) | script 524 Add Pending Change to Build File
+key 133 Customers | script 506 Sales Nav | param go to the Customers list
+key 134 Opportunities | script 506 Sales Nav | param go to the Opportunities (leads) list
+key 135 Transactions | script 506 Sales Nav | param go to the Sales List
+key 136 Items | script 506 Sales Nav | param go to the Items list
+key 137 Payments | script 506 Sales Nav | param go to the Payments List
+key 138 Showing {{FoundCount}} of {{TotalRecordCount}} Records | no step
+key 140 Show All | Show All Records
+key 144 (icon) | script 486 btn: Open Create Party Card - Customer
+key 145 (icon) | opens popover ""Find Opportunities""
+key 148 Show All | script 251 Close Find Popover and Show All
+key 149 Advanced Find | script 804 Button: Go to Advanced Find Layout ( EntityName ) | param open the Advanced Find layout for customers
+key 150 (icon) | script 478 Get Help","key 119 | navigation tooltip for the backward button (BrowserNav.Tooltip custom function)
+key 120 | navigation tooltip for the forward button (BrowserNav.Tooltip custom function)",none,none,page,"DEV-only button key 131 runs ""Add Pending Change to Build File"" (build tooling); confirm it is out of scope for the rebuild
+Popover titled ""Find Opportunities"" (key 146) sits on the Customers list; its Advanced Find passes ""customer"""
+karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt,19afd7d213ab2f734351a40871e42cefb6040a6494462d81926168c8925b214d,layouts,karbon_kontacts.fmp12,51,Customer Detail,form,"Party_PartyRole_Customer (base Customer, karbon_data.fmp12)","key 415 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 275 button ""Edit…"" | hidden when the window is in find mode
+key 277 field Party::Photo#32 | hidden when the party is an organization (Party::OrganizationInd), or the window is in find mode
+key 278 field Party::Photo#32 | hidden when the party is a person (Party::PersonInd), or the window is in find mode
+key 279 field Person::JobTitle#14 | hidden when the party has no related Person record (Person::ONE), or the window is in find mode
+key 280 field Party::Department#136 | hidden when the party has a related Person record (Person::ONE), or the window is in find mode
+key 417 button ""(icon)"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 642 text ""Invoice"" | hidden when the transaction row is not an invoice
+key 643 text ""Sales Receipt"" | hidden when the transaction row is an invoice
+key 476 rect ActivityAlertInd | hidden when the activity has no alert flag
+key 477 buttonbar | hidden when the activity has no comments
+key 480 button ""(icon)"" | hidden when the activity row is not a Note (ActivityTypeId <> 2)
+key 481 button ""(icon)"" | hidden when the activity row is not a Email (ActivityTypeId <> 1)
+key 482 button ""(icon)"" | hidden when the activity row is not a Meeting (ActivityTypeId <> 6)
+key 483 button ""(icon)"" | hidden when the activity row is not a Call (ActivityTypeId <> 8)
+key 484 button ""(icon)"" | hidden when the activity row is not a Task (ActivityTypeId <> 3)
+key 499 button ""Add Contact"" | hidden when the party is a person (Party::PersonInd)
+key 500 button ""Add Organization"" | hidden when the party is an organization (Party::OrganizationInd)
+key 501 text ""Layered buttons"" | hidden always (the calculation is the constant 1)
+key 509 field Party_PartyRelation_Party::Photo#32 | hidden when the party is an organization (Party_PartyRelation_Party::OrganizationInd), or the window is in find mode
+key 510 field Party_PartyRelation_Party::Photo#32 | hidden when the party is a person (Party_PartyRelation_Party::PersonInd), or the window is in find mode
+key 676 button ""(icon)"" | hidden when the party relation is not current
+key 677 button ""(icon)"" | hidden when the party relation is current","key 405 button ""=BrowserNav.Tooltip ( ""backward"" )"" | when the browser-style navigation history is being saved (BrowserNav.SaveNavHistory is true) | none
+key 409 field Globals::RecordNav#31 | when the record-number field holds something other than the current record number (user is typing a new number) | style","key 409 field Globals::RecordNav#31 | OnObjectEnter | script 382 Record Nav | record-number box navigation (Record Nav) | param puts the current record number into the record-number field and selects it
+key 409 field Globals::RecordNav#31 | OnObjectExit | script 382 Record Nav | record-number box navigation (Record Nav) | param jumps to the record number typed in the field (capped at the found count) and clears the field
+key 465 popover FindPopover | OnObjectEnter | script 248 Trigger: Set Up QuickFind Popover | clears the QuickFind global (with triggers off during the commit) and puts the cursor in the QuickFind field
+key 466 field Globals::QuickFind#1 | OnObjectSave | script 250 Perform QuickFind | runs Perform Quick Find on Globals::QuickFind when triggers are allowed and the field is not empty","key 403 (icon) | script 105 Display Main Nav
+key 405 (calc) BrowserNav.Tooltip ( ""backward"" ) | script 466 Browser Nav (forward or backward) | param go back in the navigation history
+key 406 (calc) BrowserNav.Tooltip ( ""forward"" ) | script 466 Browser Nav (forward or backward) | param go forward in the navigation history
+key 407 Nav.RecordNumberField | no step
+key 408 Nav.RecordNumberField | no step
+key 411 (icon) | script 382 Record Nav | param previous record
+key 412 (icon) | script 382 Record Nav | param next record
+key 414 (calc) record count, found count and sort state | script 382 Record Nav | param toggle between the found set and the omitted records
+keys 272,273,274,480,481,482,483,484,511,512,514 (×11) (icon) | no step
+key 275 Edit… | script 163 Open Party Info Card { Id } | param JSON {Id: Party::Id}
+key 281 Discuss | script 838 Open Discussion from Customer
+key 364 Links | opens popover ""Links""
+key 368 (calc) Party_PartyRole_ExternalLink::NameDisplay | script 205 btn: Open Customer In QBO
+key 417 (icon) | script 524 Add Pending Change to Build File
+key 441 List View | Go to Layout [ “Customers” (Party_PartyRole_Customer) ]
+key 463 (icon) | script 486 btn: Open Create Party Card - Customer
+key 464 (icon) | opens popover ""Find Opportunities""
+key 467 Show All | script 251 Close Find Popover and Show All
+key 468 Advanced Find | script 795 <unknown> | param open Advanced Find for customers
+key 469 (icon) | script 478 Get Help
+key 646 Invoice | script 272 Create Invoice (Customer Id) | param Party_PartyRole_Customer::Id
+key 648 Sales Receipt | script 514 Create Sales Receipt ( Id ) | param Party_PartyRole_Customer::Id
+key 640 (icon) | script 224 Display Sales Transaction in a New Window( Id ) | param Party_PartyRole_Customer_SalesTransaction::id
+key 641 (icon) | script 228 btn: Display Billing Report for Invoice
+key 475 (icon) | script 291 Open Activity { Id } | param JSON {Id: activity id, DisplayPartyIds: customer person, related persons and activity-party persons}
+key 478 (calc) comment count | no step
+key 489 Email | script 770 Button: Create Email Message From Party
+key 490 Meeting | script 771 Button: Create Meeting From Party
+key 491 Call | script 706 Button: Create Call from Party
+key 492 Task | script 772 btn: Create Task From Party
+key 493 Note | script 669 Button: Create Note from Party
+key 499 Add Contact | script 424 btn: Add Related Person to Organization
+key 500 Add Organization | script 656 btn: Add Related Organization to Person
+key 503 (icon) | script 163 Open Party Info Card { Id } | param JSON {Id: Party_PartyRelation_Party::Id}
+key 676 (icon) | script 423 btn: End Party Relation from Party
+key 677 (icon) | script 855 btn: Restore Party Relation from Party
+key 650 (icon) | script 611 Go to Opportunity Card { Id } | param JSON {Id: Party_Opportunity::Id}
+key 657 (icon) | script 603 Go to Opportunity Detail { Id } | param JSON {Id: Party_Opportunity::Id}
+key 663 Add Opportunity… | script 610 btn: Create Opportunity From Party","key 405 | navigation tooltip for the backward button (BrowserNav.Tooltip custom function)
+key 406 | navigation tooltip for the forward button (BrowserNav.Tooltip custom function)","key 366 Party_PartyRole_ExternalLink | none | none
+key 633 Party_PartyRole_Customer_SalesTransaction | date descending | none
+key 474 Party_ActivityParty_Activity | datedisplay descending, timedisplay descending | shows only activities that are not discussions
+key 502 Party_PartyRelation_Party | none | none
+key 649 Party_Opportunity | none | none","Boolean (id 1)
+Employee#current (id 44)",page,"Advanced Find button (key 468) runs script 795, whose name is <unknown> in the DDR; the list layout uses script 804 for the same job
+Text ""Layered buttons"" (key 501) is always hidden; purpose unclear
+Tab-strip and row icon buttons without a step (keys 272-274, 511, 512, 514) are presentation only; confirm no behavior is lost
+script id 795 named by a button shows <unknown> in the DDR (script missing or renamed)"
+karbon_kontacts.fmp12/layouts/84-Sales_List.txt,2f28814c6632d5c6a53b7f3e32a05f2f49f18ab9389c30d4c231e93846b8fe06,layouts,karbon_kontacts.fmp12,84,Sales List,list,"SalesTransaction (base SalesTransaction, karbon_data.fmp12)","key 147 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 129 text ""Invoice"" | hidden when the transaction is not an invoice, or the window is in find mode
+key 130 text ""Sales Receipt"" | hidden when the transaction is an invoice, or the window is in find mode
+key 152 button ""=""Edit Invoice"""" | hidden when the transaction is not an invoice
+key 153 button ""=""Edit Sales Receipt"""" | hidden when the transaction is not a sales receipt
+key 149 popover button ""SalesTransactionGear Copy"" | hidden when the transaction has no QBO id
+key 156 button ""(icon)"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 169 text ""Showing {{FoundCount}} of {{TotalRecordCount}} Records"" | hidden when every record is in the found set (nothing omitted)
+key 170 button ""Show All"" | hidden when every record is in the found set (nothing omitted)","key 137 button ""=BrowserNav.Tooltip ( ""backward"" )"" | when the browser-style navigation history is being saved (BrowserNav.SaveNavHistory is true) | none
+key 141 field Globals::RecordNav#31 | when the record-number field holds something other than the current record number (user is typing a new number) | style","key 141 field Globals::RecordNav#31 | OnObjectEnter | script 382 Record Nav | record-number box navigation (Record Nav) | param puts the current record number into the record-number field and selects it
+key 141 field Globals::RecordNav#31 | OnObjectExit | script 382 Record Nav | record-number box navigation (Record Nav) | param jumps to the record number typed in the field (capped at the found count) and clears the field
+key 173 popover FindPopover | OnObjectEnter | script 248 Trigger: Set Up QuickFind Popover | clears the QuickFind global (with triggers off during the commit) and puts the cursor in the QuickFind field
+key 174 field Globals::QuickFind#1 | OnObjectSave | script 250 Perform QuickFind | runs Perform Quick Find on Globals::QuickFind when triggers are allowed and the field is not empty","key 135 (icon) | script 105 Display Main Nav
+key 137 (calc) BrowserNav.Tooltip ( ""backward"" ) | script 466 Browser Nav (forward or backward) | param go back in the navigation history
+key 138 (calc) BrowserNav.Tooltip ( ""forward"" ) | script 466 Browser Nav (forward or backward) | param go forward in the navigation history
+key 139 Nav.RecordNumberField | no step
+key 140 Nav.RecordNumberField | no step
+key 143 (icon) | script 382 Record Nav | param previous record
+key 144 (icon) | script 382 Record Nav | param next record
+key 146 (calc) record count, found count and sort state | script 382 Record Nav | param toggle between the found set and the omitted records
+key 38 (icon) | script 224 Display Sales Transaction in a New Window( Id ) | param SalesTransaction::id
+key 125 Customers | script 506 Sales Nav | param go to the Customers list
+key 164 Opportunities | script 506 Sales Nav | param go to the Opportunities (leads) list
+key 126 Transactions | script 506 Sales Nav | param go to the Sales List
+key 127 Items | script 506 Sales Nav | param go to the Items list
+key 128 Payments | script 506 Sales Nav | param go to the Payments List
+key 149 SalesTransactionGear Copy | opens popover ""Modify Transaction""
+key 152 Edit Invoice | script 335 btn: Unlock Sales Transaction ( Id ) | param SalesTransaction::id
+key 153 Edit Sales Receipt | script 335 btn: Unlock Sales Transaction ( Id ) | param SalesTransaction::id
+key 154 Cancel | Close Popover
+key 155 Edit | script 335 btn: Unlock Sales Transaction ( Id ) | param SalesTransaction::id
+key 156 (icon) | script 524 Add Pending Change to Build File
+key 157 View in QBO | script 335 btn: Unlock Sales Transaction ( Id ) | param SalesTransaction::id
+key 168 Showing {{FoundCount}} of {{TotalRecordCount}} Records | no step
+key 170 Show All | Show All Records
+key 172 (icon) | opens popover ""Find Opportunities""
+key 175 Show All | script 251 Close Find Popover and Show All
+key 176 (icon) | script 478 Get Help","key 137 | navigation tooltip for the backward button (BrowserNav.Tooltip custom function)
+key 138 | navigation tooltip for the forward button (BrowserNav.Tooltip custom function)",none,Boolean (id 1),page,"""View in QBO"" button (key 157) runs script 335 ""btn: Unlock Sales Transaction"", the same script as ""Edit"" (key 155); confirm that is intended"
+karbon_kontacts.fmp12/layouts/126-Payments_List.txt,8bab3229bde5992055bbbc7a5693f6fd59e141abf4c70c8521407848052cdb34,layouts,karbon_kontacts.fmp12,126,Payments List,list,"Payment (base Payment, karbon_data.fmp12)","key 167 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 169 button ""(icon)"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 177 text ""Showing {{FoundCount}} of {{TotalRecordCount}} Records"" | hidden when every record is in the found set (nothing omitted)
+key 178 button ""Show All"" | hidden when every record is in the found set (nothing omitted)","key 157 button ""=BrowserNav.Tooltip ( ""backward"" )"" | when the browser-style navigation history is being saved (BrowserNav.SaveNavHistory is true) | none
+key 161 field Globals::RecordNav#31 | when the record-number field holds something other than the current record number (user is typing a new number) | style","key 161 field Globals::RecordNav#31 | OnObjectEnter | script 382 Record Nav | record-number box navigation (Record Nav) | param puts the current record number into the record-number field and selects it
+key 161 field Globals::RecordNav#31 | OnObjectExit | script 382 Record Nav | record-number box navigation (Record Nav) | param jumps to the record number typed in the field (capped at the found count) and clears the field
+key 182 popover FindPopover | OnObjectEnter | script 248 Trigger: Set Up QuickFind Popover | clears the QuickFind global (with triggers off during the commit) and puts the cursor in the QuickFind field
+key 183 field Globals::QuickFind#1 | OnObjectSave | script 250 Perform QuickFind | runs Perform Quick Find on Globals::QuickFind when triggers are allowed and the field is not empty","key 155 (icon) | script 105 Display Main Nav
+key 157 (calc) BrowserNav.Tooltip ( ""backward"" ) | script 466 Browser Nav (forward or backward) | param go back in the navigation history
+key 158 (calc) BrowserNav.Tooltip ( ""forward"" ) | script 466 Browser Nav (forward or backward) | param go forward in the navigation history
+key 159 Nav.RecordNumberField | no step
+key 160 Nav.RecordNumberField | no step
+key 163 (icon) | script 382 Record Nav | param previous record
+key 164 (icon) | script 382 Record Nav | param next record
+key 166 (calc) record count, found count and sort state | script 382 Record Nav | param toggle between the found set and the omitted records
+key 169 (icon) | script 524 Add Pending Change to Build File
+key 171 Customers | script 506 Sales Nav | param go to the Customers list
+key 172 Opportunities | script 506 Sales Nav | param go to the Opportunities (leads) list
+key 173 Transactions | script 506 Sales Nav | param go to the Sales List
+key 174 Items | script 506 Sales Nav | param go to the Items list
+key 175 Payments | script 506 Sales Nav | param go to the Payments List
+key 176 Showing {{FoundCount}} of {{TotalRecordCount}} Records | no step
+key 178 Show All | Show All Records
+key 181 (icon) | opens popover ""Find Opportunities""
+key 184 Show All | script 251 Close Find Popover and Show All
+key 186 (icon) | script 478 Get Help","key 157 | navigation tooltip for the backward button (BrowserNav.Tooltip custom function)
+key 158 | navigation tooltip for the forward button (BrowserNav.Tooltip custom function)",none,none,page,No row button runs a step in this layout; the DDR shows no way to open a payment from the list
+karbon_kontacts.fmp12/layouts/153-Opportunities.txt,4629a7de83b649fd542dc95f2fd821bd43b46bbb8634893af12c8540ee498ac9,layouts,karbon_kontacts.fmp12,153,Opportunities,list,"Opportunity (base Opportunity, karbon_data.fmp12)","key 170 field Globals::PersonIconOut#36 | hidden when the party is an organization (Opportunity_Party::OrganizationInd), or the window is in find mode
+key 172 field Globals::OrganizationIconOut#35 | hidden when the party is a person (Opportunity_Party::PersonInd), or the window is in find mode
+key 129 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 131 button ""(icon)"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 146 text ""Showing {{FoundCount}} of {{TotalRecordCount}} Records"" | hidden when every record is in the found set (nothing omitted)
+key 147 button ""Show All"" | hidden when every record is in the found set (nothing omitted)
+key 167 field Opportunity_Party::Photo#32 | hidden when the window is in find mode","key 119 button ""=BrowserNav.Tooltip ( ""backward"" )"" | when the browser-style navigation history is being saved (BrowserNav.SaveNavHistory is true) | none
+key 123 field Globals::RecordNav#31 | when the record-number field holds something other than the current record number (user is typing a new number) | style","layout | OnLayoutEnter | script 767 Set up Opportunity List View | when all records are showing, finds active opportunities and sorts the list
+key 123 field Globals::RecordNav#31 | OnObjectEnter | script 382 Record Nav | record-number box navigation (Record Nav) | param puts the current record number into the record-number field and selects it
+key 123 field Globals::RecordNav#31 | OnObjectExit | script 382 Record Nav | record-number box navigation (Record Nav) | param jumps to the record number typed in the field (capped at the found count) and clears the field
+key 108 popover FindPopover | OnObjectEnter | script 248 Trigger: Set Up QuickFind Popover | clears the QuickFind global (with triggers off during the commit) and puts the cursor in the QuickFind field
+key 109 field Globals::QuickFind#1 | OnObjectSave | script 250 Perform QuickFind | runs Perform Quick Find on Globals::QuickFind when triggers are allowed and the field is not empty","key 117 (icon) | script 105 Display Main Nav
+key 119 (calc) BrowserNav.Tooltip ( ""backward"" ) | script 466 Browser Nav (forward or backward) | param go back in the navigation history
+key 120 (calc) BrowserNav.Tooltip ( ""forward"" ) | script 466 Browser Nav (forward or backward) | param go forward in the navigation history
+key 121 Nav.RecordNumberField | no step
+key 122 Nav.RecordNumberField | no step
+key 125 (icon) | script 382 Record Nav | param previous record
+key 126 (icon) | script 382 Record Nav | param next record
+key 128 (calc) record count, found count and sort state | script 382 Record Nav | param toggle between the found set and the omitted records
+key 38 (icon) | script 603 Go to Opportunity Detail { Id } | param parameter is commented out (none passed)
+key 106 (icon) | script 602 btn: Create Opportunity
+key 107 (icon) | opens popover ""Find Opportunities""
+key 113 Show All | script 251 Close Find Popover and Show All
+key 145 Advanced Find | script 804 Button: Go to Advanced Find Layout ( EntityName ) | param open the Advanced Find layout for opportunities
+key 84 (icon) | script 478 Get Help
+key 131 (icon) | script 524 Add Pending Change to Build File
+key 133 Customers | script 506 Sales Nav | param go to the Customers list
+key 134 Opportunities | script 506 Sales Nav | param go to the Opportunities (leads) list
+key 135 Transactions | script 506 Sales Nav | param go to the Sales List
+key 136 Items | script 506 Sales Nav | param go to the Items list
+key 137 Payments | script 506 Sales Nav | param go to the Payments List
+key 148 Showing {{FoundCount}} of {{TotalRecordCount}} Records | no step
+key 147 Show All | Show All Records
+key 152 Name | Sort Records
+key 153 Status | Sort Records
+key 157 Show Active | script 789 Button: Show Active and Sort by Status","key 119 | navigation tooltip for the backward button (BrowserNav.Tooltip custom function)
+key 120 | navigation tooltip for the forward button (BrowserNav.Tooltip custom function)",none,Boolean (id 1),page,"Web viewer SalesOppChartWebViewer (key 158) has an empty calculation; its content cannot be read from the DDR
+Sort buttons (keys 152, 153) run Sort Records; the saved sort order is not shown in the layout file"
+karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt,3a7039466ccab4490c1f2941c1f00a31a908763a40b8b99c1139ca5817f1cb8f,layouts,karbon_kontacts.fmp12,156,Opportunity Detail,form,"Opportunity (base Opportunity, karbon_data.fmp12)","key 999 rect Col-3 | hidden always (the calculation is the constant 1)
+key 1000 rect Col-2 | hidden always (the calculation is the constant 1)
+key 996 rect Col-1 | hidden always (the calculation is the constant 1)
+key 707 slidecontrol | hidden when the opportunity has no related party
+key 746 slidecontrol | hidden when the opportunity party is a lead (the slide applies to customers only)
+key 750 text ""Hidden Slide Control"" | hidden always (the calculation is the constant True)
+key 711 text ""Hidden Slide Control"" | hidden always (the calculation is the constant True)
+key 676 field Opportunity_Party_PartyRelation_Party::Photo#32 | hidden when the party is an organization (Opportunity_Party_PartyRelation_Party::OrganizationInd), or the window is in find mode
+key 677 field Opportunity_Party_PartyRelation_Party::Photo#32 | hidden when the party is a person (Opportunity_Party_PartyRelation_Party::PersonInd), or the window is in find mode
+key 607 field Opportunity_Party::Photo#32 | hidden when the party is an organization (Opportunity_Party::OrganizationInd), or the window is in find mode
+key 608 field Opportunity_Party::Photo#32 | hidden when the party is a person (Opportunity_Party::PersonInd), or the window is in find mode
+key 729 button ""=GetNthRecord ( OpportunityStatus::Name ; 8 )"" | hidden when status number 8 does not exist in the OpportunityStatus list
+key 728 button ""=GetNthRecord ( OpportunityStatus::Name ; 9 )"" | hidden when status number 9 does not exist in the OpportunityStatus list
+key 983 buttonbar | hidden when the row has no attachment record, or the window mode is 3
+key 737 button ""(icon)"" | hidden when the row has no attachment record
+key 655 button ""(icon)"" | hidden when the activity row is not a Note (ActivityTypeId <> 2)
+key 656 button ""(icon)"" | hidden when the activity row is not a Email (ActivityTypeId <> 1)
+key 657 button ""(icon)"" | hidden when the activity row is not a Meeting (ActivityTypeId <> 6)
+key 761 button ""(icon)"" | hidden when the activity row is not a Call (ActivityTypeId <> 8)
+key 658 button ""(icon)"" | hidden when the activity row is not a Task (ActivityTypeId <> 3)
+key 663 rect | hidden when the activity has no alert flag
+key 756 buttonbar | hidden when the activity has no comments in the deprecated discussion relationship
+key 433 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 515 button ""(icon)"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 1049 button ""(icon)"" | hidden when the opportunity party relation is not current","key 1048 button ""=OpportunityStatus::Name"" | when the status row is the opportunity's current status | style
+key 423 button ""=BrowserNav.Tooltip ( ""backward"" )"" | when the browser-style navigation history is being saved (BrowserNav.SaveNavHistory is true) | none
+key 427 field Globals::RecordNav#31 | when the record-number field holds something other than the current record number (user is typing a new number) | style","key 427 field Globals::RecordNav#31 | OnObjectEnter | script 382 Record Nav | record-number box navigation (Record Nav) | param puts the current record number into the record-number field and selects it
+key 427 field Globals::RecordNav#31 | OnObjectExit | script 382 Record Nav | record-number box navigation (Record Nav) | param jumps to the record number typed in the field (capped at the found count) and clears the field
+key 1017 popover FindPopover | OnObjectEnter | script 248 Trigger: Set Up QuickFind Popover | clears the QuickFind global (with triggers off during the commit) and puts the cursor in the QuickFind field
+key 1018 field Globals::QuickFind#1 | OnObjectSave | script 250 Perform QuickFind | runs Perform Quick Find on Globals::QuickFind when triggers are allowed and the field is not empty","keys 602,603,604,678,679,694,655,656,657,761,658 (×11) (icon) | no step
+key 611 Discuss | script 839 Open Discussion from Opportunity
+key 693 (icon) | script 163 Open Party Info Card { Id } | param JSON {Id: Opportunity_Party_PartyRelation_Party::Id}
+key 493 Add Contact… | script 613 btn: Add Contact to Opportunity
+key 462 Email | script 691 Button: Create Email Message From Opportunity
+key 463 Meeting | script 683 Button: Create Meeting From Opportunity
+key 760 Call | script 704 Button: Create Call from Opportunity
+key 464 Task | script 670 btn: Create Task From Opportunity
+key 461 Note | script 666 Button: Create Note from Opportunity
+key 742 Attach… | script 634 btn: Add New File as FileAttachment to Opportunity
+key 744 List View | Go to Layout [ “Opportunities” (Opportunity) ]
+key 982 (icon) | script 721 Button: Assign Referring Party
+key 1026 (calc) Opportunity::PartyNameCached | script 502 Go to Contacts Detail {Id}
+keys 714,718,715,719,720,724,716,729,728 (×9) (calc) name of the Nth OpportunityStatus record (GetNthRecord N) | no step
+key 741 (icon) | script 636 btn: Download and Open File from Opportunity | param Opportunity_FileAttachment_File::FileName
+key 984 (icon) | opens popover ""Popover""
+key 986 delete | script 637 btn: Delete FileAttachment from Opportunity
+key 737 (icon) | script 637 btn: Delete FileAttachment from Opportunity
+key 653 (icon) | script 291 Open Activity { Id } | param JSON {Id: activity id, DisplayPartyIds: related contacts, salesperson, referring party}
+key 759 (calc) comment count | no step
+key 1036 (calc) Opportunity::StatusCached | opens popover ""Popover""
+key 1048 (calc) OpportunityStatus::Name | script 612 btn: Change Opportunity Status
+key 421 (icon) | script 105 Display Main Nav
+key 423 (calc) BrowserNav.Tooltip ( ""backward"" ) | script 466 Browser Nav (forward or backward) | param go back in the navigation history
+key 424 (calc) BrowserNav.Tooltip ( ""forward"" ) | script 466 Browser Nav (forward or backward) | param go forward in the navigation history
+key 425 Nav.RecordNumberField | no step
+key 426 Nav.RecordNumberField | no step
+key 429 (icon) | script 382 Record Nav | param previous record
+key 430 (icon) | script 382 Record Nav | param next record
+key 432 (calc) record count, found count and sort state | script 382 Record Nav | param toggle between the found set and the omitted records
+key 515 (icon) | script 524 Add Pending Change to Build File
+key 1015 (icon) | script 602 btn: Create Opportunity
+key 1016 (icon) | opens popover ""Find Opportunities""
+key 1019 Show All | script 251 Close Find Popover and Show All
+key 1020 Advanced Find | script 804 Button: Go to Advanced Find Layout ( EntityName ) | param open the Advanced Find layout for opportunities
+key 1021 (icon) | script 478 Get Help
+key 1049 (icon) | script 848 btn: End Party Relationship from Opportunity_deprecated","key 423 | navigation tooltip for the backward button (BrowserNav.Tooltip custom function)
+key 424 | navigation tooltip for the forward button (BrowserNav.Tooltip custom function)","key 489 Opportunity_Party_PartyRelation | none | none
+key 732 Opportunity_FileAttachment | none | none
+key 652 Opportunity_ActivityEntity_Activity | datedisplay descending, timedisplay descending | none
+key 1038 OpportunityStatus | id ascending | filter off (would show only statuses other than the opportunity's current status)","Source (id 48)
+OpportunityProbability (id 43)
+Employee#current (id 44)
+Boolean (id 1)
+OpportunityType (id 49)
+Opportunity Contacts (id 54)",page,"Status pipeline buttons (keys 714-729) have no step; status change is done by the popover button key 1036 and script 612 ""btn: Change Opportunity Status""
+Slide controls are hidden by condition (key 707 no party, key 746 party is a lead); the ""Hidden Slide Control"" texts are always hidden
+Button key 1049 still runs script 848 ""btn: End Party Relationship from Opportunity_deprecated""
+a button runs script 848 ""btn: End Party Relationship from Opportunity_deprecated"", whose name marks it deprecated or work-in-progress"
+karbon_kontacts.fmp12/layouts/162-Opportunity_Detail_-_Card.txt,79a0a8cb7fa02305f84117e8a05ee9ef4a7a85c1ee5acd678cfba3a46f566a6f,layouts,karbon_kontacts.fmp12,162,Opportunity Detail - Card,dialog,"Opportunity (base Opportunity, karbon_data.fmp12)",none,none,none,key 19 (icon) | Close Window [ Current Window ],none,none,"OpportunityProbability (id 43)
+Employee#current (id 44)",modal,none
+karbon_kontacts.fmp12/layouts/165-Opportunity_Find.txt,a5169bcbd96f02d05587bbc124fb464ac5b0fa5c043b06981ea1e391b127e75f,layouts,karbon_kontacts.fmp12,165,Opportunity Find,utility,"Opportunity (base Opportunity, karbon_data.fmp12)","key 779 rect Col-3 | hidden always (the calculation is the constant 1)
+key 780 rect Col-2 | hidden always (the calculation is the constant 1)
+key 781 rect Col-1 | hidden always (the calculation is the constant 1)
+key 433 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 784 buttonbar | hidden always in browse mode (the comment says: only show in find mode)",key 757 field Globals::RecordNav#31 | when the record-number field holds something other than the current record number (user is typing a new number) | style,"layout | OnModeExit | script 803 Trigger: Return From Advanced Find | after Advanced Find, if triggers are allowed, returns to the layout in $$Find.ReturnToLayoutNumber and hides toolbars
+key 757 field Globals::RecordNav#31 | OnObjectEnter | script 382 Record Nav | record-number box navigation (Record Nav) | param puts the current record number into the record-number field and selects it
+key 757 field Globals::RecordNav#31 | OnObjectExit | script 382 Record Nav | record-number box navigation (Record Nav) | param jumps to the record number typed in the field (capped at the found count) and clears the field","key 755 Nav.RecordNumberField | no step
+key 756 Nav.RecordNumberField | no step
+key 759 (icon) | script 382 Record Nav | param previous record
+key 760 (icon) | script 382 Record Nav | param next record
+key 785 Create new find request | New Record/Request
+key 793 Delete find request | Delete Record/Request
+key 792 Perform find | Perform Find [  ]
+key 791 Cancel find | Enter Browse Mode","key 785 | Create new find request
+key 793 | Delete find request
+key 792 | Perform find
+key 791 | Cancel find",none,"Employee#current (id 44)
+Source (id 48)
+Boolean (id 1)
+OpportunityProbability (id 43)
+OpportunityType (id 49)",page,Find-request form for the Advanced Find flow (OnModeExit returns to $$Find.ReturnToLayoutNumber); decide whether the target keeps a separate advanced-find screen or folds it into list filters
+karbon_kontacts.fmp12/layouts/178-Customer_Find.txt,1b0d6169a89d552269007b05cfa0dc0cc353f954c92f923a18accdff821cf66c,layouts,karbon_kontacts.fmp12,178,Customer Find,utility,"Party_PartyRole_Customer (base Customer, karbon_data.fmp12)","key 667 rect Col-3 | hidden always (the calculation is the constant 1)
+key 668 rect Col-2 | hidden always (the calculation is the constant 1)
+key 669 rect Col-1 | hidden always (the calculation is the constant 1)
+key 415 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 670 buttonbar | hidden always in browse mode (the comment says: only show in find mode)",key 409 field Globals::RecordNav#31 | when the record-number field holds something other than the current record number (user is typing a new number) | style,"layout | OnModeExit | script 803 Trigger: Return From Advanced Find | after Advanced Find, if triggers are allowed, returns to the layout in $$Find.ReturnToLayoutNumber and hides toolbars
+key 409 field Globals::RecordNav#31 | OnObjectEnter | script 382 Record Nav | record-number box navigation (Record Nav) | param puts the current record number into the record-number field and selects it
+key 409 field Globals::RecordNav#31 | OnObjectExit | script 382 Record Nav | record-number box navigation (Record Nav) | param jumps to the record number typed in the field (capped at the found count) and clears the field","key 407 Nav.RecordNumberField | no step
+key 408 Nav.RecordNumberField | no step
+key 411 (icon) | script 382 Record Nav | param previous record
+key 412 (icon) | script 382 Record Nav | param next record
+key 671 Create new find request | New Record/Request
+key 672 Delete find request | Delete Record/Request
+key 673 Perform find | Perform Find [  ]
+key 674 Cancel find | Enter Browse Mode","key 671 | Create new find request
+key 672 | Delete find request
+key 673 | Perform find
+key 674 | Cancel find",none,"Boolean (id 1)
+Employee#current (id 44)",page,Find-request form for the Advanced Find flow (OnModeExit returns to $$Find.ReturnToLayoutNumber); decide whether the target keeps a separate advanced-find screen or folds it into list filters

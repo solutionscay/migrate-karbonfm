@@ -1,0 +1,454 @@
+# script 418: Parse ActivityParty Array
+# file: karbon_kontroller.fmp12
+# folder: API / Activity / Public
+# source: ScriptCatalog/Script[@id=418]
+# steps: 128 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=383 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Parses an Array and creates ActivityParty records for each object in the array
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} ActivityParty
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} ActivityParty.ActivityId
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {array} ActivityParty.ActivityParty - See Create ActivityParty for schema
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnSuccess {object} result.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@history 2018-07-15 dave@geistinteractive.com - Added validation for required params; other minor tweaks
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@history 2018-06-04 lance@geistinteractive.com - Created by Generator
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  29    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  38    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $ActivityParty; Value:JSON.Format( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityParty
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ Error.IsError ( $ActivityParty ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  48    Set Variable [ $error; Value:$ActivityParty ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  49    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  50    End If
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Set Variable [ $error; Value:JSON.Validate.This ( $ActivityParty ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "ActivityId" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "ActivityParty" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  55    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $ActivityId; Value:JSONGetElement ( $ActivityParty ; "ActivityId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityId
+  62    Set Variable [ $ActivityPartyArray; Value:JSONGetElement ( $ActivityParty ; "ActivityParty" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyArray
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #Connect to the Activity record
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    If [ DBTransactions::ActivityId <> $ActivityId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::ActivityId#58
+  78    Set Field [ DBTransactions::ActivityId; $ActivityId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=58 name=ActivityId
+  79    End If
+        DisableStepCollapsed state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #Validate activity exists
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    If [ IsEmpty ( Activity::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Activity::Id#1
+  83    Set Variable [ $error; Value:_wip_API.Error.Validation ( "invalid activity ID" ; $ActivityParty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:_wip_API.Error.Validation
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  84    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  85    End If
+        DisableStepCollapsed state=False
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #Count the number of values in the array
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    Set Variable [ $ArrayCount; Value:JSON.ArrayLength ( $ActivityPartyArray ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Repetition
+          Calculation:
+            | 1
+        Name: $ArrayCount
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    #Loop through the array and create an ActivityParty for each object
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  93    Exit Loop If [ $i > $ArrayCount ]
+        DisableStepCollapsed state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    Set Variable [ $ThisActivityParty; Value:JSONGetElement ( $ActivityPartyArray ; $i - 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $ThisActivityParty
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    Set Variable [ $Param; Value:JSONSetElement ( $ThisActivityParty ; "ActivityId" ; $ActivityId ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Param
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    Perform Script [ “Create ActivityParty { json }”; Parameter: $Param ]
+        DisableStepCollapsed state=False
+        Script id=376 name="Create ActivityParty { json }"
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 104    Set Variable [ $error; Value:$Result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 105    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 106    End If
+        DisableStepCollapsed state=False
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    End Loop
+        DisableStepCollapsed state=False
+ 109    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 115    End Loop
+        DisableStepCollapsed state=False
+ 116    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    Set Variable [ $result; Value:JSONSetElement( "{}"; "Id" ; ActivityParty::Id ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, ActivityParty::Id#23, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 119    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 120    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 121    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 122    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 123    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 126    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 127    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 128    Exit Script [ Result: Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult

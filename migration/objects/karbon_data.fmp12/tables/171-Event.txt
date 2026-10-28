@@ -1,0 +1,169 @@
+# table 171: Event
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=171]
+# fields: 20
+# records: 0
+
+Field id=6 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Event:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=Event:
+      | Get ( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=77 dataType=Time fieldType=Normal name=EndTime
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=Date fieldType=Normal name=StartDate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=76 dataType=Time fieldType=Normal name=StartTime
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=129 dataType=Text fieldType=Summary name=IdList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=1 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=180 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=181 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=182 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=Event (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=183 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=Event:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=184 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=Event (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=OnlyDuringDataEntry
+    Calculation table=Event (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=189 dataType=Date fieldType=Normal name=EndDate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=190 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Event (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=192 dataType=Text fieldType=Normal name=Location
+  Comment: Description of where the event takes place
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=193 dataType=Text fieldType=Normal name=AddressId
+  Comment: The address where the event is occuring
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=194 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=Event:
+    | JSONSetElement ( "{}" ; 
+    | 	[ "AddressId" ; AddressId ; JSONString ];
+    | 	[ "EndDate" ; EndDate ; JSONString ];
+    | 	[ "EndTime" ; EndTime ; JSONString ];
+    | 	[ "Id" ; Id ; JSONString ];
+    | 	[ "Location" ; Location ; JSONString ];
+    | 	[ "StartDate" ; StartDate ; JSONString ];
+    | 	[ "StartTime" ; StartTime ; JSONString ]
+    | )
+    refs: fn:JSONSetElement, Event::AddressId#193, fn:JSONString, Event::EndDate#189, Event::EndTime#77, Event::Id#1, Event::Location#192, Event::StartDate#56, Event::StartTime#76
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=195 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=Event:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=196 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Event:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=197 dataType=Number fieldType=Normal name=MeetingInd
+  Comment: True if this event is a meeting (subtype)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=198 dataType=Number fieldType=Normal name=AllDayEventInd
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

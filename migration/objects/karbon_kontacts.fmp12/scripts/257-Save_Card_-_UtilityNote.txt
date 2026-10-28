@@ -1,0 +1,145 @@
+# script 257: Save Card - UtilityNote
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / Note
+# source: ScriptCatalog/Script[@id=257]
+# steps: 32 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=255 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-10-11 dave@geistinteractive.com - no longer using AsJson calc in the utility table in favor of setting explicitly in the script
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "ActivityMessage" ; UtilityNote::ActivityMessage ; JSONString ];
+        	[ "CreatorId" ; session::CurrentUserPartyId ; JSONString ];
+        	[ "Date" ; UtilityNote::Date ; JSONString ];
+        	[ "Id" ; UtilityNote::Id ; JSONString ];
+        	[ "EntityId" ; UtilityNote::EntityId ; JSONString ];
+        	[ "EntityTypeId" ; 13 ; JSONString ];
+        	[ "RegardingId" ; UtilityNote::RegardingId ; JSONString ];
+        	[ "Subject" ; UtilityNote::Subject ; JSONString ];
+        	[ "Time" ; UtilityNote::Time ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityNote::ActivityMessage#8, fn:JSONString, session::CurrentUserPartyId#63, UtilityNote::Date#9, UtilityNote::Id#6, UtilityNote::EntityId#18, UtilityNote::RegardingId#12, UtilityNote::Subject#7, UtilityNote::Time#10
+        Name: $json
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $SaveAndNotify; Value:JSONGetElement ( $data ; "SaveAndNotify" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SaveAndNotify
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ IsEmpty  (Selected_Activity::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_Activity::Id#1
+  10    Set Variable [ $create; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $create
+  11    Perform Script [ “Create Note { data }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=390 name="Create Note { data }" in=karbon_kontroller.fmp12
+  12    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “Edit Note { data } _deprecated” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=543 name="Edit Note { data } _deprecated" in=karbon_kontroller.fmp12
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  19    #Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Show Custom Dialog [ Title: "Error"; Message: "This Activity was not " & If ( $create; "created." ; "edited." ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  21    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #If the user wants to add a Notification...
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ $SaveAndNotify ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $ActivityId; Value:JSONGetElement ( $Result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityId
+  25    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Perform Script [ “<unknown>”; Parameter: JSONSetElement ( "" ; "Id" ; $activityId ; JSONString ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Script id=262 name=<unknown> ref=missing
+  28    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  30    End If
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    End If
+        DisableStepCollapsed state=False

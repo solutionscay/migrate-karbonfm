@@ -1,0 +1,559 @@
+# script 310: Import Copied Tables to API Generator Schema
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Public
+# source: ScriptCatalog/Script[@id=310]
+# steps: 134 (13 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=253 groupCollapsed=False includeInMenu=False
+
+   1    #@history 2018-08-16 dave@geistinteractive.com - validate for entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-08-11 dave@geistinteractive.com - 
+        	- all imported tables are attached to the parent entity; we'll revisit hierarchical APIs at some point
+        	- by default we're not importing table comments; set to true if you want them
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #CONFIG
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #Add fields to the exclusion list that your API should ignore
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $exclusionList; Value:List ( 
+        
+        	"CreationAccountName" ; 
+        	"CreationTimestamp" ; 
+        	"CreationUserId" ; 
+        	"ModificationAccountName" ; 
+        	"ModificationCount" ; 
+        	"ModificationTimestamp" ; 
+        	"ModificationUserId" ; 
+        	"ONE" ; 
+        	"AsJSON" ; 
+        	"z_xJoin" 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $exclusionList
+   8    Set Variable [ $importFieldComments; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $importFieldComments
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Freeze Window
+        DisableStepCollapsed state=False
+  16    Set Error Capture [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  17    Allow User Abort [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  18    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ not IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, ApiGeneratorLine::Id#1
+  21    Show Custom Dialog [ Title: "Update Map?"; Message: "Do you want to add to the existing map or replace it and start from scratch?"; Default Button: “Add”, Commit: “Yes”; Button 2: “Replace”, Commit: “No”; Button 3: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Add"
+          Button 2 CommitState=False: "Replace"
+          Button 3 CommitState=False: "Cancel"
+  22    If [ Get ( LastMessageChoice ) = 3 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  23    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  24    Else If [ Get ( LastMessageChoice ) = 2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  25    Go to Related Record [ From table: “ApiGeneratorLine”; Using layout: “ApiGeneratorLine” (ApiGeneratorLine) ]
+        [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065122 name=ApiGeneratorLine
+        Layout id=64 name=ApiGeneratorLine
+  26    If [ Get ( LastError ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  27    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  28    Go to Layout [ “API Generator” (ApiGenerator) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=61 name="API Generator"
+  29    End If
+        DisableStepCollapsed state=False
+  30    End If
+        DisableStepCollapsed state=False
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $entity; Value:ApiGenerator::Entity ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::Entity#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+  35    Set Variable [ $ApiGeneratorId; Value:ApiGenerator::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $ApiGeneratorId
+  36    Set Variable [ $ParentId; Value:ApiGeneratorLine::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $ParentId
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Go to Layout [ “ApiGeneratorLine” (ApiGeneratorLine) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=64 name=ApiGeneratorLine
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $clip; Value:clip_GetFMxml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_GetFMxml
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+  42    Set Variable [ $tableIndex; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $tableIndex
+  43    Set Variable [ $tableCount; Value:GetAsNumber ( <Function Missing> ( $clip ; "count(//BaseTable/@name)"  ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $tableCount
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #we're no longer creating hierarchical objects, but let's keep this for possible future enhancements
+        DisableStepCollapsed state=False
+        Restore state=False
+  46 // #Create the property object for the parent object
+        DisableStepCollapsed state=False
+        Restore state=False
+  47 // If [ IsEmpty ( $ParentId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  48 // New Record/Request
+        DisableStepCollapsed state=False
+  49 // Set Field [ ApiGeneratorLine::ApiGeneratorId; $ApiGeneratorId ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=2 name=ApiGeneratorId
+  50 // Set Field [ ApiGeneratorLine::type; "object" ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=23 name=type
+  51 // Set Field [ ApiGeneratorLine::FmpTableName ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=10 name=FmpTableName
+  52 // Set Field [ ApiGeneratorLine::JsonPropertyName; $entity ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=21 name=JsonPropertyName
+  53 // Set Field [ ApiGeneratorLine::JsonPathIn; $entity ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=27 name=JsonPathIn
+  54 // Set Field [ ApiGeneratorLine::required; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=19 name=required
+  55 // Set Field [ ApiGeneratorLine::FmpParam; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=29 name=FmpParam
+  56 // Set Variable [ $parentId; Value:ApiGeneratorLine::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $parentId
+  57 // End If
+        DisableStepCollapsed state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #Loop through all copied tables
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Exit Loop If [ $tableIndex > $tableCount ]
+        DisableStepCollapsed state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #Get field metadata as a list of JSON objects
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $thisTable; Value:List ( 
+        
+        	"<fmxmlsnippet type=\"FMObjectList\">" ; 
+        
+        	<Function Missing> ( $clip ; "//BaseTable[" & $tableIndex & "]" ; "" ; False ) ; 
+        
+        	"</fmxmlsnippet>" ; 
+        
+        	""
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisTable
+  65    Set Variable [ $tableName; Value:<Function Missing> ( $thisTable ; "//BaseTable/@name" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $tableName
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #Insert fields into schema
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $param; Value:JSONSetElement ( "{}" ; 
+        
+        	[ "exclusionList" ; $exclusionList ; JSONString ] ; 
+        	[ "clip" ; $thisTable ; JSONString ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  70    Perform Script [ “Get Field Metadata as JSON”; Parameter: $param ]
+        DisableStepCollapsed state=False
+        Script id=230 name="Get Field Metadata as JSON"
+  71    Set Variable [ $fields; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $fields
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Set Variable [ $fieldIndex; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $fieldIndex
+  74    Set Variable [ $fieldCount; Value:ValueCount ( $fields ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldCount
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Exit Loop If [ $fieldIndex > $fieldCount ]
+        DisableStepCollapsed state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #Get field metadata as a list of JSON objects
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Set Variable [ $thisField; Value:GetValue ( $fields ; $fieldIndex ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisField
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Variable [ $fieldName; Value:JSONGetElement ( $thisField ; "name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldName
+  83    Set Variable [ $fmpDataType; Value:JSONGetElement ( $thisField ; "fmpDataType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $fmpDataType
+  84    Set Variable [ $dataType; Value:JSONGetElement ( $thisField ; "dataType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataType
+  85    Set Variable [ $global; Value:JSONGetElement ( $thisField ; "global" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $global
+  86    Set Variable [ $id; Value:JSONGetElement ( $thisField ; "id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $id
+  87    Set Variable [ $readOnly; Value:JSONGetElement ( $thisField ; "readOnly" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $readOnly
+  88    If [ $importFieldComments ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    Set Variable [ $comment; Value:JSONGetElement ( $thisField ; "comment" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $comment
+  90    End If
+        DisableStepCollapsed state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    New Record/Request
+        DisableStepCollapsed state=False
+  93 // Set Field [ ApiGeneratorLine::ParentObjectId; $parentId ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=32 name=ParentObjectId
+  94    Set Field [ ApiGeneratorLine::ApiGeneratorId; $ApiGeneratorId ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=2 name=ApiGeneratorId
+  95    Set Field [ ApiGeneratorLine::FmpDataType; $fmpDataType ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=28 name=FmpDataType
+  96    Set Field [ ApiGeneratorLine::FmpFieldId; $id ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=25 name=FmpFieldId
+  97    Set Field [ ApiGeneratorLine::FmpFieldName; $fieldName ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=4 name=FmpFieldName
+  98    Set Field [ ApiGeneratorLine::FmpPath; $tableName & "::" & $fieldName ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=30 name=FmpPath
+  99    Set Field [ ApiGeneratorLine::FmpTableName; $tableName ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=10 name=FmpTableName
+ 100    Set Field [ ApiGeneratorLine::readOnly; $readOnly ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=24 name=readOnly
+ 101    Set Field [ ApiGeneratorLine::description; $comment ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=22 name=description
+ 102    Set Field [ ApiGeneratorLine::type; $dataType ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=23 name=type
+ 103    Set Field [ ApiGeneratorLine::JsonPropertyName; $fieldName ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=21 name=JsonPropertyName
+ 104    Set Field [ ApiGeneratorLine::JsonPathIn; ApiGenerator::Entity & "/" & ApiGeneratorLine::JsonPropertyName ]
+        DisableStepCollapsed state=False
+        refs: ApiGenerator::Entity#19, ApiGeneratorLine::JsonPropertyName#21
+        Field table=ApiGeneratorLine id=27 name=JsonPathIn
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #We create params for most fields, except for the following rules
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    If [ // don't expose the ID for Create APIs
+        ApiGenerator::APIType = "Create" and ApiGeneratorLine::FmpFieldName = "Id" or 
+        
+        // don't include indicator fields
+        Right ( ApiGeneratorLine::FmpFieldName ; 3 ) = "Ind" or 
+        
+        // don't include cache fields
+        Position ( ApiGeneratorLine::FmpFieldName ; "cache" ; 1 ; 1 ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGenerator::APIType#18, fn:and, ApiGeneratorLine::FmpFieldName#4, fn:or, fn:Right, fn:Position
+ 108    Set Field [ ApiGeneratorLine::FmpParam; "" ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=29 name=FmpParam
+ 109    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    Set Field [ ApiGeneratorLine::FmpParam; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=29 name=FmpParam
+ 111    End If
+        DisableStepCollapsed state=False
+ 112    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    #Let's ignore calc and global fields by default
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    If [ $global or ApiGeneratorLine::readOnly ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or, ApiGeneratorLine::readOnly#24
+ 115    Set Field [ ApiGeneratorLine::FmpIgnore; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=11 name=FmpIgnore
+ 116    End If
+        DisableStepCollapsed state=False
+ 117    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    If [ ApiGeneratorLine::FmpFieldName = "Id" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::FmpFieldName#4
+ 119    Set Field [ ApiGeneratorLine::FmpResult; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=43 name=FmpResult
+ 120    End If
+        DisableStepCollapsed state=False
+ 121    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 122    Set Variable [ $fieldIndex; Value:$fieldIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $fieldIndex
+ 123    End Loop
+        DisableStepCollapsed state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    Set Variable [ $tableIndex; Value:$tableIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $tableIndex
+ 127    End Loop
+        DisableStepCollapsed state=False
+ 128    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    Set Field [ ApiGenerator::JsonSchema; JSONFormatElements ( $json ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONFormatElements
+        Field table=ApiGenerator id=26 name=JsonSchema
+ 130    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 132    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+ 133    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 134    Exit Script [ Result: $new ]
+        DisableStepCollapsed state=False

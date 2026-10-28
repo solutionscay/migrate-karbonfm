@@ -1,0 +1,123 @@
+# table 143: ActivityMessage
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=143]
+# fields: 14
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=ActivityId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=Message
+  Comment: The body or full description of the activity. This is stored in a separate table to improve performance.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Normal name=ManuallyEditedInd
+  Comment: Was the message edited by the user? If so, we can't apply any further merge field changes.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Number fieldType=Calculated name=LengthOfMessage
+  Calculation table=ActivityMessage:
+    | Length ( Message )
+    refs: fn:Length, ActivityMessage::Message#12
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=ActivityMessage:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=ActivityMessage (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=ActivityMessage:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=ActivityMessage (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=OnlyDuringDataEntry
+    Calculation table=ActivityMessage (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=ActivityMessage (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=ActivityMessage:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ActivityMessage:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=28 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=ActivityMessage:
+      | Get ( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

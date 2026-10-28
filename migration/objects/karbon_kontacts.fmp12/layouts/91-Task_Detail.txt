@@ -1,0 +1,284 @@
+# layout 91: Task Detail
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity
+# source: LayoutCatalog/Layout[@id=91]
+# objects: 44
+# theme: Karbon-1.0
+# folder group: id=76 groupCollapsed=False includeInMenu=False
+
+Layout width=1080 quickFind=True includeInMenu=False id=91 name="Task Detail"
+  Table id=1065128 name=Task
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnLayoutExit id=109 triggerFlags=1(browse)
+      Script id=668 name="Trigger: Close Activity Window"
+      TriggerText: "Trigger: Close Activity Window"
+  Object type=Field key=31 LabelKey=32 bounds=230,110,254,300
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Task::DueDate#25
+      PlaceholderText findMode=True
+        Calculation:
+          | "date"
+  Object type=Text key=32 LabelKey=0 bounds=230,20,254,100
+    Text flags=2 style=Label-Medium: Due
+  Object type=Field key=33 LabelKey=0 bounds=60,110,110,520
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Large
+      Field: Activity::Subject#22
+      PlaceholderText findMode=True
+        Calculation:
+          | "Describe this task"
+  Object type=Field key=37 LabelKey=0 bounds=190,110,214,490
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Non Edit - Medium"
+      Field: Task::ToCached#24
+      ValueList: Users By PartyId#24
+  Object type=Text key=38 LabelKey=0 bounds=190,0,210,100
+    Text flags=2 style=Label-Medium: "Assigned To"
+  Object type=Text key=42 LabelKey=0 flags=1073741824 bounds=0,0,40,540
+    Text flags=2 style=H1-CardHeader: Task
+  Object type=Field key=45 LabelKey=46 flags=-2147483648 bounds=270,110,520,520
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Activity_ActivityMessage::Message#12
+  Object type=Text key=46 LabelKey=0 bounds=270,20,294,100
+    Text flags=2 style=Label-Medium: Notes
+  Object type=Button key=47 LabelKey=0 flags=65540 bounds=60,50,110,100
+    Text flags=2 style=Button-Invisible-Circle
+    ButtonObj buttonFlags=0 iconSize=50 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Mark Task Complete” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=758 name="btn: Mark Task Complete"
+      Image name=MarkDone.svg
+    HideCondition findMode=False
+      Calculation:
+        | Task::CompletedInd
+        refs: Task::CompletedInd#29
+  Object type=Button key=50 LabelKey=0 flags=65540 bounds=60,50,110,100
+    Text flags=2 style=Button-Invisible-Circle
+    ButtonObj buttonFlags=0 iconSize=50 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Mark Task Incomplete” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=759 name="btn: Mark Task Incomplete"
+      Image name=check-circle-solid-2.svg
+    HideCondition findMode=False
+      Calculation:
+        | not Task::CompletedInd
+        refs: fn:not, Task::CompletedInd#29
+  Object type=Field key=51 LabelKey=0 bounds=150,110,174,490
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Non Edit - Medium"
+      Field: Task::FromCached#23
+      ValueList: Users By PartyId#24
+  Object type=Text key=52 LabelKey=0 bounds=150,0,170,100
+    Text flags=2 style=Label-Medium: "Assigned By"
+  Object type=Field key=54 LabelKey=0 bounds=230,330,254,520
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Task::DueTime#28
+      PlaceholderText findMode=True
+        Calculation:
+          | "time"
+  Object type=PopoverButton key=56 LabelKey=0 bounds=147,490,177,520
+    Text flags=2 style=Button-Invisible-Circle
+    PopoverButtonObj buttonFlags=0 key=57 iconSize=20 displayType=1
+      Image name=a47_account.svg
+      Object type=Popover key=57 LabelKey=0 style="Popover-White No Title" bounds=5,190,350,479
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=2 key=56
+          Object type=Portal key=59 LabelKey=0 bounds=28,210,330,460
+            PortalObj portalFlags=25 numOfRows=10 initialRow=1 style="Standard Portal"
+              TableAliasKey: Selected_PartyRole#currentEmployee
+              FieldList
+                Field table=Selected_PartyRole#currentEmployee_Employee id=20 name=NameCached
+              SortList BlanksLast=False Maintain=True value=True
+                Sort type=Ascending
+                  PrimaryField
+                    Field table=Selected_PartyRole#currentEmployee_Employee id=20 name=NameCached
+              Object type=Button key=61 LabelKey=0 flags=65536 bounds=28,210,58,445
+                Text flags=2 style=Button-RowHighlight
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText
+                      | Perform Script [ “Add/Edit Activity Party to Activity { ActivityPartyRoleId }”; Parameter: JSONSetElement ( "{}" ; 
+                      | 	[ "ActivityPartyRoleId" ; 52 ; JSONNumber ] ; 
+                      | 	[ "PartyId" ; Selected_PartyRole#currentEmployee::PartyId ; JSONString ] 
+                      | ) ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Calculation:
+                      | JSONSetElement ( "{}" ; 
+                      | 	[ "ActivityPartyRoleId" ; 52 ; JSONNumber ] ; 
+                      | 	[ "PartyId" ; Selected_PartyRole#currentEmployee::PartyId ; JSONString ] 
+                      | )
+                      refs: fn:JSONSetElement, fn:JSONNumber, Selected_PartyRole#currentEmployee::PartyId#45, fn:JSONString
+                    Script id=673 name="Add/Edit Activity Party to Activity { ActivityPartyRoleId }"
+              Object type=Field key=60 LabelKey=0 bounds=31,215,55,445
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                  Field: Selected_PartyRole#currentEmployee_Employee::NameCached#20
+  Object type=PopoverButton key=69 LabelKey=0 bounds=187,490,217,520
+    Text flags=2 style=Button-Invisible-Circle
+    PopoverButtonObj buttonFlags=0 key=70 iconSize=20 displayType=1
+      Image name=a47_account.svg
+      Object type=Popover key=70 LabelKey=0 style="Popover-White No Title" bounds=30,190,375,479
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=2 key=69
+          Object type=Portal key=71 LabelKey=0 bounds=53,210,355,460
+            PortalObj portalFlags=25 numOfRows=10 initialRow=1 style="Standard Portal"
+              TableAliasKey: Selected_PartyRole#currentEmployee
+              FieldList
+                Field table=Selected_PartyRole#currentEmployee_Employee id=20 name=NameCached
+              SortList BlanksLast=False Maintain=True value=True
+                Sort type=Ascending
+                  PrimaryField
+                    Field table=Selected_PartyRole#currentEmployee_Employee id=20 name=NameCached
+              Object type=Button key=72 LabelKey=0 flags=65536 bounds=53,210,83,446
+                Text flags=2 style=Button-RowHighlight
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText
+                      | Perform Script [ “Add/Edit Activity Party to Activity { ActivityPartyRoleId }”; Parameter: JSONSetElement ( "{}" ; 
+                      | 	[ "ActivityPartyRoleId" ; 53 ; JSONNumber ] ; 
+                      | 	[ "PartyId" ; Selected_PartyRole#currentEmployee::PartyId ; JSONString ] 
+                      | ) ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Calculation:
+                      | JSONSetElement ( "{}" ; 
+                      | 	[ "ActivityPartyRoleId" ; 53 ; JSONNumber ] ; 
+                      | 	[ "PartyId" ; Selected_PartyRole#currentEmployee::PartyId ; JSONString ] 
+                      | )
+                      refs: fn:JSONSetElement, fn:JSONNumber, Selected_PartyRole#currentEmployee::PartyId#45, fn:JSONString
+                    Script id=673 name="Add/Edit Activity Party to Activity { ActivityPartyRoleId }"
+              Object type=Field key=73 LabelKey=0 bounds=56,215,80,445
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                  Field: Selected_PartyRole#currentEmployee_Employee::NameCached#20
+  Object type=Line key=74 LabelKey=0 flags=12288 style=Line-Thin bounds=130,110,130,520
+  Object type=Rect key=75 LabelKey=0 flags=-1073741824 style=Shape-Discussion bounds=0,540,580,1080
+  Object type=Portal key=76 LabelKey=0 name=DiscussionPortal flags=-1073741824 bounds=119,550,523,1060
+    PortalObj portalFlags=273 numOfRows=4 initialRow=1
+      TableAliasKey: Selected_Discussion_ActivityComment
+      FieldList
+        FieldReference id=19 name=Time repetition=1 UUID=""
+          TableOccurrenceReference id=1065343 name=Selected_Discussion_ActivityComment UUID=""
+        FieldReference id=18 name=Date repetition=1 UUID=""
+          TableOccurrenceReference id=1065343 name=Selected_Discussion_ActivityComment UUID=""
+        FieldReference id=106 name=CreationTimestamp repetition=1 UUID=""
+          TableOccurrenceReference id=1065344 name=Selected_Discussion_ActivityComment_Party UUID=""
+        Field table=Selected_Discussion_ActivityComment id=10 name=Comment
+      Object type=Text key=77 LabelKey=0 bounds=128,560,148,1040
+        Text flags=10 tableViewVisibility=0 style=Label-Small-Left-Muted: <<Selected_Discussion_ActivityComment_Party::CreationTimestamp>>
+          FieldList quickFind=True
+            Field table=Selected_Discussion_ActivityComment_Party id=106 name=CreationTimestamp
+      Object type=Field key=78 LabelKey=0 flags=1073741824 bounds=148,560,210,1050
+        FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+          Field: Selected_Discussion_ActivityComment::Comment#10
+      Object type=Text key=79 LabelKey=0 flags=1342177280 bounds=128,720,190,1050
+        Text flags=10 tableViewVisibility=0 style=Label-Small-Left-Muted: "<<Selected_Discussion_ActivityComment::Date>> <<Selected_Discussion_ActivityComment::Time>>"
+          FieldList quickFind=True
+            Field table=Selected_Discussion_ActivityComment id=18 name=Date
+            Field table=Selected_Discussion_ActivityComment id=19 name=Time
+      Object type=Line key=80 LabelKey=0 flags=1073745920 style=Line-Thin bounds=219,559,219,1060
+  Object type=Text key=81 LabelKey=0 name=text.discuss bounds=13,560,37,1020
+    Text flags=2 style=H3-Primary: Discuss
+  Object type=Field key=82 LabelKey=0 flags=1073741828 bounds=60,560,110,1050
+    ScriptTriggers
+      Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+        Script id=694 name="_wip_Button: Add Comment to Activity Discussion v2"
+        TriggerText: "_wip_Button: Add Comment to Activity Discussion v2"
+    FieldObj numOfReps=1 flags=1179744 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: UtilityDiscussion::Notes#9
+      PlaceholderText findMode=True
+        Calculation:
+          | "Enter a comment and hit return"
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( UtilityDiscussion::SubscriberPartyIds )
+        refs: fn:IsEmpty, UtilityDiscussion::SubscriberPartyIds#19
+  Object type=ButtonBar key=83 LabelKey=0 style=BB-BadgePurple bounds=10,640,40,670
+    ButtonBarObj segmentKey=0
+      Object type=Button key=84 LabelKey=0 flags=1 bounds=10,640,40,670
+        ConditionalFormatting
+          Item id=0 flags=5
+            Condition op=0
+              Calculation:
+                | IsEmpty ( Selected_Discussion::ONE )
+                refs: fn:IsEmpty, Selected_Discussion::ONE#7
+            Format: background-color: rgba(36.3922%,36.3922%,36.3922%,1);
+        Text flags=2 style=BB-BadgePurple
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | Count ( Selected_Discussion_ActivityComment::ONE )
+            refs: fn:Count, Selected_Discussion_ActivityComment::ONE#7
+  Object type=Text key=94 LabelKey=0 flags=-1610612736 bounds=530,550,570,930
+    Text flags=10 tableViewVisibility=0 style=Label-Small-Left: "Subscribers: <<UtilityDiscussion::SubscriberListName>>"
+      FieldList quickFind=True
+        Field table=UtilityDiscussion id=20 name=SubscriberListName
+  Object type=Button key=95 LabelKey=0 name=Button.AddSubscribers flags=-268435456 bounds=450,1100,480,1230
+    Text flags=2: "Add Subscribers"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Button: Launch Party Picker For Subscriber { layoutObjectName }_deprecated”; Parameter: JSONSetElement ( "{}" ; "layoutObjectName" ; "text.discuss" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ( "{}" ; "layoutObjectName" ; "text.discuss" ; JSONString )
+          refs: fn:JSONSetElement, fn:JSONString
+        Script id=718 name="Button: Launch Party Picker For Subscriber { layoutObjectName }_deprecated"
+      Image name=a45_contacts.svg
+  Object type=Text key=96 LabelKey=0 flags=-1073741820 bounds=280,710,410,890
+    Text flags=2 style=H1-Primary: "Select at least one subscriber"
+    HideCondition findMode=False
+      Calculation:
+        | not IsEmpty ( UtilityDiscussion::SubscriberPartyIds )
+        refs: fn:not, fn:IsEmpty, UtilityDiscussion::SubscriberPartyIds#19
+  Object type=Graphic key=97 LabelKey=0 flags=4 rotation=1800 bounds=371,961,510,1030
+    GraphicObj pictFormat=3 mixColor=#0
+    HideCondition findMode=False
+      Calculation:
+        | not IsEmpty ( UtilityDiscussion::SubscriberPartyIds )
+        refs: fn:not, fn:IsEmpty, UtilityDiscussion::SubscriberPartyIds#19
+  Object type=Text key=102 LabelKey=0 flags=-1610612732 bounds=540,110,574,520
+    Text flags=10 tableViewVisibility=0 style=Label-Small-Left-Muted: "Completed by <<CompletedByCached>> at <<CompletionTimestamp>>"
+      FieldList quickFind=True
+        Field table=Task id=27 name=CompletedByCached
+        Field table=Task id=26 name=CompletionTimestamp
+    HideCondition findMode=False
+      Calculation:
+        | not Task::CompletedInd
+        refs: fn:not, Task::CompletedInd#29
+  Object type=PopoverButton key=103 LabelKey=0 flags=-1610612736 bounds=540,470,580,520
+    Text flags=2 style=Button-Invisible
+    PopoverButtonObj buttonFlags=0 key=104 iconSize=16 displayType=1
+      Image name=a25_trash.svg
+      Object type=Popover key=104 LabelKey=0 bounds=587,386,643,541
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=1 key=103
+          Object type=Button key=105 LabelKey=0 flags=65536 bounds=600,401,630,531
+            Text flags=2 style=Button-Danger: Delete
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Delete and Close” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=693 name="Button: Delete and Close"
+  Object type=Button key=106 LabelKey=0 name="Button.AddSubscribers 2" flags=-268435456 bounds=534,900,570,1060
+    Text flags=2: "Manage Subscribers"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Manage Subscribers v2” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=842 name="btn: Manage Subscribers v2"
+      Image name=a45_contacts.svg
+  Object type=Field key=58 LabelKey=0 flags=8320 bounds=22,990,48,1110
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=2 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+      Field: Activity::ActivityTypeId#100

@@ -1,0 +1,35 @@
+# script 203: Dispatch Address Search
+# file: Picker Module.fmp12
+# folder: Modules / Address Autocomplete / API / Private
+# source: ScriptCatalog/Script[@id=203]
+# steps: 9 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=False includeInMenu=False
+
+   1    If [ not IsEmpty ( Picker::Search_Field ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, Picker::Search_Field#1
+   2    If [ Picker::AddressServiceProviderThisSession = "SmartyStreets" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Picker::AddressServiceProviderThisSession#25
+   3    Perform Script [ “Get Smarty Street Address Suggestions” ]
+        DisableStepCollapsed state=False
+        Script id=117 name="Get Smarty Street Address Suggestions"
+   4    Else If [ Picker::AddressServiceProviderThisSession = "Google Places" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Picker::AddressServiceProviderThisSession#25
+   5    Perform Script [ “Get Google Places Address Suggestions” ]
+        DisableStepCollapsed state=False
+        Script id=198 name="Get Google Places Address Suggestions"
+   6    End If
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

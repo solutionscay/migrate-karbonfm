@@ -1,0 +1,161 @@
+# script 775: Button: Send Email Message
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / EmailMessage
+# source: ScriptCatalog/Script[@id=775]
+# steps: 36 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=688 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2019-03-01 dave@geistinteractive.com - Don't ask to authenticate when sending via system
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2019-02-26 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ IsEmpty ( Selected_User::SmtpPassword ) and not EmailMessage::UseSystemSettingsInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_User::SmtpPassword#118, fn:and, fn:not, EmailMessage::UseSystemSettingsInd#26
+   5    Show Custom Dialog [ Title: "Email password"; Message: "Please enter your email password (required once per session)."; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No”; Input #1: User::SmtpPassword, Password, "Password" ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+        InputFields
+          InputField UsePasswordCharacter=True
+            Field table=User id=118 name=SmtpPassword
+          InputField UsePasswordCharacter=False
+            Field table="" id=0 name="" ref=none
+          InputField UsePasswordCharacter=False
+            Field table="" id=0 name="" ref=none
+   6    If [ Get ( LastMessageChoice ) = 2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+   7    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+   8    End If
+        DisableStepCollapsed state=False
+   9    End If
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "Id" ; EmailMessage::Id ; JSONString ]  ;
+        	[ "UserId" ; session::CurrentUserId ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, EmailMessage::Id#1, fn:JSONString, session::CurrentUserId#58
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Send Email Message Activity { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=521 name="Send Email Message Activity { json }" in=karbon_kontroller.fmp12
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  18    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  19    Set Variable [ $errorCode; Value:JSONGetElement ( $result ; "errorCode" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $errorCode
+  20    If [ $errorCode = 1507 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ User::SmtpPassword; "" ]
+        DisableStepCollapsed state=False
+        Field table=User id=118 name=SmtpPassword
+  22    Show Custom Dialog [ Title: "Authentication error"; Message: "Either your user name and/or password was incorrect. OK to try again?"; Default Button: “Try Again”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Try Again"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  23    If [ Get ( LastMessageChoice ) = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  24    Perform Script [ “Button: Send Email Message” ]
+        DisableStepCollapsed state=False
+        Script id=775 name="Button: Send Email Message"
+  25    End If
+        DisableStepCollapsed state=False
+  26    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  29    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  30    End If
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $ActivityId; Value:JSONGetElement ( $result ; "ActivityId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityId
+  33    Set Variable [ $Sent; Value:JSONGetElement ( $result ; "Sent" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Sent
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False

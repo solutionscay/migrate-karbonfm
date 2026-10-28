@@ -1,0 +1,21 @@
+source_id,source_hash,kind,file,id,name,role,fields,regular,calculated,summary,global,container,repeating,keys,logic,logic_count,target,open_question
+karbon_tester.fmp12/tables/130-Test.txt,44c1833d1a4cfe686588174bd17993f0c8e49cd35949a18f088d5ca8700a661c,tables,karbon_tester.fmp12,130,Test,utility,6,1,0,0,5,0,0,none,4 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit),1,drop-candidate,Test harness table; DeleterKey is a global that matches Deleter::key.
+karbon_tester.fmp12/tables/131-TestData.txt,39608f894417a993f1ef056f1f10646c8ba2899c3f09bb282389282d42100d89,tables,karbon_tester.fmp12,131,TestData,staging,14,13,0,0,1,0,9,none,2 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit),1,drop-candidate,Fixture table: repeating text fields (up to 10 repetitions) hold test data lists; confirm test data is not needed in the target.
+karbon_tester.fmp12/tables/132-Rows.txt,1028d8bdf6e990d2996576197b0b4c3f5b69d354dcfceecb8f6a1b7f9dc9b2bd,tables,karbon_tester.fmp12,132,Rows,utility,15,1,13,0,1,0,0,none,"2 rowJSON | calc-unstored | returns element RowNumber-1 of the global variable $$vl_Data (one test-result JSON object per row)
+3 Group | calc-unstored | reads JSON key ""Group"" from the row JSON
+4 Subject | calc-unstored | reads JSON key ""Subject"" from the row JSON
+5 Case | calc-unstored | reads JSON key ""Case"" from the row JSON
+6 Passed | calc-unstored | reads JSON key ""Passed"" from the row JSON
+7 TestScript | calc-unstored | reads JSON key ""TestScript"" from the row JSON
+8 Type | calc-unstored | reads JSON key ""Info.Type"" from the row JSON
+9 Expected | calc-unstored | reads JSON key ""Info.Expected"" from the row JSON
+10 Actual | calc-unstored | reads JSON key ""Info.Actual"" from the row JSON
+11 Assert | calc-unstored | reads JSON key ""Assert"" from the row JSON
+12 Result | calc-unstored | reads Info.Result from the row JSON and pretty-prints it with JSONFormatElements; when formatting fails (starts with ""?"") returns the raw value
+13 Counter | calc-unstored | reads JSON key ""Counter"" from the row JSON
+14 SortSubject | calc-unstored | 100000 + Counter concatenated with Subject (a numeric sort key built by text concatenation)",13,drop-candidate,Virtual-list table over the $$vl_Data variable (529 records); only the test runner reads it.
+karbon_tester.fmp12/tables/133-Globals.txt,a1e8abd52f09d34314e0d457a9a7828f437b60f3ef4830e4bbdb885b4867f3ac,tables,karbon_tester.fmp12,133,Globals,settings-globals,3,0,2,0,1,0,0,none,"1 TestScriptNames | calc-unstored | builds a JSON array of this file's script names from ScriptNames(Get(FileName)), keeps those starting with ""test"" and returns them as a value list
+2 const1 | calc-stored | constant 1 stored calculation (helper)",2,session-state,none
+karbon_tester.fmp12/tables/134-Deleter.txt,e9b4f01871577b9e5458c302e04181c700fa6e4da7993bbf33060b8714e5a568,tables,karbon_tester.fmp12,134,Deleter,utility,3,2,0,0,1,0,0,key | FK-like: Equal relationship Test::DeleterKey = Deleter::key (its auto-enter UUID is switched off),none,0,drop-candidate,"IDsList is matched with the Id of about a dozen karbon_data tables (User, Customer, Invoice, Party, Employee ...) and one missing table; test cleanup tool, confirm it is not a production feature."
+karbon_tester.fmp12/tables/135-meta.txt,d89503b3eeac06012199b920218762f1cbccdd8179adc28993c5c1e3b89b5454,tables,karbon_tester.fmp12,135,meta,settings-globals,2,0,1,0,1,0,0,none,"10 FileVersion | calc-unstored | constant text ""0.9.1"" (file version)",1,config,none
+karbon_tester.fmp12/tables/136-connector.txt,e04e0d8c088db29a983a71a5e0adb620ed6263b59641ff05e1f5b1278cc66614,tables,karbon_tester.fmp12,136,connector,utility,1,0,0,0,1,0,0,none,none,0,drop-candidate,none

@@ -1,0 +1,59 @@
+# script 372: Export HTML File
+# file: karbon_charts.fmp12
+# source: ScriptCatalog/Script[@id=372]
+# steps: 11 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Go to Layout [ “charts” (charts) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=23 name=charts
+   4    Set Variable [ $path; Value:"file:" &Get (TemporaryPath) & "index.html" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:TemporaryPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+   5    Export Field Contents [ charts::opportunitiesCharts; “$path”; Create folders:No ]
+        CreateDirectories state=False
+        DisableStepCollapsed state=False
+        AutoOpen state=False
+        CreateEmail state=False
+        UniversalPathList: $path
+        Field table=charts id=6 name=opportunitiesCharts
+   6    If [ Get(SystemPlatform) =1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:SystemPlatform
+   7    Set Variable [ $path; Value:Substitute(
+           $path ;
+           Get (SystemDrive) ; "///"
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:Get, fn:SystemDrive
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+   8    End If
+        DisableStepCollapsed state=False
+   9    Set Variable [ $$path; Value:$path ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$path
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Exit Script [ Result: $$path ]
+        DisableStepCollapsed state=False

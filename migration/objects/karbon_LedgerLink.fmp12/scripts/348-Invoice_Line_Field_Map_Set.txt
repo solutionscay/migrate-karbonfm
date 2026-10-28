@@ -1,0 +1,253 @@
+# script 348: Invoice Line :: Field Map :: Set
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Transactions
+# source: ScriptCatalog/Script[@id=348]
+# steps: 64 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=246 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # This script is responsible for saving the data from QBO into a FileMaker Record
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # context QBO Layout, related to the target record
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} json the record just pulled from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  10    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  11    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #Only SalesItemLineDetail lines are passed through to here
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $Description; Value:JSONGetElement( $json ; "Description" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Description
+  21    Set Variable [ $LineNum; Value:JSONGetElement( $json ; "LineNum" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $LineNum
+  22    Set Variable [ $Amount; Value:JSONGetElement( $json ; "Amount" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Amount
+  23    Set Variable [ $SalesItemLineDetail.ItemRef.value; Value:JSONGetElement( $json ; "SalesItemLineDetail.ItemRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.ItemRef.value
+  24    Set Variable [ $SalesItemLineDetail.TaxCodeRef.value; Value:JSONGetElement( $json ; "SalesItemLineDetail.TaxCodeRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.TaxCodeRef.value
+  25    Set Variable [ $SalesItemLineDetail.UnitPrice; Value:JSONGetElement( $json ; "SalesItemLineDetail.UnitPrice" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.UnitPrice
+  26    Set Variable [ $SalesItemLineDetail.Qty; Value:JSONGetElement( $json ; "SalesItemLineDetail.Qty" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.Qty
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $taxable; Value:$SalesItemLineDetail.TaxCodeRef.value <> "NON" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $taxable
+  38    Set Variable [ $SalesItemLineDetail.ItemRef.value; Value:QBO.LookupFMId ( "Item" ; $SalesItemLineDetail.ItemRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.ItemRef.value
+  39    Set Variable [ $SalesItemLineDetail.TaxCodeRef.value; Value:QBO.LookupFMId ( "TaxCode" ; $SalesItemLineDetail.TaxCodeRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.TaxCodeRef.value
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Field [ qbo_InvoiceItem::id_Item; $SalesItemLineDetail.ItemRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_InvoiceItem id=9 name=id_Item
+  50    Set Field [ qbo_InvoiceItem::description; $Description ]
+        DisableStepCollapsed state=False
+        Field table=qbo_InvoiceItem id=5 name=description
+  51    Set Field [ qbo_InvoiceItem::amount; $Amount ]
+        DisableStepCollapsed state=False
+        Field table=qbo_InvoiceItem id=6 name=amount
+  52    Set Field [ qbo_InvoiceItem::qbo_lineNum; $LineNum ]
+        DisableStepCollapsed state=False
+        Field table=qbo_InvoiceItem id=4 name=qbo_lineNum
+  53    Set Field [ qbo_InvoiceItem::taxable; $taxable ]
+        DisableStepCollapsed state=False
+        Field table=qbo_InvoiceItem id=11 name=taxable
+  54    Set Field [ qbo_InvoiceItem::unitPrice; $SalesItemLineDetail.UnitPrice ]
+        DisableStepCollapsed state=False
+        Field table=qbo_InvoiceItem id=7 name=unitPrice
+  55    Set Field [ qbo_InvoiceItem::qty; $SalesItemLineDetail.Qty ]
+        DisableStepCollapsed state=False
+        Field table=qbo_InvoiceItem id=8 name=qty
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,92 @@
+# script 89: btn: Delete This Package
+# file: karbon_Generator.fmp12
+# folder: App Modules / Generators / Public / Buttons
+# source: ScriptCatalog/Script[@id=89]
+# steps: 23 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=129 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Show Custom Dialog [ Title: "Are you sure?"; Message: "This can't be undone. The entire generator package will be deleted forever."; Default Button: “Cancel”, Commit: “Yes”; Button 2: “Delete”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Cancel"
+          Button 2 CommitState=False: "Delete"
+          Button 3 CommitState=False
+   4    If [ Get(LastMessageChoice) = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+   5    Exit Script [  ]
+        DisableStepCollapsed state=False
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $packageName; Value:Generators::name ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Generators::name#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $packageName
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ IsEmpty ( $packageName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  11    Exit Script [  ]
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $packagePath; Value:PathToPackage (  $packageName  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:PathToPackage
+        Repetition
+          Calculation:
+            | 1
+        Name: $packagePath
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ <Function Missing> ( $packagePath  ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $result; Value:<Function Missing> ( $packagePath ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Delete Record/Request
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  23    Go to Layout [ “Generators” (Generators) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=39 name=Generators

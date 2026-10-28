@@ -1,0 +1,138 @@
+# script 216: Import Script
+# file: karbon_Generator.fmp12
+# folder: Miscellaneous Generators
+# source: ScriptCatalog/Script[@id=216]
+# steps: 26 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=215 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $file; Value:"karbon_data" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $file
+   5    Set Variable [ $fileRef; Value:"file:karbon_data.fmp12" ]
+        DisableStepCollapsed state=False
+        Name: $fileRef
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $allTables; Value:design_x_sql ( "SELECT * FROM FileMaker_Tables ORDER BY \"BaseTableName\"" ;  $file ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:design_x_sql
+        Repetition
+          Calculation:
+            | 1
+        Name: $allTables
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  10    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $line; Value:GetValue($allTables; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $line
+  12    Exit Loop If [ IsEmpty ( $line ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  13    Set Variable [ $split; Value:Substitute ( $line ; "|" ; "¶" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $split
+  14    Set Variable [ $baseTO; Value:GetValue($split; 3) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $baseTO
+  15    If [ IsEmpty ( FilterValues ( $alreadySeen; $base) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:FilterValues
+  16    #not seen yet
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $sourceTableID; Value:GetValue($split; 2) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $sourceTableID
+  18    Set Variable [ $targetTableID; Value:GetValue($split; 2) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $targetTableID
+  19    Set Variable [ $targetTableName; Value:GetValue($split; 1) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $targetTableName
+  20    Set Variable [ $steps; Value:/*List($steps; 
+        
+        
+        ScriptStep_Import ( $fileRef ; $sourceTableID ; $targetTableID ; $targetTableName )
+        
+        )*/ ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $steps
+  21    End If
+        DisableStepCollapsed state=False
+  22    Set Variable [ $alreadySeen; Value:List($alreadySeen; $baseTO) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $alreadySeen
+  23    Set Variable [ $n; Value:1 + $n ]
+        DisableStepCollapsed state=False
+        Name: $n
+  24    End Loop
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $resullt; Value:clip_Set ( $steps ; "ScriptSteps" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_Set
+        Repetition
+          Calculation:
+            | 1
+        Name: $resullt

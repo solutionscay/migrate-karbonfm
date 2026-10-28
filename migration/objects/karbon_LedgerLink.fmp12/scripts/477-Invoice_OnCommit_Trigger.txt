@@ -1,0 +1,83 @@
+# script 477: Invoice OnCommit Trigger
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Invoice Interface
+# source: ScriptCatalog/Script[@id=477]
+# steps: 20 (7 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=470 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #flag an Invoice as modified when its related line items are modified
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Field [ Invoice::qbo_send; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=Invoice id=3 name=qbo_send
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #summarize related records
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Field [ Invoice::subtotal; InvoiceItem::summaryTotalAmount ]
+        DisableStepCollapsed state=False
+        refs: InvoiceItem::summaryTotalAmount#14
+        Field table=Invoice id=33 name=subtotal
+   8    Set Field [ Invoice::taxableSubtotal; InvoiceItem::summaryTotalAmountTaxable ]
+        DisableStepCollapsed state=False
+        refs: InvoiceItem::summaryTotalAmountTaxable#13
+        Field table=Invoice id=34 name=taxableSubtotal
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10 // #following steps disable bcs now qbo handles all tax calcs
+        DisableStepCollapsed state=False
+        Restore state=False
+  11 // If [ /* tax field was not modified */
+        
+        IsEmpty ( FilterValues (
+        	Get ( ModifiedFields ) ;
+        	FieldName ( Invoice::totalTax )
+        ) )
+        
+        /* this allows the user manually enter the total tax */ ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:FilterValues, fn:Get, fn:ModifiedFields, cf:FieldName, Invoice::totalTax#30
+  12 // Set Field [ Invoice::totalTax; Round ( Invoice::taxableSubtotal * ( Invoice_TaxCode::percentage / 100 ) ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, Invoice::taxableSubtotal#34, Invoice_TaxCode::percentage#10
+        Field table=Invoice id=30 name=totalTax
+  13 // Else If [ /* at least one item is taxable */
+        InvoiceItem::summaryTotalAmountTaxable ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: InvoiceItem::summaryTotalAmountTaxable#13
+  14 // #at least one line must be taxable for total tax to be sent to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+  15 // Set Field [ Invoice::totalTax; "" ]
+        DisableStepCollapsed state=False
+        Field table=Invoice id=30 name=totalTax
+  16 // End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Field [ Invoice::totalAmt; Invoice::subtotal + Invoice::totalTax + Invoice::shipAmt ]
+        DisableStepCollapsed state=False
+        refs: Invoice::subtotal#33, Invoice::totalTax#30, Invoice::shipAmt#41
+        Field table=Invoice id=25 name=totalAmt
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Field [ Invoice::balance; Invoice::totalAmt - Invoice::totalPaid ]
+        DisableStepCollapsed state=False
+        refs: Invoice::totalAmt#25, Invoice::totalPaid#58
+        Field table=Invoice id=26 name=balance

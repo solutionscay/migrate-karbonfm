@@ -1,0 +1,82 @@
+# script 435: Save Contact Method - Network Address
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Contact Methods / Popover Edits
+# source: ScriptCatalog/Script[@id=435]
+# steps: 17 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=429 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2019-07-17 dave@geistinteractive.com - update to allow for editing existing
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Close Popover
+        DisableStepCollapsed state=False
+   4    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $networkaddress; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "Address" ; UtilityContactMethod::NetworkAddress ; JSONString ];
+        	[ "Id" ; UtilityContactMethod::Id ; JSONString ];
+        	[ "Label" ; UtilityContactMethod::Label ; JSONString ];
+        	[ "PartyId" ; Party::Id ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityContactMethod::NetworkAddress#15, fn:JSONString, UtilityContactMethod::Id#16, UtilityContactMethod::Label#7, Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $networkaddress
+   7    Perform Script [ “Create or Update Network Address { data }” from file: “karbon_kontroller”; Parameter: $networkaddress ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=207 name="Create or Update Network Address { data }" in=karbon_kontroller.fmp12
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  12    #Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Show Custom Dialog [ Title: "Error"; Message: "This Network Address was not created."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False

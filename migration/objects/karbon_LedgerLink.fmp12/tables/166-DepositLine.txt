@@ -1,0 +1,126 @@
+# table 166: DepositLine
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=166]
+# fields: 15
+# records: 0
+
+Field id=6 dataType=Text fieldType=Normal name=id_Deposit
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=qbo_error
+  Comment: error message returned by QBO when attempting to sync this record
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Number fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=TimeStamp fieldType=Normal name=qbo_LastUpdated
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Number fieldType=Normal name=qbo_lineNum
+  Comment: determines the sort order. NOT suitable for display to users due to it's auto-enter value.
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=DepositLine:
+      | /* auto-entering milliseconds ensures new records are sorted after previously entered records */
+      | Get ( CurrentTimeUTCMilliseconds )
+      refs: fn:Get, fn:CurrentTimeUTCMilliseconds
+  Validation type=Always
+    StrictDataType value=Numeric
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=qbo_send
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=DepositLine:
+      | Let(
+      | [
+      | x = GetField("")
+      | 
+      | ];
+      | Case(
+      |    $LL_IsUpdatingThisRecord ; Self;
+      |    1
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:GetField, fn:Case, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=id_Account
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=DepositLine (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Number fieldType=Normal name=amount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=id_PaymentMethod
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=id_Class
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=id_Entity
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=DepositLine:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Normal name=CheckNum
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=description
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

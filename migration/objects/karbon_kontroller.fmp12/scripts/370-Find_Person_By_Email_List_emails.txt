@@ -1,0 +1,247 @@
+# script 370: Find Person By Email  ( List( emails ) )
+# file: karbon_kontroller.fmp12
+# folder: API / Party
+# source: ScriptCatalog/Script[@id=370]
+# steps: 65 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Find a person party with an email address
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {string} emails seperate each email with a return
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@return {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@return {number} count the number of matching parties found
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@return {array} data an array of {Parties}
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #--- [ SETUP ] ---------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  16    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #--- [ SETUP END ] -----------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $emails; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $emails
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #start the results package
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $result; Value:JSONSetElement( "{}" ; "count" ; 0 ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    If [ IsEmpty ( $emails ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  27    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Go to Layout [ “f_Party” (f_Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=19 name=f_Party
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #create a find for all the emails in the list
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  36    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $email; Value:GetValue ( $emails ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $email
+  38    Exit Loop If [ IsEmpty( $email ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  39    If [ $n = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  41    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    New Record/Request
+        DisableStepCollapsed state=False
+  43    End If
+        DisableStepCollapsed state=False
+  44    Set Field [ f_Party::PersonInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=f_Party id=130 name=PersonInd
+  45    Set Field [ f_NetworkAddress::Address; Quote ( $email ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Quote
+        Field table=f_NetworkAddress id=7 name=Address
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  48    End Loop
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=f_NetworkAddress id=7 name=Address
+              Text: $emailQuoted
+            Criteria
+              Field table=f_NetworkAddress id=18 name=EmailAddressInd
+              Text: 1
+  51    Set Variable [ $error; Value:Error.Last ( "finding employees" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    If [ Get(FoundCount) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  54    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  55    Exit Script [ Result:  $error ]
+        DisableStepCollapsed state=False
+  56    End If
+        DisableStepCollapsed state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $count; Value:Get ( FoundCount ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:FoundCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $count
+  60    Set Variable [ $partyArray; Value:JSON.ArrayFromRelated ( f_Party::AsJsonListOf ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayFromRelated, f_Party::AsJsonListOf#139
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyArray
+  61    Set Variable [ $result; Value:JSONSetElement ( "" ; 
+        
+        	["count" ; $count ; JSONNumber];
+        	["data" ; $partyArray ; JSONArray]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  65    Exit Script [ Result:  $result ]
+        DisableStepCollapsed state=False

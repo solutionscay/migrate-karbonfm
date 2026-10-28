@@ -1,0 +1,49 @@
+# custom function 53: FilterValuesByExpression
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=53]
+
+CustomFunction id=53 functionArity=2 visible=True parameters=theList;expression name=FilterValuesByExpression
+  Calculation:
+    | /*
+    | 
+    | NAME:       FilterValuesByExpression
+    | PURPOSE:  Filters the values of a list based on a Filemaker expression
+    | NOTES:  if the expression is applied to each value in the List and if it evalutes to true then the Item is return.  Expressions can use "item" to refer to the List Item
+    | AUTHOR: Todd Geist, todd@geistinteractive.com
+    | HISTORY: 
+    |     Version 1.0 9/27/2013
+    | 
+    | EXAMPLES:
+    | 
+    | // get all values that begin with the letter a
+    | FilterValuesByExpression ( List("a" ; "bee"; "see" ; "apple") ; "Left(item ;1) = \"a\" " )
+    | //  -> a¶apple
+    | 
+    | // get all values that contain "ee"
+    | FilterValuesByExpression ( List("a" ; "bee"; "see" ; "apple") ; " PatternCount( item ; \"ee\" )" )
+    | //  -> bee¶see
+    | 
+    | */
+    | 
+    | 
+    | Let(
+    | [
+    | 
+    | left = " Let( [ item =\"";
+    | right = "\" ]; If( " & expression & " ; item ) );" ;
+    | 
+    | let = 
+    | "List(¶"  & 
+    | left & 
+    | Substitute(theList & "¶" ; "¶" ; right & "¶" & left) & 
+    | right
+    | & "¶)"
+    | 
+    | 
+    | 
+    | ];
+    | 
+    | Evaluate( let )
+    | 
+    | )
+    refs: fn:Let, fn:Substitute, fn:Evaluate

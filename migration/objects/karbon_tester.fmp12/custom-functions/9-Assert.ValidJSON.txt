@@ -1,0 +1,28 @@
+# custom function 9: Assert.ValidJSON
+# file: karbon_tester.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=9]
+
+CustomFunction id=9 functionArity=1 visible=True parameters=TEST_Result name=Assert.ValidJSON
+  Calculation:
+    | Let(
+    | [
+    | 
+    | json = JSONFormatElements(TEST_Result);
+    | 
+    | passed = Left( json ;1 ) <> "?";
+    | $TEST_Assert =  If( IsEmpty($TEST_Assert) ; "it should be valid JSON" ; $TEST_Assert );
+    | 
+    | testInfo = JSONSetElement("{}";
+    | 	["Type" ; "ValidJSON" ; JSONString];
+    | 	["Result" ; $TEST_Result ; ""]
+    | 
+    | )
+    | ];
+    | 
+    | 
+    | Assert._helper ( passed ; testinfo )
+    | 
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:JSONFormatElements, fn:Left, fn:If, fn:IsEmpty, fn:JSONSetElement, fn:JSONString, cf:Assert._helper

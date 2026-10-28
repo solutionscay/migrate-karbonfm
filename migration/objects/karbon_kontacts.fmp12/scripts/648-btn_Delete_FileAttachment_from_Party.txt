@@ -1,0 +1,82 @@
+# script 648: btn: Delete FileAttachment from Party
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Party Attachments
+# source: ScriptCatalog/Script[@id=648]
+# steps: 18 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=645 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Close Popover
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "Id" ; Party_FileAttachment::Id ; JSONString ];
+        	[ "AttachmentId" ; Party_FileAttachment::AttachmentId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Party_FileAttachment::Id#1, fn:JSONString, Party_FileAttachment::AttachmentId#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Perform Script [ “Delete FileAttachment { data }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=612 name="Delete FileAttachment { data }" in=karbon_kontroller.fmp12
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  11    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  12    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  13    End If
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  16    Refresh Object [ Object Name: "portal.attachments"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False

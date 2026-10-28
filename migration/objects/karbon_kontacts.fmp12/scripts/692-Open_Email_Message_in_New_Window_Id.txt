@@ -1,0 +1,162 @@
+# script 692: Open Email Message in New Window { Id }
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / EmailMessage
+# source: ScriptCatalog/Script[@id=692]
+# steps: 31 (2 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=688 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-10-25 dave@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #If already sent, go to view-only layout
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ Selected_Activity_EmailMessage::SentInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_Activity_EmailMessage::SentInd#9
+   5    Go to Related Record [ From table: “Selected_Activity_EmailMessage”; Using layout: “Email Message - View Only” (EmailMessage) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        Name
+          Calculation:
+            | "Email"
+        Height
+          Calculation:
+            | 830
+        Width
+          Calculation:
+            | 900
+        DistanceFromTop
+          Calculation:
+            | Get ( WindowTop ) + 22
+            refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          Calculation:
+            | Get ( WindowLeft ) + 22
+            refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=1074201090
+        Table id=1065245 name=Selected_Activity_EmailMessage
+        Layout id=167 name="Email Message - View Only"
+   6    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ IsEmpty ( Get ( ScriptParameter ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:Get, fn:ScriptParameter
+  10    Show Custom Dialog [ Title: "Error"; Message: "Missing required parameter: ID."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  11    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #Set quick recipient list
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #Select this party and all of its related parties
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Field [ selector::PartyId; List ( 
+        	Selected_ActivityParty#to::PartyId // all "to" recipients
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, Selected_ActivityParty#to::PartyId#7
+        Field table=selector id=6 name=PartyId
+  18    Set Field [ selector::PartyId; List ( 
+        	selector::PartyId ; // all "to" recipients
+        
+        	List ( Selected_Party_PartyRelation::PartyIdTo ) // all parties related to those recipients
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, selector::PartyId#6, Selected_Party_PartyRelation::PartyIdTo#6
+        Field table=selector id=6 name=PartyId
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #Select all email ContactMethodIds
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ selector::ContactMethodId; List ( Selected_Party_ContactMethod_NetworkAddress#email::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, Selected_Party_ContactMethod_NetworkAddress#email::Id#1
+        Field table=selector id=10 name=ContactMethodId
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23 // #The recipient fields parse this out for display purposes
+        DisableStepCollapsed state=False
+        Restore state=False
+  24 // Set Field [ UtilityEmailMessage::ActivityPartyArray; JSON.ArrayFromRelated ( Selected_Activity_ActivityPartyEmail::AsJson ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.ArrayFromRelated, Selected_Activity_ActivityPartyEmail::AsJson#75
+        Field table=UtilityEmailMessage id=10 name=ActivityPartyArray
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #Open the email message window
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Go to Related Record [ From table: “Selected_Activity_EmailMessage”; Using layout: “Email Message - Edit” (EmailMessage) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        Name
+          Calculation:
+            | "Email"
+        Height
+          Calculation:
+            | 830
+        Width
+          Calculation:
+            | 900
+        DistanceFromTop
+          Calculation:
+            | Get ( WindowTop ) + 22
+            refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          Calculation:
+            | Get ( WindowLeft ) + 22
+            refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=1074201090
+        Table id=1065245 name=Selected_Activity_EmailMessage
+        Layout id=176 name="Email Message - Edit"
+  28    Go to Field [ Activity::Subject ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=Activity id=22 name=Subject
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False

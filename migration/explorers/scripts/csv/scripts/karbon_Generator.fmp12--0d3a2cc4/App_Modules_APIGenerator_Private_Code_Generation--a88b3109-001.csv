@@ -1,0 +1,105 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_Generator.fmp12/scripts/238-Convert_Fields_to_AsJson.txt,e1970d7a92e37f85dabc000c780f0620944581fa324db58d2e9334c3c424b444,scripts,karbon_Generator.fmp12,238,Convert Fields to AsJson,utility,drop-candidate,tier3,"Developer tool in the API Generator. Takes table or fields copied from the Manage Database dialog (clipboard XML) and builds a JSONSetElement expression line for each normal, non-global, non-calculated field (skipping ONE, AsJSON, z_xJoin), then puts it on the clipboard. Effect owner would be client-ui.",none,"GLOBALS::BaseTableName#15 (step 12, global; set to ""NULL"" when only fields were copied)",karbon_Generator.fmp12/scripts/230 (step 18),karbon_Generator.fmp12/layouts/57-Misc_Generators.txt,"clip_GetFMxml clipboard read (step 8)
+<Function Missing> (step 72, clipboard write)",WIP per history comment (2018-02-13).
+karbon_Generator.fmp12/scripts/257-Create_DocBlock.txt,cb165191b72e6195e7c59cfaa2149887c7321ed10df3d9e603226c3de539d9f9,scripts,karbon_Generator.fmp12,257,Create DocBlock,utility,drop-candidate,tier3,Developer tool in the API Generator. Walks the portal of ApiGeneratorLine rows and builds the @param / @result / @returnError comment lines of a generated script.,"ApiGenerator::Entity#19
+ApiGeneratorLine::Id#1
+ApiGeneratorLine::FmpIgnore#11
+ApiGeneratorLine::FmpParam#29
+ApiGeneratorLine::FmpResult#43
+ApiGeneratorLine::type#23
+ApiGeneratorLine::readOnly#24
+ApiGeneratorLine::JsonPathIn#27
+ApiGeneratorLine::default#20
+ApiGeneratorLine::required#19
+ApiGeneratorLine::description#22
+ApiGeneratorLine::JsonPropertyName#21
+ApiGeneratorLine::Id#1 (portal loop, steps 19, 71)",none,none,"karbon_Generator.fmp12/scripts/475-Generate_API_Script_-_Delete.txt step 5
+karbon_Generator.fmp12/scripts/315-Generate_API_Script_-_Create.txt step 5
+karbon_Generator.fmp12/scripts/319-Generate_API_Script_-_Edit_V2.txt step 6
+karbon_Generator.fmp12/scripts/373-Generate_API_Script_-_Read.txt step 6
+karbon_Generator.fmp12/scripts/480-Generate_API_Script_-_Go_WIP.txt step 7",none,"WIP per history comment. Uses portal rows of the current layout (Go to Portal Row), so it only works from the generator layout."
+karbon_Generator.fmp12/scripts/263-API_Setup.txt,50903063b0b6204e7b1463e38e8df1c9db943f20a9b9fcfd29165f830ee08c76,scripts,karbon_Generator.fmp12,263,API Setup,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns the generated ""SETUP"" and ""VALIDATE INCOMING JSON"" script steps (Allow User Abort off, Set Error Capture on, validate the parameter with JSON.Format and exit on error).","ApiGenerator::Entity (steps 15, 17, 18)",none,none,none found,none,No caller found; later generators use script 266 and inline setup instead. The entity field id is not in the refs.
+karbon_Generator.fmp12/scripts/266-API_Validation.txt,eecc940ca284aa14f12f7b9edd36ea3100c9808292e20eb9c2147c216d5affb0,scripts,karbon_Generator.fmp12,266,API Validation,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns the generated JSON.Validate.This / ApplyRules statement from the portal rows: required, one-of, and one-of-if-present rules per property (skipping objects).","ApiGeneratorLine::Id#1
+ApiGeneratorLine::JsonPropertyName#21
+ApiGeneratorLine::IsObject#41
+ApiGeneratorLine::required#19
+ApiGeneratorLine::IsOneOf#37
+ApiGeneratorLineValueOption::Number (step 31)
+ApiGeneratorLineValueOption::Value (step 31)",none,none,"karbon_Generator.fmp12/scripts/475-Generate_API_Script_-_Delete.txt step 11
+karbon_Generator.fmp12/scripts/315-Generate_API_Script_-_Create.txt step 11
+karbon_Generator.fmp12/scripts/319-Generate_API_Script_-_Edit_V2.txt step 12
+karbon_Generator.fmp12/scripts/373-Generate_API_Script_-_Read.txt step 12
+karbon_Generator.fmp12/scripts/480-Generate_API_Script_-_Go_WIP.txt step 13",none,"Uses the portal rows of the current layout. Step 13 (entity from ApiGenerator) is disabled; the entity name in the output is a fixed ""json"" since 2018-09-11. IsNumeric and IsOnlyOneOf are not used."
+karbon_Generator.fmp12/scripts/274-API_Parse_Data_Into_Variables.txt,555181835c96bf6bc398381a621eb8c15ec505f4d3313093228dc366c978bc32,scripts,karbon_Generator.fmp12,274,API Parse Data Into Variables,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns generated Set Variable steps that read each parameter property from the incoming JSON (dates wrapped in GetAsDate), skipping the root object.","ApiGenerator::Entity#19
+ApiGeneratorLine::Id#1
+ApiGeneratorLine::JsonPathIn#27
+ApiGeneratorLine::type#23
+ApiGeneratorLine::FmpParam#29
+ApiGeneratorLine::FmpDataType#28",none,none,"karbon_Generator.fmp12/scripts/475-Generate_API_Script_-_Delete.txt step 14
+karbon_Generator.fmp12/scripts/315-Generate_API_Script_-_Create.txt step 14
+karbon_Generator.fmp12/scripts/319-Generate_API_Script_-_Edit_V2.txt step 15
+karbon_Generator.fmp12/scripts/373-Generate_API_Script_-_Read.txt step 15
+karbon_Generator.fmp12/scripts/480-Generate_API_Script_-_Go_WIP.txt step 16",none,"Uses the portal rows of the current layout. Entity name in the output is fixed to ""json"" since 2018-09-11."
+karbon_Generator.fmp12/scripts/275-API_Start_Transaction.txt,ef790e43819d3d4192efcaf0098f9b280bd90e2885296a05fcb2cb1f1f932ecf,scripts,karbon_Generator.fmp12,275,API Start Transaction,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns the generated ""START TRANSACTION"" steps: perform Start Transaction with Transaction.Payload, then open a Loop.",none,none,none,none found,"clip_Set clipboard write (step 17, custom function)","No caller found; the pattern is the transaction wrapper every karbon_kontroller write script uses (Start Transaction, Loop, Save Transaction Result, End Transaction)."
+karbon_Generator.fmp12/scripts/276-API_Create_Record.txt,3068626c40c51ae82c9d231c198ac5c8a8c157089c2034373412d0edf920d89c,scripts,karbon_Generator.fmp12,276,API Create Record,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns the generated steps that create the entity record by setting DBTransactions::<Entity>Id to the new id and the entity ONE field to 1, then exit the loop on error.",ApiGenerator::Entity#19,none,none,none found,"clip_Set clipboard write (step 15, custom function)","No caller found. Shows the kontroller convention of creating a record through a Set Field on a one-field relationship (record auto-created by ""allow creation of related records"")."
+karbon_Generator.fmp12/scripts/277-API_Connect_to_Record_for_Edit.txt,e875a6e27cfafd91ea341da222f328e8855d5807f6fb0badffa05dc3e9acb3c4,scripts,karbon_Generator.fmp12,277,API Connect to Record for Edit,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns the generated steps that connect to an existing entity record through DBTransactions::<Entity>Id and ONE, exiting the loop with ""Not a valid <Entity> Id"" when it is missing.",ApiGenerator::Entity#19,none,none,none found,"clip_Set clipboard write (step 15, custom function)",No caller found.
+karbon_Generator.fmp12/scripts/278-API_End_Transaction.txt,0d35dd449bd5baf1ded728d4bfc2cc5561515d222f8d0e6e88d973387c3177dc,scripts,karbon_Generator.fmp12,278,API End Transaction,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns the generated ""END TRANSACTION"" steps: close the loop, build the result Id JSON, then Save Transaction Result and End Transaction, and exit with the script result.",none,none,none,none found,"clip_Set clipboard write (step 23, custom function)",No caller found.
+karbon_Generator.fmp12/scripts/279-API_Set_Fields_-_Create.txt,ae8b921700e4cf25d3671c2df6aecf2567fc235f4328f2de139e5ed044fe1cd3,scripts,karbon_Generator.fmp12,279,API Set Fields - Create,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns generated Set Field steps that copy each parameter variable into its mapped table field for a create script, skipping ignored lines, lines without a field and lines with an output path.","ApiGenerator::Entity#19
+ApiGeneratorLine::Id#1
+ApiGeneratorLine::FmpIgnore#11
+ApiGeneratorLine::FmpFieldName#4
+ApiGeneratorLine::JsonPathOut#26
+ApiGeneratorLine::FmpTableName#10
+ApiGeneratorLine::JsonPropertyName#21",none,none,"karbon_Generator.fmp12/scripts/475-Generate_API_Script_-_Delete.txt step 17
+karbon_Generator.fmp12/scripts/315-Generate_API_Script_-_Create.txt step 17
+karbon_Generator.fmp12/scripts/480-Generate_API_Script_-_Go_WIP.txt step 19",none,Uses the portal rows of the current layout. Disabled steps 2-3 hold a sample pluck expression.
+karbon_Generator.fmp12/scripts/280-API_Set_Fields_-_Patch.txt,c6b84063c359a1c1232d12d54cc8aceaac2bd3a065c6dfa6038486635f26f255,scripts,karbon_Generator.fmp12,280,API Set Fields - Patch,utility,drop-candidate,tier3,"Developer tool in the API Generator. Returns generated Set Field steps for an edit script, each wrapped in an If JSON.ContainsProperty so only properties present in the request are changed.","ApiGenerator::Entity#19
+ApiGeneratorLine::Id#1
+ApiGeneratorLine::FmpIgnore#11
+ApiGeneratorLine::FmpFieldName#4
+ApiGeneratorLine::JsonPathOut#26
+ApiGeneratorLine::FmpTableName#10
+ApiGeneratorLine::JsonPropertyName#21
+ApiGeneratorLine::FmpFieldName#4",none,none,karbon_Generator.fmp12/scripts/319-Generate_API_Script_-_Edit_V2.txt step 18,none,Uses the portal rows of the current layout. The patch semantics (only present properties change) is the rule the generated kontroller edit scripts follow.
+karbon_Generator.fmp12/scripts/281-API_Pluck_Props_For_Subscript_-_WIP.txt,813cfcd28e493e3acd79be62a8ff418a0a4c6627184143cc567fed772bdf7f92,scripts,karbon_Generator.fmp12,281,API Pluck Props For Subscript - WIP,utility,drop-candidate,tier3,Developer tool in the API Generator. Returns a generated JSON.Pluck statement that maps properties with an output path to the parameters of a sub-script call; empty when none.,"ApiGeneratorLine::Id#1
+ApiGeneratorLine::FmpIgnore#11
+ApiGeneratorLine::JsonPathOut#26
+ApiGeneratorLine::JsonPropertyName#21
+ApiGeneratorLine::type#23",none,none,"karbon_Generator.fmp12/scripts/475-Generate_API_Script_-_Delete.txt step 22
+karbon_Generator.fmp12/scripts/315-Generate_API_Script_-_Create.txt step 22
+karbon_Generator.fmp12/scripts/319-Generate_API_Script_-_Edit_V2.txt step 23",none,"WIP per name. Uses the portal rows of the current layout. Entity is fixed to ""ScriptParameter"" since 2018-09-11, but step 44 substitutes $Entity (variable not set here), so the pluck source may be empty."
+karbon_Generator.fmp12/scripts/315-Generate_API_Script_-_Create.txt,e22a70466ab1954bea297b7822010a6b4061f397d3ef3c14c4df03ff467caddf,scripts,karbon_Generator.fmp12,315,Generate API Script - Create,orchestration,drop-candidate,tier3,"Developer tool in the API Generator. Assembles the full ""Create"" script for an entity as FileMaker script steps on the clipboard: doc block, loop with Start Transaction, JSON validation and rules, parameters into variables, connect/create the record through DBTransactions::<Entity>Id and ONE, Set Field steps, optional sub-script call, result, Save Transaction Result and End Transaction. This is the template the karbon_kontroller write scripts follow.","ApiGenerator::APIName#2
+ApiGenerator::Entity#19
+ApiGeneratorLine::JsonPathOut#26 (step 20)
+meta::FileVersion (step 37)",none,"karbon_Generator.fmp12/scripts/257 (step 5)
+karbon_Generator.fmp12/scripts/460 (step 8)
+karbon_Generator.fmp12/scripts/266 (step 11)
+karbon_Generator.fmp12/scripts/274 (step 14)
+karbon_Generator.fmp12/scripts/279 (step 17)
+karbon_Generator.fmp12/scripts/281 (step 22)
+karbon_Generator.fmp12/scripts/477 (step 26)",karbon_Generator.fmp12/scripts/320-Generate_Code.txt step 6,"clip_Set clipboard write (step 157, custom function)","Not used by the target, but it documents the shape of every generated kontroller script: validate JSON, lock the record via DBTransactions + ONE, set fields, return {""Id""}. The generated script ends with Exit Script ""Get ( ScriptResult ) )"", a stray closing bracket."
+karbon_Generator.fmp12/scripts/319-Generate_API_Script_-_Edit_V2.txt,3fdde55db1d4878bcef94956985d2cb0337c2b4858ca3462c2ac083f8cc16b8d,scripts,karbon_Generator.fmp12,319,Generate API Script - Edit V2,orchestration,drop-candidate,tier3,"Developer tool in the API Generator. Assembles the full ""Edit"" script for an entity as FileMaker script steps on the clipboard, like the Create generator but with patch-style Set Field steps (only properties present in the JSON change) and a result carrying the entity Id. This is the template the karbon_kontroller edit scripts follow.","ApiGenerator::APIName#2
+ApiGenerator::Entity#19
+ApiGeneratorLine::JsonPathOut#26 (step 21)
+meta::FileVersion (step 35)",none,"karbon_Generator.fmp12/scripts/257 (step 6)
+karbon_Generator.fmp12/scripts/460 (step 9)
+karbon_Generator.fmp12/scripts/266 (step 12)
+karbon_Generator.fmp12/scripts/274 (step 15)
+karbon_Generator.fmp12/scripts/280 (step 18)
+karbon_Generator.fmp12/scripts/281 (step 23)",karbon_Generator.fmp12/scripts/320-Generate_Code.txt step 8,"clip_Set clipboard write (step 154, custom function)","Same stray bracket in the generated Exit Script. The edit script connects to the record with the same DBTransactions + ONE pattern, so a missing Id still creates a blank record unless script 460 sets a default."
+karbon_Generator.fmp12/scripts/320-Generate_Code.txt,ac5edc05a2e732ea43bb27383c6156449044548830956d0513613903d783c457,scripts,karbon_Generator.fmp12,320,Generate Code,orchestration,drop-candidate,tier3,"Developer tool in the API Generator. Dispatches by API type (Create, Edit, Delete, Read, Go) to the matching script generator, otherwise shows an unsupported dialog. Effect owner would be client-ui.",ApiGenerator::APIType#18,none,"karbon_Generator.fmp12/scripts/315 (step 6)
+karbon_Generator.fmp12/scripts/319 (step 8)
+karbon_Generator.fmp12/scripts/475 (step 10)
+karbon_Generator.fmp12/scripts/373 (step 12)
+karbon_Generator.fmp12/scripts/480 (step 14)","karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt
+karbon_Generator.fmp12/layouts/61-API_Generator.txt",none,none
+karbon_Generator.fmp12/scripts/370-Create_AsJson_Calc.txt,43e420f72a9cf776371999ca2f9652c664cd3990c596688c8c2146053cc764d4,scripts,karbon_Generator.fmp12,370,Create AsJson Calc,utility,drop-candidate,tier3,"Developer tool in the API Generator. Builds a JSONSetElement ""AsJson"" calculation from the portal rows (non-ignored, parameter, non-object lines) and copies it to the clipboard. Effect owner would be client-ui.","ApiGenerator::Entity#19
+ApiGeneratorLine::Id#1
+ApiGeneratorLine::FmpIgnore#11
+ApiGeneratorLine::FmpParam#29
+ApiGeneratorLine::IsObject#41
+ApiGeneratorLine::type#23
+ApiGeneratorLine::JsonPropertyName#21
+ApiGeneratorLine::FmpTableName#10
+ApiGeneratorLine::FmpFieldName#4",none,none,"karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt
+karbon_Generator.fmp12/layouts/61-API_Generator.txt","<Function Missing> (step 26, clipboard write)",none

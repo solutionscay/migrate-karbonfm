@@ -1,0 +1,452 @@
+# script 75: Create External Link V1 { data }
+# file: karbon_kontroller.fmp12
+# folder: API / Party
+# source: ScriptCatalog/Script[@id=75]
+# steps: 116 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # links a party to an external reference
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {string} PartyRoleId
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} ExternalId
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {string} ExternalTypeId
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnSuccess {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnSuccess {string} id
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # @returnError {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @returnError {object} errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    # @returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    # @history 2018-02-15 Dave Graham: 
+        	- using InternalId instead of PartyRoleId.
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    # @history 2018-02-08 Dave Graham: 
+        	- now referencing ExternalTypeId instead of ExternalType, which was a string that can change.
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    # @history 2018-02-06 Dave Graham: 
+        	- now referencing an ExternalLinkType table
+        	- additional validation
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    # @history 2018-02-04 Dave Graham: 
+        	- updating references to reflect that External Links are now associated with Party Role instead of party
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #TODO - should V1 exist?
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #--- [ SETUP ] ---------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  29    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  30    #--- [ SETUP END ] -----------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #--- [ VALIDATE INCOMING JSON ] ---------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #Validate the JSON itself.
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $data; Value:JSON.Format ( Get (ScriptParameter); "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  38    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  39    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #Init
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    If [ JSON.ContainsProperty ( $data ; "PartyRoleId" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.ContainsProperty
+  44    #2018-02-15 dave@geistinteractive.com - external links can work with any data type, so we're no longer expecting a PartyRoleId. This is for backwards compatibility
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $data; Value:JSONSetElement ( $data ; "InternalId" ; JSONGetElement ( $data; "PartyRoleId" ) ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONGetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Variable [ $InternalId; Value:JSONGetElement ( $data; "InternalId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $InternalId
+  49    Set Variable [ $ExternalTypeId; Value:JSONGetElement ( $data; "ExternalTypeId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ExternalTypeId
+  50    Set Variable [ $ExternalId; Value:JSONGetElement ( $data; "ExternalId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ExternalId
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #Validate by rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Set Variable [ $AllowedExternalTypes; Value:Let ( [ 
+        
+        	columnField = ExternalLinkType::Id ; 
+        	whereField = ExternalLinkType::ONE ; 
+        	whereValue = 1
+        
+        ] ; 
+        
+        	SQL.GetColumn ( columnField ; whereField ; whereValue ) 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, ExternalLinkType::Id#1, ExternalLinkType::ONE#8, cf:SQL.GetColumn
+        Name: $AllowedExternalTypes
+  55    Set Variable [ $error; Value:JSON.Validate.This ( $data ) & 
+        JSON.Validate.ApplyRules (
+        List(
+        
+        
+        JSON.Validate.Rule.IsRequired ( "InternalId" ) ;
+        JSON.Validate.Rule.IsRequired ( "ExternalId" ) ; 
+        JSON.Validate.Rule.IsOneOf ( ( "ExternalTypeId" ) ; $AllowedExternalTypes )
+        
+        
+        )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired, cf:JSON.Validate.Rule.IsOneOf
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  56    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  57    Exit Script [ Result:  $error ]
+        DisableStepCollapsed state=False
+  58    End If
+        DisableStepCollapsed state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #validate that the external type is associated with the correct party role type
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Variable [ $externalLinkTypeExists; Value:// get me the party role type ID from the given party role 
+        
+        Let ( [ 
+        
+        	columnField = ExternalLinkType::InternalType ; 
+        	whereField = ExternalLinkType::Id ; 
+        	whereValue = $ExternalTypeId 
+        
+        ] ; 
+        
+        	SQL.GetColumn ( columnField ; whereField ; whereValue ) 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, ExternalLinkType::InternalType#14, ExternalLinkType::Id#1, cf:SQL.GetColumn
+        Repetition
+          Calculation:
+            | 1
+        Name: $externalLinkTypeExists
+  63    If [ IsEmpty ( $externalLinkTypeExists ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  64    Exit Script [ Result: _wip_API.Error.Validation ( "The external link type is invalid/missing" ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:_wip_API.Error.Validation
+  65    End If
+        DisableStepCollapsed state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #Make sure an existing link doesn't already exist
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $existingLink; Value:Let ( [ 
+        
+        	columnField = ExternalLink::Id ; 
+        	whereField = ExternalLink::ExternalId ; 
+        	whereValue = $ExternalId ; 
+        	whereField2 = ExternalLink::ExternalLinkTypeId ; 
+        	whereValue2 = $ExternalTypeId
+        
+        ] ; 
+        
+        	SQL.GetColumn2Fields ( columnField ; whereField ; whereValue ; whereField2 ; whereValue2 ) 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, ExternalLink::Id#1, ExternalLink::ExternalId#10, ExternalLink::ExternalLinkTypeId#9, cf:SQL.GetColumn2Fields
+        Repetition
+          Calculation:
+            | 1
+        Name: $existingLink
+  70    If [ not IsEmpty ( $existingLink ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  71    Exit Script [ Result: _wip_API.Error.Validation ( "The link already exists" ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:_wip_API.Error.Validation
+  72    End If
+        DisableStepCollapsed state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #--- [ VALIDATION JSON END ] -----------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #==== [ TRANSACTION ] ==========================================================================
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  85    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #create the record
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    Set Field [ DBTransactions::ExternalLinkId; "" ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=46 name=ExternalLinkId
+  89    Set Field [ ExternalLink::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ExternalLink id=8 name=ONE
+  90    Set Variable [ $error; Value:Error.Last ( "Link record couldn't be locked" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  91    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #set the data
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    Set Field [ ExternalLink::InternalId; $InternalId ]
+        DisableStepCollapsed state=False
+        Field table=ExternalLink id=2 name=InternalId
+  95    Set Field [ ExternalLink::ExternalLinkTypeId; $ExternalTypeId ]
+        DisableStepCollapsed state=False
+        Field table=ExternalLink id=9 name=ExternalLinkTypeId
+  96    Set Field [ ExternalLink::ExternalId; $ExternalId ]
+        DisableStepCollapsed state=False
+        Field table=ExternalLink id=10 name=ExternalId
+  97    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 100    End Loop
+        DisableStepCollapsed state=False
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    Set Variable [ $result; Value:ExternalLink::AsJsonV1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ExternalLink::AsJsonV1#12
+        Name: $result
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 106    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 107    #==== [ END TRANSACTION ] ==========================================================================
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    Exit Script [ Result: Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+ 112    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    #
+        DisableStepCollapsed state=False
+        Restore state=False

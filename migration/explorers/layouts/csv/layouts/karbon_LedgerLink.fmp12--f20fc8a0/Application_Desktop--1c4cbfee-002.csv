@@ -1,0 +1,114 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+karbon_LedgerLink.fmp12/layouts/114-Purchase_Order_Desktop.txt,a4dda4baebff23cbaa4602bc9a750cac09890c2172e88894eed6c7d7738e61fa,layouts,karbon_LedgerLink.fmp12,114,Purchase Order | Desktop,form,"PurchaseOrder (base PurchaseOrder, karbon_LedgerLink.fmp12)","key 65 text “<<docNumber>> <<PurchaseOrder_Vendor::displayName>>” | hidden when in Find mode
+key 66 text “<<totalAmt>>” | hidden when PurchaseOrder::deleted is true or in Find mode
+key 76 field PurchaseOrder::docNumber | hidden when always (constant True) (rule not applied in Find mode)
+key 83 text “DELETED” | hidden when PurchaseOrder::deleted is false/empty or in Find mode
+key 97 field PurchaseOrderLine_ItemBasedExpenseLineDetail::qty | hidden when PurchaseOrderLine_ItemBasedExpenseLineDetail::id_Item is empty (rule not applied in Find mode)
+key 98 field PurchaseOrderLine_ItemBasedExpenseLineDetail::unitPrice | hidden when PurchaseOrderLine_ItemBasedExpenseLineDetail::id_Item is empty (rule not applied in Find mode)
+key 236 button (icon) | hidden when PurchaseOrderLine_ItemBasedExpenseLineDetail::id is empty (rule not applied in Find mode)
+key 269 field PurchaseOrderLine_ItemBasedExpenseLineDetail::amount | hidden when PurchaseOrderLine_ItemBasedExpenseLineDetail::id_Item is empty (rule not applied in Find mode)
+key 121 field PurchaseOrder::qbo_error | hidden when PurchaseOrder::qbo_error is empty (rule not applied in Find mode)
+key 122 text “sync error” | hidden when PurchaseOrder::qbo_error is empty (rule not applied in Find mode)
+key 164 popoverbutton (icon) | hidden when in Find mode
+key 179 button (icon) | hidden when PurchaseOrder::id_Vendor is empty (rule not applied in Find mode)
+key 180 slidecontrol | hidden when in Find mode
+key 182 button “Delete” | hidden when PurchaseOrder::deleted is true (rule not applied in Find mode)
+key 183 button “Restore” | hidden when PurchaseOrder::deleted is false/empty (rule not applied in Find mode)
+key 184 text “Will be deleted on next sync.” | hidden when PurchaseOrder::deleted is false/empty (rule not applied in Find mode)
+key 185 slidecontrol | hidden when always (constant True) (rule not applied in Find mode)
+key 188 button (icon) | hidden when the Purchase Order is not flagged deleted
+key 205 button “Sync” | hidden when in Find mode
+key 206 button “Open in QBO” | hidden when PurchaseOrder::qbo_id is empty or in Find mode
+key 224 button (icon) | hidden when PurchaseOrderLine_AccountBasedExpenseLineDetail::id is empty (rule not applied in Find mode)
+key 226 field PurchaseOrderLine_AccountBasedExpenseLineDetail::amount | hidden when PurchaseOrderLine::id_ExpenseAccount is empty (rule not applied in Find mode)
+key 237 popoverbutton (icon) | hidden when in Find mode","key 202 button (icon) | when PurchaseOrderLine_ItemBasedExpenseLineDetail::id_Item is empty | hide
+key 204 button (icon) | when PurchaseOrder::billAddressLine1 is empty and PurchaseOrder::billAddressCity is empty and PurchaseOrder::billAddressState is empty and PurchaseOrder::billAddressPostalCode is empty | style
+key 205 button “Sync” | when PurchaseOrder::qbo_send is true | style
+key 225 button (icon) | when PurchaseOrderLine_AccountBasedExpenseLineDetail::id_ExpenseAccount is empty | hide
+key 275 button (icon) | when PurchaseOrder::shipAddressLine1 is empty and PurchaseOrder::shipAddressCity is empty and PurchaseOrder::shipAddressState is empty and PurchaseOrder::shipAddressPostalCode is empty | style","layout | OnRecordCommit | id 548 “Purchase Order OnCommit Trigger” | flags the Purchase Order for QBO sync and refreshes the total from the PO lines
+layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table
+key 269 field PurchaseOrderLine_ItemBasedExpenseLineDetail::amount | OnObjectExit | id 555 “POItem Amount OnObjectExit Trigger” | rounds the PO line amount to 2 decimals and back-adjusts unit price; branch chosen by the line detail type parameter
+key 165 popover | OnObjectEnter | id 544 “Select Vendor for PO On Popover Open” | clears GLOBAL::FILTER, focuses it and refreshes the vendor picker portal
+key 165 popover | OnObjectExit | id 545 “Select Vendor for PO On Popover Close” | clears GLOBAL::FILTER and refreshes the vendor picker portal
+key 171 field GLOBAL::FILTER | OnObjectModify | id 546 “Select Vendor for PO: Filter” | re-filters the vendor picker portal as the user types, keeping the text cursor position
+key 226 field PurchaseOrderLine_AccountBasedExpenseLineDetail::amount | OnObjectExit | id 555 “POItem Amount OnObjectExit Trigger” | rounds the PO line amount to 2 decimals and back-adjusts unit price; branch chosen by the line detail type parameter
+key 238 popover | OnObjectEnter | id 549 “Select Customer for PO On Popover Open” | clears GLOBAL::FILTER, focuses it and refreshes the customer picker portal
+key 238 popover | OnObjectExit | id 550 “Select Customer for PO On Popover Close” | clears GLOBAL::FILTER and refreshes the customer picker portal
+key 244 field GLOBAL::FILTER | OnObjectModify | id 473 “Select Customer for Invoice: Filter” | re-filters the customer picker portal as the user types, keeping the text cursor position","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 202 remove value | Set Field [ PurchaseOrderLine_ItemBasedExpenseLineDetail::id_Item; """" ]
+key 236 (icon) | Delete Portal Row
+key 164 (icon) | opens popover ""Popover""
+key 170 (icon) | Perform Script [ “Select Vendor for Purchase Order” ] (script id 543)
+key 172 Add | Go to Object [ Object Name: ""field.newVendorName""; Repetition: 1 ]
+key 175 Save | Perform Script [ “Add Vendor From Purchase Order” ] (script id 547)
+key 176 Cancel | Close Popover
+key 179 go to Vendor | Go to Related Record [ From table: “PurchaseOrder_Vendor”; Using layout: “Vendor | Desktop” (Vendor) ] (layout id 104)
+key 182 Delete | Set Field [ PurchaseOrder::deleted; True ]
+key 183 Restore | Set Field [ PurchaseOrder::deleted; """" ]
+key 187 (icon) | Set Field [ Invoice::deleted; True ]
+key 188 (icon) | Set Field [ PurchaseOrder::deleted; """" ]
+key 204 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the billing address (line 1-2, city, state, postal code, country) from PurchaseOrder
+key 205 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 206 Open in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: PurchaseOrder, QBOId: PurchaseOrder::qbo_id}
+key 224 (icon) | Delete Portal Row
+key 225 remove value | Set Field [ PurchaseOrderLine_AccountBasedExpenseLineDetail::id_ExpenseAccount; """" ]
+key 237 (icon) | opens popover ""Popover""
+key 243 (icon) | Perform Script [ “Select Customer for Purchase Order” ] (script id 553)
+key 245 Add | Go to Object [ Object Name: ""field.newCustomerName""; Repetition: 1 ]
+key 248 Save | Perform Script [ “Add Customer From Purchase Order” ] (script id 552)
+key 249 Cancel | Close Popover
+key 275 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the shipping address (line 1-2, city, state, postal code, country) from PurchaseOrder","key 202 | remove value
+key 179 | go to Vendor
+key 182 | Flag this record as deleted to have it deleted from QuickBooks on the next sync.
+key 205 | when PurchaseOrder::qbo_id is empty: ""New record hasn't been sent to QBO yet.""; when PurchaseOrder::qbo_send is true: ""Record has been changed and needs to be sent to QBO.""
+key 225 | remove value","key 94 | PurchaseOrderLine_ItemBasedExpenseLineDetail | sort none | none
+key 168 | PurchaseOrder_Vendor~all | sort Ascending PurchaseOrder_Vendor~all::displayName | filter shows vendors whose displayName contains the typed GLOBAL::FILTER text (all when empty)
+key 220 | PurchaseOrderLine_AccountBasedExpenseLineDetail | sort none | none
+key 241 | PurchaseOrder_Customer~all | sort Ascending PurchaseOrder_Customer~all::displayName | filter shows customers whose displayName contains the typed GLOBAL::FILTER text (all when empty)","Customer displayName
+Item Id Active
+Item Id
+Class Id
+Purchase Order Status
+Accounts Expense Id",page,"Button k187 sets Invoice::deleted (not PurchaseOrder::deleted); popover filter trigger k244 runs ""Select Customer for Invoice: Filter""; shipMethod k142 uses value list ""Class Id"" and vendor field k163 uses ""Customer displayName"": probable copy-paste errors."
+karbon_LedgerLink.fmp12/layouts/115-Journal_Entry_Desktop.txt,a15e9f2e18242d58df99dbb425689671c3b8aad96c64b21057487edcbbc4dddf,layouts,karbon_LedgerLink.fmp12,115,Journal Entry | Desktop,form,"JournalEntry (base JournalEntry, karbon_LedgerLink.fmp12)","key 65 text “<<docNumber>>” | hidden when in Find mode
+key 76 field JournalEntry::docNumber | hidden when always (constant True) (rule not applied in Find mode)
+key 205 button “Sync” | hidden when in Find mode
+key 206 button “Open in QBO” | hidden when JournalEntry::qbo_id is empty or in Find mode
+key 283 field JournalEntryItem::amount_debit | hidden when JournalEntryItem::id_Account is empty (rule not applied in Find mode)
+key 285 button (icon) | hidden when JournalEntryItem::id is empty (rule not applied in Find mode)
+key 297 field JournalEntryItem::amount_credit | hidden when JournalEntryItem::id_Account is empty (rule not applied in Find mode)
+key 298 field JournalEntryItem::description | hidden when JournalEntryItem::id_Account is empty (rule not applied in Find mode)
+key 304 text | hidden when total credits equal total debits (entry is balanced) (rule not applied in Find mode)","key 205 button “Sync” | when JournalEntry::qbo_send is true | style
+key 286 button (icon) | when JournalEntryItem::id_Account is empty | hide","layout | OnRecordCommit | id 561 “Journal OnCommit Trigger” | flags the Journal Entry for QBO sync and refreshes total debits and total credits from the lines
+layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table
+key 283 field JournalEntryItem::amount_debit | OnObjectExit | id 569 “Clear Amount (type)” | clears the opposite amount (debit or credit) on a journal line so only one is filled | param ""credit""
+key 297 field JournalEntryItem::amount_credit | OnObjectExit | id 569 “Clear Amount (type)” | clears the opposite amount (debit or credit) on a journal line so only one is filled | param ""debit""","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 205 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 206 Open in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: JournalEntry, QBOId: JournalEntry::qbo_id}
+key 285 (icon) | Delete Portal Row
+key 286 remove value | Set Field [ JournalEntryItem::id_Account; """" ]","key 205 | when JournalEntry::qbo_id is empty: ""New record hasn't been sent to QBO yet.""; when JournalEntry::qbo_send is true: ""Record has been changed and needs to be sent to QBO.""
+key 286 | remove value",key 281 | JournalEntryItem | sort none | none,Account Id,page,
+karbon_LedgerLink.fmp12/layouts/116-Journal_Entries_Desktop.txt,23c6876bdc6a6237e4b10c35905aeb80503db71f8ff7881a666d10a3bcddda3f,layouts,karbon_LedgerLink.fmp12,116,Journal Entries | Desktop,list,"JournalEntry (base JournalEntry, karbon_LedgerLink.fmp12)",none,none,"layout | OnModeEnter | id 490 “Enter Find Mode Trigger” | on entering Find mode, routes the user to the Desktop find layout of the current table (Invoice, Customer, Item, Vendor, Bill, Estimate, PO, Journal)","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 47 (icon) | Go to Layout [ “Journal Entry | Desktop” (JournalEntry) ] (layout id 115)
+key 48 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 49 Journal Date | no step
+key 54 amount | no step",none,none,none,page,
+karbon_LedgerLink.fmp12/layouts/118-New_Payment_Card.txt,67f53864a532feb391ad7f9bb5934404c8775dbc4a0b9cffb1381f100e0d9fc0,layouts,karbon_LedgerLink.fmp12,118,New Payment Card,dialog,"Payment (base Payment, karbon_LedgerLink.fmp12)","key 217 field Payment_PaymentLine_Invoice::totalAmt | hidden when Payment_PaymentLine::id is empty (rule not applied in Find mode)
+key 218 field Payment_PaymentLine::TransactionDocNumber | hidden when Payment_PaymentLine::id is empty (rule not applied in Find mode)
+key 219 field Payment_PaymentLine::TransactionDate | hidden when Payment_PaymentLine::id is empty (rule not applied in Find mode)
+key 220 field Payment_PaymentLine::amount | hidden when Payment_PaymentLine::id is empty (rule not applied in Find mode)
+key 221 field Payment_PaymentLine_Invoice::balance | hidden when Payment_PaymentLine::id is empty (rule not applied in Find mode)
+key 224 field Payment::TotalAllocatedPayments | hidden when Payment_PaymentLine::id is empty (rule not applied in Find mode)
+key 225 field Payment::TotalUnallocated | hidden when Payment_PaymentLine::id is empty (rule not applied in Find mode)",none,layout | OnRecordCommit | id 583 “Block Payment Commit” | blocks record commit on the Payment unless the $$allow_commit flag is set,"key 66 OK | Perform Script [ “Save Payment” ] (script id 704)
+key 67 Cancel | Perform Script [ “Cancel Payment” ] (script id 584)
+key 193 (icon) | opens popover ""Popover""
+key 197 (icon) | no step
+key 198 (icon) | no step
+key 199 (icon) | no step
+key 205 (icon) | Perform Script [ “Choose Open Invoice” ] (script id 600)",none,"key 200 | Payment_Customer_OpenInvoices | sort none | filter shows open invoices that are not already in Payment::IncludedInVoiceIDs
+key 216 | Payment_PaymentLine | sort none | filter off (False)","Payment Method Id
+Accounts Bank Id",modal,"OnRecordCommit trigger ""Block Payment Commit"" only allows commit when $$allow_commit is set; confirm which scripts set it."
+karbon_LedgerLink.fmp12/layouts/128-Attachable_Card_List.txt,1a5658f99e20252a9edd9d5ed77ac6ae6b3403b97226b72e3f11620f318d7e6b,layouts,karbon_LedgerLink.fmp12,128,Attachable Card List,dialog,"Attachable (base Attachable, karbon_LedgerLink.fmp12)",none,none,none,"key 2 (icon) | Close Window [ Current Window ]
+key 6 calc GetAsDate ( Attachable::CreationTi… | no step
+key 7 Add | Perform Script [ “btn: Add Existing File as FileAttachment to Invoice” ] (script id 661) | param Attachable::Id (field value)
+key 11 Download | Perform Script [ “btn: Download File and Open (filename)” ] (script id 663) | param Attachable::FileName (field value)",none,none,none,modal,

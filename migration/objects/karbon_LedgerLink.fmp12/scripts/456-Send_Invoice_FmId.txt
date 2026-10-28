@@ -1,0 +1,393 @@
+# script 456: Send Invoice ( FmId )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Public / Invoice
+# source: ScriptCatalog/Script[@id=456]
+# steps: 100 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=457 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Sends an invoice directly checking first to see if Items and Customers have been sent
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {string} fmId
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @returnSuccess {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @returnSuccess {number} error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnError {number} error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Entity; Value:"Invoice" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  17    Set Variable [ $FmId; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $FmId
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Call Key Fields, Build Config” ]
+        DisableStepCollapsed state=False
+        Script id=233 name="Call Key Fields, Build Config"
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    # Customer Check
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $CustomerId; Value:SQL.GetColumn  ( Config ( "Invoice.fields.customerId" ) ; Config ( "Invoice.fields.fmId" ) ; $fmID ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerId
+  23    If [ IsEmpty ( $CustomerId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  24    Set Variable [ $error; Value:QBO.Error ( "You can't send an Invoice that doesn't have a Customer associated with it" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  25    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #standard lookup
+        DisableStepCollapsed state=False
+        Restore state=False
+  29 // # get the customer qbo ID
+        DisableStepCollapsed state=False
+        Restore state=False
+  30 // Set Variable [ $CustomerQBOId; Value:QBO.LookupQBOId ( "Customer" ; $CustomerId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupQBOId
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerQBOId
+  31    #karbon overrides the Customer
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Perform Script [ “Lookup Customer qbo_id ( fmId )”; Parameter: $CustomerId ]
+        DisableStepCollapsed state=False
+        Script id=611 name="Lookup Customer qbo_id ( fmId )"
+  33    Set Variable [ $CustomerQBOId; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerQBOId
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #if it is empty we need to send the customer first.
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    If [ IsEmpty ( $CustomerQBOID ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  38    Perform Script [ “Send Customer ( FmId )”; Parameter: $CustomerId ]
+        DisableStepCollapsed state=False
+        Script id=587 name="Send Customer ( FmId )"
+  39    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  40    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  41    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  42    End If
+        DisableStepCollapsed state=False
+  43    End If
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #next do the same with Invoice Line Item Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $InvoiceLineIds; Value:SQL.GetColumn  ( Config ( "Invoice.fields.line.itemId" ) ; Config ( "Invoice.fields.line.parentId" ) ; Invoice::id) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, cf:Config, Invoice::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $InvoiceLineIds
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  50    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $ItemId; Value:GetValue ( $InvoiceLineIds ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemId
+  52    Exit Loop If [ IsEmpty( $ItemId ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #get the qbo_id for the Item
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $ItemQBOId; Value:QBO.LookupQBOId ( "Item" ; $ItemId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupQBOId
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemQBOId
+  56    If [ IsEmpty ( $ItemQBOId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  57    Perform Script [ “Send Item ( FmId )”; Parameter: $ItemId ]
+        DisableStepCollapsed state=False
+        Script id=592 name="Send Item ( FmId )"
+  58    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  59    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  60    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  61    End If
+        DisableStepCollapsed state=False
+  62    End If
+        DisableStepCollapsed state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  65    End Loop
+        DisableStepCollapsed state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #Finally Send the Invoice
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ;  "Invoice" ; JSONString ];
+        	[ "FmId" ; $FmId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  70    Perform Script [ “Send FMData To QBO ( {Entity , FmID} )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=302 name="Send FMData To QBO ( {Entity , FmID} )"
+  71    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  72    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  73    Show Custom Dialog [ Title: "Error"; Message: "Invoice was not sent!¶¶" & If ( not IsEmpty($result); JSONFormatElements ( $result ) ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If, fn:not, fn:IsEmpty, fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  74    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  75    End If
+        DisableStepCollapsed state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #We need the whole thing back ASAP - tax info, etc.
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Perform Script [ “Refresh Invoice From QBO ( fmId ) ”; Parameter: $FmId ]
+        DisableStepCollapsed state=False
+        Script id=586 name="Refresh Invoice From QBO ( fmId ) "
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #Send Attachables now that the Invoice is in QBO - also sends any related AttachableRef records
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #send only qbo_send = 1
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Variable [ $AttachableIds; Value:SQL.GetColumn ( AttachableRef::AttachmentId ; AttachableRef::EntityId; $FmId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, AttachableRef::AttachmentId#8, AttachableRef::EntityId#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $AttachableIds
+  83    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  84    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    Set Variable [ $AttachableId; Value:GetValue ( $AttachableIds ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $AttachableId
+  86    Exit Loop If [ IsEmpty( $AttachableId ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #Send the attachments that need to be sent
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    Set Variable [ $qbo_send; Value:SQL.GetColumn ( Attachable::qbo_send ; Attachable::Id ; $AttachableId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, Attachable::qbo_send#20, Attachable::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $qbo_send
+  90    If [ $qbo_send ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    Perform Script [ “Send Attachable to QBO (FmId)”; Parameter: $AttachableId ]
+        DisableStepCollapsed state=False
+        Script id=662 name="Send Attachable to QBO (FmId)"
+  92    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  93    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  94    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  95    End If
+        DisableStepCollapsed state=False
+  96    End If
+        DisableStepCollapsed state=False
+  97    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  99    End Loop
+        DisableStepCollapsed state=False
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False

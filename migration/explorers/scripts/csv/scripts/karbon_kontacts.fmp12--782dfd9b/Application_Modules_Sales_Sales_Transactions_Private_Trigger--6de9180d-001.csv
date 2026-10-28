@@ -1,0 +1,32 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/270-SalesLine_Amount_OnObjectExit_Trigger.txt,3862a982b593c4f9d62470a439e53da8ebee92893ede178cc2340c22de6aaabe,scripts,karbon_kontacts.fmp12,270,SalesLine Amount OnObjectExit Trigger,data-change,server-domain,tier1,"Trigger on the line amount field of invoices and sales receipts: rounds the line amount to 2 decimals, recomputes the unit price to 7 decimals when quantity times unit price no longer equals the amount, then recalculates the transaction subtotal, taxable subtotal, total and balance. ","SalesLine::amount#6 (step 4,11,12)
+SalesLine::unitPrice#7 (step 6,10)
+SalesLine::qty#8 (step 9)
+SalesLine::summaryTotalAmount#14 (step 19)
+SalesLine::summaryTotalAmountTaxable#13 (step 20)
+SalesTransaction::subtotal#33 (step 29)
+SalesTransaction::totalTax#30 (step 29)
+SalesTransaction::shipAmt#41 (step 29)
+SalesTransaction::totalAmt#25 (step 30)
+SalesTransaction::totalPaid#58 (step 30)","SalesLine::amount#6 (Set Field step 4, portal row)
+SalesLine::unitPrice#7 (Set Field step 13, portal row)
+SalesTransaction::subtotal#33 (Set Field step 19, current record)
+SalesTransaction::taxableSubtotal#34 (Set Field step 20, current record)
+SalesTransaction::totalAmt#25 (Set Field step 29, current record)
+SalesTransaction::balance#26 (Set Field step 30, current record)",none,"objects/karbon_kontacts.fmp12/layouts/145-SalesReceipt_-_View_Only.txt
+objects/karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt
+objects/karbon_kontacts.fmp12/layouts/143-Invoice_-_View_Only.txt
+objects/karbon_kontacts.fmp12/layouts/69-Invoice.txt",none,Disabled steps 23-28 held the old tax calculation and point to missing fields ('let QBO calc taxes'). Total = subtotal + tax + shipping and balance = total - paid are business rules.
+karbon_kontacts.fmp12/scripts/345-Sort_Items_by_Name_OnLayout_Enter_Trigger.txt,875993afd1725c5ba3b82ace2cd63138120563e510e25fc6d03926380952e921,scripts,karbon_kontacts.fmp12,345,Sort Items by Name OnLayout Enter Trigger,navigation,client-ui,tier3,"On entering the Items layout, sorts the items by fully qualified name and keeps them sorted. ",none,none,none,objects/karbon_kontacts.fmp12/layouts/86-Items.txt,none,none
+karbon_kontacts.fmp12/scripts/376-On_Commit_-_Sales_Transactions.txt,2d5819a2c72b76546d65ded800610927698bbb3da7b5ad419d06eb3ab10c8964,scripts,karbon_kontacts.fmp12,376,On Commit - Sales Transactions,data-change,server-domain,tier1,"Commit trigger on invoice and sales receipt layouts: recalculates the transaction subtotal, taxable subtotal, total and balance, and marks the transaction to be sent to QuickBooks (qbo_send = true). Also called from the email-party and activity-party scripts. ","SalesLine::summaryTotalAmount#14 (step 3)
+SalesLine::summaryTotalAmountTaxable#13 (step 4)
+SalesTransaction::subtotal#33 (step 6)
+SalesTransaction::totalTax#30 (step 6)
+SalesTransaction::shipAmt#41 (step 6)
+SalesTransaction::totalAmt#25 (step 8)
+SalesTransaction::totalPaid#58 (step 8)","SalesTransaction::subtotal#33 (Set Field step 3, current record)
+SalesTransaction::taxableSubtotal#34 (Set Field step 4, current record)
+SalesTransaction::totalAmt#25 (Set Field step 6, current record)
+SalesTransaction::balance#26 (Set Field step 8, current record)
+SalesTransaction::qbo_send#3 (Set Field step 11, current record)",none,"objects/karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt
+objects/karbon_kontacts.fmp12/layouts/69-Invoice.txt",none,Setting qbo_send on every commit makes every edit queue a QBO push; the rule that totals are stored (not calculated) is in this script.

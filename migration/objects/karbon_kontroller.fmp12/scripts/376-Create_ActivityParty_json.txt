@@ -1,0 +1,1062 @@
+# script 376: Create ActivityParty { json }
+# file: karbon_kontroller.fmp12
+# folder: API / Activity / Public
+# source: ScriptCatalog/Script[@id=376]
+# steps: 290 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=383 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Create ActivityParty
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} ActivityParty
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} ActivityParty.ActivityId
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {number} ActivityParty.ActivityPartyRoleId
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {string} [ActivityParty.Comments]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {string} [ActivityParty.ContactMethodId] - Allow an activity to link to a phone, address, etc. directly.
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@param {string} [ActivityParty.EmailAddress]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@param {string} [ActivityParty.EmailAddressFormatted]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@param {string} [ActivityParty.PartyId]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@param {string} [ActivityParty.Rsvp]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@param {boolean} [ActivityParty.RsvpInd]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@returnSuccess {object} result.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #@returnError {string} error.reason - one of type enum: duplicate
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #@history 2019-02-26 dave@geistinteractive.com - no longer validating PartyId if PartyId is null
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #@history 2018-10-28 dave@geistinteractive.com - no longer requiring PartyId
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #@history 2018-10-27 dave@geistinteractive.com - We're no longer storing EmailAddressId in ActivityPartyEmail table. The ContactMethodId property in the supertype is sufficient for tracking this type of data.
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #@history 2018-06-04 lance@geistinteractive.com - Created by Generator
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  38    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  48    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $ActivityParty; Value:JSON.Format( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityParty
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    If [ Error.IsError ( $ActivityParty ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  58    Set Variable [ $error; Value:$ActivityParty ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  59    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  60    End If
+        DisableStepCollapsed state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $error; Value:JSON.Validate.This ( $ActivityParty ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "ActivityId" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "ActivityPartyRoleId" ) ; 
+        //		JSON.Validate.Rule.IsRequired ( "PartyId" ) ; 
+        		"" ; // additional tests  
+        	)
+        )
+        
+        // @history 2018-10-28 dave@geistinteractive.com - no longer requiring PartyId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Name: $error
+  65    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Set Variable [ $ActivityId; Value:JSONGetElement ( $ActivityParty ; "ActivityId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityId
+  73    Set Variable [ $ActivityPartyRoleId; Value:JSONGetElement ( $ActivityParty ; "ActivityPartyRoleId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyRoleId
+  74    Set Variable [ $ContactMethodId; Value:JSONGetElement ( $ActivityParty ; "ContactMethodId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ContactMethodId
+  75    Set Variable [ $PartyId; Value:JSONGetElement ( $ActivityParty ; "PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #ActivityPartyEmail
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Set Variable [ $EmailAddress; Value:JSONGetElement( $ActivityParty ; "EmailAddress" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailAddress
+  79    Set Variable [ $EmailAddressFormatted; Value:JSONGetElement( $ActivityParty ; "EmailAddressFormatted" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailAddressFormatted
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #ActivityPartyEvent
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Variable [ $AttendedInd; Value:JSONGetElement( $ActivityParty ; "AttendedInd" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AttendedInd
+  83    Set Variable [ $Comments; Value:JSONGetElement( $ActivityParty ; "Comments" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Comments
+  84    Set Variable [ $Rsvp; Value:JSONGetElement( $ActivityParty ; "Rsvp" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Rsvp
+  85    Set Variable [ $RsvpInd; Value:JSONGetElement( $ActivityParty ; "RsvpInd" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $RsvpInd
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    #Create the ActivityParty record
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    Set Field [ DBTransactions::ActivityPartyId; "" ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=59 name=ActivityPartyId
+ 100    Set Field [ ActivityParty::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ActivityParty id=62 name=ONE
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    Set Variable [ $error; Value:Error.Last ( "Creating/locking the ActivityParty record. " ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 103    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #Connect to the Party record
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    If [ DBTransactions::PartyId <> $PartyId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::PartyId#25
+ 108    Set Field [ DBTransactions::PartyId; $PartyId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=25 name=PartyId
+ 109    End If
+        DisableStepCollapsed state=False
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    #If PartyId is passed, make sure it's valid
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    If [ not IsEmpty ( $PartyId ) and IsEmpty ( Party::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:and, Party::Id#1
+ 113    Set Variable [ $error; Value:Custom.Error ( "Not a valid Party Id" ; $ActivityParty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Custom.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 114    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 115    End If
+        DisableStepCollapsed state=False
+ 116    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 119    #Connect to the Activity record
+        DisableStepCollapsed state=False
+        Restore state=False
+ 120    If [ DBTransactions::ActivityId <> $ActivityId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::ActivityId#58
+ 121    Set Field [ DBTransactions::ActivityId; $ActivityId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=58 name=ActivityId
+ 122    End If
+        DisableStepCollapsed state=False
+ 123    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124    #Make sure there is a valid Activity record
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    If [ IsEmpty ( Activity::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Activity::Id#1
+ 126    Set Variable [ $error; Value:Custom.Error ( "Not a valid Activity Id" ; $ActivityParty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Custom.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 127    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 128    End If
+        DisableStepCollapsed state=False
+ 129    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 130    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 132    #Get the ActivityType from Activity
+        DisableStepCollapsed state=False
+        Restore state=False
+ 133    Set Field [ DBTransactions::ActivityTypeId; Activity::ActivityTypeId ]
+        DisableStepCollapsed state=False
+        refs: Activity::ActivityTypeId#100
+        Field table=DBTransactions id=81 name=ActivityTypeId
+ 134    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 135    #Make sure the ActivityPartyRole is eligible for this activity
+        DisableStepCollapsed state=False
+        Restore state=False
+ 136    Set Variable [ $Eligible_ActivityPartyRole_List; Value:List( ActivityPartyRole#ByActivityType::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ActivityPartyRole#ByActivityType::Id#18
+        Repetition
+          Calculation:
+            | 1
+        Name: $Eligible_ActivityPartyRole_List
+ 137    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 138    If [ IsNotInList ( $Eligible_ActivityPartyRole_List ; $ActivityPartyRoleId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:IsNotInList
+ 139    Set Variable [ $data; Value:JSONSetElement ( "{}" ; 
+        	[ "Eligible_ActivityPartyRole_List" ; $Eligible_ActivityPartyRole_List ; JSONString ] ; 
+        	[ "ActivityPartyRoleId" ; $ActivityPartyRoleId ; JSONString ] ; 
+        	[ "ActivityTypeId" ; DBTransactions::ActivityTypeId ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, DBTransactions::ActivityTypeId#81
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+ 140    Set Variable [ $error; Value:_wip_API.Error.Validation ( "This ActivityPartyRole does not apply to this activity Type" ; $data ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:_wip_API.Error.Validation
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 141    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 142    End If
+        DisableStepCollapsed state=False
+ 143    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 144    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 145    #Connect to the ActivityPartyRole
+        DisableStepCollapsed state=False
+        Restore state=False
+ 146    Set Field [ DBTransactions::ActivityPartyRoleId; $ActivityPartyRoleId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=77 name=ActivityPartyRoleId
+ 147    If [ IsEmpty ( ActivityPartyRole::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, ActivityPartyRole::Id#18
+ 148    Set Variable [ $error; Value:_wip_API.Error.Validation ( "Not a valid ActivityPartyRole Id"; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:_wip_API.Error.Validation
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 149    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 150    End If
+        DisableStepCollapsed state=False
+ 151    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 152    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 153    #For email messages, don't allow a duplicate contact method in the same activity party role.
+        DisableStepCollapsed state=False
+        Restore state=False
+ 154    #@todo 2018-10-27 dave@geistinteractive.com - Need to add additional duplicate checks based on the activity type.
+        DisableStepCollapsed state=False
+        Restore state=False
+ 155    If [ Activity::EmailMessageInd or 
+        Activity::TaskInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Activity::EmailMessageInd#74, fn:or, Activity::TaskInd#171
+ 156    If [ DBTransactions::ContactMethodId <> $ContactMethodId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::ContactMethodId#33
+ 157    Set Field [ DBTransactions::ContactMethodId; $ContactMethodId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=33 name=ContactMethodId
+ 158    End If
+        DisableStepCollapsed state=False
+ 159    If [ not IsEmpty ( ActivityParty#byActivityAndRoleAndContactMethodId::Id )// this is a duplicate ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, ActivityParty#byActivityAndRoleAndContactMethodId::Id#23
+ 160    Set Variable [ $error; Value:_wip_API.Error.Validation ( "checking for duplicate contact method"; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:_wip_API.Error.Validation
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 161    Set Variable [ $error; Value:JSONSetElement ( $error ; "reason" ; "duplicate" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 162    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 163    End If
+        DisableStepCollapsed state=False
+ 164    End If
+        DisableStepCollapsed state=False
+ 165    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 166    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 167    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 168    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+ 169    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 170    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 171    Set Field [ ActivityParty::ActivityId; $ActivityId ]
+        DisableStepCollapsed state=False
+        Field table=ActivityParty id=6 name=ActivityId
+ 172    Set Field [ ActivityParty::ActivityPartyRoleId; $ActivityPartyRoleId ]
+        DisableStepCollapsed state=False
+        Field table=ActivityParty id=24 name=ActivityPartyRoleId
+ 173    Set Field [ ActivityParty::ContactMethodId; $ContactMethodId ]
+        DisableStepCollapsed state=False
+        Field table=ActivityParty id=28 name=ContactMethodId
+ 174    Set Field [ ActivityParty::PartyId; $PartyId ]
+        DisableStepCollapsed state=False
+        Field table=ActivityParty id=7 name=PartyId
+ 175    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 176    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 177    #Set cached fields from the party table
+        DisableStepCollapsed state=False
+        Restore state=False
+ 178    Set Field [ ActivityParty::PartyNameCached; Party::NameCached ]
+        DisableStepCollapsed state=False
+        refs: Party::NameCached#19
+        Field table=ActivityParty id=13 name=PartyNameCached
+ 179    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 180    #To get the initials, lets get the uppercase letters for a person, or just the first for an organization
+        DisableStepCollapsed state=False
+        Restore state=False
+ 181    If [ Party::OrganizationInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party::OrganizationInd#18
+ 182    Set Field [ ActivityParty::PartyInitials; Left ( Party::NameCached ; 1 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Left, Party::NameCached#19
+        Field table=ActivityParty id=29 name=PartyInitials
+ 183    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 184    Set Variable [ $Initials; Value:Left ( Filter ( Party::NameCached ; "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ) ; 3 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Left, fn:Filter, Party::NameCached#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $Initials
+ 185    Set Field [ ActivityParty::PartyInitials; $Initials ]
+        DisableStepCollapsed state=False
+        Field table=ActivityParty id=29 name=PartyInitials
+ 186    End If
+        DisableStepCollapsed state=False
+ 187    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 188    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 189    #For email messages, create ActivityPartyEmail subtype
+        DisableStepCollapsed state=False
+        Restore state=False
+ 190    If [ ActivityPartyRole::CreateActivityPartyEmailInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ActivityPartyRole::CreateActivityPartyEmailInd#22
+ 191    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 192    Set Field [ ActivityPartyEmail::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ActivityPartyEmail id=62 name=ONE
+ 193    Set Variable [ $error; Value:Error.Last ( "Creating/locking the ActivityPartyEmail record. " ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 194    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 195    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 196    Set Variable [ $EmailAddressFormatted; Value:If ( IsEmpty ( $EmailAddressFormatted ) and not IsEmpty ( $EmailAddress ); $EmailAddress; $EmailAddressFormatted ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:and, fn:not
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailAddressFormatted
+ 197    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 198    Set Field [ ActivityPartyEmail::EmailAddress; $EmailAddress ]
+        DisableStepCollapsed state=False
+        Field table=ActivityPartyEmail id=15 name=EmailAddress
+ 199    Set Field [ ActivityPartyEmail::EmailAddressFormatted; $EmailAddressFormatted ]
+        DisableStepCollapsed state=False
+        Field table=ActivityPartyEmail id=16 name=EmailAddressFormatted
+ 200    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 201    End If
+        DisableStepCollapsed state=False
+ 202    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 203    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 204    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 205    #For events, create ActivityPartyEvent subtype
+        DisableStepCollapsed state=False
+        Restore state=False
+ 206    If [ ActivityPartyRole::CreateActivityPartyEventInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ActivityPartyRole::CreateActivityPartyEventInd#23
+ 207    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 208    Set Field [ ActivityPartyEvent::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ActivityPartyEvent id=62 name=ONE
+ 209    Set Variable [ $error; Value:Error.Last ( "Creating/locking the ActivityPartyEvent record. " ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 210    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 211    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 212    Set Field [ ActivityPartyEvent::AttendedInd; $AttendedInd ]
+        DisableStepCollapsed state=False
+        Field table=ActivityPartyEvent id=33 name=AttendedInd
+ 213    Set Field [ ActivityPartyEvent::Comments; $Comments ]
+        DisableStepCollapsed state=False
+        Field table=ActivityPartyEvent id=35 name=Comments
+ 214    Set Field [ ActivityPartyEvent::Rsvp; $Rsvp ]
+        DisableStepCollapsed state=False
+        Field table=ActivityPartyEvent id=32 name=Rsvp
+ 215    Set Field [ ActivityPartyEvent::RsvpInd; $RsvpInd ]
+        DisableStepCollapsed state=False
+        Field table=ActivityPartyEvent id=73 name=RsvpInd
+ 216    End If
+        DisableStepCollapsed state=False
+ 217    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 218    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 219    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 220    #CACHE ACTIVITY FIELDS FOR PARTY
+        DisableStepCollapsed state=False
+        Restore state=False
+ 221    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 222    If [ $ActivityPartyRoleId <> 50 //Creator
+        and 
+        $ActivityPartyRoleId <> 51 //Completed By ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and
+ 223    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 224    Set Field [ Activity::PartiesCached; Substitute (  List ( Activity::PartiesCached; Party::NameCached ); ¶; ", " ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, fn:List, Activity::PartiesCached#198, Party::NameCached#19
+        Field table=Activity id=198 name=PartiesCached
+ 225    Set Variable [ $error; Value:Error.Last ( "Caching the Activity Parties" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 226    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 227    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 228    End If
+        DisableStepCollapsed state=False
+ 229    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 230    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 231    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 232    #CACHE ACTIVITY FIELDS FOR TASK
+        DisableStepCollapsed state=False
+        Restore state=False
+ 233    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 234    If [ $ActivityPartyRoleId = 52 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 235    Set Field [ Task::FromCached; Party::NameCached ]
+        DisableStepCollapsed state=False
+        refs: Party::NameCached#19
+        Field table=Task id=23 name=FromCached
+ 236    Set Variable [ $error; Value:Error.Last ( "caching task assigned by" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 237    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 238    End If
+        DisableStepCollapsed state=False
+ 239    If [ $ActivityPartyRoleId = 53 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 240    Set Field [ Task::ToCached; Party::NameCached ]
+        DisableStepCollapsed state=False
+        refs: Party::NameCached#19
+        Field table=Task id=24 name=ToCached
+ 241    Set Variable [ $error; Value:Error.Last ( "caching task assigned to" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 242    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 243    End If
+        DisableStepCollapsed state=False
+ 244    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 245    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 246    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 247    #CACHE FIELDS FOR CREATOR
+        DisableStepCollapsed state=False
+        Restore state=False
+ 248    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 249    If [ $ActivityPartyRoleId = 50 //Creator ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 250    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 251    Set Field [ Activity::CreatorCached; Party::NameCached ]
+        DisableStepCollapsed state=False
+        refs: Party::NameCached#19
+        Field table=Activity id=197 name=CreatorCached
+ 252    Set Variable [ $error; Value:Error.Last ( "Caching the Activity Creator" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 253    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 254    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 255    End If
+        DisableStepCollapsed state=False
+ 256    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 257    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 258    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 259    #CACHE FIELDS ON COMPLETION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 260    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 261    If [ $ActivityPartyRoleId = 51 //Completed ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 262    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 263    Set Field [ Activity::AlertInd; False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+        Field table=Activity id=107 name=AlertInd
+ 264    Set Variable [ $error; Value:Error.Last ( "Updating the AlertInd" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 265    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 266    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 267    Set Field [ Activity::CompletedByCached_deprecated; Party::NameCached ]
+        DisableStepCollapsed state=False
+        refs: Party::NameCached#19
+        Field table=Activity id=196 name=CompletedByCached_deprecated
+ 268    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 269    End If
+        DisableStepCollapsed state=False
+ 270    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 271    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 272    End Loop
+        DisableStepCollapsed state=False
+ 273    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 274    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 275    Set Variable [ $result; Value:JSONSetElement( "{}"; "Id" ; ActivityParty::Id ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, ActivityParty::Id#23, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 276    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 277    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 278    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 279    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 280    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 281    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 282    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 283    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 284    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 285    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 286    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 287    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 288    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 289    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 290    End If
+        DisableStepCollapsed state=False

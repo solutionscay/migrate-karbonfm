@@ -1,0 +1,254 @@
+# script 501: Open in QB ( {entity , qbo_id} )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices
+# source: ScriptCatalog/Script[@id=501]
+# steps: 62 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=469 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    # Open an Entity in QuickBooks Online if the entity supports deeplinking
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # if doesn't, then go to the list.
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} params.Entity the target Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {string} params.QBOId
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  11    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #get parameters
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  15    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  16    Set Variable [ $qbo_id; Value:JSONGetElement ( $params ;  "QBOId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $qbo_id
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #validate parameters
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ IsEmpty ( $entity ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  21    Show Custom Dialog [ Title: "ERROR"; Message: "The entity was not sent to this script, which is a required parameter."; Default Button: “Cancel”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Cancel"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  22    Exit Script [  ]
+        DisableStepCollapsed state=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    If [ IsEmpty ( $qbo_id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  25    If [ IsEmpty ( FilterValues (
+        	List ( "Term" ; "TaxCode" ; "Item" ) ;
+        	$entity
+        ) )
+        
+        /* qbo_id is not required for these entities */ ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:FilterValues, fn:List
+  26    Show Custom Dialog [ Title: "ERROR"; Message: "The qbo_id was empty, perhaps this record hasn't been synced with QBO yet?"; Default Button: “Cancel”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Cancel"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  27    Exit Script [  ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    End If
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $sandbox; Value:SQL.GetColumn ( QBOConfig::UseSandbox ; QBOConfig::One ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, QBOConfig::UseSandbox#16, QBOConfig::One#20
+        Name: $sandbox
+  32    If [ $sandbox ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $baseUrl; Value:"https://sandbox.qbo.intuit.com/app/" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $baseUrl
+  34    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $baseUrl; Value:"https://qbo.intuit.com/app/" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $baseUrl
+  36    End If
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #compile entire url
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    If [ $entity = "Customer" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $url; Value:$baseUrl & "customerdetail?nameId=" & $qbo_id ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  42    Else If [ $entity = "Item" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Variable [ $url; Value:$baseUrl & "items" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  44    Else If [ $entity = "Term" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $url; Value:$baseUrl & "terms" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  46    Else If [ $entity = "TaxCode" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $url; Value:$baseUrl & "salestax" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  48    Else If [ $entity = "Purchase" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $url; Value:$baseUrl & "expense" & "?txnId=" & $qbo_id ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  50    Else If [ $entity = "Vendor" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $url; Value:$baseUrl & "vendordetail?nameId=" & $qbo_Id ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  52    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Set Variable [ $url; Value:$baseUrl & Lower ( $entity ) & "?txnId=" & $qbo_id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Lower
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  54    End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    ## I don't think this does anything.
+        DisableStepCollapsed state=False
+        Restore state=False
+  57 // Set Variable [ $companyID; Value:SQL.GetColumn ( QBOConfig::CompanyID ; QBOConfig::One ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, QBOConfig::CompanyID#17, QBOConfig::One#20
+        Name: $companyID
+  58 // Set Variable [ $url; Value:$url & "&deeplinkcompanyid=" & $companyId ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #open url
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Open URL [ $url ]
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        DisableStepCollapsed state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False

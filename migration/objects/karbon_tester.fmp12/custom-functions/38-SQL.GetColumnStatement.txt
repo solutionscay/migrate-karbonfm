@@ -1,0 +1,32 @@
+# custom function 38: SQL.GetColumnStatement
+# file: karbon_tester.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=38]
+
+CustomFunction id=38 functionArity=3 visible=True parameters=theField;whereField;whereValue name=SQL.GetColumnStatement
+  Calculation:
+    | /**
+    |  * 
+    |  * get the SQL Statement for getting values from a field
+    |  *
+    |  * @param {reference} columnField
+    |  * @param {reference} whereField
+    |  * @param {string} whereValue
+    |  *
+    |  * @returns {string} SQL Statemnt
+    |  *
+    |  * @module fm-sql-cfs
+    |  * @see https://github.com/karbonfm/fm-sql-cfs
+    |  * 
+    |  * @history  2017-11-9, todd@geistinteractive.com
+    |  *
+    |  */
+    | 
+    | List(
+    | "SELECT ''|| " & SQL.GetFieldName ( theField );
+    | "FROM " & SQL.GetTableName ( theField );
+    | Case(
+    |    not IsEmpty( GetFieldName( whereField) ) ; "WHERE " & SQL.GetFieldName(whereField) & "=" & whereValue;
+    |   ""
+    | )
+    | )
+    refs: fn:List, cf:SQL.GetFieldName, cf:SQL.GetTableName, fn:Case, fn:not, fn:IsEmpty, fn:GetFieldName

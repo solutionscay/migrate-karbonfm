@@ -1,0 +1,26 @@
+# custom function 1: TestDescription
+# file: karbon_tester.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=1]
+
+CustomFunction id=1 functionArity=3 visible=True parameters=Topic;Test;Passed name=TestDescription
+  Calculation:
+    | Let(
+    | [
+    | test = JSONSetElement ( "{}" ;
+    | 
+    | 	["Script" ; Get(ScriptName) ; JSONString ];
+    | 	["Topic" ; Topic ; JSONString ];
+    | 	["Test" ; Test ; JSONString ];
+    | 	["Passed" ; Passed; JSONBoolean ]
+    | 
+    | );
+    | 
+    | n = If( IsEmpty($$Tests) ; 0; ValueCount(JSONListValues ( $$Tests ; "" ))  )
+    | 
+    | 
+    | ];
+    | 
+    | JSONSetElement(  $$TESTS  ; "[" & n & "]"  ;  test  ; "" )
+    | 
+    | )
+    refs: fn:Let, fn:JSONSetElement, fn:Get, fn:ScriptName, fn:JSONString, fn:JSONBoolean, fn:If, fn:IsEmpty, fn:ValueCount, fn:JSONListValues

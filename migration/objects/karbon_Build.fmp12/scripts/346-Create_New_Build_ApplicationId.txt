@@ -1,0 +1,754 @@
+# script 346: Create New Build { ApplicationId }
+# file: karbon_Build.fmp12
+# folder: API / Public
+# source: ScriptCatalog/Script[@id=346]
+# steps: 212 (6 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=337 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Create New Build
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@description
+        
+        When we build a multi-file application for deployment, we need to create a build record for the application, and build records for each file included in the build. This script generates the build and increments the version for the application and each file, based on rudimentary support of Semantic Versioning. 
+        
+        We're also doing some integration with Otto, the commercial migration utility from Geist Interactive. If you use Otto, you can automate the build process by pushing the build out.
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {object} json
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {string} json.ApplicationId
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnSuccess {object} json
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnSuccess {string} json.AppBuildId
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError - n/a
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@history 2019-07-18 dave@geistinteractive.com - Now using DBTransactions
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@history 2019-07-16 dave@geistinteractive.com - The type of the build now depends on the severity of the change(s).
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@history 2018-09-27 dave@geistinteractive.com - lots of little bug fixes
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@history 2018-08-18 dave@geistinteractive.com - fixes issues resulting from the use of multi-keys for files. build process is now transactional
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #@history 2018-08-14 dave@geistinteractive.com - added version check for local file. minor refactoring and erro-trapping
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #@history 2018-08-14 dave@geistinteractive.com - Added support for Otto.
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #@history 2018-08-13 dave@geistinteractive.com - Creates new application version, and new file versions for all files that have pending changes
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #@history 2018-08-13 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #START BUILD
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  34 // Show Custom Dialog [ Title: "New Build"; Message: "OK to create a new build? "; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  35 // If [ Get ( LastMessageChoice ) = 2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  36 // Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  37 // End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #Validate
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $ApplicationId; Value:JSONGetElement ( Get ( ScriptParameter ) ; "ApplicationId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $ApplicationId
+  43 // Set Variable [ $Type; Value:JSONGetElement ( Get ( ScriptParameter ) ; "Type" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Type
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    If [ // NULL ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Else If [ IsEmpty ( $ApplicationId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  47    Show Custom Dialog [ Title: "Error"; Message: "An Application ID is required."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  48    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  49    End If
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  52    Freeze Window
+        DisableStepCollapsed state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #Find pending changes to include in new build
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  56    Go to Layout [ “Change” (Change) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=21 name=Change
+  57    Set Field [ Change_File::ApplicationId; $ApplicationId ]
+        DisableStepCollapsed state=False
+        Field table=Change_File id=15 name=ApplicationId
+  58    Set Field [ Change_AppBuild::Id; "*" ]
+        DisableStepCollapsed state=False
+        Field table=Change_AppBuild id=1 name=Id
+  59    Omit Record
+        DisableStepCollapsed state=False
+  60    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  61    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    If [ Get ( FoundCount ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  64    Show Custom Dialog [ Title: "Error"; Message: "There are no pending changes."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  65    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  66    End If
+        DisableStepCollapsed state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #Get a list of IDs of all change records that are being included in this build
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Insert Calculated Result [ $changeIds; Change::IdListOf ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: Change::IdListOf#18
+        Field: $changeIds
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    New Window [ Style: Document; Using layout: “DBTransactions” (DBTransactions); Close: Yes; Minimize: Yes; Maximize: Yes; Resize: Yes; Menu Bar: Yes; Dim parent window: No; Toolbars: Yes ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=No Toolbars=Yes MenuBar=Yes Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=1076299266
+        Layout id=35 name=DBTransactions
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=364 name="Start Transaction ( TransactionPayload )"
+  77    Insert Calculated Result [ $error; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $error
+  78    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Set Field [ DBTransactions::ApplicationId; $ApplicationId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=84 name=ApplicationId
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    #@todo 2019-07-18 dave@geistinteractive.com - make this transactional
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    #Get a list of all files that have changes
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    Set Field [ DBTransactions::ChangeId; $changeIds ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=85 name=ChangeId
+  88    Insert Calculated Result [ $fileIds; List ( Tx_Change_File::Id ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:List, Tx_Change_File::Id#1
+        Field: $fileIds
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    #Prescribe the AppBuildId; we'll create it at the end
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    Set Variable [ $AppBuildId; Value:Get ( UUID ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:UUID
+        Repetition
+          Calculation:
+            | 1
+        Name: $AppBuildId
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #Loop through each file and create file builds
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    Set Variable [ $i; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  96    Set Variable [ $end; Value:ValueCount ( $fileIds ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+  97    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    Exit Loop If [ $i > $end ]
+        DisableStepCollapsed state=False
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Set Variable [ $FileId; Value:GetValue ( $fileIds ; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileId
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #Get the new version for this File Build
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    Set Field [ DBTransactions::FileId; $FileId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=73 name=FileId
+ 108    Set Variable [ $SeverityList; Value:UniqueValues ( Tx_Change#pendingThisFile::Severity ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:UniqueValues, Tx_Change#pendingThisFile::Severity#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $SeverityList
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    If [ ListIncludes ( $SeverityList ; "Major" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:ListIncludes
+ 111    #Major (2)
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    Set Variable [ $Severity; Value:"Major" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Severity
+ 113    Set Variable [ $ApplicationSeverity; Value:2 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $ApplicationSeverity
+ 114    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    Else If [ ListIncludes ( $SeverityList ; "Minor" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:ListIncludes
+ 116    #Minor (1)
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    Set Variable [ $Severity; Value:"Minor" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Severity
+ 118    Set Variable [ $ApplicationSeverity; Value:If ( $ApplicationSeverity < 1 ; 1 ; $ApplicationSeverity ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If
+        Name: $ApplicationSeverity
+ 119    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 120    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 121    #Patch (0)
+        DisableStepCollapsed state=False
+        Restore state=False
+ 122    Set Variable [ $Severity; Value:"Patch" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Severity
+ 123    Set Variable [ $ApplicationSeverity; Value:If ( $ApplicationSeverity = "" ; 0 ; $ApplicationSeverity ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If
+        Repetition
+          Calculation:
+            | 1
+        Name: $ApplicationSeverity
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    End If
+        DisableStepCollapsed state=False
+ 126    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    Set Variable [ $NewFileVersion; Value:NewVersion ( Tx_File::CurrentVersion ; $Severity ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:NewVersion, Tx_File::CurrentVersion#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $NewFileVersion
+ 128    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 130    #Create the file build record
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    Set Field [ DBTransactions::FileBuildId; "" ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=86 name=FileBuildId
+ 132    Set Field [ Tx_FileBuild::Version; $NewFileVersion ]
+        DisableStepCollapsed state=False
+        Field table=Tx_FileBuild id=7 name=Version
+ 133    Set Field [ Tx_FileBuild::FileId; $FileId ]
+        DisableStepCollapsed state=False
+        Field table=Tx_FileBuild id=6 name=FileId
+ 134    Set Field [ Tx_FileBuild::AppBuildId; $AppBuildId ]
+        DisableStepCollapsed state=False
+        Field table=Tx_FileBuild id=8 name=AppBuildId
+ 135    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 136    #Update the current file version
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    Set Field [ Tx_File::CurrentVersion; $NewFileVersion ]
+        DisableStepCollapsed state=False
+        Field table=Tx_File id=7 name=CurrentVersion
+ 138    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 139    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+ 140    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 141    End Loop
+        DisableStepCollapsed state=False
+ 142    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 143    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 144    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 145    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 146    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 147    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 148    #Loop through each change record and link to the app build
+        DisableStepCollapsed state=False
+        Restore state=False
+ 149    Set Variable [ $i; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+ 150    Set Variable [ $end; Value:ValueCount ( $changeIds ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+ 151    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 152    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 153    Exit Loop If [ $i > $end ]
+        DisableStepCollapsed state=False
+ 154    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 155    Set Field [ DBTransactions::ChangeId; GetValue ( $changeIds ; $i ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetValue
+        Field table=DBTransactions id=85 name=ChangeId
+ 156    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 157    #Record changes to the change record
+        DisableStepCollapsed state=False
+        Restore state=False
+ 158    Set Field [ Tx_Change::AppBuildId; $AppBuildId ]
+        DisableStepCollapsed state=False
+        Field table=Tx_Change id=9 name=AppBuildId
+ 159    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 160    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+ 161    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 162    End Loop
+        DisableStepCollapsed state=False
+ 163    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 164    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 165    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 166    #Set the new application version
+        DisableStepCollapsed state=False
+        Restore state=False
+ 167    Set Variable [ $ApplicationSeverityOut; Value:Choose ( $ApplicationSeverity ; "patch" ; "minor" ; "major" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Choose
+        Repetition
+          Calculation:
+            | 1
+        Name: $ApplicationSeverityOut
+ 168    Set Variable [ $NewAppVersion; Value:NewVersion ( Tx_Application::CurrentAppVersion ; $ApplicationSeverityOut ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:NewVersion, Tx_Application::CurrentAppVersion#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $NewAppVersion
+ 169    Set Field [ Tx_Application::CurrentAppVersion; $NewAppVersion ]
+        DisableStepCollapsed state=False
+        Field table=Tx_Application id=8 name=CurrentAppVersion
+ 170    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 171    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 172    #Create the new app build
+        DisableStepCollapsed state=False
+        Restore state=False
+ 173    Set Field [ Tx_AppBuild::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Tx_AppBuild id=10 name=ONE
+ 174    Insert Calculated Result [ $error; Error.Last ( "creating app build" ; "" ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: cf:Error.Last
+        Field: $error
+ 175    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 176    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 177    Set Field [ Tx_AppBuild::Id; $AppBuildId ]
+        DisableStepCollapsed state=False
+        Field table=Tx_AppBuild id=1 name=Id
+ 178    Set Field [ Tx_AppBuild::ApplicationId; $ApplicationId ]
+        DisableStepCollapsed state=False
+        Field table=Tx_AppBuild id=9 name=ApplicationId
+ 179    Set Field [ Tx_AppBuild::Version; $NewAppVersion ]
+        DisableStepCollapsed state=False
+        Field table=Tx_AppBuild id=6 name=Version
+ 180    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 181    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 182    Insert Calculated Result [ $result; JSONSetElement ( "{}" ; "AppBuildId" ; Tx_AppBuild::Id ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, Tx_AppBuild::Id#1, fn:JSONString
+        Field: $result
+ 183    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 184    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+ 185    End Loop
+        DisableStepCollapsed state=False
+ 186    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 187    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=365 name="Save Transaction Result ( {result} )"
+ 188    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=367 name="End Transaction ( {error}  )"
+ 189    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 190    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 191    #Create Change Log file
+        DisableStepCollapsed state=False
+        Restore state=False
+ 192    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 193    Set Variable [ $Param; Value:JSONSetElement ( "{}" ; "AppBuildId" ; $AppBuildId ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Param
+ 194    Perform Script [ “Create Change Log { AppBuildId }”; Parameter: $Param ]
+        DisableStepCollapsed state=False
+        Script id=359 name="Create Change Log { AppBuildId }"
+ 195    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 196    Insert Calculated Result [ $result; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $result
+ 197    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 198    Show Custom Dialog [ Title: "Error"; Message: "An error occurred while creating the change log."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+ 199    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+ 200    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 201    Show Custom Dialog [ Title: "Success"; Message: "The change log has been saved to your Desktop in Markdown format."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+ 202    End If
+        DisableStepCollapsed state=False
+ 203    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 204    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 205    #Otto integration
+        DisableStepCollapsed state=False
+        Restore state=False
+ 206    Show Custom Dialog [ Title: "Create Otto Migration"; Message: "OK to create an Otto Migration for this build?"; Default Button: “Create”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Create"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+ 207    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 208    If [ Get ( LastMessageChoice ) = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+ 209    Perform Script [ “_Create Otto Migration” ]
+        DisableStepCollapsed state=False
+        Script id=352 name="_Create Otto Migration"
+ 210    End If
+        DisableStepCollapsed state=False
+ 211    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 212    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

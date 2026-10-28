@@ -1,0 +1,57 @@
+# custom function 55: BrowserNav.SaveNavHistory
+# file: karbon_kontacts.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=55]
+
+CustomFunction id=55 functionArity=0 visible=True parameters="" name=BrowserNav.SaveNavHistory
+  Calculation:
+    | Let( [
+    | 
+    | // GET CURRRENT VALUE OF $$BrowserNav OR IF EMPTY SET DEFAULTS
+    | 
+    | $$BrowserNav = If(  not IsEmpty( $$BrowserNav ) ; $$BrowserNav ; JSONSetElement ( "" ; 
+    | 
+    | 	[ "disabled" ; False ; "" ] ;   // This can be set to manually exclude a layout for which the history would normally be saved
+    | 	[ "commonHistory" ; False ; "" ] ;
+    | 	[ "hideInactiveWindow" ; True ; "" ]
+    | )) ;
+    | 
+    | ~CommonHistory= JSONGetElement ( $$BrowserNav ; "commonHistory" ) ;
+    | ~disabled= JSONGetElement ( $$BrowserNav ; "disabled" ) ;
+    | 
+    | ~lno = Get ( LayoutNumber )  ;
+    | ~lName = Get( LayoutName ) ;
+    | ~window = Get( WindowName ) ;
+    | 
+    | ~newItem = JSONSetElement ( "" ; 
+    | 
+    | 	[ "layoutName" ; ~lName ; "" ] ;
+    | 	[ "layoutNumber" ; ~lNo; "" ] ;
+    | 	[ "windowName" ; ~window ; "" ] 
+    | ) ;
+    | 
+    | ~hName = If( ~commonHistory ; "history.common" ; "history." & ~window ) ; // Use window name if not set as common history
+    | 
+    | ~back = JSONGetElement ( $$BrowserNav ; ~hName & ".backward" ) ;
+    | 
+    | ~different = Case( 
+    | 	JSONGetElement ( $$BrowserNav ; ~hName & ".backward[0].windowName" ) ≠ ~window ; True ;
+    | 	JSONGetElement ( $$BrowserNav ; ~hName & ".backward[0].layoutNumber" ) ≠ ~lNo ; True ;
+    | 	False ) ;
+    | 
+    | ~newBack = Case( 
+    | IsEmpty( ~back )or ~back = "[]" ; "[" & ~newItem & "]" ;
+    | ~different ; Substitute( ~back ; "[" ; "[" & ~newItem & " , "  )) ;
+    | 
+    | 
+    | ~result = If( IsEmpty ( ~newBack ) ; $$BrowserNav ; JSONFormatElements ( 
+    | JSONSetElement ( JSONDeleteElement (JSONDeleteElement ( $$browserNav  ; ~hName & ".backward" ) ; ~hName & ".forward" ) ; ~hName & ".backward" ;
+    | ~newBack;  JSONArray ) )
+    | ) ;
+    | $$BrowserNav = If( ~disabled ; $$BrowserNav ; ~result ) ;
+    | 
+    | ~null = "" ] ;
+    |  
+    | False //returning false so function can be easily called in a hide calculation 
+    | 
+    | )
+    refs: fn:Let, fn:If, fn:not, fn:IsEmpty, fn:JSONSetElement, fn:False, fn:True, fn:JSONGetElement, fn:Get, fn:LayoutNumber, fn:LayoutName, fn:WindowName, fn:Case, fn:or, fn:Substitute, fn:JSONFormatElements, fn:JSONDeleteElement, fn:JSONArray

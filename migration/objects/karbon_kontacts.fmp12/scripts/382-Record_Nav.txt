@@ -1,0 +1,106 @@
+# script 382: Record Nav
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Navigation
+# source: ScriptCatalog/Script[@id=382]
+# steps: 28 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=498 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $action; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $action
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ $action= "next" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Go to Record/Request/Page
+        [ Next ]
+        NoInteract state=False
+        Exit state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+   6    Go to Object [ Object Name: "x"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+   7    Else If [ $action = "prev" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Go to Record/Request/Page
+        [ Previous ]
+        NoInteract state=False
+        Exit state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Previous
+   9    Go to Object [ Object Name: "x"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  10    Else If [ $action = "ToggleFoundSet" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Show Omitted Only
+        DisableStepCollapsed state=False
+  12    Else If [ $action = "exit" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $rn; Value:GetAsNumber( Filter( Globals::RecordNav; "0123456789" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsNumber, fn:Filter, Globals::RecordNav#31
+        Name: $rn
+  14    If [ IsEmpty ( $rn ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  15    Exit Script [  ]
+        DisableStepCollapsed state=False
+  16    End If
+        DisableStepCollapsed state=False
+  17    If [ $rn > Get(FoundCount) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  18    Set Variable [ $rn; Value:Get(FoundCount) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:FoundCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $rn
+  19    End If
+        DisableStepCollapsed state=False
+  20 // Go to Object [ Object Name: "x"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  21    Go to Record/Request/Page [ $rn ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+  22    Set Field [ Globals::RecordNav; "" ]
+        DisableStepCollapsed state=False
+        Field table=Globals id=31 name=RecordNav
+  23    Else If [ $action = "open" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Field [ Globals::RecordNav; Get(RecordNumber) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:RecordNumber
+        Field table=Globals id=31 name=RecordNav
+  25    Select All
+        DisableStepCollapsed state=False
+  26    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    End If
+        DisableStepCollapsed state=False

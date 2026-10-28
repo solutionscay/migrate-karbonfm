@@ -1,0 +1,256 @@
+# script 222: Refresh Invoice From QBO ( qbo_id )
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / LedgerLink / Public
+# source: ScriptCatalog/Script[@id=222]
+# steps: 50 (35 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=580 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $qbo_id; Value:SalesTransaction::qbo_id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::qbo_id#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $qbo_id
+   4    Set Variable [ $Entity; Value:"Invoice" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+   5    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "QBOId" ; $qbo_id ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   6    Perform Script [ “Pull QBO Entity Into FileMaker ( {Entity, QBOId })” from file: “karbon_LedgerLink”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        FileReference id=6 name=karbon_LedgerLink
+          UniversalPathList: file:karbon_LedgerLink
+        Script id=145 name="Pull QBO Entity Into FileMaker ( {Entity, QBOId })" in=karbon_LedgerLink.fmp12
+   7    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   8    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   9    Show Custom Dialog [ Title: "Error"; Message: "Invoice was not refreshed!¶¶" & If ( not IsEmpty($result); JSONFormatElements ( $result ) ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If, fn:not, fn:IsEmpty, fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  10    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14 // #get all attachableIds this Invoice
+        DisableStepCollapsed state=False
+        Restore state=False
+  15 // # construct a send request
+        DisableStepCollapsed state=False
+        Restore state=False
+  16 // Set Variable [ $SelectStatement; Value: "select Id from attachable where AttachableRef.EntityRef.Type='invoice' and AttachableRef.EntityRef.value='" & $qbo_id & "'" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $SelectStatement
+  17 // Set Variable [ $request; Value:JSONSetElement ( "" ;
+              ["path"; "/query"; JSONString];
+              ["query.query" ;  $SelectStatement ; JSONString] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  18 // Perform Script [ “Send QBO Request” from file: “karbon_LedgerLink”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        FileReference id=6 name=karbon_LedgerLink
+          UniversalPathList: file:karbon_LedgerLink
+        Script id=18 name="Send QBO Request" in=karbon_LedgerLink.fmp12
+  19 // Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  20 // If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  21 // Show Custom Dialog [ Title: "Error"; Message: "Attachments not refreshed!¶¶" & If ( not IsEmpty ( $result ) ; JSONFormatElements ( $result ) ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If, fn:not, fn:IsEmpty, fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  22 // Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  23 // End If
+        DisableStepCollapsed state=False
+  24 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  25 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  26 // #process attachments
+        DisableStepCollapsed state=False
+        Restore state=False
+  27 // Set Variable [ $Attachables; Value:JSONGetElement ( $result; "QueryResponse.Attachable" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Attachables
+  28 // Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  29 // Set Variable [ $end; Value:JSON.ArrayLength ( $Attachables ; "" ) -1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Name: $end
+  30 // Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  31 // Set Variable [ $thisAttachable; Value:JSONGetElement ( $Attachables ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisAttachable
+  32 // Exit Loop If [ $n>$end ]
+        DisableStepCollapsed state=False
+  33 // Set Variable [ $AttachableId; Value:JSONGetElement ( $thisAttachable ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AttachableId
+  34 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  35 // #refresh this AttachableId
+        DisableStepCollapsed state=False
+        Restore state=False
+  36 // Set Variable [ $qbo_id; Value:$AttachableId ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $qbo_id
+  37 // Set Variable [ $Entity; Value:"Attachable" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  38 // Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "QBOId" ; $qbo_id ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  39 // Perform Script [ “Pull QBO Entity Into FileMaker ( {Entity, QBOId })” from file: “karbon_LedgerLink”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        FileReference id=6 name=karbon_LedgerLink
+          UniversalPathList: file:karbon_LedgerLink
+        Script id=145 name="Pull QBO Entity Into FileMaker ( {Entity, QBOId })" in=karbon_LedgerLink.fmp12
+  40 // Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  41 // If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  42 // Show Custom Dialog [ Title: "Error"; Message: "Attachment was not refreshed!¶¶" & If ( not IsEmpty($result); JSONFormatElements ( $result ) ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If, fn:not, fn:IsEmpty, fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  43 // Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  44 // End If
+        DisableStepCollapsed state=False
+  45 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  46 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  47 // Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  48 // End Loop
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,97 @@
+# script 401: Show SQL Statement Result
+# file: karbon_Generator.fmp12
+# folder: Test / TestLine
+# source: ScriptCatalog/Script[@id=401]
+# steps: 15 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=348 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $FileName; Value:Selected_TestLine::FileName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::FileName#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   3    Set Variable [ $TableName; Value:Selected_TestLine::SQL_TableName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_TableName#14
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableName
+   4    Set Variable [ $FieldName; Value:Selected_TestLine::SQL_Field ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_Field#25
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldName
+   5    Set Variable [ $FieldValue; Value:Selected_TestLine::SQL_FieldValue ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_FieldValue#13
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldValue
+   6    Set Variable [ $FieldValueFromResult; Value:JSONGetElement ( Test_TestLine#ActualTest::LastResult ; Selected_TestLine::SQL_GetFromResultKey ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Test_TestLine#ActualTest::LastResult#20, Selected_TestLine::SQL_GetFromResultKey#26
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldValueFromResult
+   7    Set Variable [ $FieldValue; Value:If ( Selected_TestLine::SQL_GetFromResultInd; $FieldValuefromResult; $FieldValue ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, Selected_TestLine::SQL_GetFromResultInd#24
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldValue
+   8    Set Variable [ $FieldReturn; Value:Selected_TestLine::SQL_FieldReturn ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_FieldReturn#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldReturn
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $sqlStatement; Value:"SELECT " & $FieldReturn & " FROM " & $TableName & " WHERE " & $FieldName & " = '" & $FieldValue & "'" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $sqlStatement
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $Result; Value:<Function Missing> ( $sqlStatement; "," ; ¶ ; $FileName ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Show Custom Dialog [ Message: $Result; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False

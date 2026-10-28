@@ -1,0 +1,312 @@
+# script 301: _Update Line Records If Required
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Private
+# source: ScriptCatalog/Script[@id=301]
+# steps: 72 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=108 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # loop through lines after a send to re-write the Id and the lineNumber values
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} params.Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {string} params.Record the record as it exists from QuickBooks
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @returnSuccess {object } error
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnSuccess {number } error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnError {object } error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @returnError {number } error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  19    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  20    Set Variable [ $Record; Value:JSONGetElement ( $params ;  "Record" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Record
+  21    Set Variable [ $Line; Value:JSONGetElement ( $Record ;  "Line" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Line
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #filter the lines to remove things like Subtotal
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ $Entity = "Invoice" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $Line; Value:JSON.FilterPropertyByExpression ( $Line ; "" ; "DetailType" ; "= " & Quote("SalesItemLineDetail") ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.FilterPropertyByExpression, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $Line
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ IsEmpty ( $Line ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  31    Exit Script [ Result: Error ( 0; ""; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $fmIDFieldName; Value:Config ( $Entity & ".fields.line.fmId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $fmIDFieldName
+  35    Set Variable [ $syncIDFieldName; Value:Config ( $Entity & ".fields.line.syncId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $syncIDFieldName
+  36    Set Variable [ $parentSyncIDFieldName; Value:Config ( $Entity & ".fields.syncId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $parentSyncIDFieldName
+  37    Set Variable [ $qboIDFieldName; Value:Config ( $Entity & ".fields.line.qboId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $qboIDFieldName
+  38    Set Variable [ $lineNumberFieldName; Value:Config ( $Entity & ".fields.line.lineNumber" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineNumberFieldName
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $ParentId; Value:GetField($parentSyncIDFieldName) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetField
+        Repetition
+          Calculation:
+            | 1
+        Name: $ParentId
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $errorData; Value:JSONSetElement ( "";
+        
+        ["Config" ; Config($Enity) ; JSONObject ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, cf:Config, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $errorData
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $ListOfLineFMIds; Value:QBO.LookupRelatedLinesFMId ( $Entity ; $ParentId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupRelatedLinesFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $ListOfLineFMIds
+  45    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Variable [ $lineFMId; Value:GetValue($ListOfLineFMIds; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineFMId
+  49    Exit Loop If [ IsEmpty ( $lineFMId ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #protection against 504 bug
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Go to Field [ QBO::Lock ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=QBO id=33 name=Lock
+  53    Set Field By Name [ $syncIDFieldName; $lineFMId ]
+        DisableStepCollapsed state=False
+  54    Set Variable [ $error; Value:Error.Last ( "Setting line id sync Field" ; $errorData ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  55    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Field By Name [ $lineNumberFieldName; JSONGetElement ( $line ; "[" & $n-1 & "]."  & "LineNum" ) ]
+        DisableStepCollapsed state=False
+        Result
+          refs: fn:JSONGetElement
+  59    Set Variable [ $error; Value:Error.Last ( "Setting lineNumber field" ; $errorData ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  60    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Field By Name [ $qboIDFieldName; JSONGetElement ( $line ; "[" & $n-1 & "]."  &  "Id" ) ]
+        DisableStepCollapsed state=False
+        Result
+          refs: fn:JSONGetElement
+  63    Set Variable [ $error; Value:Error.Last ( "Setting qboIDFieldName" ; $errorData ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  64    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  67    End Loop
+        DisableStepCollapsed state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,106 @@
+# script 311: Select Property
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / UI
+# source: ScriptCatalog/Script[@id=311]
+# steps: 27 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=298 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Field [ SELECTOR::ApiGeneratorLineId; ApiGeneratorLine::Id ]
+        DisableStepCollapsed state=False
+        refs: ApiGeneratorLine::Id#1
+        Field table=SELECTOR id=13 name=ApiGeneratorLineId
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $hasChildren; Value:not IsEmpty ( Selected_ApiGeneratorLine_ApiGeneratorLine#children::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:IsEmpty, Selected_ApiGeneratorLine_ApiGeneratorLine#children::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $hasChildren
+   5    Set Variable [ $result; Value:If ( Selected_ApiGeneratorLine::selected ; "" ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, Selected_ApiGeneratorLine::selected#34
+        Name: $result
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Field [ Selected_ApiGeneratorLine::selected; $result ]
+        DisableStepCollapsed state=False
+        Field table=Selected_ApiGeneratorLine id=34 name=selected
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ $hasChildren ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $childIds; Value:List ( Selected_ApiGeneratorLine_ApiGeneratorLine#children::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Selected_ApiGeneratorLine_ApiGeneratorLine#children::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $childIds
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  14    Set Variable [ $endAt; Value:ValueCount ( $childIds ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $endAt
+  15    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Loop If [ $n > $endAt ]
+        DisableStepCollapsed state=False
+  17    Set Field [ SELECTOR::ApiGeneratorLineId; GetValue ( $childIds ; $n ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetValue
+        Field table=SELECTOR id=13 name=ApiGeneratorLineId
+  18    Set Field [ Selected_ApiGeneratorLine::selected; $result ]
+        DisableStepCollapsed state=False
+        Field table=Selected_ApiGeneratorLine id=34 name=selected
+  19    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  20    End Loop
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

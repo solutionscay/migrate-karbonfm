@@ -1,0 +1,23 @@
+# custom function 67: SQL.GetRandomFieldValue
+# file: karbon_tester.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=67]
+
+CustomFunction id=67 functionArity=1 visible=True parameters=returnField name=SQL.GetRandomFieldValue
+  Calculation:
+    | Let(
+    | [
+    | FullFieldName = GetFieldName ( returnField );
+    | Break = Position ( FullFieldName ; "::" ; 0 ; 1 );
+    | TableName = Left ( FullFieldName ; Break - 1 );
+    | FieldName = Right ( FullFieldName ; Length( FullFieldName ) - Break - 1 );
+    | sqlStatement = "SELECT " & FieldName & " FROM \"" & TableName & "\" WHERE " & FieldName & " IS NOT NULL";
+    | ListId = ExecuteSQL ( sqlStatement ; "" ; "¶" );
+    | Count = ValueCount( ListId );
+    | ThisRandom = Ceiling( Random * Count )
+    | 
+    | ];
+    | 
+    | GetValue( ListId ; ThisRandom )
+    | 
+    | )
+    refs: fn:Let, fn:GetFieldName, fn:Position, fn:Left, fn:Right, fn:Length, fn:ExecuteSQL, fn:ValueCount, fn:Ceiling, fn:Random, fn:GetValue

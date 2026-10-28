@@ -1,0 +1,237 @@
+# script 461: Import Copied JSON to API Generator ( Id )
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Public
+# source: ScriptCatalog/Script[@id=461]
+# steps: 59 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=253 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Freeze Window
+        DisableStepCollapsed state=False
+   3    Set Error Capture [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   4    Allow User Abort [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   5    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $ApiGeneratorId; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $ApiGeneratorId
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $clip; Value:<Function Missing>("public.utf8-plain-text" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $json; Value:JSON.Format ( $clip ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ Error.IsError ( $json ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  15    Show Custom Dialog [ Title: "Error"; Message: "No valid JSON was found on the clipboard."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  16    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  17    End If
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ not IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, ApiGeneratorLine::Id#1
+  21    Show Custom Dialog [ Title: "Update Map?"; Message: "Do you want to add to the existing map or replace it and start from scratch?"; Default Button: “Add”, Commit: “Yes”; Button 2: “Replace”, Commit: “No”; Button 3: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Add"
+          Button 2 CommitState=False: "Replace"
+          Button 3 CommitState=False: "Cancel"
+  22    If [ Get ( LastMessageChoice ) = 3 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  23    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  24    Else If [ Get ( LastMessageChoice ) = 2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  25    Go to Related Record [ From table: “ApiGeneratorLine”; Using layout: “ApiGeneratorLine” (ApiGeneratorLine) ]
+        [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065122 name=ApiGeneratorLine
+        Layout id=64 name=ApiGeneratorLine
+  26    If [ Get ( LastError ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  27    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  28    Go to Layout [ “API Generator” (ApiGenerator) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=61 name="API Generator"
+  29    End If
+        DisableStepCollapsed state=False
+  30    End If
+        DisableStepCollapsed state=False
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Field [ FieldMap::JSONDocument; $json ]
+        DisableStepCollapsed state=False
+        Field table=FieldMap id=5 name=JSONDocument
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Perform Script [ “Flatten( JSON )”; Parameter: FieldMap::JSONDocument ]
+        DisableStepCollapsed state=False
+        refs: FieldMap::JSONDocument#5
+        Script id=18 name="Flatten( JSON )"
+  38    Set Variable [ $props; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $props
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Freeze Window
+        DisableStepCollapsed state=False
+  42    Go to Layout [ “ApiGeneratorLine” (ApiGeneratorLine) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=64 name=ApiGeneratorLine
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  45    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $prop; Value:GetValue ( $props ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $prop
+  47    Exit Loop If [ IsEmpty( $prop ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  48    New Record/Request
+        DisableStepCollapsed state=False
+  49    Set Variable [ $null; Value:Let(
+        [
+        t = $prop;
+        sep = Char(166);
+        c = PatternCount(t; sep);
+        p=Position(t ; sep; 1; c);
+        path = Left(t;p-1);
+        $path = Substitute(path; sep ; ".");
+        $value = Middle(t; p+1; 100000000)
+        ];
+        
+        ""
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Char, fn:PatternCount, fn:Position, fn:Left, fn:Substitute, fn:Middle
+        Name: $null
+  50    Set Field [ ApiGeneratorLine::ApiGeneratorId; $ApiGeneratorId ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=2 name=ApiGeneratorId
+  51    Set Field [ ApiGeneratorLine::JsonPropertyName; $path ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=21 name=JsonPropertyName
+  52    Set Field [ ApiGeneratorLine::FmpParam; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=29 name=FmpParam
+  53    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  54    End Loop
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Exit Script [ Result: $new ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,103 @@
+# table 180: PaymentLine
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=180]
+# fields: 13
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table="":
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=id_Payment
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Number fieldType=Normal name=amount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=id_Invoice
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=id_JournalEntry
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=qbo_error
+  Comment: error message returned by QBO when attempting to sync this record
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=id_Customer
+  AutoEnter allowEditing=True calculation=True
+    Calculation table="":
+      | <Table Missing>::<Field Missing>
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Date fieldType=Calculated name=TransactionDate
+  Calculation table=PaymentLine:
+    | SalesTransaction::date
+    refs: SalesTransaction::date#5
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Calculated name=TransactionDocNumber
+  Calculation table=PaymentLine:
+    | SalesTransaction::docNumber
+    refs: SalesTransaction::docNumber#4
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table="":
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table="" (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Number fieldType=Summary name=totalOfAmount
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=Total
+    SummaryField
+      Field id=4 name=amount
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+

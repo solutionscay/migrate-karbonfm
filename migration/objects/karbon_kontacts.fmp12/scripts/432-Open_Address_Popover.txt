@@ -1,0 +1,103 @@
+# script 432: Open Address Popover
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Contact Methods / Popover Edits
+# source: ScriptCatalog/Script[@id=432]
+# steps: 23 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=429 groupCollapsed=False includeInMenu=True
+
+   1    #2018-07-25 Barbara Cooney barbara@geistinteractive.com: created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   6    Set Variable [ $address; Value:JSONGetElement ( $data ; "Address" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+   7    Set Variable [ $address; Value:If ( IsEmpty ( $address ) ; "{}" ; $address ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Field [ UtilityContactMethod::Id; JSONGetElement( $data ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=16 name=Id
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Field [ UtilityContactMethod::Label; JSONGetElement( $address ; "Label" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=7 name=Label
+  12    Set Field [ UtilityContactMethod::AddressLine1; JSONGetElement( $address ; "AddressLine1" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=1 name=AddressLine1
+  13    Set Field [ UtilityContactMethod::AddressLine2; JSONGetElement( $address ; "AddressLine2" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=2 name=AddressLine2
+  14    Set Field [ UtilityContactMethod::AddressLine3; JSONGetElement( $address ; "AddressLine3" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=3 name=AddressLine3
+  15    Set Field [ UtilityContactMethod::City; JSONGetElement( $address ; "City" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=4 name=City
+  16    Set Field [ UtilityContactMethod::StateProvince; JSONGetElement( $address ; "StateProvince" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=10 name=StateProvince
+  17    Set Field [ UtilityContactMethod::PostalCode; JSONGetElement( $address ; "PostalCode" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=8 name=PostalCode
+  18    Set Field [ UtilityContactMethod::County; JSONGetElement( $address ; "County" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=6 name=County
+  19    Set Field [ UtilityContactMethod::Country; JSONGetElement( $address ; "Country" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=5 name=Country
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Go to Object [ Object Name: "AddressLabel"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

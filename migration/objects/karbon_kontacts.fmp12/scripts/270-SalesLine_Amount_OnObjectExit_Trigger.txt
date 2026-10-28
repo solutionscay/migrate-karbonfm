@@ -1,0 +1,118 @@
+# script 270: SalesLine Amount OnObjectExit Trigger
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Triggers
+# source: ScriptCatalog/Script[@id=270]
+# steps: 31 (6 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=564 groupCollapsed=True includeInMenu=False
+
+   1    #PURPOSE: provide the same auto-calculations as QBO interface
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #NOTE: attach to InvoiceItem::amount field on the Invoice Detail layout
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Field [ SalesLine::amount; Round ( SalesLine::amount ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, SalesLine::amount#6
+        Field table=SalesLine id=6 name=amount
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    If [ not IsEmpty ( SalesLine::unitPrice ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, SalesLine::unitPrice#7
+   7    #unitPrice can have more precision (7 decimal places) than the amount field (2 decimal places)
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #adjust the unitPrice based on current amount ONLY if the amount would be different after rounding
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $qty; Value:If ( IsEmpty (SalesLine::qty ) ; 1 ; SalesLine::qty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, SalesLine::qty#8
+        Name: $qty
+  10    Set Variable [ $amount; Value:Round ( SalesLine::unitPrice * $qty ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, SalesLine::unitPrice#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $amount
+  11    If [ $amount ≠ SalesLine::amount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: SalesLine::amount#6
+  12    Set Variable [ $unitPrice; Value:Round (SalesLine::amount / $qty ; 7 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, SalesLine::amount#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $unitPrice
+  13    Set Field [ SalesLine::unitPrice; $unitPrice ]
+        DisableStepCollapsed state=False
+        Field table=SalesLine id=7 name=unitPrice
+  14    End If
+        DisableStepCollapsed state=False
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #summarize related records
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Field [ SalesTransaction::subtotal; SalesLine::summaryTotalAmount ]
+        DisableStepCollapsed state=False
+        refs: SalesLine::summaryTotalAmount#14
+        Field table=SalesTransaction id=33 name=subtotal
+  20    Set Field [ SalesTransaction::taxableSubtotal; SalesLine::summaryTotalAmountTaxable ]
+        DisableStepCollapsed state=False
+        refs: SalesLine::summaryTotalAmountTaxable#13
+        Field table=SalesTransaction id=34 name=taxableSubtotal
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #let QBO calc taxes
+        DisableStepCollapsed state=False
+        Restore state=False
+  23 // If [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24 // Set Field [ Invoice::<Field Missing>; /*Round ( Invoice::taxableSubtotal * ( Invoice_TaxCode::percentage / 100 ) ; 2 )*/ ]
+        DisableStepCollapsed state=False
+        Field table=Invoice id=0 name="" ref=none
+  25 // Else If [ /*/* at least one item is taxable */
+        <Table Missing>::<Field Missing>*/ ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26 // #at least one line must be taxable for total tax to be sent to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+  27 // Set Field [ Invoice::<Field Missing>; "" ]
+        DisableStepCollapsed state=False
+        Field table=Invoice id=0 name="" ref=none
+  28 // End If
+        DisableStepCollapsed state=False
+  29    Set Field [ SalesTransaction::totalAmt; SalesTransaction::subtotal+ SalesTransaction::totalTax + SalesTransaction::shipAmt ]
+        DisableStepCollapsed state=False
+        refs: SalesTransaction::subtotal#33, SalesTransaction::totalTax#30, SalesTransaction::shipAmt#41
+        Field table=SalesTransaction id=25 name=totalAmt
+  30    Set Field [ SalesTransaction::balance; SalesTransaction::totalAmt - SalesTransaction::totalPaid ]
+        DisableStepCollapsed state=False
+        refs: SalesTransaction::totalAmt#25, SalesTransaction::totalPaid#58
+        Field table=SalesTransaction id=26 name=balance
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False

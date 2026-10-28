@@ -1,0 +1,120 @@
+# script 180: _Open Sync Record
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Private
+# source: ScriptCatalog/Script[@id=180]
+# steps: 30 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=108 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Go to Layout [ “LedgerLink Processing...” (QBO) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=32 name="LedgerLink Processing..."
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ IsEmpty ( $$QBO_Semaphor ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   6    Set Variable [ $$QBO_Semaphor; Value:Get(UUID) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:UUID
+        Repetition
+          Calculation:
+            | 1
+        Name: $$QBO_Semaphor
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ Get(RecordOpenState) <> 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:RecordOpenState
+  10    Set Field [ QBO::semaphor; $$QBO_Semaphor ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=34 name=semaphor
+  11    Exit Script [ Result: Error ( 0 ; ""; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error
+  12    Else If [ $$QBO_Semaphor = QBO::semaphor ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: QBO::semaphor#34
+  13    #if we have a matching semapor open the record by setting the field
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Field [ QBO::semaphor; $$QBO_Semaphor ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=34 name=semaphor
+  15    Set Variable [ $error; Value:Error.Last ( "Opening the sync record" ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  16    Else If [ (Get(CurrentTimeUTCMilliseconds) - QBO::lastCommitUTC) > 2000 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:CurrentTimeUTCMilliseconds, QBO::lastCommitUTC#35
+  17    #if the time lock on the semaphor has expired then open the record
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Field [ QBO::semaphor; $$QBO_Semaphor ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=34 name=semaphor
+  19    Set Variable [ $error; Value:Error.Last ( "Opening the sync record" ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  20    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #otherwise we have an error
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $error; Value:QBO.Error ( "Sync record lock too soon" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ not Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  26    Perform Script [ “_Clear all Key Fields” ]
+        DisableStepCollapsed state=False
+        Script id=258 name="_Clear all Key Fields"
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False

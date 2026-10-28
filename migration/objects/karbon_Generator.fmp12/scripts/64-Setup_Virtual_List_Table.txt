@@ -1,0 +1,68 @@
+# script 64: Setup Virtual List Table
+# file: karbon_Generator.fmp12
+# folder: Modules
+# source: ScriptCatalog/Script[@id=64]
+# steps: 18 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=37 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   3    Go to Layout [ “VIRTUALLIST” (VIRTUALLIST) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=35 name=VIRTUALLIST
+   4    Show All Records
+        DisableStepCollapsed state=False
+   5    If [ Get(FoundCount)> 1000 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+   6    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Exit Loop If [ Get(FoundCount) >= 1000 ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:FoundCount
+  11    New Record/Request
+        DisableStepCollapsed state=False
+  12    End Loop
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Go to Record/Request/Page
+        [ Last ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  15    If [ VIRTUALLIST::n <> 1000 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: VIRTUALLIST::n#1
+  16    Replace Field Contents [ VIRTUALLIST::n; Replace with serial numbers: Custom values; Initial value: 1; Increment value: 1 ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=False
+        With value=SerialNumbers
+        SerialNumbers PerformAutoEnter=False UpdateEntryOptions=False increment=1 InitialValue=1 UseEntryOptions=False
+        Field table=VIRTUALLIST id=1 name=n
+  17    End If
+        DisableStepCollapsed state=False
+  18    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout

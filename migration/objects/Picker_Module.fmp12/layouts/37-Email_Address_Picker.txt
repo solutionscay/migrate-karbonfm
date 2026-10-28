@@ -1,0 +1,210 @@
+# layout 37: Email Address Picker
+# file: Picker Module.fmp12
+# folder: Email Address Picker
+# source: LayoutCatalog/Layout[@id=37]
+# objects: 30
+# theme: Cool Gray
+# folder group: id=43 groupCollapsed=False includeInMenu=True
+
+Layout width=500 quickFind=True includeInMenu=True id=37 name="Email Address Picker"
+  Table id=1065101 name=VIRTUALLISTS_Rows
+  CustomMenuSet id=2 name="Default Menu Set"
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=False showFieldFrames=False saveRecord=True
+  Object type=Button key=301 LabelKey=0 name=pickerButton flags=1073741824 bounds=130,0,160,500
+    ScriptTriggers
+      Trigger event=OnObjectKeystroke id=5 triggerFlags=1(browse)
+        Script id=70 name="Handle Keystroke on Picker Row"
+        TriggerText: "Handle Keystroke on Picker Row"
+    Text flags=2 style="Selector Button"
+    ButtonObj buttonFlags=0 iconSize=8 displayType=0
+  Object type=Rect key=159 LabelKey=0 flags=268435456 style="Search Field Old" bounds=10,40,40,360
+  Object type=Text key=160 LabelKey=0 flags=268435456 bounds=40,40,60,300
+    Text flags=10 tableViewVisibility=0: <<$$PickerSearchStatus>>
+      FieldList quickFind=False
+  Object type=Button key=162 LabelKey=0 name=cancelButton flags=268435456 bounds=16,330,34,348
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=49 name=Clear
+        StepText
+          | Clear [ Picker::Search_Field ]
+          | [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+      Image name=a27_XCircle.svg
+  Object type=Button key=163 LabelKey=0 flags=268435456 bounds=17,50,33,66
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Image name=a89_find.svg
+  Object type=Field key=164 LabelKey=0 name=searchField flags=285212672 bounds=10,70,40,320
+    ScriptTriggers
+      Trigger event=OnObjectSave id=4 triggerFlags=1(browse)
+        Script id=210 name="Find EmailAddresses"
+        TriggerText: "Find EmailAddresses"
+    FieldObj numOfReps=1 flags=242 inputMode=0 keyboardType=0 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Picker::Search_Field#1
+      PlaceholderText findMode=True
+        Calculation:
+          | Picker::Settings_PlaceholderText
+          refs: Picker::Settings_PlaceholderText#13
+  Object type=Rect key=165 LabelKey=0 name=headerBackground flags=1073741826 style="Title Bar Shape" bounds=0,0,70,461
+  Object type=Text key=263 LabelKey=0 bounds=135,60,155,320
+    Text flags=10 tableViewVisibility=0: <<Email.EmailAddress>>
+      Display: number flags=24027 negativeStyle=0 currencySymbol="" thousandsSep="" decimalPoint="" negativeColor=#54F51200 decimalDigits=0 trueString="" falseString=""; date format=168 monthStyle=231 dayStyle=11 separator=U+DB50 elements=0,136,140,211 separators=||||
+      FieldList quickFind=True
+        Field table=VIRTUALLISTS_Rows id=31 name=Email.EmailAddress
+  Object type=Button key=268 LabelKey=0 flags=268500996 bounds=175,60,205,160
+    Text flags=2 style=GreenButton: "Save changes"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Close EmailAddress Picker” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=215 name="Close EmailAddress Picker"
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Picker::Results )
+        refs: fn:IsEmpty, Picker::Results#2
+  Object type=GroupButton key=305 LabelKey=0 bounds=90,60,125,490
+    GroupButtonObj numOfObjs=1
+      Object type=GroupButton key=306 LabelKey=0 bounds=90,60,125,490
+        GroupButtonObj numOfObjs=1
+          Object type=Text key=269 LabelKey=0 bounds=90,60,125,490
+            Text flags=10 tableViewVisibility=0
+              | <<Email.PartyName>>
+              | <<Email.EmailOrganizationName>>
+              FieldList quickFind=True
+                Field table=VIRTUALLISTS_Rows id=34 name=Email.PartyName
+                Field table=VIRTUALLISTS_Rows id=36 name=Email.EmailOrganizationName
+  Object type=Field key=270 LabelKey=0 name=Headshot flags=4 bounds=90,10,130,50
+    FieldObj numOfReps=1 flags=1048628 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=7
+      Field: VIRTUALLISTS_Rows_Party::Photo#32
+    HideCondition findMode=False
+      Calculation:
+        | VIRTUALLISTS_Rows_Party::OrganizationInd
+        refs: VIRTUALLISTS_Rows_Party::OrganizationInd#18
+  Object type=Field key=271 LabelKey=0 name=BusinessLogo flags=4 bounds=90,10,130,50
+    FieldObj numOfReps=1 flags=1048628 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=4
+      Field: VIRTUALLISTS_Rows_Party::Photo#32
+    HideCondition findMode=False
+      Calculation:
+        | VIRTUALLISTS_Rows_Party::PersonInd
+        refs: VIRTUALLISTS_Rows_Party::PersonInd#130
+  Object type=Button key=299 LabelKey=0 flags=1342242820 bounds=135,330,155,410
+    Text flags=2 style=Link: Remove
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Deselect Email Address” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=245 name="Deselect Email Address"
+    HideCondition findMode=False
+      Calculation:
+        | Position ( Picker::Results ; VIRTUALLISTS_Rows::Email.ContactMethodId ; 1 ; 1 ) = 0
+        refs: fn:Position, Picker::Results#2, VIRTUALLISTS_Rows::Email.ContactMethodId#30
+  Object type=SlideControl key=272 LabelKey=0 flags=1342177284 bounds=130,340,160,490
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( VIRTUALLISTS_Rows::Email.ContactMethodId ) or 
+        | 
+        | Position ( Picker::Results ; VIRTUALLISTS_Rows::Email.ContactMethodId ; 1 ; 1 )
+        refs: fn:IsEmpty, VIRTUALLISTS_Rows::Email.ContactMethodId#30, fn:or, fn:Position, Picker::Results#2
+    SlideControlObj visPanelKey=275 visPanelIndex=0 dotSize=9 slideFlagSet=3
+      Object type=SlidePanel key=275 LabelKey=0 name=AddRecipientButtons flags=1342177280 bounds=130,340,160,490
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=265 LabelKey=0 flags=268500992 bounds=135,340,155,390
+            Text flags=2 style=Link: To
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText
+                  | Perform Script [ “Select EmailAddress”; Parameter: JSONSetElement ( VIRTUALLISTS_Rows::Email.Result ; 
+                  | 	[ "ActivityPartyRoleId" ; 55 ; JSONNumber ] ; 
+                  | 	[ "ActivityPartyRoleName" ; "To" ; JSONString ] 
+                  | ) ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | JSONSetElement ( VIRTUALLISTS_Rows::Email.Result ; 
+                  | 	[ "ActivityPartyRoleId" ; 55 ; JSONNumber ] ; 
+                  | 	[ "ActivityPartyRoleName" ; "To" ; JSONString ] 
+                  | )
+                  refs: fn:JSONSetElement, VIRTUALLISTS_Rows::Email.Result#29, fn:JSONNumber, fn:JSONString
+                Script id=211 name="Select EmailAddress"
+          Object type=Button key=266 LabelKey=0 flags=268500992 bounds=135,390,155,440
+            Text flags=2 style=Link: Cc
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText
+                  | Perform Script [ “Select EmailAddress”; Parameter: JSONSetElement ( VIRTUALLISTS_Rows::Email.Result ; 
+                  | 	[ "ActivityPartyRoleId" ; 56 ; JSONNumber ] ; 
+                  | 	[ "ActivityPartyRoleName" ; "Cc" ; JSONString ] 
+                  | ) ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | JSONSetElement ( VIRTUALLISTS_Rows::Email.Result ; 
+                  | 	[ "ActivityPartyRoleId" ; 56 ; JSONNumber ] ; 
+                  | 	[ "ActivityPartyRoleName" ; "Cc" ; JSONString ] 
+                  | )
+                  refs: fn:JSONSetElement, VIRTUALLISTS_Rows::Email.Result#29, fn:JSONNumber, fn:JSONString
+                Script id=211 name="Select EmailAddress"
+          Object type=Button key=267 LabelKey=0 flags=268500992 bounds=135,440,155,490
+            Text flags=2 style=Link: Bcc
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText
+                  | Perform Script [ “Select EmailAddress”; Parameter: JSONSetElement ( VIRTUALLISTS_Rows::Email.Result ; 
+                  | 	[ "ActivityPartyRoleId" ; 57 ; JSONNumber ] ; 
+                  | 	[ "ActivityPartyRoleName" ; "Bcc" ; JSONString ] 
+                  | ) ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | JSONSetElement ( VIRTUALLISTS_Rows::Email.Result ; 
+                  | 	[ "ActivityPartyRoleId" ; 57 ; JSONNumber ] ; 
+                  | 	[ "ActivityPartyRoleName" ; "Bcc" ; JSONString ] 
+                  | )
+                  refs: fn:JSONSetElement, VIRTUALLISTS_Rows::Email.Result#29, fn:JSONNumber, fn:JSONString
+                Script id=211 name="Select EmailAddress"
+  Object type=GroupButton key=303 LabelKey=0 name="Alert to add email address" flags=4 bounds=130,620,146,770
+    GroupButtonObj numOfObjs=2
+      Object type=PopoverButton key=280 LabelKey=0 flags=4 bounds=130,730,146,770
+        Text flags=2 style=Link: add…
+        PopoverButtonObj buttonFlags=0 key=281 iconSize=12 displayType=0
+          Object type=Popover key=281 LabelKey=0 style="Simple Popover" bounds=47,781,230,1120
+            TitleCalc
+              Calculation:
+                | "Popover"
+            PopoverObj flags=2 position=0 key=280
+              Object type=Field key=287 LabelKey=288 bounds=93,808,114,1061
+                FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+                  Field: Picker::Email.NewEmailAddress#37
+              Object type=Text key=288 LabelKey=0 bounds=72,808,92,967
+                Text flags=2: "Email Address"
+              Object type=Field key=289 LabelKey=290 bounds=146,808,167,1061
+                FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=1(drop-down-list) tableViewVisibility=0 quickFind=0 pictFormat=5
+                  Field: Picker::Email.NewEmailLabel#38
+                  ValueList: NetworkAddressLabels#2
+              Object type=Text key=290 LabelKey=0 bounds=125,808,145,951
+                Text flags=2: Label
+              Object type=Button key=291 LabelKey=0 flags=65536 bounds=177,911,207,1011
+                Text flags=2 style=GreenButton: Save
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Add New Email Address” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Script id=246 name="Add New Email Address"
+        HideCondition findMode=False
+          Calculation:
+            | not IsEmpty ( VIRTUALLISTS_Rows::Email.ContactMethodId )
+            refs: fn:not, fn:IsEmpty, VIRTUALLISTS_Rows::Email.ContactMethodId#30
+      Object type=Button key=302 LabelKey=0 bounds=130,620,146,730
+        Text flags=2 style="Portal Delete Icon": "No email address"
+        ButtonObj buttonFlags=0 iconSize=12 displayType=4
+          Image name=a141_alert.svg
+    HideCondition findMode=False
+      Calculation:
+        | not IsEmpty ( VIRTUALLISTS_Rows::Email.ContactMethodId )
+        refs: fn:not, fn:IsEmpty, VIRTUALLISTS_Rows::Email.ContactMethodId#30
+  Object type=Line key=304 LabelKey=0 flags=1073745920 bounds=159,60,159,490

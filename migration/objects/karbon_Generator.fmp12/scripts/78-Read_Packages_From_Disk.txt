@@ -1,0 +1,136 @@
+# script 78: Read Packages From Disk
+# file: karbon_Generator.fmp12
+# folder: App Modules / Generators / Private
+# source: ScriptCatalog/Script[@id=78]
+# steps: 36 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=127 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $generatorPackages; Value:<Function Missing> ( GetGeneratorFolder ; <Function Missing> ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:GetGeneratorFolder
+        Repetition
+          Calculation:
+            | 1
+        Name: $generatorPackages
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ IsEmpty ( $generatorPackages ) or $generatorPackages = "?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:or
+   8    Show All Records
+        DisableStepCollapsed state=False
+   9    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  10    Exit Script [  ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “Create Temporary Utility Window” ]
+        DisableStepCollapsed state=False
+        Script id=56 name="Create Temporary Utility Window"
+  14    Go to Layout [ “Generators” (Generators) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=36 name=Generators
+  15    Set Variable [ $ms; Value:Get(CurrentTimeUTCMilliseconds) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:CurrentTimeUTCMilliseconds
+        Repetition
+          Calculation:
+            | 1
+        Name: $ms
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  18    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $gen; Value:GetValue ( $generatorPackages ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $gen
+  20    Exit Loop If [ IsEmpty( $gen ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Perform Script [ “Find Record and Read Package from Disk ( generator )”; Parameter: $gen ]
+        DisableStepCollapsed state=False
+        Script id=79 name="Find Record and Read Package from Disk ( generator )"
+  23    Set Field [ Generators::lastReadMS; $ms ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=7 name=lastReadMS
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  26    End Loop
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Show All Records
+        DisableStepCollapsed state=False
+  29    Perform Find [ Specified Find Requests: Omit Records; Criteria: Generators::lastReadMS: “$ms” ]
+        [ Restore ]
+        DisableStepCollapsed state=False
+        Restore state=True
+        Query
+          RequestRow operation=Exclude
+            Criteria
+              Field table=Generators id=7 name=lastReadMS
+              Text: $ms
+  30    If [ Get(LastError) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  31    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Perform Script [ “Close Temporary Utility Window” ]
+        DisableStepCollapsed state=False
+        Script id=57 name="Close Temporary Utility Window"
+  36    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout

@@ -1,0 +1,250 @@
+# script 266: Open Phone Picker ( data )
+# file: Picker Module.fmp12
+# folder: Modules / Phone Picker
+# source: ScriptCatalog/Script[@id=266]
+# steps: 61 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=265 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2019-05-02 dave@geistinteractive.com - supporting startWith param; pass in a list of JSON objects to show in the picker
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2019-04-02 barbara@geistinteractive.com - created.
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #init
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $defaultSettings; Value:JSONFormatElements ( JSONSetElement ( "{}" ; 
+        	[ "placeholderText" ; "Search..." ; JSONString ] ; 
+        	[ "footerMessage" ; "" ; JSONString ] ; 
+        	[ "cardTop" ; "" ; JSONNull ] ; 
+        	[ "cardLeft" ; "" ; JSONNull ] ; 
+        	[ "windowTop" ; "" ; JSONNull ] ; 
+        	[ "windowLeft" ; "" ; JSONNull ] 
+        ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONString, fn:JSONNull
+        Repetition
+          Calculation:
+            | 1
+        Name: $defaultSettings
+  10    If [ IsEmpty ( $parameters ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  11    Set Field [ Picker::Settings; "{}" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=4 name=Settings
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Field [ Picker::Settings; JSON.Merge ( $defaultSettings ; $parameters ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.Merge
+        Field table=Picker id=4 name=Settings
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $cardTop; Value:JSONGetElement ( Picker::Settings ; "cardTop" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $cardTop
+  17    Set Variable [ $cardLeft; Value:JSONGetElement ( Picker::Settings ; "cardLeft" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $cardLeft
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $windowName; Value:JSONGetElement ( Picker::Settings ; "windowName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowName
+  20    Set Variable [ $windowTop; Value:JSONGetElement ( Picker::Settings ; "windowTop" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowTop
+  21    Set Variable [ $windowLeft; Value:JSONGetElement ( Picker::Settings ; "windowLeft" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowLeft
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $startWith; Value:JSONGetElement ( $parameters ; "startWith" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $startWith
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #So our virtual lists displays the correct content when the picker opens
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    If [ not IsEmpty ( $startWith ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  28    Set Field [ Picker::Phone.Found; $startWith ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=39 name=Phone.Found
+  29    End If
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #Clear search and result fields
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Field [ Picker::Search_Field; "" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+  34    Set Field [ Picker::Results; "" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=2 name=Results
+  35    Set Field [ VIRTUALLISTS::foundCount; 0 ]
+        DisableStepCollapsed state=False
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #Init variables
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $$FirstFindHasBeenPerformed; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$FirstFindHasBeenPerformed
+  39    Set Variable [ $$PickerSearchStatus; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$PickerSearchStatus
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #Setup picker window
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    New Window [ Style: Card; Name: $windowName; Using layout: “Phone Picker” (VIRTUALLISTS_Rows); Height: 570; Width: 440; Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Layout id=49 name="Phone Picker"
+  44    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  45    New Window [ Style: Dialog; Name: $windowName; Using layout: “Phone Picker” (VIRTUALLISTS_Rows); Height: 80; Width: 400; Top: $windowTop; Left: $windowLeft; Close: Yes; Minimize: No; Maximize: No; Resize: Yes; Menu Bar: No; Dim parent window: No; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Dialog Close=Yes Minimize=No Maximize=No Resize=Yes Styles=3221291524
+        Layout id=49 name="Phone Picker"
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Install Menu Set [ “Default Menu Set” ]
+        UseAsFileDefault state=False
+        DisableStepCollapsed state=False
+        CustomMenuSet id=2 name="Default Menu Set"
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #OPTIONAL: start with all records
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    If [ IsEmpty ( $startWith ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  52    Show All Records
+        DisableStepCollapsed state=False
+  53    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Perform Script [ “_Display Results in Virtual List”; Parameter: $startWith ]
+        DisableStepCollapsed state=False
+        Script id=268 name="_Display Results in Virtual List"
+  55    End If
+        DisableStepCollapsed state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Go to Object [ Object Name: "searchField"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,22 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/670-btn_Create_Task_From_Opportunity.txt,a90b26bb3a3d298992984f7256cdc81aa9269365cbcfdeaa0cb64f4fc66bdcb0,scripts,karbon_kontacts.fmp12,670,btn: Create Task From Opportunity,data-change,server-domain,tier2,"Button on Opportunity Detail: asks karbon_kontroller to create a Task linked to the opportunity (entity type 13) for the current user, then opens the new activity showing the opportunity's related contacts, salesperson and referring party. Shows an error dialog on failure.","Opportunity::Id#1
+session::CurrentUserPartyId#63
+Opportunity_Party_PartyRelation::PartyIdTo#6
+Opportunity::SalespersonId#56
+Opportunity::ReferringPartyId#65",none,"karbon_kontroller.fmp12/scripts/391 (step 4)
+karbon_kontacts.fmp12/scripts/291 (step 16)",karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt,none,"The Task row is created by karbon_kontroller script 391, outside this share. EntityTypeId 13 is a hard-coded entity type code."
+karbon_kontacts.fmp12/scripts/758-btn_Mark_Task_Complete.txt,a939d51580ee3aee34ad1977eaa9f5a417abab8d32bcef489ee7770109e77658,scripts,karbon_kontacts.fmp12,758,btn: Mark Task Complete,data-change,server-domain,tier2,"Button on Task Detail: commits the record, then asks karbon_kontroller to mark the task complete for the current user. Shows an error dialog on failure.","Task::Id#1
+session::CurrentUserPartyId#63",none,karbon_kontroller.fmp12/scripts/690 (step 4),karbon_kontacts.fmp12/layouts/91-Task_Detail.txt,none,The completion write is in karbon_kontroller script 690.
+karbon_kontacts.fmp12/scripts/759-btn_Mark_Task_Incomplete.txt,e91ee32a7290ae04cf983246d9e5bf4807ad4ffdfdca887bf9de504a8271b705,scripts,karbon_kontacts.fmp12,759,btn: Mark Task Incomplete,data-change,server-domain,tier2,"Button on Task Detail: commits the record, points the selector at the task and role 51 to find the matching ActivityParty, then asks karbon_kontroller to mark the task incomplete. Shows an error dialog on failure.","Task::Id#1
+Selected_ActivityParty#matchByRole::Id#23","selector::ParentId#19 (step 3, current record)
+selector::ActivityPartyRoleId#29 (step 4, current record)",karbon_kontroller.fmp12/scripts/691 (step 7),karbon_kontacts.fmp12/layouts/91-Task_Detail.txt,none,Role id 51 is a hard-coded code (presumably the completed-by or assignee role). The incomplete write is in karbon_kontroller script 691.
+karbon_kontacts.fmp12/scripts/760-btn_Create_Task_From_User_Home.txt,6c10d75f2847ce09299575c6e1226f9caac59a68954bb4314a752f6e628caa19,scripts,karbon_kontacts.fmp12,760,btn: Create Task From User Home,data-change,server-domain,tier2,"Button on User Home: asks karbon_kontroller to create a Task assigned from and to the current user, then opens the new activity. Shows an error dialog on failure.",session::CurrentUserPartyId#63,none,"karbon_kontroller.fmp12/scripts/391 (step 4)
+karbon_kontacts.fmp12/scripts/291 (step 14)",karbon_kontacts.fmp12/layouts/101-User_Home.txt,none,none
+karbon_kontacts.fmp12/scripts/772-btn_Create_Task_From_Party.txt,b7db0a21013edb4f2069b4ca63095ff80f7df0512d6f1e85a018ee57a195ca71,scripts,karbon_kontacts.fmp12,772,btn: Create Task From Party,data-change,server-domain,tier2,"Button on Party/Customer detail: asks karbon_kontroller to create a Task linked to the party (entity type 10) for the current user, then opens the new activity with the person, related persons and activity parties as display parties.","Party::Id#1
+session::CurrentUserPartyId#63
+Person::Id#1
+Party_PartyRelation_Party_Person::Id#1
+Party_ActivityParty::PartyIdList#59",none,"karbon_kontroller.fmp12/scripts/391 (step 4)
+karbon_kontacts.fmp12/scripts/291 (step 17)","karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt
+karbon_kontacts.fmp12/layouts/50-Party_Detail.txt",none,EntityTypeId 10 is a hard-coded entity type code for party.

@@ -1,0 +1,109 @@
+# script 388: Search for Duplicate Organizations
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Create Party / Party Wizard
+# source: ScriptCatalog/Script[@id=388]
+# steps: 28 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=396 groupCollapsed=False includeInMenu=True
+
+   1    Perform Script [ “Validate Related Organization” ]
+        DisableStepCollapsed state=False
+        Script id=657 name="Validate Related Organization"
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Field [ UtilityParty::SkipOrganizationInd; 0 ]
+        DisableStepCollapsed state=False
+        Field table=UtilityParty id=22 name=SkipOrganizationInd
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Search Option: Set to True if you want the search to match on the full words in the name. They default is to shorten the names to produce more matches.
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $FullWordSearch; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FullWordSearch
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #Search Option: If you want to search just the left 3 digits of each word, set this to 3.
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $NumberOfDigitsPerWord; Value:12 ]
+        DisableStepCollapsed state=False
+        Name: $NumberOfDigitsPerWord
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #Run Search
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Perform Script [ “Get Party { data }” from file: “karbon_kontroller”; Parameter: JSONSetElement ( "{}" ; 
+        [ "Name" ; UtilityParty::OrganizationName ; JSONString ];
+        [ "SearchPerWord" ; $SearchPerWord ; JSONBoolean ];
+        [ "NumberOfDigitsPerWord" ; $NumberOfDigitsPerWord ; JSONString ];
+        [ "OrganizationInd" ; True; JSONBoolean ]
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: fn:JSONSetElement, UtilityParty::OrganizationName#4, fn:JSONString, fn:JSONBoolean, fn:True
+        Script id=186 name="Get Party { data }" in=karbon_kontroller.fmp12
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $PartyList; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyList
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    If [ Error.IsError ( $PartyList ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  17    #None found, go to Org Info card
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “No Org Matches” ]
+        DisableStepCollapsed state=False
+        Script id=399 name="No Org Matches"
+  19    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #Found match(es); review potential duplicates
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ selector::PartyListId; JSONGetElement ( $PartyList ; "IdList" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=selector id=21 name=PartyListId
+  22    Set Layout Object Animation [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  23    Go to Object [ Object Name: "Duplicate Organizations Found"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False

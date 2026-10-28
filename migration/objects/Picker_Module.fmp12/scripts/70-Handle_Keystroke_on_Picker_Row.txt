@@ -1,0 +1,231 @@
+# script 70: Handle Keystroke on Picker Row
+# file: Picker Module.fmp12
+# folder: Modules / Contact Picker (Contacts Sample File) / Public / Triggers
+# source: ScriptCatalog/Script[@id=70]
+# steps: 51 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=17 groupCollapsed=True includeInMenu=False
+
+   1    #@history 2018-10-24 dave@geistinteractive.com - When multiple selection is enabled, the expectation is that the enter/return key will be equivalent to the "add x contacts" button. If we are in single-selection mode, treat it the same as the space bar.
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ /* FilterValues is great to see if an item exists in a list */
+        
+        not IsEmpty( FilterValues (
+        
+        	List( 
+        		9 /* tab */ 
+        	;	29 /* up arrow */
+        	;	31 /* down arrow */
+        	
+        	)
+        
+        ; 
+        
+        	Code( Get ( TriggerKeystroke ) )
+        
+        ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:FilterValues, fn:List, fn:Code, fn:Get, fn:TriggerKeystroke
+   6    #The user typed a navigation character; go forward or back as appropriate
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Go to Record/Request/Page [ Let( 
+        
+        $recNum = 
+        
+        Case( 
+        
+        	Get ( TriggerModifierKeys ) = 1 // shift key is pressed
+        	or Get ( TriggerModifierKeys ) = 3 // shift + caps lock is pressed
+        	or Code( Get ( TriggerKeystroke ) ) = 29  // up arrow
+        
+        ; 
+        
+        	Get( RecordNumber ) - 1 // go back
+        ;	Get( RecordNumber ) + 1 // otherwise go forward
+        
+        ) 
+        
+        ; 
+        
+        $recNum 
+        
+        ) ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+        refs: fn:Let, fn:Case, fn:Get, fn:TriggerModifierKeys, fn:or, fn:Code, fn:TriggerKeystroke, fn:RecordNumber
+   8    If [ Get( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+   9    If [ $recNum < 1 
+        
+        // only go to search field on shift+tab. Arrow keys should be bound to record nav.
+        and Code( Get ( TriggerKeystroke ) ) <> 29 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and, fn:Code, fn:Get, fn:TriggerKeystroke
+  10    #navigated past first record; go to search field
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Go to Field [ Picker::Search_Field ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+  12    Else If [ $recNum > Get ( FoundCount )
+        
+        // only go to new contact button on tab keypress. Arrow keys should be bound to record nav.
+        and Code( Get ( TriggerKeystroke ) ) <> 31 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount, fn:and, fn:Code, fn:TriggerKeystroke
+  13    #navigated past last record; go to execute button
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Go to Object [ Object Name: "executeButton"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  15    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  17    End If
+        DisableStepCollapsed state=False
+  18    End If
+        DisableStepCollapsed state=False
+  19    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Else If [ Code( Get ( TriggerKeystroke ) ) = 32 /* space bar */ ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:TriggerKeystroke
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Perform Script [ “Select Party” ]
+        DisableStepCollapsed state=False
+        Script id=71 name="Select Party"
+  24    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Else If [ Code( Get ( TriggerKeystroke ) ) = 10 /* enter */ 
+        or Code( Get ( TriggerKeystroke ) ) = 13 /* return */ ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:TriggerKeystroke, fn:or
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    If [ Picker::Settings_AllowMultipleSelectionsInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Picker::Settings_AllowMultipleSelectionsInd#6
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #Prompt user in case they accidentally hit the return key
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $SelectedContactCount; Value:JSONGetElement ( Picker::Results ; "Result.CountPicked" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Results#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $SelectedContactCount
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Show Custom Dialog [ Title: "Add Contact(s)"; Message: "OK to add the " & 
+        
+        Case( 
+        	// singular form
+        	$SelectedContactCount = 1 ; 
+        		"one selected contact?" ; 
+        	// spell out numbers from two through nine
+        	$SelectedContactCount > 1 and $SelectedContactCount < 10 ; 
+        		Choose ( $SelectedContactCount ; "" ; "" ; "two" ; "three" ; "four" ; "five" ; "six" ; "seven" ; "eight" ; "nine" ) & " selected contacts" ; 
+        	// 10 or more
+        		$SelectedContactCount & " selected contacts?"
+        ); Default Button: “Add”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:Case, fn:and, fn:Choose
+        Buttons
+          Button 1 CommitState=True: "Add"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  35    If [ Get ( LastMessageChoice ) = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  36    Perform Script [ “Close Picker” ]
+        DisableStepCollapsed state=False
+        Script id=94 name="Close Picker"
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #Don't allow enter/return to select/deselect party
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Perform Script [ “Select Party” ]
+        DisableStepCollapsed state=False
+        Script id=71 name="Select Party"
+  45    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    End If
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True

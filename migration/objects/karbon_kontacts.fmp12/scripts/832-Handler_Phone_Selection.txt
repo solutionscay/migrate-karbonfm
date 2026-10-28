@@ -1,0 +1,344 @@
+# script 832: Handler: Phone Selection
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Chat
+# source: ScriptCatalog/Script[@id=832]
+# steps: 85 (3 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=709 groupCollapsed=False includeInMenu=True
+
+   1    #get picker result
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Perform Script [ “Phone Handler Common Tests” ]
+        DisableStepCollapsed state=False
+        Script id=830 name="Phone Handler Common Tests"
+   3    Set Variable [ $results; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+   4    If [ Error.IsError ( $results ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   5    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $PickerResult; Value:$results ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $PickerResult
+   9    Set Variable [ $ContactId; Value:JSONGetElement ( $PickerResult ; "ContactId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ContactId
+  10    Set Variable [ $Phone; Value:JSONGetElement ( $PickerResult ; "Phone" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+  11 // Set Variable [ $Phone; Value:Filter ( $Phone ; "0123456789" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Filter
+        Name: $Phone
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13 // #keep this until I can cancel correctly
+        DisableStepCollapsed state=False
+        Restore state=False
+  14 // Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    If [ Get( ScriptResult ) = -1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:ScriptResult
+  17    #user canceled; exit
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  19    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ $Phone ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #a pick was made; destroy timer
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #format phone - call to format phone
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "PhoneNumber" ; $Phone ; JSONString ]  ;
+        	[ "CountryCode" ; $CountryCode ; JSONString ]  ;
+        	[ "Format" ; "E.164 standard format" ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $json
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Perform Script [ “Phone Lookup” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=533 name="Phone Lookup" in=karbon_kontroller.fmp12
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $Result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  33    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  34    Show Custom Dialog [ Title: "Error"; Message: "The phone number appears to be invalid."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  35    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  36    End If
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $Phone; Value:JSONGetElement ( $result ; "PhoneNumber" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #is there an Activity this phone
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Perform Script [ “Find Chat Activity by Phone ( PhoneNumber)” from file: “karbon_kontroller”; Parameter: $Phone ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=725 name="Find Chat Activity by Phone ( PhoneNumber)" in=karbon_kontroller.fmp12
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  47    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  48    Set Variable [ $error; Value:$result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  49    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  50    End If
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $ChatId; Value:JSONGetElement ( $result ; "ChatId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ChatId
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #if found
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    If [ not IsEmpty ( $ChatId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  56    Set Field [ selector::ActivityId; $ChatId ]
+        DisableStepCollapsed state=False
+        Field table=selector id=7 name=ActivityId
+  57    Go to Related Record [ From table: “Selected_Activity_Chat”; Using layout: <Current Layout> ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+        LayoutDestination value=CurrentLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065380 name=Selected_Activity_Chat
+  58    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #create new Chat Activity
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "PartyId" ; $ContactId ; JSONString ]  ;
+        	[ "Phone" ; $Phone ; JSONString ]  ;
+        	[ "FormatPhoneNumber" ; False ; JSONBoolean ]  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Perform Script [ “Create Chat Activity { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=726 name="Create Chat Activity { json }" in=karbon_kontroller.fmp12
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  68    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  69    Set Variable [ $error; Value:$result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  70    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  71    End If
+        DisableStepCollapsed state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Set Variable [ $ChatId; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ChatId
+  74    Set Field [ selector::ActivityId; $ChatId ]
+        DisableStepCollapsed state=False
+        Field table=selector id=7 name=ActivityId
+  75    Go to Related Record [ From table: “Selected_Activity_Chat”; Using layout: <Current Layout> ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+        LayoutDestination value=CurrentLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065380 name=Selected_Activity_Chat
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    End If
+        DisableStepCollapsed state=False
+  78    End If
+        DisableStepCollapsed state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Go to Object [ Object Name: "field.MessageInput"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,188 @@
+# script 265: Payment Line :: Field Map :: Set
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Transactions
+# source: ScriptCatalog/Script[@id=265]
+# steps: 52 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=246 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # This script is responsible for saving the data from QBO into a FileMaker Record
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # context QBO Layout, related to the target record
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} json the record just pulled from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  10    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  11    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $Amount; Value:JSONGetElement ( $json ; "Amount" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Amount
+  20    Set Variable [ $LinkedTxnType; Value:JSONGetElement ( $json ; "LinkedTxn[0].TxnType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $LinkedTxnType
+  21    Set Variable [ $LinkedId; Value:JSONGetElement ( $json ; "LinkedTxn[0].TxnId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $LinkedId
+  22    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ $LinkedTxnType= "Invoice" or $LinkedTxnType= "JournalEntry" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  31    Set Variable [ $LinkedId; Value:QBO.LookupFMId ( $LinkedTxnType ; $LinkedId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $LinkedId
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Field [ qbo_PaymentLine::amount; $amount ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PaymentLine id=4 name=amount
+  43    If [ $LinkedTxnType= "Invoice" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Field [ qbo_PaymentLine::id_Invoice; $LinkedId ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PaymentLine id=7 name=id_Invoice
+  45    Else If [ $LinkedTxnType= "JournalEntry" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Field [ qbo_PaymentLine::id_JournalEntry; $LinkedId ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PaymentLine id=8 name=id_JournalEntry
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False

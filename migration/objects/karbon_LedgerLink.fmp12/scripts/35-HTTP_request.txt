@@ -1,0 +1,1079 @@
+# script 35: _HTTP ( {request} )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / HTTP / Private
+# source: ScriptCatalog/Script[@id=35]
+# steps: 239 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=82 groupCollapsed=False includeInMenu=False
+
+   1    #############################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #PURPOSE:
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #	Performs an HTTP Request using the native Insert From Url Step
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #RETURNS:
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #	returns a JSON String with the response Data in it
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #	on error: "?"
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #VERSION:
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #	1.0.1 of this script
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #	08/26/2017
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #############################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  14    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $$REQUEST; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $$REQUEST
+  18    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #| PARSE PARAMETERS |
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $request; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  22    If [ IsEmpty ( $request ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  23    Exit Script [  ]
+        DisableStepCollapsed state=False
+  24    End If
+        DisableStepCollapsed state=False
+  25    Set Variable [ $url; Value:JSONGetElement($request; "url" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  26    Set Variable [ $data; Value:JSONGetElement($request; "data" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  27    Set Variable [ $query; Value:JSONGetElement($request; "query" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $query
+  28    Set Variable [ $headers; Value:JSONGetElement($request; "headers" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $headers
+  29    Set Variable [ $auth; Value:JSONGetElement( $request  ; "auth") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $auth
+  30    Set Variable [ $dataQuoted; Value:GetAsBoolean( JSONGetElement( $request  ; "dataQuoted") ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataQuoted
+  31    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #| HANDLE QUERY |
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ not IsEmpty ( $query ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  39    Set Variable [ $paramList; Value:JSONListKeys ( $query ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListKeys
+        Repetition
+          Calculation:
+            | 1
+        Name: $paramList
+  40    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  41    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $param; Value:GetValue ( $paramList ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  43    Exit Loop If [ IsEmpty( $param ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  44    Set Variable [ $queryStringList; Value:List(
+        $queryStringList;
+        $param & "=" & GetAsURLEncoded (JSONGetElement( $query ; $param ))
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:GetAsURLEncoded, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $queryStringList
+  45    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  46    End Loop
+        DisableStepCollapsed state=False
+  47    Set Variable [ $queryString; Value:Substitute($queryStringList ;  "¶"; "&" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $queryString
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    If [ not IsEmpty ( $queryString ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  50    Set Variable [ $url; Value:$url & "?" & $queryString ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  51    End If
+        DisableStepCollapsed state=False
+  52    End If
+        DisableStepCollapsed state=False
+  53    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #| MultiPart Form |
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $ContentType; Value:JSONGetElement($headers; "Content-Type" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ContentType
+  61    If [ $ContentType = "multipart/form-data" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  62 // Set Variable [ $headers; Value:JSONDeleteElement ( $headers ; "ContentType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $headers
+  63    Set Variable [ $MultiPartFormData; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $MultiPartFormData
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Set Variable [ $parts; Value:JSONListValues ($Data ; "parts") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListValues
+        Repetition
+          Calculation:
+            | 1
+        Name: $parts
+  66    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  67    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    Set Variable [ $part; Value:GetValue ( $parts ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $part
+  69    Exit Loop If [ IsEmpty( $part ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Variable [ $partBody; Value:JSONGetElement ( $part; "body" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partBody
+  72    Set Variable [ $type; Value:JSONGetElement ( $part ; "ContentType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $type
+  73    If [ $type="application/json" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Set Variable [ $partBody; Value:Let(
+        [
+        s = Quote($partBody);
+        l = Length ( s )
+        ];
+        
+        Middle(s;2;l-2)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Quote, fn:Length, fn:Middle
+        Repetition
+          Calculation:
+            | 1
+        Name: $partBody
+  75    Set Variable [ $partsString; Value:List(
+        $partsString;
+        "-F \"" & JSONGetElement ( $part; "name" ) & "=" & $partBody & ";" & "type=application/json\""
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partsString
+  76    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Set Variable [ $filename; Value:JSONGetElement ( $part ; "filename" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $filename
+  78    Set Variable [ $File[$n]; Value:Base64Decode ( $partBody ; $filename ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Base64Decode
+        Name: $File
+  79    Set Variable [ $partBody; Value:"@$File[" & $n & "]" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $partBody
+  80    Set Variable [ $partsString; Value:List(
+        $partsString;
+        "-F \"" & JSONGetElement ( $part; "name" ) & "=" & $partBody & ";" & "type="& $type & ";filename="& $fileName & "\""
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partsString
+  81    End If
+        DisableStepCollapsed state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  84    End Loop
+        DisableStepCollapsed state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Set Variable [ $partsString; Value:Substitute($partsString ;  "¶"; " " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $partsString
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    End If
+        DisableStepCollapsed state=False
+  89    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #| HANDLE DATA |
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #some API need ordered properties, since most JSON parsers
+            can't guarentee that, we need to treat it as string
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    If [ not $MultiPartFormData ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  97    If [ not IsEmpty ( $Data ) and $dataQuoted ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:and
+  98    Set Variable [ $data; Value:Evaluate($data) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Evaluate
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  99    End If
+        DisableStepCollapsed state=False
+ 100    If [ not IsEmpty ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+ 101    Set Variable [ $dataString; Value:Char(45) & Char(45) & "data-raw " & Quote($data) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Char, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataString
+ 102    End If
+        DisableStepCollapsed state=False
+ 103    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    Set Variable [ $dataString; Value:$partsString ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataString
+ 105    End If
+        DisableStepCollapsed state=False
+ 106    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    #| HANDLE HEADER |
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    #fixed #20
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    Set Variable [ $headerList; Value:JSONListKeys ( $headers ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListKeys
+        Repetition
+          Calculation:
+            | 1
+        Name: $headerList
+ 115    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+ 116    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    Set Variable [ $header; Value:GetValue ( $headerList ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $header
+ 118    Exit Loop If [ IsEmpty( $header ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+ 119    Set Variable [ $headerString; Value:List(
+        $headerString;
+        "-H \"" & $header & ": "  & JSONGetElement( $headers ; $header ) & "\""
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $headerString
+ 120    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+ 121    End Loop
+        DisableStepCollapsed state=False
+ 122    Set Variable [ $headerString; Value:Substitute($headerString ;  "¶"; " " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $headerString
+ 123    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 128    #| HANDLE AUTHENTICATION |
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 130    If [ not IsEmpty ( $auth ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+ 131    Set Variable [ $userName; Value:GetAsURLEncoded ( JSONGetElement( $auth ; "user") ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsURLEncoded, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $userName
+ 132    Set Variable [ $userName; Value:JSONGetElement( $auth ; "user") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $userName
+ 133    Set Variable [ $password; Value:JSONGetElement( $auth ; "password") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $password
+ 134    Set Variable [ $authString; Value:"-u " &  $userName & ":" & $password ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $authString
+ 135    End If
+        DisableStepCollapsed state=False
+ 136    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 138    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 139    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 140    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 141    #| HANDLE METHOD |
+        DisableStepCollapsed state=False
+        Restore state=False
+ 142    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 143    Set Variable [ $method; Value:JSONGetElement( Get (ScriptParameter) ; "method" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $method
+ 144    If [ IsEmpty ( $method ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+ 145    Set Variable [ $method; Value:"GET" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $method
+ 146    End If
+        DisableStepCollapsed state=False
+ 147    Set Variable [ $methodString; Value:"-X " & $method ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $methodString
+ 148    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 149    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 150    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 151    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 152    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 153    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 154    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 155    #| cURL OPTIONS |
+        DisableStepCollapsed state=False
+        Restore state=False
+ 156    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 157    # Do Not Use show Error --show-error
+        DisableStepCollapsed state=False
+        Restore state=False
+ 158    Set Variable [ $FMOptions; Value:"-D $ResponseHeaders" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMOptions
+ 159    Set Variable [ $curlOptions; Value:$methodString & " " & 
+        $headerString & " " & 
+        $authString & " " & 
+        $dataString & " " & 
+        $FMOptions ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $curlOptions
+ 160    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 161    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 162    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 163    #fixed #22
+        DisableStepCollapsed state=False
+        Restore state=False
+ 164    Insert from URL [ $responseBody; $url; cURL options: $curlOptions ]
+        [ Select; No dialog ]
+        NoInteract state=True
+        DontEncodeURL state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        VerifySSLCertificates state=False
+        Field: $responseBody
+ 165    Set Variable [ $error; Value:Get (LastError) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LastError
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 166    Set Variable [ $responseLine1; Value:GetValue($responseHeaders; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $responseLine1
+ 167    Set Variable [ $status; Value:Let(
+        [
+        line = $responseLine1;
+        split = Substitute ( line; " " ; "¶" );
+        code = GetAsNumber (GetValue ( split; 2) )
+        
+        ];
+        
+        JSONSetElement ( "" ;
+        
+        	["message"; line; JSONString ];
+        	["code"; code; JSONNumber ]
+        
+         )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Substitute, fn:GetAsNumber, fn:GetValue, fn:JSONSetElement, fn:JSONString, fn:JSONNumber
+        Name: $status
+ 168    If [ $error = 1631 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 169    If [ JSONGetElement( $status ; "code"  ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+ 170    Set Variable [ $responseJSON; Value:JSONSetElement( $responseJSON ; 
+        
+        	["code" ;  0;JSONNumber];
+        	["status" ; "Insert From URL Failed with error: " & $error & ". " & Get(LastErrorDetail)     ; JSONString]
+        
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:Get, fn:LastErrorDetail, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseJSON
+ 171    Exit Script [ Result: $responseJSON ]
+        DisableStepCollapsed state=False
+ 172    End If
+        DisableStepCollapsed state=False
+ 173    End If
+        DisableStepCollapsed state=False
+ 174    Set Variable [ $$lastCurlOptions; Value:$curlOptions ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$lastCurlOptions
+ 175    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 176    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 177    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 178    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 179    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 180    #| HANDLE RESPONSE HEADERS |
+        DisableStepCollapsed state=False
+        Restore state=False
+ 181    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 182    Set Variable [ $isOK; Value:GetAsBoolean ( RightWords ( $ResponseLine1 ; 1 ) = "OK" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:RightWords
+        Name: $isOK
+ 183    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 184    Set Variable [ $h; Value:2 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $h
+ 185    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 186    Set Variable [ $headerLine; Value:GetValue($ResponseHeaders ; $h ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $headerLine
+ 187    Exit Loop If [ IsEmpty ($headerLine ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+ 188    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 189    Set Variable [ $split; Value:Let(
+        [
+        headerLine = $headerLine;
+        p = Position( headerLine ; ":" ; 1; 1 );
+        $name = Left(headerLine ; p-1 );
+        value = Middle ( headerLine; p + 1; 10000 );
+        $value = Trim(value)
+        
+        ];
+        
+        value
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Position, fn:Left, fn:Middle, fn:Trim
+        Name: $split
+ 190    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 191    Set Variable [ $jsonType; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $jsonType
+ 192    Set Variable [ $responseHeadersJSON; Value:JSONSetElement ( $responseHeadersJSON ; $name ; $value ; $jsonType ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseHeadersJSON
+ 193    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 194    Set Variable [ $h; Value:$h + 1 ]
+        DisableStepCollapsed state=False
+        Name: $h
+ 195    End Loop
+        DisableStepCollapsed state=False
+ 196    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 197    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 198    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 199    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 200    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 201    #| HANDLE RESPONSE BODY |
+        DisableStepCollapsed state=False
+        Restore state=False
+ 202    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 203    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 204    If [ JSONGetElement( $status ; "code"  ) = 100 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+ 205    # specfic fix for what I think is an intui QBO API bug
+        DisableStepCollapsed state=False
+        Restore state=False
+ 206    Set Variable [ $contentType; Value:"application/json" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $contentType
+ 207    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 208    Set Variable [ $contentType; Value:Let(
+        [
+        contentType = JSONGetElement( $responseHeadersJSON ; "Content-Type");
+        contentType = If( IsEmpty( contentType ) ; JSONGetElement( $responseHeadersJSON ; "content-type"); contentType);
+        contentType = If( IsEmpty( contentType ) ; JSONGetElement( $responseHeadersJSON ; "content-Type"); contentType);
+        contentType = If( IsEmpty( contentType ) ; JSONGetElement( $responseHeadersJSON ; "Content-type"); contentType)
+        
+        ];
+        
+        contentType
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:JSONGetElement, fn:If, fn:IsEmpty
+        Repetition
+          Calculation:
+            | 1
+        Name: $contentType
+ 209    Set Variable [ $contentType; Value:GetValue(
+        
+        Substitute(
+           $contentType ; ";" ; "¶"
+        );
+        
+        1
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue, fn:Substitute
+        Name: $contentType
+ 210    End If
+        DisableStepCollapsed state=False
+ 211    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 212    Set Variable [ $responseBodyType; Value:JSONString ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseBodyType
+ 213    If [ $contentType = "application/json" or $contentType = "text/javascript" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+ 214    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 215    If [ Left($responseBody; 1) & Right($responseBody; 1) = "{}" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left, fn:Right
+ 216    Set Variable [ $responseBodyType; Value:JSONObject ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseBodyType
+ 217    Else If [ Left($responseBody; 1) & Right($responseBody; 1) = "[]" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left, fn:Right
+ 218    Set Variable [ $responseBodyType; Value:JSONArray ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseBodyType
+ 219    End If
+        DisableStepCollapsed state=False
+ 220    End If
+        DisableStepCollapsed state=False
+ 221    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 222    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 223    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 224    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 225    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 226    #| PACKAGE RESPONSE |
+        DisableStepCollapsed state=False
+        Restore state=False
+ 227    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 228    Set Variable [ $responseJSON; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseJSON
+ 229    Set Variable [ $responseJSON; Value:JSONSetElement( $responseJSON ; "status" ; JSONGetElement($status; "message"); "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseJSON
+ 230    Set Variable [ $responseJSON; Value:JSONSetElement( $responseJSON ; "code" ; JSONGetElement($status; "code"); JSONNumber ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONGetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseJSON
+ 231    Set Variable [ $responseJSON; Value:JSONSetElement( $responseJSON ; "headers" ; $responseHeadersJSON; JSONObject) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseJSON
+ 232    Set Variable [ $responseJSON; Value:JSONSetElement( $responseJSON ; "body" ; $responseBody ; $responseBodyType ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseJSON
+ 233    #--------------------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 234    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 235    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 236    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 237    Exit Script [ Result: $responseJSON ]
+        DisableStepCollapsed state=False
+ 238    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 239    #
+        DisableStepCollapsed state=False
+        Restore state=False

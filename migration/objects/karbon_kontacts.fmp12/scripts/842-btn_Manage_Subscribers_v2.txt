@@ -1,0 +1,87 @@
+# script 842: btn: Manage Subscribers v2
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / Subscriber Picker
+# source: ScriptCatalog/Script[@id=842]
+# steps: 17 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=716 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #employee data for picker
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $employeeData; Value:JSON.ArrayFromRelated ( Selected_PartyRole#currentEmployee::AsJSONforEmployeeSearch ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayFromRelated, Selected_PartyRole#currentEmployee::AsJSONforEmployeeSearch#52
+        Repetition
+          Calculation:
+            | 1
+        Name: $employeeData
+   4    Set Variable [ $everyoneElseData; Value:UtilityDiscussion::DisplayPartys ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityDiscussion::DisplayPartys#22
+        Repetition
+          Calculation:
+            | 1
+        Name: $everyoneElseData
+   5    Set Variable [ $defaultValues; Value:// preselect existing subscribers
+        
+        Substitute ( UtilityDiscussion::SubscriberPartyIds ; ¶ ; ", ") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, UtilityDiscussion::SubscriberPartyIds#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $defaultValues
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ Activity::EventInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Activity::EventInd#90
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #update display parties since user may have added people to the event
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Field [ UtilityDiscussion::DisplayPartyIds; List ( UtilityDiscussion::DisplayPartyIds ; Activity_ActivityParty::PartyIdList) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityDiscussion::DisplayPartyIds#21, Activity_ActivityParty::PartyIdList#59
+        Field table=UtilityDiscussion id=21 name=DisplayPartyIds
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “Open Manage Subscribers Card” ]
+        DisableStepCollapsed state=False
+        Script id=849 name="Open Manage Subscribers Card"
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Employee Search Bar”; Parameter: JSONSetElement ( $json ; 
+        
+        [ "employeeData" ; $employeeData ; JSONString ] ;
+        [ "defaultValues" ; $defaultValues ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Script id=841 name="Employee Search Bar"
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “Everyone Else Search Bar”; Parameter: JSONSetElement ( $json ; 
+        
+        [ "everyoneElseData" ; $everyoneElseData ; JSONString ] ;
+        [ "defaultValues" ; $defaultValues ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Script id=859 name="Everyone Else Search Bar"

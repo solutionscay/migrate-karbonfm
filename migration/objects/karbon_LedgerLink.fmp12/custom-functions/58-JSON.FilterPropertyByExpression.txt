@@ -1,0 +1,44 @@
+# custom function 58: JSON.FilterPropertyByExpression
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=58]
+
+CustomFunction id=58 functionArity=4 visible=True parameters=arrayOrObject;pathToArray;propertyToFilter;FMExpression name=JSON.FilterPropertyByExpression
+  Calculation:
+    | 
+    | 
+    | /* filter a give array at a given property by a given FileMaker Expression */
+    | 
+    | Let(
+    | [
+    | json = arrayOrObject;
+    | array = JSONGetElement ( json ; pathToArray ) 
+    | 
+    | ];
+    | 
+    | Case(
+    |     Left(array;1) & Right(array;1) <> "[]" ; 
+    | 
+    |        // error case
+    |        Let(
+    |        [
+    |        errorData = JSONSetElement(""; ["parameters.arrayOrObject"; arrayOrObject; ""]; ["parameters.pathToArray" ; pathToArray; ""]) ;
+    |        error =  JSON.Error.Invalid ( "Parsing array from object" ; errorData );
+    |        error = JSONSetElement( error ; "customFunction" ; "JSON.FilterPropertyByExpression" ; JSONString )
+    |        ];
+    |        error
+    |        )
+    | 
+    |   ;
+    | 
+    |     // return result
+    |        Let(
+    |        [
+    |        filter = "JSONGetElement ( $item ; \""& propertyToFilter &"\" ) " & FMExpression ;
+    |        filteredArray = JSON.FilterByExpression ( array; filter )
+    |        ];
+    |        JSONSetElement(json; pathToArray; filteredArray ; JSONArray )
+    |        )
+    |    )
+    | 
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:Case, fn:Left, fn:Right, fn:JSONSetElement, cf:JSON.Error.Invalid, fn:JSONString, cf:JSON.FilterByExpression, fn:JSONArray

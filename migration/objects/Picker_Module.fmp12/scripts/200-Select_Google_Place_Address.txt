@@ -1,0 +1,529 @@
+# script 200: Select Google Place Address
+# file: Picker Module.fmp12
+# folder: Modules / Address Autocomplete / API / Private
+# source: ScriptCatalog/Script[@id=200]
+# steps: 86 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=False includeInMenu=False
+
+   1    #@history 2018-10-11 dave@geistinteractive.com - some addresses use a postal city instead of its actual city (e.g., Woodland Hills instead of Los Angeles). If we don't get a match, try again with the Google Places neighborhood.
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-05-16 dave@geistinteractive.com - we can't really trust the Google Places address because it was entered by a person. We're feeding the address to SmartyStreets to get a validated address
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #The array index is one less than the record number
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $index; Value:Get ( RecordNumber ) - 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:RecordNumber
+        Name: $index
+   7    Set Variable [ $thisPlace; Value:JSONGetElement ( Picker::AddressSuggestions ; "predictions[" & $index & "]" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::AddressSuggestions#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPlace
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #Call address verification API
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $apiKey; Value:Picker::GooglePlaces_ApiKey ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Picker::GooglePlaces_ApiKey#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $apiKey
+  13    Set Variable [ $url; Value:"https://maps.googleapis.com/maps/api/place/details/json" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  14    Set Variable [ $placeId; Value:JSONGetElement ( $thisPlace ; "place_id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $placeId
+  15    Set Variable [ $requestJSON; Value:Let(
+        [
+          json="{}";
+          json = JSONSetElement( json ; "method" ; "GET"; JSONString );
+          json = JSONSetElement( json ; "query.placeid" ; $placeId ; JSONString );
+          json = JSONSetElement( json ; "query.key" ; $apiKey ; JSONString );
+          json = JSONSetElement( json ; "url" ; $url ; JSONString );
+          null=""
+        ];
+        
+        json
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “HTTP ( {request} )”; Parameter: $requestJSON ]
+        DisableStepCollapsed state=False
+        Script id=115 name="HTTP ( {request} )"
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $response; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  20    Set Variable [ $body; Value:JSONFormatElements ( JSONGetElement($response; "body") ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  21    Set Variable [ $thisAddress; Value:JSONGetElement ( $body ; "result.address_components" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisAddress
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #Get short name values from each address object
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $city; Value:JSONGetElement ( 
+        
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"locality\" " ) ; 
+        
+        	"[0]short_name" 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $city
+  25    Set Variable [ $county; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"administrative_area_level_2\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $county
+  26    Set Variable [ $country; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"country\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $country
+  27    Set Variable [ $floor; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"floor\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $floor
+  28    Set Variable [ $postal_code; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"postal_code\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $postal_code
+  29    Set Variable [ $postal_code_suffix; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"postal_code_suffix\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $postal_code_suffix
+  30    Set Variable [ $route; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"route\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $route
+  31    Set Variable [ $state; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"administrative_area_level_1\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Name: $state
+  32    Set Variable [ $street_number; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"street_number\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $street_number
+  33    Set Variable [ $subpremise; Value:JSONGetElement ( 
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"subpremise\" " ) ; 
+        	"[0]short_name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $subpremise
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #Extract place properties
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $name; Value:JSONGetElement ( $body ; "result.name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  37    Set Variable [ $website; Value:JSONGetElement ( $body ; "result.website" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $website
+  38    Set Variable [ $phone; Value:JSONGetElement ( $body ; "result.formatted_phone_number" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $phone
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #Transform address to one line
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $address_line_1; Value:List ( 
+        	$street_number ;
+        	$route ; 
+        	$subpremise ; 
+        	$floor
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Name: $address_line_1
+  42    Set Variable [ $address_line_1; Value:Substitute ( $address_line_1 ; ¶ ; " " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Name: $address_line_1
+  43    Set Variable [ $postal_code; Value:Substitute ( 
+        	List ( $postal_code ; $postal_code_suffix ) ; 
+        	¶ ; 
+        	"-" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $postal_code
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #Verify address with SmartyStreets
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #default request values
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $requestJSON; Value:Let(
+        [
+          json="{}";
+          json = JSONSetElement( json ; "method" ; "GET"; "" );
+          json = JSONSetElement( json ; "url" ; "https://us-street.api.smartystreets.com/street-address"; JSONString );
+          json = JSONSetElement( json ; "query.auth-id" ; Picker::SmartyStreets_AuthId ; JSONString );
+          json = JSONSetElement( json ; "query.auth-token" ; Picker::SmartyStreets_AuthToken ; JSONString );
+        
+          null=""
+        ];
+        
+        json
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:JSONSetElement, fn:JSONString, Picker::SmartyStreets_AuthId#17, Picker::SmartyStreets_AuthToken#18
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #address-specific request values
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $requestJSON; Value:JSONSetElement( $requestJSON ; "query.city" ; $city ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  53    Set Variable [ $requestJSON; Value:JSONSetElement( $requestJSON ; "query.street" ; $address_line_1 ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $requestJSON
+  54    Set Variable [ $requestJSON; Value:JSONSetElement( $requestJSON ; "query.state" ; $state ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Perform Script [ “HTTP ( {request} )”; Parameter: $requestJSON ]
+        DisableStepCollapsed state=False
+        Script id=115 name="HTTP ( {request} )"
+  57    Set Variable [ $response; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $body; Value:JSONFormatElements ( JSONGetElement($response; "body") ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  60    Set Variable [ $AddressCount; Value:JSON.ArrayLength ( $body ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Repetition
+          Calculation:
+            | 1
+        Name: $AddressCount
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    If [ $AddressCount = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #Try again with neighboorhood in case this address uses a postal city instead of its actual city
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $neighborhood; Value:JSONGetElement ( 
+        
+        	JSON.FilterByExpression ( $thisAddress ; "JSONGetElement ( $item ; \"types.[0]\" ) = \"neighborhood\" " ) ; 
+        
+        	"[0]short_name" 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $neighborhood
+  65    Set Variable [ $requestJSON; Value:JSONSetElement( $requestJSON ; "query.city" ; $neighborhood ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Perform Script [ “HTTP ( {request} )”; Parameter: $requestJSON ]
+        DisableStepCollapsed state=False
+        Script id=115 name="HTTP ( {request} )"
+  68    Set Variable [ $response; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Set Variable [ $body; Value:JSONFormatElements ( JSONGetElement($response; "body") ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  71    Set Variable [ $AddressCount; Value:JSON.ArrayLength ( $body ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Repetition
+          Calculation:
+            | 1
+        Name: $AddressCount
+  72    End If
+        DisableStepCollapsed state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #Convert Smarty Streets data into standard format
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Set Variable [ $addressOut; Value:JSONSetElement (  "{}" ; 
+         
+        	[ "AddressLine1" ; JSONGetElement ( $body ; "[0]delivery_line_1" ) ; JSONString ];
+        	[ "AddressLine2" ; JSONGetElement ( $body ; "[0]delivery_line_2" ) ; JSONString ];
+        	[ "Comment" ; "Address verified by SmartyStreets" ; JSONString ];
+        	[ "City" ; JSONGetElement ( $body ; "[0]components.city_name" ) ; JSONString ];
+        	[ "County" ; JSONGetElement ( $body ; "[0]metadata.county_name" ) ; JSONString ];
+        	[ "PostalCode" ; JSONGetElement ( $body ; "[0]components.zipcode" ) & "-" & JSONGetElement ( $body ; "[0]components.plus4_code" ) ; JSONString ];
+        	[ "StateProvince" ; JSONGetElement ( $body ; "[0]components.state_abbreviation" ) ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONGetElement, fn:JSONString
+        Name: $addressOut
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Set Variable [ $result; Value:JSONSetElement ( "{}" ; 
+        	[ "Result.AddressCount" ; $AddressCount ; JSONNumber ] ; 
+        	[ "Result.AddressArray[0]" ; $addressOut ; JSONObject ] ; 
+        	[ "Result.Phone" ; $phone ; JSONString ] ; 
+        	[ "Result.Name" ; $Name ; JSONString ] ; 
+        	[ "Result.Website" ; $website ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONObject, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #Return full address object
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Set Field [ Picker::Results; $result ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=2 name=Results
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

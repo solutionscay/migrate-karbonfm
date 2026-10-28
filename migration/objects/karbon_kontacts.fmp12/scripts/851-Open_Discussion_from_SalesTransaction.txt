@@ -1,0 +1,40 @@
+# script 851: Open Discussion from SalesTransaction
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion
+# source: ScriptCatalog/Script[@id=851]
+# steps: 3 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=305 groupCollapsed=True includeInMenu=False
+
+   1    Set Variable [ $title; Value:"Invoice No. " & SalesTransaction::docNumber ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::docNumber#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $title
+   2    Set Variable [ $params; Value:Let ([
+        
+        CustomerPartyId = SalesTransaction_Customer_PartyRole::PartyId  ; 
+        
+        
+        displayPartyIds = CustomerPartyId  
+        
+        ];
+        
+        
+        JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Invoice::Id ; JSONString ];
+        	[ "EntityTypeId" ; 12 ; JSONNumber ]; //SalesTransaction
+        	[ "Title" ; $title ; JSONString ] ;
+        	[ "DisplayPartyIds" ; displayPartyIds ; JSONString ]
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, SalesTransaction_Customer_PartyRole::PartyId#45, fn:JSONSetElement, Invoice::Id#9, fn:JSONString, fn:JSONNumber
+        Name: $params
+   3    Perform Script [ “Open Discussion in New Window { data } v2”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=313 name="Open Discussion in New Window { data } v2"

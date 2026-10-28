@@ -1,0 +1,300 @@
+# script 653: _wip_Find Parties By Phone  ( List( phones) )
+# file: karbon_kontroller.fmp12
+# folder: API / Party
+# source: ScriptCatalog/Script[@id=653]
+# steps: 77 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # find parties via phone
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {string} ListOfPhones
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @returnSuccess {array} Parties
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnError {object} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #--- [ SETUP ] ---------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  19    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #--- [ SETUP END ] -----------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $phones; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $phones
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #start the results package
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $result; Value:JSONSetElement( "{}" ; "count" ; 0 ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    If [ IsEmpty ( $phones ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  30    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Go to Layout [ “f_Phone” (f_Phone) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=31 name=f_Phone
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #create a find for all the phones in the list
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  39    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $phone; Value:GetValue ( $phones ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $phone
+  41    Set Variable [ $phone; Value:Filter ( $phone ;  "0123456789" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Filter
+        Name: $phone
+  42    Exit Loop If [ IsEmpty( $phone ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  43    If [ $n = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  45    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    New Record/Request
+        DisableStepCollapsed state=False
+  47    End If
+        DisableStepCollapsed state=False
+  48    Set Field [ f_Phone::NumberDigitsOnly; $phone ]
+        DisableStepCollapsed state=False
+        Field table=f_Phone id=35 name=NumberDigitsOnly
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  51    End Loop
+        DisableStepCollapsed state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=f_NetworkAddress id=7 name=Address
+              Text: $emailQuoted
+            Criteria
+              Field table=f_NetworkAddress id=18 name=EmailAddressInd
+              Text: 1
+  54    If [ Get(FoundCount) > 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Go to Layout [ “f_Phone” (f_Phone) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=31 name=f_Phone
+  57    Go to Related Record [ From table: “f_Party”; Using layout: “f_Party” (f_Party) ]
+        [ Show only related records; Match found set ]
+        Option state=False
+        MatchAllRecords state=True
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065162 name=f_Party
+        Layout id=19 name=f_Party
+  58    Set Variable [ $error; Value:Get (LastError) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LastError
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  59    If [ $error = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $partyList; Value:List ( 
+        	$partyList ; 
+        	f_Party::AsJsonListOf
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, f_Party::AsJsonListOf#139
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyList
+  61    Set Variable [ $count; Value:$count + Get ( FoundCount ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:FoundCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $count
+  62    End If
+        DisableStepCollapsed state=False
+  63    End If
+        DisableStepCollapsed state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    If [ Get(FoundCount) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  67    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  68    Exit Script [ Result:  $error ]
+        DisableStepCollapsed state=False
+  69    End If
+        DisableStepCollapsed state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Set Variable [ $partyArray; Value:JSON.ArrayFromRelated ( $partyList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayFromRelated
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyArray
+  73    Set Variable [ $result; Value:JSONSetElement ( "" ; 
+        
+        	["count" ; $count ; JSONNumber];
+        	["data" ; $partyArray ; JSONArray]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  77    Exit Script [ Result:  $result ]
+        DisableStepCollapsed state=False

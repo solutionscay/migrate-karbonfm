@@ -1,0 +1,110 @@
+# script 308: Save Card - UtilityDiscussion
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / DiscussionUtility
+# source: ScriptCatalog/Script[@id=308]
+# steps: 22 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=311 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Create Discussion v2” from file: “karbon_kontroller”; Parameter: UtilityDiscussion::AsJSON ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: UtilityDiscussion::AsJSON#11
+        Script id=421 name="Create Discussion v2" in=karbon_kontroller.fmp12
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  10    #Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Show Custom Dialog [ Title: "Error"; Message: "This Discussion was not created."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  12    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #Take the user to the Discussion
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $EntityId; Value:JSONGetElement ( $ScriptResult ; "EntityId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityId
+  15    Set Variable [ $EntityTypeId; Value:JSONGetElement ( $ScriptResult ; "EntityTypeId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityTypeId
+  16    Set Variable [ $Title; Value:JSONGetElement ( $ScriptResult ; "Title" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Title
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “Open Discussion in New Window { data } v2”; Parameter: JSONSetElement ( "{}" ; 
+        
+        [ "EntityId" ; $EntityId ; JSONString ] ;
+        [ "EntityTypeId" ; $EntityTypeId ; JSONString ] ;
+        [ "Title" ; $Title ; JSONString ] 
+         ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Script id=313 name="Open Discussion in New Window { data } v2"
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    End If
+        DisableStepCollapsed state=False

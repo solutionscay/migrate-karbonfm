@@ -1,0 +1,870 @@
+# script 492: Convert Karbon Payment into QBO Payment
+# file: karbon_kontroller.fmp12
+# folder: Modules / QuickBooks Online / Payments / Private
+# source: ScriptCatalog/Script[@id=492]
+# steps: 195 (6 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=566 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Converts a Karbon Payment to a QBO Payment
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {string} Id - Payment Id
+        DisableStepCollapsed state=False
+        Restore state=False
+   6 // # @param {string} params.Entity the target Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   7 // Insert Text [ $Id ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: BB64F32E-B336-46C6-8021-54B40354B523
+        Field: $Id
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returnSuccess {object} json - QBOPayment
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {object} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@history	19-Jul-2018 Barbara Cooney - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  26    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  35    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $Id; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #Create/connect to the Payment record
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ DBTransactions::PaymentId <> $Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::PaymentId#84
+  45    Set Field [ DBTransactions::PaymentId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=84 name=PaymentId
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Field [ Payment::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Payment id=23 name=ONE
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Variable [ $error; Value:Error.Last ( "Creating/locking the Payment record. " ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  51    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Set Variable [ $QBOId; Value:Payment::qbo_id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::qbo_id#11
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOId
+  55    Set Variable [ $Entity; Value:"Payment" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #read from QBO to get lastest data
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    If [ not IsEmpty ( $QBOId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  59    Set Variable [ $parameters; Value:JSONSetElement (  ""; 
+         
+        	[ "QBOId" ; $QBOId ; JSONString ];
+        	[ "Entity" ; $Entity ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+  60    Perform Script [ “Read({Entity, QBOId })” from file: “karbon_LedgerLink”; Parameter: $parameters ]
+        DisableStepCollapsed state=False
+        FileReference id=5 name=karbon_LedgerLink
+          UniversalPathList: file:karbon_LedgerLink
+        Script id=1 name="Read({Entity, QBOId })" in=karbon_LedgerLink.fmp12
+  61    Set Variable [ $readResponse; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $readResponse
+  62    If [ Error.IsError ( $readResponse ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  63    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  64    End If
+        DisableStepCollapsed state=False
+  65    Set Variable [ $CurrentQBOData; Value:JSONGetElement($readResponse ; $Entity ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  66    End If
+        DisableStepCollapsed state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    If [ not IsEmpty ( $CurrentQBOData ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  70    Set Variable [ $CurrentQBOData; Value:JSONDeleteElement ( $CurrentQBOData ; "MetaData" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  71    Set Variable [ $CurrentQBOData; Value:JSONDeleteElement ( $CurrentQBOData ; "sparse" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  72    Set Variable [ $CurrentQBOData; Value:JSONDeleteElement ( $CurrentQBOData ; "domain" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  73    Set Variable [ $CurrentQBOData; Value:JSONDeleteElement ( $CurrentQBOData ; "Line" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  74    End If
+        DisableStepCollapsed state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #READ FIELD DATA INTO $VARS
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80 // #grab QBO Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  81 // Set Variable [ $Id; Value:Invoice::CreationTimestamp ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Invoice::CreationTimestamp#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Set Variable [ $CustomerRef.value; Value:Payment::id_Customer ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::id_Customer#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerRef.value
+  84    Set Variable [ $DepositToAccountRef.value; Value:Payment::id_DepositAccount ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::id_DepositAccount#5
+        Repetition
+          Calculation:
+            | 1
+        Name: $DepositToAccountRef.value
+  85    Set Variable [ $PaymentMethodRef.value; Value:Payment::id_PaymentMethod ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::id_PaymentMethod#14
+        Repetition
+          Calculation:
+            | 1
+        Name: $PaymentMethodRef.value
+  86    Set Variable [ $TxnDate; Value:Payment::date ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::date#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $TxnDate
+  87    Set Variable [ $TotalAmt; Value:Payment::amount ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::amount#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $TotalAmt
+  88    Set Variable [ $PrivateNote; Value:Payment::PrivateNote ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::PrivateNote#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $PrivateNote
+  89    Set Variable [ $PaymentRefNum; Value:Payment::PaymentRefNum ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::PaymentRefNum#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $PaymentRefNum
+  90    Set Variable [ $ProcessPayment; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $ProcessPayment
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Set Variable [ $Id; Value:$QBOId ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    #zeitgeist overrides customers completely so we need to use a handler here
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    Set Variable [ $CustomerFMId; Value:$CustomerRef.value ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerFMId
+ 105    Set Variable [ $Entity; Value:"Customer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+ 106    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "FMId" ; $CustomerFMId ; JSONString ];
+        	[ "Entity" ; $Entity ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+ 107    Perform Script [ “Lookup QBOId { FMId, Entity }”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=327 name="Lookup QBOId { FMId, Entity }"
+ 108    Set Variable [ $CustomerRef.value; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerRef.value
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    Set Variable [ $PaymentMethodRef.value; Value:$PaymentMethodRef.value ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $PaymentMethodRef.value
+ 111    Set Variable [ $Entity; Value:"PaymentMethod" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+ 112    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "FMId" ; $PaymentMethodRef.value ; JSONString ];
+        	[ "Entity" ; $Entity ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+ 113    Perform Script [ “Lookup QBOId { FMId, Entity }”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=327 name="Lookup QBOId { FMId, Entity }"
+ 114    Set Variable [ $PaymentMethodRef.value; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $PaymentMethodRef.value
+ 115    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    Set Variable [ $TxnDate; Value:Date.ToISO ( $TxnDate ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Date.ToISO
+        Repetition
+          Calculation:
+            | 1
+        Name: $TxnDate
+ 118    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 119    Set Variable [ $id_AccountDeposit; Value:$DepositToAccountRef.value ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $id_AccountDeposit
+ 120    Set Variable [ $Entity; Value:"Account" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+ 121    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "FMId" ; $id_AccountDeposit ; JSONString ];
+        	[ "Entity" ; $Entity ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+ 122    Perform Script [ “Lookup QBOId { FMId, Entity }”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=327 name="Lookup QBOId { FMId, Entity }"
+ 123    Set Variable [ $DepositToAccountRef.value; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $DepositToAccountRef.value
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    #CONVERT LINES
+        DisableStepCollapsed state=False
+        Restore state=False
+ 128    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 130    #$i is used to build line array, $n for looping lineitem Ids
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 132    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 133    #  -------- LOOP LINES --------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 134    Set Variable [ $PaymentLineIds; Value:List ( Payment_PaymentLine::id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Payment_PaymentLine::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $PaymentLineIds
+ 135    Set Variable [ $count; Value:ValueCount ($PaymentLineIds ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $count
+ 136    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+ 138    Set Variable [ $i; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $i
+ 139    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 140    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+ 141    Exit Loop If [ $n > $count ]
+        DisableStepCollapsed state=False
+ 142    Set Variable [ $thisPaymentLineId; Value:GetValue ( $PaymentLineIds; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPaymentLineId
+ 143    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 144    Perform Script [ “Convert Karbon PaymentLine into QBO PaymentLine”; Parameter: $thisPaymentLineId ]
+        DisableStepCollapsed state=False
+        Script id=494 name="Convert Karbon PaymentLine into QBO PaymentLine"
+ 145    Set Variable [ $result; Value:Get ( ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 146    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 147    #build new QBOLine Array
+        DisableStepCollapsed state=False
+        Restore state=False
+ 148    If [ IsEmpty ( $Line ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+ 149    Set Variable [ $Line; Value:"[]" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Line
+ 150    End If
+        DisableStepCollapsed state=False
+ 151    Set Variable [ $Line; Value:JSONSetElement( $Line ; $i ; $result ; JSONObject  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $Line
+ 152    Set Variable [ $i; Value:$i+1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+ 153    End Loop
+        DisableStepCollapsed state=False
+ 154    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 155    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 156    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 157    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 158    #BUILD INTO JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+ 159    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 160    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 161    Set Variable [ $json; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 162    Set Variable [ $json; Value:$CurrentQBOdata ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 163    If [ not IsEmpty ( $Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+ 164    Set Variable [ $json; Value:JSONSetElement( $json ; "Id" ; $Id; JSONString) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 165    End If
+        DisableStepCollapsed state=False
+ 166    Set Variable [ $json; Value:JSONSetElement( $json ; "CustomerRef.value" ; $CustomerRef.value; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 167 // Set Variable [ $json; Value:JSONSetElement( $json ; "CustomerRef.name" ; $CustomerRef.name; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 168 // Set Variable [ $json; Value:JSONSetElement( $json ; "ProcessPayment" ; $ProcessPayment; JSONBoolean) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 169    Set Variable [ $json; Value:JSONSetElement( $json ; "TotalAmt" ; $TotalAmt; JSONNumber ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 170    Set Variable [ $json; Value:JSONSetElement( $json ; "DepositToAccountRef.value" ; $DepositToAccountRef.value; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 171    Set Variable [ $json; Value:JSONSetElement( $json ; "PaymentMethodRef.value" ; $PaymentMethodRef.value; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 172    Set Variable [ $json; Value:JSONSetElement( $json ; "TxnDate" ; $TxnDate; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 173    Set Variable [ $json; Value:JSONSetElement( $json ; "PrivateNote" ; $PrivateNote; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 174    Set Variable [ $json; Value:JSONSetElement( $json ; "PaymentRefNum" ; $PaymentRefNum; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 175    Set Variable [ $json; Value:JSONSetElement( $json ; "Line" ; $Line; JSONArray ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 176    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 177    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 178    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 179    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 180    End Loop
+        DisableStepCollapsed state=False
+ 181    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 182    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 183    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 184    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 185    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 186    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 187    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 188    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 189    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 190    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 191    Exit Script [ Result: Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+ 192    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 193    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 194    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 195    #
+        DisableStepCollapsed state=False
+        Restore state=False

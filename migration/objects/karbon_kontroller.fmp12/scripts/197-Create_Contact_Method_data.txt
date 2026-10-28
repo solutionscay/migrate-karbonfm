@@ -1,0 +1,351 @@
+# script 197: Create Contact Method { data }
+# file: karbon_kontroller.fmp12
+# folder: API / ContactMethod / Private
+# source: ScriptCatalog/Script[@id=197]
+# steps: 97 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=201 groupCollapsed=True includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Create or Update and Contact Method
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @inherit Create Phone
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @inherit Create Address
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @inherit Create Network Address
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @returnSuccess n/a
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnError {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  17    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  18    Set Variable [ $error; Value:Error.Last ( "ensure we return an error object" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #Init
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $data; Value:JSON.Format ( Get (ScriptParameter) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  23    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  24    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  25    End If
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $Comment; Value:JSONGetElement ( $data ;  "Comment" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Comment
+  28    Set Variable [ $Label; Value:JSONGetElement ( $data ;  "Label" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Label
+  29    Set Variable [ $PartyId; Value:JSONGetElement ( $data ;  "PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+  30    Set Variable [ $Purpose; Value:JSONGetElement ( $data ;  "Purpose" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Purpose
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #single pass error trap
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Field [ ContactMethod::PartyId; $PartyId ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethod id=33 name=PartyId
+  39    Set Field [ ContactMethod::Label; $Label ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethod id=47 name=Label
+  40    Set Field [ ContactMethod::Comment; $Comment ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethod id=51 name=Comment
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #Drop existing and add new contact method purposes (CMPs)
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #Remove existing CMPs
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #Clear any existing cached indicators
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Field [ ContactMethod::_BillingIndCached; "" ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethod id=48 name=_BillingIndCached
+  51    Set Field [ ContactMethod::_ShippingIndCached; "" ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethod id=50 name=_ShippingIndCached
+  52    Set Field [ ContactMethod::_MailingIndCached; "" ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethod id=49 name=_MailingIndCached
+  53    Exit Loop If [ IsEmpty ( ContactMethodPurpose#contactMethodId::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ContactMethodPurpose#contactMethodId::Id#1
+  54    Perform Script [ “Delete First Portal Row (portalLayoutObjectName)”; Parameter: "ContactMethodPurposePortalByContactMethod" ]
+        DisableStepCollapsed state=False
+        Script id=33 name="Delete First Portal Row (portalLayoutObjectName)"
+  55    Exit Loop If [ Error.IsError ( Get ( ScriptResult ) ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError, fn:Get, fn:ScriptResult
+  56    End Loop
+        DisableStepCollapsed state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #Add new CMPs
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  60    Set Variable [ $end; Value:JSON.ArrayLength ( $purpose ; "" ) - 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Name: $end
+  61    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $thisPurpose; Value:JSONGetElement ( $purpose ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPurpose
+  65    Set Variable [ $thisPurposeTypeId; Value:Case ( 
+        	$thisPurpose = "billing" ; 
+        		1 ; 
+        	$thisPurpose = "shipping" ; 
+        		2 ; 
+        	$thisPurpose = "mailing" ;
+        		3 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case
+        Name: $thisPurposeTypeId
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #Create new or lock existing phone record
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    Set Field [ DBTransactions::ContactMethodPurposeId; "" ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=69 name=ContactMethodPurposeId
+  69    Set Field [ ContactMethodPurpose::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethodPurpose id=40 name=ONE
+  70    Set Variable [ $error; Value:Error.Last ( "Couldn't create or lock ContactMethodPurpose record" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  71    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #Set fields
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Set Field [ ContactMethodPurpose::ContactMethodId; DBTransactions::ContactMethodId ]
+        DisableStepCollapsed state=False
+        refs: DBTransactions::ContactMethodId#33
+        Field table=ContactMethodPurpose id=33 name=ContactMethodId
+  75    Set Field [ ContactMethodPurpose::ContactMethodPurposeTypeId; $thisPurposeTypeId ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethodPurpose id=47 name=ContactMethodPurposeTypeId
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #Cache purpose on contact method
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    If [ False ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:False
+  79    Else If [ $thisPurposeTypeId = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Set Field [ ContactMethod::_BillingIndCached; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=ContactMethod id=48 name=_BillingIndCached
+  81    Else If [ $thisPurposeTypeId = 2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Field [ ContactMethod::_ShippingIndCached; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=ContactMethod id=50 name=_ShippingIndCached
+  83    Else If [ $thisPurposeTypeId = 3 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Set Field [ ContactMethod::_MailingIndCached; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=ContactMethod id=49 name=_MailingIndCached
+  85    End If
+        DisableStepCollapsed state=False
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  89    End Loop
+        DisableStepCollapsed state=False
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  93    End Loop
+        DisableStepCollapsed state=False
+  94    #end single pass error trap
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False

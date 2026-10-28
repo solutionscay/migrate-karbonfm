@@ -1,0 +1,39 @@
+# custom function 14: JSON.ArrayLength
+# file: karbon_data.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=14]
+
+CustomFunction id=14 functionArity=2 visible=True parameters=array;path name=JSON.ArrayLength
+  Calculation:
+    | /*
+    |  * 
+    |  * JSONArrayLength ( array ; path)
+    |  *
+    |  * @param {array} array a valid JSON Array
+    |  * @param {string} path the path to the array if it is nested
+    |  *
+    |  * @returns {number}
+    |  *
+    |  * @module fm-json-additions
+    |  * @see https://github.com/geistinteractive/fm-json-additions
+    |  * 
+    |  * @history 2017-04-09, todd@geistinteractive.com, created
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | 
+    | Let ( [
+    | 	_array = Substitute ( array ; [ "\r" ; "" ] ; [ "\n" ; "" ] ); 
+    | 	_values = JSONListValues ( _array ; path );
+    | 	_array = JSONGetElement ( _array ; path );
+    | 	isArray = ( Left ( _array ; 1 ) & Right ( _array ; 1 )  = "[]" )
+    | ];
+    | 
+    | 	Case (
+    | 		not isArray ; 0 ;
+    | 		Left ( _values ; 1 )  = "?" ; 0 ;
+    | 		ValueCount ( _values )
+    | 	) //end case
+    | 
+    | ) //end let
+    refs: fn:Let, fn:Substitute, fn:JSONListValues, fn:JSONGetElement, fn:Left, fn:Right, fn:Case, fn:not, fn:ValueCount

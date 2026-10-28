@@ -1,0 +1,405 @@
+# script 868: Search for FullContact Company Match
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Create Party / Party Wizard
+# source: ScriptCatalog/Script[@id=868]
+# steps: 42 (2 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=396 groupCollapsed=False includeInMenu=True
+
+   1    If [ True //testing set to false to avoid API hits since the free plan is limited ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:True
+   2    #check for minimum API requirements
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $domain; Value:UtilityParty::OrgWebsite ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::OrgWebsite#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $domain
+   4    If [ IsEmpty ( $domain ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   5    Perform Script [ “Go to Org Info Slide” ]
+        DisableStepCollapsed state=False
+        Script id=403 name="Go to Org Info Slide"
+   6    Exit Script [  ]
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Insert Calculated Result [ $json; JSONSetElement ( "{}" ; 
+        	[ "domain" ; $domain ; JSONString ] 
+        ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Perform Script [ “FullContact Company Enrich” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=754 name="FullContact Company Enrich" in=karbon_kontroller.fmp12
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Insert Calculated Result [ $result; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $result
+  15    If [ Error.IsError( $result )or JSONGetElement ( $result ; "status" )=404 //profile not found ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError, fn:or, fn:JSONGetElement
+  16    Insert Calculated Result [ $error; $result ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $error
+  17    #Error, go to Org Info
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “Go to Org Info Slide” ]
+        DisableStepCollapsed state=False
+        Script id=403 name="Go to Org Info Slide"
+  19    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22 // #use this sample result to avoid check parsing
+        DisableStepCollapsed state=False
+        Restore state=False
+  23 // Insert Text [ $result ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "bio": "FullContact is the most powerful fully-connected contact management platform for professionals and enterprises who need to master their contacts and be awesome with people.",
+          |   "category": "Other",
+          |   "dataAddOns": [
+          |     {
+          |       "applied": false,
+          |       "description": "Displays information about people of interest at this company.",
+          |       "docLink": "http://docs.fullcontact.com/api/#key-people",
+          |       "enabled": false,
+          |       "id": "keypeople",
+          |       "name": "Key People"
+          |     }
+          |   ],
+          |   "details": {
+          |     "categories": [
+          |       {
+          |         "code": "OTHER",
+          |         "name": "Other"
+          |       }
+          |     ],
+          |     "emails": [
+          |       {
+          |         "label": "other",
+          |         "value": "support@fullcontact.com"
+          |       },
+          |       {
+          |         "label": "sales",
+          |         "value": "team@fullcontact.com"
+          |       },
+          |       {
+          |         "label": "work",
+          |         "value": "sales@fullcontact.com"
+          |       }
+          |     ],
+          |     "images": [
+          |       {
+          |         "label": "twitter",
+          |         "value": "https://img.fullcontact.com/static/fc3461f1f9465b4375ae464ccce22041_f0e1bc209f6ead21c8d72834f48e370cf12a9260ef58431d7dafb4bf1b9b4510"
+          |       },
+          |       {
+          |         "label": "twitter",
+          |         "value": "https://img.fullcontact.com/static/8de8732924b9bdc7f4d4d0308e57fdd8_bfdfc555e93ab5849050a5832cf236026012b784cf32dd53b24ffda7fbdf849e"
+          |       },
+          |       {
+          |         "label": "logo",
+          |         "value": "https://img.fullcontact.com/static/2ab4d453f220d5d33558a29b95d5ef28_b151428e2f8f7f87ca0b7f870eb1799c23598700baab75c45cfb8de2810cf30f"
+          |       },
+          |       {
+          |         "label": "other",
+          |         "value": "https://img.fullcontact.com/static/4c1d5bdcea5612a206ba2573d5f459cf_b9ac649579685df0f8240be77db8ae57e20569a63521f9419c48cb98031bfe50"
+          |       },
+          |       {
+          |         "label": "other",
+          |         "value": "https://img.fullcontact.com/static/701d0d8a116456bda8d2b4d6af208a31_899585cabdc44fec91e68da671fbdf9f8d6ed0cd61fd783846e07ce4da4c06e2"
+          |       },
+          |       {
+          |         "label": "other",
+          |         "value": "https://img.fullcontact.com/static/a126172abf6441bde7186005bf40e998_14d7b3a49301a6f53149f6d6e238f716ddc8b8587f93d3e85fdf6e2e5d3c9c7a"
+          |       },
+          |       {
+          |         "label": "logo",
+          |         "value": "https://img.fullcontact.com/static/f5f644029c2970c80dd5d8a40eb9bc45_3fe5aecdad350930d6197bd8116fed8ee4009ba1ad0a244262d511a01842912b"
+          |       },
+          |       {
+          |         "label": "other",
+          |         "value": "https://media.licdn.com/dms/image/C4E0BAQHWCHFaki5Meg/company-logo_200_200/0?e=2125267200&v=beta&t=YOlJrC4CFikrVpibbj3q7sa7qi4qTXIsQaJtn2mPYY8"
+          |       }
+          |     ],
+          |     "industries": [
+          |       {
+          |         "code": "3577",
+          |         "name": "Computer Peripheral Equipment, Nec",
+          |         "type": "SIC"
+          |       },
+          |       {
+          |         "code": "5045",
+          |         "name": "Computers, Peripherals, and Software",
+          |         "type": "SIC"
+          |       },
+          |       {
+          |         "code": "7373",
+          |         "name": "Computer Integrated Systems Design",
+          |         "type": "SIC"
+          |       }
+          |     ],
+          |     "keyPeople": [],
+          |     "keywords": [
+          |       "CRM",
+          |       "Contact Management",
+          |       "Developer APIs",
+          |       "Information Services",
+          |       "Services",
+          |       "Social Media"
+          |     ],
+          |     "locales": [
+          |       {
+          |         "code": "en",
+          |         "name": "English"
+          |       }
+          |     ],
+          |     "locations": [
+          |       {
+          |         "addressLine1": "1755 Blake Street",
+          |         "addressLine2": "Suite 450",
+          |         "city": "Denver",
+          |         "country": "USA",
+          |         "formatted": "1755 Blake Street Suite 450 Denver CO, 80202 USA",
+          |         "label": "work",
+          |         "postalCode": "80202",
+          |         "region": "CO"
+          |       },
+          |       {
+          |         "country": "United States",
+          |         "formatted": "     United States"
+          |       }
+          |     ],
+          |     "phones": [
+          |       {
+          |         "label": "other",
+          |         "value": "+1 (720) 475-1292"
+          |       },
+          |       {
+          |         "label": "other",
+          |         "value": "+1 (888) 330-6943"
+          |       },
+          |       {
+          |         "label": "other",
+          |         "value": "+1-888-330-6943"
+          |       }
+          |     ],
+          |     "profiles": {
+          |       "angellist": {
+          |         "bio": "FullContact's address book brings all of your contacts into one place and keeps them automatically up to date on the web, as well as on your iPhone and iPad. \n\nAdd photos to your contacts. Find them on social networks like Twitter, Facebook, LinkedIn and of course AngelList. It's the address book that busy professionals from any walk of life can appreciate, and best of all it's free. \n\nFor developers, the suite of FullContact APIs builds powerful, complete profiles of contacts that can be included in any application.",
+          |         "followers": 285,
+          |         "service": "angellist",
+          |         "url": "https://angel.co/fullcontact",
+          |         "userid": "1748",
+          |         "username": "fullcontact"
+          |       },
+          |       "crunchbasecompany": {
+          |         "bio": "FullContact provides a suite of cloud-based contact management solutions for businesses, developers, and individuals.",
+          |         "service": "crunchbasecompany",
+          |         "url": "http://www.crunchbase.com/organization/fullcontact",
+          |         "username": "fullcontact"
+          |       },
+          |       "facebook": {
+          |         "service": "facebook",
+          |         "url": "https://www.facebook.com/fullcontact",
+          |         "username": "fullcontact"
+          |       },
+          |       "klout": {
+          |         "service": "klout",
+          |         "url": "http://klout.com/FullContact",
+          |         "username": "FullContact"
+          |       },
+          |       "linkedincompany": {
+          |         "service": "linkedincompany",
+          |         "url": "https://www.linkedin.com/company/fullcontact-inc-",
+          |         "username": "fullcontact-inc-"
+          |       },
+          |       "owler": {
+          |         "service": "owler",
+          |         "url": "https://www.owler.com/iaApp/106145/fullcontact-company-profile",
+          |         "userid": "106145",
+          |         "username": "fullcontact"
+          |       },
+          |       "twitter": {
+          |         "service": "twitter",
+          |         "url": "https://twitter.com/fullcontact",
+          |         "username": "fullcontact"
+          |       },
+          |       "youtube": {
+          |         "service": "youtube",
+          |         "url": "https://youtube.com/user/FullContactAPI",
+          |         "username": "FullContactAPI"
+          |       }
+          |     },
+          |     "traffic": {
+          |       "countryRank": {
+          |         "global": {
+          |           "name": "Global",
+          |           "rank": 46342
+          |         }
+          |       },
+          |       "localeRank": {
+          |         "gb": {
+          |           "name": "United Kingdom",
+          |           "rank": 27355
+          |         },
+          |         "in": {
+          |           "name": "India",
+          |           "rank": 39446
+          |         },
+          |         "us": {
+          |           "name": "United States",
+          |           "rank": 13423
+          |         }
+          |       }
+          |     },
+          |     "urls": [
+          |       {
+          |         "label": "website",
+          |         "value": "https://www.fullcontact.com"
+          |       },
+          |       {
+          |         "label": "rss",
+          |         "value": "https://www.fullcontact.com/feed"
+          |       },
+          |       {
+          |         "label": "rss",
+          |         "value": "https://www.fullcontact.com/comments/feed"
+          |       },
+          |       {
+          |         "label": "youtube",
+          |         "value": "https://www.youtube.com/watch?v=RnltbT0BKMo"
+          |       },
+          |       {
+          |         "label": "blog",
+          |         "value": "https://www.fullcontact.com/blog"
+          |       }
+          |     ]
+          |   },
+          |   "employees": 351,
+          |   "facebook": "https://www.facebook.com/fullcontact",
+          |   "founded": 2010,
+          |   "linkedin": "https://www.linkedin.com/company/fullcontact-inc-",
+          |   "locale": "en",
+          |   "location": "1755 Blake Street Suite 450 Denver CO, 80202 USA",
+          |   "logo": "https://media.licdn.com/dms/image/C4E0BAQHWCHFaki5Meg/company-logo_200_200/0?e=2125267200&v=beta&t=YOlJrC4CFikrVpibbj3q7sa7qi4qTXIsQaJtn2mPYY8",
+          |   "name": "FullContact Inc.",
+          |   "twitter": "https://twitter.com/fullcontact",
+          |   "updated": "2019-07-22",
+          |   "website": "https://www.fullcontact.com"
+          | }
+        Field: $result
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Field [ UtilityParty::FullContactOrgBio; JSONGetElement ( $result ; "bio" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=61 name=FullContactOrgBio
+  26    Set Field [ UtilityParty::FullContactOrgName; JSONGetElement ( $result ; "name" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=75 name=FullContactOrgName
+  27    Set Field [ UtilityParty::FullContactOrgFacebook; JSONGetElement ( $result ; "facebook" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=76 name=FullContactOrgFacebook
+  28    Set Field [ UtilityParty::FullContactOrgLinkedInURL; JSONGetElement ( $result ; "linkedin" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=62 name=FullContactOrgLinkedInURL
+  29    Set Field [ UtilityParty::FullContactOrgTwitter; JSONGetElement ( $result ; "twitter" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=70 name=FullContactOrgTwitter
+  30    Set Field [ UtilityParty::FullContactOrgAddressFull; JSONGetElement ( $result ; "location" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=69 name=FullContactOrgAddressFull
+  31    Set Field [ UtilityParty::FullContactOrgLogoURL; JSONGetElement ( $result ; "logo" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=72 name=FullContactOrgLogoURL
+  32    Insert from URL [ UtilityParty::FullContactOrgLogo; UtilityParty::FullContactOrgLogoURL ]
+        [ Select; No dialog ]
+        NoInteract state=True
+        DontEncodeURL state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        VerifySSLCertificates state=False
+        refs: UtilityParty::FullContactOrgLogoURL#72
+        Field table=UtilityParty id=71 name=FullContactOrgLogo
+  33    Set Field [ UtilityParty::FullContactOrgAddressLine1; JSONGetElement ( $result ; "details.locations[0].addressLine1" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=63 name=FullContactOrgAddressLine1
+  34    Set Field [ UtilityParty::FullContactOrgAddressLine2; JSONGetElement ( $result ; "details.locations[0].addressLine2" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=64 name=FullContactOrgAddressLine2
+  35    Set Field [ UtilityParty::FullContactOrgCity; JSONGetElement ( $result ; "details.locations[0].city" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=65 name=FullContactOrgCity
+  36    Set Field [ UtilityParty::FullContactOrgCountry; JSONGetElement ( $result ; "details.locations[0].country" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=66 name=FullContactOrgCountry
+  37    Set Field [ UtilityParty::FullContactOrgPhoneLabel; JSONGetElement ( $result ; "details.phones[0].label" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=74 name=FullContactOrgPhoneLabel
+  38    Set Field [ UtilityParty::FullContactOrgPhone; JSONGetElement ( $result ; "details.phones[0].value" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=73 name=FullContactOrgPhone
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Perform Script [ “Go to FullContact Org Slide” ]
+        DisableStepCollapsed state=False
+        Script id=867 name="Go to FullContact Org Slide"

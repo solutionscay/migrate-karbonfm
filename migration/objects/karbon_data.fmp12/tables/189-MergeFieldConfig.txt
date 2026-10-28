@@ -1,0 +1,187 @@
+# table 189: MergeFieldConfig
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=189]
+# fields: 23
+# records: 7
+
+Field id=19 dataType=Number fieldType=Normal name=Id
+  AutoEnter allowEditing=False
+    Serial increment=1 nextValue=9 generate=OnCreation
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=AcitivityRoleTypeId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=31 dataType=Text fieldType=Normal name=Name
+  Comment: A merge field token encloused in double-angle brackets (ex: <<RecipientName>>)
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: <<Field Name>>
+  Validation type=Always
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=42 dataType=Number fieldType=Calculated name=ValidExpressionInd
+  Calculation table=MergeFieldConfig:
+    | IsValidExpression ( 
+    | 	ForeignTableOccurrenceName & "::" & DBTransactionsFieldName
+    | )
+    refs: fn:IsValidExpression, MergeFieldConfig::ForeignTableOccurrenceName#52, MergeFieldConfig::DBTransactionsFieldName#53
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Text fieldType=Normal name=ActivityTypeId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Normal name=ForeignFieldName
+  Comment: The field name of the field being referenced
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=52 dataType=Text fieldType=Normal name=ForeignTableOccurrenceName
+  Comment: The base table name of the field being referenced
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=53 dataType=Text fieldType=Normal name=DBTransactionsFieldName
+  Comment: The field name in DBTransactions to be set to connect to the foreign key
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=54 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=MergeFieldConfig:
+      | Let ( dependsOn = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=55 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=MergeFieldConfig:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=MergeFieldConfig (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=MergeFieldConfig (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=57 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=MergeFieldConfig:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=58 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=MergeFieldConfig (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=59 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=MergeFieldConfig:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=60 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=61 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=62 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=MergeFieldConfig (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=63 dataType=Text fieldType=Normal name=ScriptName
+  Comment: The name of the script to be called in lieu of TABLE::Field lookups
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=64 dataType=Text fieldType=Normal name=DBTransactionsFieldValue
+  Comment: The name of the variable that should define what the DBTransactionsFieldName is set to
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=65 dataType=Number fieldType=Normal name=Resolve_ScriptInd
+  Comment: The substitute for the template will be resolved using a Script
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=66 dataType=Number fieldType=Normal name=Resolve_FieldReferenceInd
+  Comment: The substitute for the template will be resolved by referencing a field
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=67 dataType=Number fieldType=Normal name=Resolve_ActivityPartyInd
+  Comment: The substitute for the template will be resolved using a value in the related ActivityParty Array
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=68 dataType=Text fieldType=Normal name=ActivityPartyPluck
+  Comment: The field to pluck from the ActivityPartyArray to perform the substitution
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

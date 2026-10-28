@@ -1,0 +1,1530 @@
+# script 393: Create Parties
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Create Party / Party Wizard
+# source: ScriptCatalog/Script[@id=393]
+# steps: 297 (10 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=396 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-09-25 dave@geistinteractive.com - 
+        	- added single-pass error loop
+        	- no longer navigating to record—use a handler instead
+        	- code cleanup
+        	- creating party relationship for two selected parties (i.e., they don't have to be newly created)
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #@history 2018-09-24 dave@geistinteractive.com - no longer creating relationships for customers and leads, which are handled by their respective APIs
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $CreateOrganization; Value:// we don't have an org ID yet
+        IsEmpty( UtilityParty::OrganizationId ) and 
+        
+        // we aren't skipping org creation
+        not UtilityParty::SkipOrganizationInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:IsEmpty, UtilityParty::OrganizationId#20, fn:and, fn:not, UtilityParty::SkipOrganizationInd#22
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreateOrganization
+  11    Set Variable [ $AddRoleToOrganization; Value:// we DO have an org ID yet
+        not IsEmpty( UtilityParty::OrganizationId ) and 
+        
+        // we aren't skipping org creation
+        not UtilityParty::SkipOrganizationInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:IsEmpty, UtilityParty::OrganizationId#20, fn:and, UtilityParty::SkipOrganizationInd#22
+        Repetition
+          Calculation:
+            | 1
+        Name: $AddRoleToOrganization
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ $CreateOrganization ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #Create an Organization (if applicable)
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #Create the Organization
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $OrganizationName; Value:UtilityParty::OrganizationName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::OrganizationName#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $OrganizationName
+  22    Set Variable [ $Address; Value:"[" & 
+        
+        JSONSetElement (  ""; 
+         
+        	[ "AddressLine1" ; UtilityParty::OrgAddressLine1 ; JSONString ];
+        	[ "AddressLine2" ; UtilityParty::OrgAddressLine2 ; JSONString ];
+        	[ "City" ; UtilityParty::OrgCity ; JSONString ];
+        	[ "Country" ; UtilityParty::OrgCountry ; JSONString ];
+        	[ "County" ; UtilityParty::OrgCounty ; JSONString ];
+        	[ "PostalCode" ; UtilityParty::OrgPostalCode ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ];
+        	[ "StateProvince" ; UtilityParty::OrgStateProvince ; JSONString ]
+         
+        )
+        
+        & "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::OrgAddressLine1#8, fn:JSONString, UtilityParty::OrgAddressLine2#9, UtilityParty::OrgCity#10, UtilityParty::OrgCountry#11, UtilityParty::OrgCounty#12, UtilityParty::OrgPostalCode#13, fn:True, fn:JSONBoolean, UtilityParty::OrgStateProvince#14
+        Name: $Address
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24 // #fullcontactaddress
+        DisableStepCollapsed state=False
+        Restore state=False
+  25 // If [ UtilityParty::FullContactOrgKeepLocation and not IsEmpty ( UtilityParty::FullContactOrgAddressFull ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactOrgKeepLocation#79, fn:and, fn:not, fn:IsEmpty, UtilityParty::FullContactOrgAddressFull#69
+  26 // Set Variable [ $FullContactAddress; Value:JSONSetElement (  ""; 
+         
+        	[ "AddressLine1" ; UtilityParty::FullContactOrgAddressLine1 ; JSONString ];
+        	[ "AddressLine2" ; UtilityParty::FullContactOrgAddressLine2 ; JSONString ];
+        	[ "City" ; UtilityParty::FullContactOrgCity ; JSONString ];
+        	[ "Country" ; UtilityParty::FullContactOrgCountry ; JSONString ];
+        	//[ "County" ; UtilityParty::OrgCounty ; JSONString ];
+        	[ "PostalCode" ;UtilityParty::FullContactOrgPostalCode ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ];
+        	[ "StateProvince" ; UtilityParty::FullContactOrgStateProvince ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::FullContactOrgAddressLine1#63, fn:JSONString, UtilityParty::FullContactOrgAddressLine2#64, UtilityParty::FullContactOrgCity#65, UtilityParty::FullContactOrgCountry#66, UtilityParty::FullContactOrgPostalCode#67, fn:True, fn:JSONBoolean, UtilityParty::FullContactOrgStateProvince#68
+        Name: $FullContactAddress
+  27 // Set Variable [ $Address; Value:JSON.Push ( $Address ; $FullContactAddress ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $Address
+  28 // End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $Phone; Value:"[" & 
+        
+        JSONSetElement (  ""; 
+         
+        	[ "Label" ; "" ; JSONString ];
+        	[ "Number" ; UtilityParty::OrgPhone ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ]
+         
+        )
+        
+        & "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, UtilityParty::OrgPhone#15, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33 // #fullcontactphone
+        DisableStepCollapsed state=False
+        Restore state=False
+  34 // If [ UtilityParty::FullContactOrgKeepPhone and not IsEmpty ( UtilityParty::FullContactOrgPhone ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactOrgKeepPhone#80, fn:and, fn:not, fn:IsEmpty, UtilityParty::FullContactOrgPhone#73
+  35 // Set Variable [ $FullContactPhone; Value:JSONSetElement (  ""; 
+         
+        	[ "Label" ; UtilityParty::FullContactOrgPhoneLabel ; JSONString ];
+        	[ "Number" ; UtilityParty::FullContactOrgPhone ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::FullContactOrgPhoneLabel#74, fn:JSONString, UtilityParty::FullContactOrgPhone#73, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $FullContactPhone
+  36 // Set Variable [ $Phone; Value:JSON.Push ( $Phone ; $FullContactPhone ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+  37 // End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $NetworkAddress; Value:"[" & 
+        
+        JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::OrgWebsite ; JSONString ];
+        	[ "Label" ; "Website" ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ];
+        	[ "Type" ; "web" ; JSONString ]
+         
+        ) & 
+        
+        "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::OrgWebsite#16, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #Facebook
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    If [ UtilityParty::FullContactOrgKeepFacebook and not IsEmpty ( UtilityParty::FullContactOrgFacebook ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactOrgKeepFacebook#83, fn:and, fn:not, fn:IsEmpty, UtilityParty::FullContactOrgFacebook#76
+  43    Set Variable [ $Facebook; Value:
+        
+        JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::FullContactOrgFacebook ; JSONString ];
+        	[ "Label" ; "Facebook" ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ]
+        	
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::FullContactOrgFacebook#76, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Facebook
+  44    Set Variable [ $NetworkAddress; Value:JSON.Push ( $NetworkAddress ; $Facebook ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+  45    End If
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #Twitter
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    If [ UtilityParty::FullContactOrgKeepTwitter and not IsEmpty ( UtilityParty::FullContactOrgTwitter ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactOrgKeepTwitter#82, fn:and, fn:not, fn:IsEmpty, UtilityParty::FullContactOrgTwitter#70
+  49    Set Variable [ $Twitter; Value:JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::FullContactOrgTwitter ; JSONString ];
+        	[ "Label" ; "Twitter" ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ]
+        	
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::FullContactOrgTwitter#70, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Twitter
+  50    Set Variable [ $NetworkAddress; Value:JSON.Push ( $NetworkAddress ; $Twitter ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+  51    End If
+        DisableStepCollapsed state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #LinkedIn
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    If [ UtilityParty::FullContactOrgKeepLinkedIn and not IsEmpty ( UtilityParty::FullContactOrgKeepLinkedIn ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactOrgKeepLinkedIn#81, fn:and, fn:not, fn:IsEmpty
+  55    Set Variable [ $LinkedIn; Value:JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::FullContactOrgLinkedInURL; JSONString ];
+        	[ "Label" ; "LinkedIn" ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ]
+        	
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::FullContactOrgLinkedInURL#62, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $LinkedIn
+  56    Set Variable [ $NetworkAddress; Value:JSON.Push ( $NetworkAddress ; $LinkedIn ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+  57    End If
+        DisableStepCollapsed state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $Bio; Value:If ( UtilityParty::FullContactOrgKeepBio ; UtilityParty::FullContactOrgBio ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, UtilityParty::FullContactOrgKeepBio#78, UtilityParty::FullContactOrgBio#61
+        Repetition
+          Calculation:
+            | 1
+        Name: $Bio
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $LogoURL; Value:If ( UtilityParty::FullContactOrgKeepLogo ; UtilityParty::FullContactOrgLogoURL ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, UtilityParty::FullContactOrgKeepLogo#77, UtilityParty::FullContactOrgLogoURL#72
+        Repetition
+          Calculation:
+            | 1
+        Name: $LogoURL
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $Organization; Value:JSONFormatElements ( 
+        
+        
+        JSONSetElement (  ""; 
+         
+        	[ "OrganizationName" ; $OrganizationName ; JSONString ];
+        	[ "PhotoAccessURL" ; $LogoURL ; JSONString ];
+        	[ "Comments" ; $Bio ; JSONString ];
+        	[ "Phone" ; $Phone ; JSONArray ];
+        	[ "Address" ; $Address ; JSONArray ];
+        	[ "NetworkAddress" ; $NetworkAddress ; JSONArray ]
+         
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $Organization
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    If [ UtilityParty::CustomerInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::CustomerInd#26
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #Customer
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $Organization; Value:JSONSetElement ( $Organization ; "CreateOrganization" ; True ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Organization
+  70    Set Variable [ $Organization; Value:JSONSetElement ( $Organization ; "DisplayName" ; $OrganizationName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Organization
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Perform Script [ “_wip_Create Customer V3 { data }” from file: “karbon_kontroller”; Parameter: $Organization ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=229 name="_wip_Create Customer V3 { data }" in=karbon_kontroller.fmp12
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyRoleId" ) ; 
+        		JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Else If [ UtilityParty::LeadInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::LeadInd#38
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #Lead
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Set Variable [ $Organization; Value:JSONSetElement ( $Organization ; "CreateOrganization" ; True ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Organization
+  80    Set Variable [ $Organization; Value:JSONSetElement ( $Organization ; "DisplayName" ; $OrganizationName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Organization
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Perform Script [ “#wip Create Lead { json }” from file: “karbon_kontroller”; Parameter: $Organization ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=595 name="#wip Create Lead { json }" in=karbon_kontroller.fmp12
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyRoleId" ) ; 
+        		JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #Organization (no party role)
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    Perform Script [ “_wip_Create Organization { data }” from file: “karbon_kontroller”; Parameter: $Organization ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=253 name="_wip_Create Organization { data }" in=karbon_kontroller.fmp12
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    End If
+        DisableStepCollapsed state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  96    Set Variable [ $error; Value:$result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  97    Show Custom Dialog [ Title: "Error"; Message: "Failed to create the organizational record."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  98    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  99    End If
+        DisableStepCollapsed state=False
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Set Variable [ $CreatedOrganization; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreatedOrganization
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    #Record results
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    Set Field [ UtilityParty::PartyRoleId; JSONGetElement ( $result ; "PartyRoleId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=39 name=PartyRoleId
+ 105    Set Field [ UtilityParty::OrganizationId; JSONGetElement ( $result ; "PartyId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=20 name=OrganizationId
+ 106    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    Else If [ $AddRoleToOrganization ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    #Add party roles to existing organization if applicable
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    If [ UtilityParty::CustomerInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::CustomerInd#26
+ 117    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "PartyId" ; UtilityParty::OrganizationId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::OrganizationId#20, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 119    Perform Script [ “#wip Add Customer to Party { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=705 name="#wip Add Customer to Party { json }" in=karbon_kontroller.fmp12
+ 120    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 121    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyRoleId" ) ; 
+        		JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 122    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 123    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    #Record results
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    Set Field [ UtilityParty::PartyRoleId; JSONGetElement ( $result ; "PartyRoleId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=39 name=PartyRoleId
+ 127    Set Field [ UtilityParty::OrganizationId; JSONGetElement ( $result ; "PartyId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=20 name=OrganizationId
+ 128    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    Else If [ UtilityParty::LeadInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::LeadInd#38
+ 130    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "PartyId" ; UtilityParty::OrganizationId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::OrganizationId#20, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 132    Perform Script [ “#wip Add Lead to Party { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=610 name="#wip Add Lead to Party { json }" in=karbon_kontroller.fmp12
+ 133    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 134    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyRoleId" ) ; 
+        		JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 135    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 136    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 138    #Record results
+        DisableStepCollapsed state=False
+        Restore state=False
+ 139    Set Field [ UtilityParty::PartyRoleId; JSONGetElement ( $result ; "PartyRoleId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=39 name=PartyRoleId
+ 140    Set Field [ UtilityParty::OrganizationId; JSONGetElement ( $result ; "PartyId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=20 name=OrganizationId
+ 141    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 142    End If
+        DisableStepCollapsed state=False
+ 143    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 144    End If
+        DisableStepCollapsed state=False
+ 145    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 146    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 147    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 148    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 149    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 150    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 151    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 152    Set Variable [ $CreatePerson; Value:// we don't have an person ID yet
+        IsEmpty( UtilityParty::PersonId ) and 
+        
+        // we aren't skipping person creation
+        not UtilityParty::SkipPersonInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:IsEmpty, UtilityParty::PersonId#21, fn:and, fn:not, UtilityParty::SkipPersonInd#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreatePerson
+ 153    Set Variable [ $AddRoleToPerson; Value:// we DO have a person ID
+        not IsEmpty( UtilityParty::PersonId ) and 
+        
+        // we aren't skipping the person 
+        not UtilityParty::SkipPersonInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:IsEmpty, UtilityParty::PersonId#21, fn:and, UtilityParty::SkipPersonInd#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $AddRoleToPerson
+ 154    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 155    If [ $CreatePerson ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 156    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 157    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 158    #Create a Person (if applicable)
+        DisableStepCollapsed state=False
+        Restore state=False
+ 159    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 160    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 161    Set Variable [ $FirstName; Value:UtilityParty::PersonFirstName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::PersonFirstName#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $FirstName
+ 162    Set Variable [ $JobTitle; Value:Case (
+        
+        not IsEmpty ( UtilityParty::PersonJobTitle  ) ; UtilityParty::PersonJobTitle ;
+        
+        not IsEmpty ( UtilityParty::FullContactPersonJobTitle )  and UtilityParty::FullContactPersonKeepJobTitle  ; UtilityParty::FullContactPersonJobTitle 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case, fn:not, fn:IsEmpty, UtilityParty::PersonJobTitle#19, UtilityParty::FullContactPersonJobTitle#54, fn:and, UtilityParty::FullContactPersonKeepJobTitle#59
+        Repetition
+          Calculation:
+            | 1
+        Name: $JobTitle
+ 163    Set Variable [ $LastName; Value:UtilityParty::PersonLastName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::PersonLastName#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $LastName
+ 164    Set Variable [ $Address; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Address
+ 165    Set Variable [ $Phone; Value:"[" & 
+        
+        JSONSetElement (  ""; 
+         
+        	[ "Label" ; "" ; JSONString ];
+        	[ "Number" ; UtilityParty::PersonPhone ; JSONString ];
+        	[ "Extension" ; UtilityParty::PersonPhoneExt ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ]
+         
+        ) & 
+        
+        "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, UtilityParty::PersonPhone#17, UtilityParty::PersonPhoneExt#40, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+ 166    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 167    #fullcontactphone
+        DisableStepCollapsed state=False
+        Restore state=False
+ 168    If [ UtilityParty::FullContactPersonKeepPhone and not IsEmpty ( UtilityParty::FullContactPersonPhone ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactPersonKeepPhone#60, fn:and, fn:not, fn:IsEmpty, UtilityParty::FullContactPersonPhone#50
+ 169    Set Variable [ $FullContactPhone; Value:JSONSetElement (  ""; 
+         
+        	[ "Label" ; "" ; JSONString ];
+        	[ "Number" ; UtilityParty::FullContactPersonPhone ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, UtilityParty::FullContactPersonPhone#50, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $FullContactPhone
+ 170    Set Variable [ $Phone; Value:JSON.Push ( $Phone ; $FullContactPhone ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+ 171    End If
+        DisableStepCollapsed state=False
+ 172    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 173    Set Variable [ $NetworkAddress; Value:"[" & 
+        
+        JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::PersonEmail ; JSONString ];
+        	[ "Label" ; "Work" ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ];
+        	[ "Type" ; "email" ; JSONString ]
+         
+        ) & 
+        
+        "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::PersonEmail#18, fn:JSONString, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+ 174    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 175    #Facebook
+        DisableStepCollapsed state=False
+        Restore state=False
+ 176    If [ UtilityParty::FullContactPersonKeepFacebook and not IsEmpty ( UtilityParty::FullContactPersonFacebookURL ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactPersonKeepFacebook#58, fn:and, fn:not, fn:IsEmpty, UtilityParty::FullContactPersonFacebookURL#48
+ 177    Set Variable [ $Facebook; Value:
+        
+        JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::FullContactPersonFacebookURL ; JSONString ];
+        	[ "Label" ; "Facebook" ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ]
+        	
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::FullContactPersonFacebookURL#48, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Facebook
+ 178    Set Variable [ $NetworkAddress; Value:JSON.Push ( $NetworkAddress ; $Facebook ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+ 179    End If
+        DisableStepCollapsed state=False
+ 180    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 181    #Twitter
+        DisableStepCollapsed state=False
+        Restore state=False
+ 182    If [ UtilityParty::FullContactPersonKeepTwitter and not IsEmpty ( UtilityParty::FullContactPersonTwitter ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactPersonKeepTwitter#56, fn:and, fn:not, fn:IsEmpty, UtilityParty::FullContactPersonTwitter#51
+ 183    Set Variable [ $Twitter; Value:JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::FullContactPersonTwitter ; JSONString ];
+        	[ "Label" ; "Twitter" ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ]
+        	
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::FullContactPersonTwitter#51, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Twitter
+ 184    Set Variable [ $NetworkAddress; Value:JSON.Push ( $NetworkAddress ; $Twitter ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+ 185    End If
+        DisableStepCollapsed state=False
+ 186    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 187    #LinkedIn
+        DisableStepCollapsed state=False
+        Restore state=False
+ 188    If [ UtilityParty::FullContactPersonKeepLinkedIn and not IsEmpty ( UtilityParty::FullContactPersonLinkedInURL ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::FullContactPersonKeepLinkedIn#46, fn:and, fn:not, fn:IsEmpty, UtilityParty::FullContactPersonLinkedInURL#45
+ 189    Set Variable [ $LinkedIn; Value:JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::FullContactPersonLinkedInURL; JSONString ];
+        	[ "Label" ; "LinkedIn" ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ]
+        	
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::FullContactPersonLinkedInURL#45, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $LinkedIn
+ 190    Set Variable [ $NetworkAddress; Value:JSON.Push ( $NetworkAddress ; $LinkedIn ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+ 191    End If
+        DisableStepCollapsed state=False
+ 192    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 193    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 194    Set Variable [ $Gender; Value:If ( UtilityParty::FullContactPersonKeepGender ; UtilityParty::FullContactPersonGender ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, UtilityParty::FullContactPersonKeepGender#44, UtilityParty::FullContactPersonGender#43
+        Repetition
+          Calculation:
+            | 1
+        Name: $Gender
+ 195    Set Variable [ $Bio; Value:If ( UtilityParty::FullContactPersonKeepBio ; UtilityParty::FullContactPersonBio ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, UtilityParty::FullContactPersonKeepBio#57, UtilityParty::FullContactPersonBio#52
+        Repetition
+          Calculation:
+            | 1
+        Name: $Bio
+ 196    Set Variable [ $AvatarURL; Value:If ( UtilityParty::FullContactPersonKeepAvatar ; UtilityParty::FullContactPersonAvatarURL ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, UtilityParty::FullContactPersonKeepAvatar#55, UtilityParty::FullContactPersonAvatarURL#49
+        Repetition
+          Calculation:
+            | 1
+        Name: $AvatarURL
+ 197    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 198    Set Variable [ $Person; Value:JSONFormatElements ( JSONSetElement (  ""; 
+         
+        	[ "Bio" ; $Bio ; JSONString ];
+        	[ "Comments" ; $Comments ; JSONString ];
+        	[ "DateOfBirth" ; $DateOfBirth ; JSONString ];
+        	[ "Department" ; $Department ; JSONString ];
+        	[ "EmployerName" ; $EmployerName ; JSONString ];
+        	[ "Ethnicity" ; $Ethnicity ; JSONString ];
+        	[ "FirstName" ; $FirstName ; JSONString ];
+        	[ "Gender" ; $Gender ; JSONString ];
+        	[ "Id" ; $Id ; JSONString ];
+        	[ "JobTitle" ; $JobTitle ; JSONString ];
+        	[ "LastName" ; $LastName ; JSONString ];
+        	[ "MaritalStatus" ; $MaritalStatus ; JSONString ];
+        	[ "MiddleName" ; $MiddleName ; JSONString ];
+        	[ "Nickname" ; $Nickname ; JSONString ];
+        	[ "Photo" ; $Photo ; JSONString ];
+        	[ "PhotoAccessURL" ; $AvatarURL ; JSONString ];
+        	[ "Prefix" ; $Prefix ; JSONString ];
+        	[ "Salutation" ; $Salutation ; JSONString ];
+        	[ "Suffix" ; $Suffix ; JSONString ];
+        	[ "Phone" ; $Phone ; JSONArray ];
+        	[ "Address" ; $Address ; JSONArray ];
+        	[ "NetworkAddress" ; $NetworkAddress ; JSONArray ]
+         
+        ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $Person
+ 199    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 200    If [ UtilityParty::EmployeeInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::EmployeeInd#29
+ 201    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 202    #Employee
+        DisableStepCollapsed state=False
+        Restore state=False
+ 203    Perform Script [ “_wip_Create Employee { data }” from file: “karbon_kontroller”; Parameter: $Person ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=164 name="_wip_Create Employee { data }" in=karbon_kontroller.fmp12
+ 204    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 205    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyRoleId" ) ; 
+        		JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 206    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 207    Else If [ // we didn't create an org
+        not $CreateOrganization and 
+        
+        // and we didn't select an org
+        IsEmpty ( UtilityParty::OrganizationId ) and 
+        
+        // and we're creating a lead (party role)
+        UtilityParty::LeadInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:and, fn:IsEmpty, UtilityParty::OrganizationId#20, UtilityParty::LeadInd#38
+ 208    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 209    #Lead (Person)
+        DisableStepCollapsed state=False
+        Restore state=False
+ 210    Perform Script [ “#wip Create Lead { json }” from file: “karbon_kontroller”; Parameter: $Person ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=595 name="#wip Create Lead { json }" in=karbon_kontroller.fmp12
+ 211    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 212    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyRoleId" ) ; 
+        		JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 213    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 214    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 215    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 216    #Person (no party role)
+        DisableStepCollapsed state=False
+        Restore state=False
+ 217    Perform Script [ “_wip_Create Person { data }” from file: “karbon_kontroller”; Parameter: $Person ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=246 name="_wip_Create Person { data }" in=karbon_kontroller.fmp12
+ 218    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 219    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 220    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 221    End If
+        DisableStepCollapsed state=False
+ 222    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 223    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 224    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 225    Show Custom Dialog [ Title: "Error"; Message: "Failed to create the contact."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+ 226    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 227    End If
+        DisableStepCollapsed state=False
+ 228    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 229    Set Variable [ $CreatedPerson; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreatedPerson
+ 230    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 231    If [ IsEmpty ( UtilityParty::PartyRoleId) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, UtilityParty::PartyRoleId#39
+ 232    #Only set this if it wasn't set during the organizational steps (above)
+        DisableStepCollapsed state=False
+        Restore state=False
+ 233    Set Field [ UtilityParty::PartyRoleId; JSONGetElement ( $result ; "PartyRoleId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=39 name=PartyRoleId
+ 234    End If
+        DisableStepCollapsed state=False
+ 235    Set Field [ UtilityParty::PersonId; JSONGetElement ( $result ; "PartyId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=21 name=PersonId
+ 236    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 237    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 238    Else If [ $AddRoleToPerson ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 239    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 240    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 241    #Add party roles to existing person if applicable
+        DisableStepCollapsed state=False
+        Restore state=False
+ 242    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 243    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 244    If [ UtilityParty::CustomerInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::CustomerInd#26
+ 245    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 246    #Customer
+        DisableStepCollapsed state=False
+        Restore state=False
+ 247    #@todo - need to create the endpoint for this, similar to Lead option below
+        DisableStepCollapsed state=False
+        Restore state=False
+ 248    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 249    Else If [ UtilityParty::EmployeeInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityParty::EmployeeInd#29
+ 250    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 251    #Employee
+        DisableStepCollapsed state=False
+        Restore state=False
+ 252    #@todo - need to create the endpoint for this, similar to Lead option below
+        DisableStepCollapsed state=False
+        Restore state=False
+ 253    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 254    Else If [ // we didn't create an org
+        not $CreateOrganization and 
+        
+        // and we didn't select an org
+        IsEmpty ( UtilityParty::OrganizationId ) and 
+        
+        // and we're creating a lead (party role)
+        UtilityParty::LeadInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:and, fn:IsEmpty, UtilityParty::OrganizationId#20, UtilityParty::LeadInd#38
+ 255    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 256    #Lead
+        DisableStepCollapsed state=False
+        Restore state=False
+ 257    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "PartyId" ; UtilityParty::PersonId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::PersonId#21, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 258    Perform Script [ “#wip Add Lead to Party { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=610 name="#wip Add Lead to Party { json }" in=karbon_kontroller.fmp12
+ 259    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 260    End If
+        DisableStepCollapsed state=False
+ 261    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 262    Set Variable [ $result; Value:JSON.Pluck.From ( Get ( ScriptResult ) ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Id" ; JSONString ; "PartyRoleId" ) ; 
+        		JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        		"" // NULL
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, fn:Get, fn:ScriptResult, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 263    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 264    End If
+        DisableStepCollapsed state=False
+ 265    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 266    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 267    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 268    #Create party relationships (if applicable)
+        DisableStepCollapsed state=False
+        Restore state=False
+ 269    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+ 270    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 271    Set Variable [ $CreatePartyRelationships; Value:// Relationships are created by the APIs for these entities:
+        not UtilityParty::EmployeeInd and 
+        not UtilityParty::CustomerInd and 
+        
+        // we created or selected an org and a person
+        ( not IsEmpty ( UtilityParty::OrganizationId ) and 
+        not IsEmpty ( UtilityParty::PersonId ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, UtilityParty::EmployeeInd#29, fn:and, UtilityParty::CustomerInd#26, fn:IsEmpty, UtilityParty::OrganizationId#20, UtilityParty::PersonId#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreatePartyRelationships
+ 272    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 273    If [ $CreatePartyRelationships ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 274    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 275    #Join person and org
+        DisableStepCollapsed state=False
+        Restore state=False
+ 276    Set Variable [ $PartyRelation; Value:JSONSetElement (  ""; 
+         
+        	[ "PartyFrom.PartyId" ; UtilityParty::OrganizationId ; JSONString ];
+        	[ "PartyFrom.Relationship" ; "employer" ; JSONString ];
+        	[ "PartyTo.PartyId" ; UtilityParty::PersonId ; JSONString ];
+        	[ "PartyTo.Relationship" ; UtilityParty::PersonJobTitle ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::OrganizationId#20, fn:JSONString, UtilityParty::PersonId#21, UtilityParty::PersonJobTitle#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyRelation
+ 277    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 278    Perform Script [ “_wip_Create Party Relation V2 { data }” from file: “karbon_kontroller”; Parameter: $PartyRelation ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=254 name="_wip_Create Party Relation V2 { data }" in=karbon_kontroller.fmp12
+ 279    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 280    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+ 281    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 282    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 283    Show Custom Dialog [ Title: "Error"; Message: "Party relationships could not be created."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+ 284    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 285    End If
+        DisableStepCollapsed state=False
+ 286    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 287    End If
+        DisableStepCollapsed state=False
+ 288    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 289    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+ 290    End Loop
+        DisableStepCollapsed state=False
+ 291    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 292    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 293    #because it's a card window
+        DisableStepCollapsed state=False
+        Restore state=False
+ 294    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+ 295    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 296    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 297    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

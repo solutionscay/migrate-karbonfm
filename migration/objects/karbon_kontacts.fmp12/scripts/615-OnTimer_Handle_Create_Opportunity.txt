@@ -1,0 +1,141 @@
+# script 615: OnTimer: Handle Create Opportunity
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Opportunity
+# source: ScriptCatalog/Script[@id=615]
+# steps: 28 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=601 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #Kill the timer
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $LeadId; Value:UtilityParty::PartyRoleId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::PartyRoleId#39
+        Repetition
+          Calculation:
+            | 1
+        Name: $LeadId
+   6    Set Variable [ $PartyId; Value:GetValue ( 
+        	List ( UtilityParty::OrganizationId ; UtilityParty::PersonId ) ; 
+        	1 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue, fn:List, UtilityParty::OrganizationId#20, UtilityParty::PersonId#21
+        Name: $PartyId
+   7    Set Variable [ $SalespersonId; Value:session::CurrentUserPartyId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: session::CurrentUserPartyId#63
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalespersonId
+   8    Set Variable [ $SalespersonId; Value:Let ([
+        
+        
+        columnField  = 	Party_PartyRole::Id	;
+        whereField   =   Party_PartyRole::PartyId	;
+        whereValue   =   $SalespersonId 	;
+        whereField2  = 	Party_PartyRole::EmployeeInd 	;
+        whereValue2 =  	1
+        
+        ];
+        
+        
+        SQL.GetColumn2Fields ( columnField ; whereField ; whereValue ; whereField2 ; whereValue2 )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, Party_PartyRole::Id#16, Party_PartyRole::PartyId#45, Party_PartyRole::EmployeeInd#43, cf:SQL.GetColumn2Fields
+        Name: $SalespersonId
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ IsEmpty ( $PartyId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  11    Exit Script [  ]
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #Create the opportunity
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "LeadId" ; $LeadId ; JSONString ];
+        	[ "PartyId" ; $PartyId ; JSONString ];
+        	[ "SalespersonId" ; $SalespersonId ; JSONString ];
+        	[ "StartDate" ; $StartDate ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  16    Perform Script [ “#wip Create Opportunity { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=602 name="#wip Create Opportunity { json }" in=karbon_kontroller.fmp12
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  19    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  20    Show Custom Dialog [ Title: "Error"; Message: "The opportunity could not be created."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  21    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #Go to the opportunity record
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Perform Script [ “Go to Opportunity Detail { Id }”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=603 name="Go to Opportunity Detail { Id }"
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

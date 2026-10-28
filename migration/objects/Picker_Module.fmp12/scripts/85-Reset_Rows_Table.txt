@@ -1,0 +1,218 @@
+# script 85: Reset Rows Table
+# file: Picker Module.fmp12
+# folder: Modules / gi Virtual Lists / Virtual Lists Public
+# source: ScriptCatalog/Script[@id=85]
+# steps: 61 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=True
+# folder group: id=83 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #==============================================
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #   Function:             Make Sure the Table is setup correctly
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #   Parameters:
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #   Notes:                You may want to run this on Open
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #   Author:                Todd Geist
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #   Version:               1.0
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #==============================================
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #how many records do you want.  It's unlikely you need more than 1000
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $numberOfRecordsWanted; Value:50 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $numberOfRecordsWanted
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Go to Layout [ “VIRTUALLISTS_Rows” (VIRTUALLISTS_Rows) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=20 name=VIRTUALLISTS_Rows
+  17    Show All Records
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #check record count
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $notEnoughRecords; Value:Get (TotalRecordCount) < $numberOfRecordsWanted ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:TotalRecordCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $notEnoughRecords
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #check sequence
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Sort Records [ Keep records in sorted order; Specified Sort Order: VIRTUALLISTS_Rows::n; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=VIRTUALLISTS_Rows id=1 name=n
+  28    Go to Record/Request/Page
+        [ Last ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  29    Set Variable [ $sequenceIsOff; Value:VIRTUALLISTS_Rows::n <> Get (RecordNumber) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: VIRTUALLISTS_Rows::n#1, fn:Get, fn:RecordNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $sequenceIsOff
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #can we exit?
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $everythingIsOK; Value:not (
+        $sequenceIsOff
+        or 
+        $notEnoughRecords
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:or
+        Repetition
+          Calculation:
+            | 1
+        Name: $everythingIsOK
+  36    If [ $everythingIsOK ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  38    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  39    End If
+        DisableStepCollapsed state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Freeze Window
+        DisableStepCollapsed state=False
+  44    #something is messed up, so delete and start over.
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Truncate Table [ No dialog; Table: “VIRTUALLISTS_Rows” ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        BaseTable id=140 comment="" name=VIRTUALLISTS_Rows
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #reset the serial number
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Next Serial Value [ VIRTUALLISTS_Rows::n; 1 ]
+        DisableStepCollapsed state=False
+        Field table=VIRTUALLISTS_Rows id=1 name=n
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #create the number of records you want
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    New Record/Request
+        DisableStepCollapsed state=False
+  57    Exit Loop If [ Get (RecordNumber) >=$numberOfRecordsWanted ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:RecordNumber
+  58    End Loop
+        DisableStepCollapsed state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout

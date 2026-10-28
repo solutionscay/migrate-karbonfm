@@ -1,0 +1,408 @@
+# script 1221: Execute JavaScript ( { function, parameter, ...} )
+# file: karbon_charts.fmp12
+# folder: FM WebViewer Bridge / Public
+# source: ScriptCatalog/Script[@id=1221]
+# steps: 75 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=1218 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Calls a function in the Web Viwer External API
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # Passes the Parameters Object to the function
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # you will need one of these scripts in each file you want to use it in
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @module fm-webviewer-bridge
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {object} options
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @param {string} options.function the name of the function to call
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @param {object} [options.parameter={}] to pass to the function
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # @param {object} [options.callback] to pass to the function
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @param {string} [options.callback.script] the script to call back to
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    # @param {string} [options.callback.file=Get(CurrentFile)] the the file to callback to
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    # @param {string} options.webViewer the name of the webviewer.
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    # @errorResult {object) error Object
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  24    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $WebViewer; Value:JSONGetElement($parameters; "webViewer") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $WebViewer
+  29    Set Variable [ $function; Value:JSONGetElement($parameters; "function") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $function
+  30    Set Variable [ $callbackScript; Value:JSONGetElement($parameters; "callback.script") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $callbackScript
+  31    Set Variable [ $callbackFile; Value:JSONGetElement($parameters; "callback.file") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $callbackFile
+  32    Set Variable [ $parameter; Value:JSONGetElement($parameters; "parameter") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameter
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    If [ IsEmpty ( $parameter ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  35    Set Variable [ $parameter; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameter
+  36    End If
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $url; Value:JSONGetElement($parameters; "url") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    If [ IsEmpty ( $WebViewer ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  42    Set Variable [ $error; Value:
+        
+        JSONSetElement ("";
+        
+           ["descriptor"; "No Web Viewer" ; JSONString];
+           ["script"; Get(ScriptName); JSONString];
+           ["data" ; Get(ScriptParameter) ; ""];
+           ["errorCode" ; -2 ; JSONNumber ];
+           ["type" ; "FM WebVeiwer Bridge"; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Get, fn:ScriptName, fn:ScriptParameter, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  43    Show Custom Dialog [ Title: "Developer Error"; Message: JSONFormatElements($error); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  44    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  45    End If
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ IsEmpty ( $url ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  48    Set Variable [ $url; Value:Let(
+        [
+        s = GetLayoutObjectAttribute ( $webViewer ; "source" ) ;
+        p = Position ( s; "/" ; 1; 3  );
+        p = If(p=0 ; Position ( s; "#" ; 1; 1  ) ; p);
+        p = If(p=0 ; Length(s); p)
+        ];
+        
+           Left(s;p-1)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:GetLayoutObjectAttribute, fn:Position, fn:If, fn:Length, fn:Left
+        Name: $url
+  49    End If
+        DisableStepCollapsed state=False
+  50    If [ IsEmpty ( $url ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  51    Set Variable [ $error; Value:JSONSetElement ("";
+        
+           ["descriptor"; "url is required" ; JSONString];
+           ["script"; Get(ScriptName); JSONString];
+           ["data" ; Get(ScriptParameter) ; ""];
+           ["errorCode" ; -2 ; JSONNumber ];
+           ["type" ; "FM WebVeiwer Bridge"; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Get, fn:ScriptName, fn:ScriptParameter, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  52    Show Custom Dialog [ Title: "Developer Error"; Message: JSONFormatElements ( $error ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  53    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  54    End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    If [ IsEmpty($callbackFile) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  57    Set Variable [ $callbackFile; Value:Get(FileName) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:FileName
+        Repetition
+          Calculation:
+            | 1
+        Name: $callbackFile
+  58    End If
+        DisableStepCollapsed state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $callback; Value:JSONSetElement ("";
+        
+          ["script" ; $callbackScript ; JSONString ];
+          ["file" ; $callbackFile ; JSONString ]
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $callback
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62 // Set Variable [ $hash; Value:$function 
+        
+        &
+        
+        If(not IsEmpty ( $parameter ) ;  "^parameter^" & Substitute($parameter; "#"; "h^" ) )
+        
+        &
+        
+        If(not IsEmpty ( $callbackFile ) ;  "^callback^" & $callbackFile )
+        
+        &
+        
+        If(not IsEmpty ( $callbackScript ) ;  "^callback^" & $callbackScript ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:not, fn:IsEmpty, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $hash
+  63    Set Variable [ $hash; Value:JSONSetElement (""; 
+        
+        
+        ["function" ; $function ; JSONString ];
+        ["parameter" ; Substitute($parameter; "#"; "h^" ) ; "" ];
+        ["callback" ; $callback ; JSONObject ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Substitute, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $hash
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "url" ; $url ; JSONString ];
+        	[ "hash" ; $hash ; "" ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  67    Perform Script [ “Compile URL( url ; hash )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=1228 name="Compile URL( url ; hash )"
+  68    Set Variable [ $url; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Set Web Viewer [ Object Name: $WebViewer; URL: $url ]
+        DisableStepCollapsed state=False
+        Action value=GoToURL
+        URL custom=False
+  71    Set Variable [ $error; Value:Let(
+        [
+        error =Get(LastError ) ;
+        
+        
+        errorJSON = JSONSetElement (""; "errorCode" ; error ; JSONNumber );
+        
+        
+        errorJSON  = If(error ;
+        JSONSetElement ("";
+        
+           ["type" ; "FileMaker Error"; JSONString];
+           ["descriptor"; "attempting to Set WebViewr" ; JSONString];
+           ["script"; Get(ScriptName); JSONString]
+        );
+        
+        errorJSON
+        )
+        ];
+        
+        
+        errorJSON
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Get, fn:LastError, fn:JSONSetElement, fn:JSONNumber, fn:If, fn:JSONString, fn:ScriptName
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False

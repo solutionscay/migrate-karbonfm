@@ -1,0 +1,151 @@
+# script 289: Save Card - UtiityTask
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / Task
+# source: ScriptCatalog/Script[@id=289]
+# steps: 35 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=286 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-10-21 dave@geistinteractive.com - no longer using AsJson calc field
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "CreatorId" ; session::CurrentUserPartyId ; JSONString ];
+        	[ "Date" ; UtilityTask::DueDate ; JSONString ];
+        	[ "Id" ; UtilityTask::Id ; JSONString ];
+        	[ "EntityId" ; UtilityTask::EntityId ; JSONString ] ; 
+        	[ "PartyFromId" ; UtilityTask::PartyAssignedById ; JSONString ];
+        	[ "PartyRegardingId" ; UtilityTask::PartyRegardingId ; JSONString ];
+        	[ "PartyToId" ; UtilityTask::PartyAssignedToId ; JSONString ];
+        	[ "Subject" ; UtilityTask::Subject ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, session::CurrentUserPartyId#63, fn:JSONString, UtilityTask::DueDate#9, UtilityTask::Id#10, UtilityTask::EntityId#23, UtilityTask::PartyAssignedById#6, UtilityTask::PartyRegardingId#12, UtilityTask::PartyAssignedToId#7, UtilityTask::Subject#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $CreateAnother; Value:JSONGetElement ( $json ; "CreateAnother" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreateAnother
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ IsEmpty  (Selected_Activity::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_Activity::Id#1
+  10    Set Variable [ $create; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $create
+  11    Perform Script [ “Create Task { data }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=391 name="Create Task { data }" in=karbon_kontroller.fmp12
+  12    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “Edit Task { data } _deprecated” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=544 name="Edit Task { data } _deprecated" in=karbon_kontroller.fmp12
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  19    #Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Show Custom Dialog [ Title: "Error"; Message: "This Task was not " & If ( $create; "created." ; "edited." ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  21    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ $CreateAnother ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25 // Set Field [ UtilityTask::PartyAssignedToId; "" ]
+        DisableStepCollapsed state=False
+        Field table=UtilityTask id=7 name=PartyAssignedToId
+  26    Set Field [ UtilityTask::Subject; "" ]
+        DisableStepCollapsed state=False
+        Field table=UtilityTask id=8 name=Subject
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Go to Field [ UtilityTask::Subject ]
+        [ Select/perform ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=UtilityTask id=8 name=Subject
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    End If
+        DisableStepCollapsed state=False
+  35    End If
+        DisableStepCollapsed state=False

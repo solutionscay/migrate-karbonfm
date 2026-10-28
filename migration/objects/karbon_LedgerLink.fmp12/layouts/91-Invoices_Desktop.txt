@@ -1,0 +1,110 @@
+# layout 91: Invoices | Desktop
+# file: karbon_LedgerLink.fmp12
+# folder: Application / Desktop
+# source: LayoutCatalog/Layout[@id=91]
+# objects: 19
+# theme: LedgerLink PC
+# folder group: id=88 groupCollapsed=True includeInMenu=False
+
+Layout width=1024 quickFind=True includeInMenu=True id=91 name="Invoices | Desktop"
+  Table id=1065132 name=Invoice
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnModeEnter id=106 triggerFlags=2(find)
+      Script id=490 name="Enter Find Mode Trigger"
+      TriggerText: "Enter Find Mode Trigger"
+  Object type=Button key=7 LabelKey=0 bounds=8,1044,48,1172
+    Text flags=2 style=button.logo
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Button key=8 LabelKey=0 bounds=48,16,72,264
+    Text flags=2 style=button.list.label.left: Customer
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Text key=9 LabelKey=0 bounds=80,16,104,264
+    Text flags=10 tableViewVisibility=0 style=text.list.field.left: <<Invoice_Customer::displayName>>
+      FieldList quickFind=True
+        Field table=Invoice_Customer id=9 name=displayName
+  Object type=Button key=10 LabelKey=0 bounds=0,0,39,42
+    Text flags=2 style=button.nav
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Display Main Nav” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=463 name="Display Main Nav"
+      Image name=a3_list.svg
+  Object type=Button key=25 LabelKey=0 flags=1073741824 bounds=73,0,113,1024
+    Text flags=2 style=button.row
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=6 name="Go to Layout"
+        StepText: Go to Layout [ “Invoice | Desktop” (Invoice) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=97 name="Invoice | Desktop"
+  Object type=Button key=26 LabelKey=0 flags=1342177280 bounds=0,928,40,1024
+    Text flags=2 style=button.nav: Sync
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Sync QBO with FM, Show Progress Card” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=242 name="Sync QBO with FM, Show Progress Card"
+      Image name=a125_sync.svg
+  Object type=Button key=27 LabelKey=0 bounds=48,264,72,360
+    Text flags=2 style=button.list.label.left: Date
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Button key=28 LabelKey=0 bounds=48,360,72,456
+    Text flags=2 style=button.list.label.left: No.
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Button key=29 LabelKey=0 bounds=48,456,72,552
+    Text flags=2 style=button.list.label.left: "Due Date"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Button key=30 LabelKey=0 bounds=48,552,72,648
+    Text flags=2 style=button.list.label.right: Balance
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Button key=31 LabelKey=0 bounds=48,648,72,744
+    Text flags=2 style=button.list.label.right: Total
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Text key=32 LabelKey=0 bounds=80,264,104,360
+    Text flags=10 tableViewVisibility=0 style=text.list.field.left: <<date>>
+      Display: date format=8 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"
+      FieldList quickFind=True
+        Field table=Invoice id=5 name=date
+  Object type=Text key=33 LabelKey=0 bounds=80,360,104,456
+    Text flags=10 tableViewVisibility=0 style=text.list.field.left: <<docNumber>>
+      FieldList quickFind=True
+        Field table=Invoice id=4 name=docNumber
+  Object type=Text key=34 LabelKey=0 bounds=80,456,104,552
+    Text flags=10 tableViewVisibility=0 style=text.list.field.left: <<dueDate>>
+      Display: date format=8 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"
+      FieldList quickFind=True
+        Field table=Invoice id=22 name=dueDate
+  Object type=Text key=35 LabelKey=0 bounds=80,552,104,648
+    Text flags=10 tableViewVisibility=0 style=text.list.field.right: <<balance>>
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      FieldList quickFind=True
+        Field table=Invoice id=26 name=balance
+  Object type=Text key=36 LabelKey=0 bounds=80,648,104,744
+    Text flags=10 tableViewVisibility=0 style=text.list.field.right: <<totalAmt>>
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      FieldList quickFind=True
+        Field table=Invoice id=25 name=totalAmt
+  Object type=Text key=37 LabelKey=0 flags=260 bounds=80,800,104,872
+    Text flags=6 style=text.list.field.right: Deleted
+    HideCondition findMode=True
+      Calculation:
+        | not Invoice::deleted
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:not, Invoice::deleted#32, fn:or, fn:Get, fn:WindowMode
+  Object type=Button key=38 LabelKey=0 flags=1342177280 bounds=0,824,40,928
+    Text flags=2 style=button.nav: Chart
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Go To Chart” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=480 name="Go To Chart"
+      Image name=a57_sort.svg
+  Object type=Text key=39 LabelKey=0 bounds=0,42,39,170
+    Text flags=2 style=text.header.title.left: Invoices

@@ -1,0 +1,249 @@
+# table 143: UtilityEmailMessage
+# file: karbon_kontacts.fmp12
+# source: BaseTableCatalog/BaseTable[@id=143]
+# fields: 25
+# records: 1
+
+Field id=6 dataType=Text fieldType=Normal name=Subject
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=Message
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=Attachments
+  Comment: a return separated list of paths
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Number fieldType=Normal name=UseSystemSettingsInd
+  Comment: If the user wants to send an EmailMessage using the system settings, they don't need to authenticate with a password
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=ActivityPartyArray
+  Comment: An array of JSON Objects representing the PartyId, PartyName, EmailAddressId, and EmailAddress
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=UtilityEmailMessage:
+    | JSONSetElement ( "{}" ; 
+    | 	[ "ActivityParty" ; ActivityPartyArray ; JSONArray ] ; 
+    | 	[ "Attachments" ; Attachments ; JSONString ];
+    | 	[ "CreatorId" ; session::CurrentUserId ; JSONString ];
+    | 	[ "Date" ; Date ; JSONString ];
+    | 	[ "Id" ; Id ; JSONString ];
+    | 	[ "EntityId" ; EntityId ; JSONString ];
+    | 	[ "Message" ; Message ; JSONString ];
+    | 	[ "SentInd" ; SentInd ; JSONString ];
+    | 	[ "Subject" ; Subject ; JSONString ];
+    | 	[ "Time" ; Time ; JSONString ];
+    | 	[ "UserId" ; UserId ; JSONString ];
+    | 	[ "UseSystemSettingsInd" ; UseSystemSettingsInd ; JSONString ]
+    | )
+    refs: fn:JSONSetElement, UtilityEmailMessage::ActivityPartyArray#10, fn:JSONArray, UtilityEmailMessage::Attachments#8, fn:JSONString, session::CurrentUserId#58, UtilityEmailMessage::Date#14, UtilityEmailMessage::Id#25, UtilityEmailMessage::EntityId#31, UtilityEmailMessage::Message#7, UtilityEmailMessage::SentInd#22, UtilityEmailMessage::Subject#6, UtilityEmailMessage::Time#15, UtilityEmailMessage::UserId#21, UtilityEmailMessage::UseSystemSettingsInd#9
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Date fieldType=Normal name=Date
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Time fieldType=Normal name=Time
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=From
+  Comment: The email address the email will come from
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Calculated name=ToDisplay
+  Calculation table=UtilityEmailMessage:
+    | Let ( [ 
+    | 
+    | 	RecipientsTo = List ( Selected_ActivityParty#to_ActivityPartyEmail::EmailAddressFormatted ) 
+    | 
+    | ] ; 
+    | 
+    | 	Substitute ( RecipientsTo ; ¶ ; ", " ) 
+    | 
+    | )
+    refs: fn:Let, fn:List, Selected_ActivityParty#to_ActivityPartyEmail::EmailAddressFormatted#16, fn:Substitute
+  Comment: Comma separated emailaddresses
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Calculated name=CcArrayDisplay
+  Calculation table=UtilityEmailMessage:
+    | Let ( [ 
+    | 
+    | 	RecipientsTo = List ( Selected_ActivityParty#cc_ActivityPartyEmail::EmailAddressFormatted ) 
+    | 
+    | ] ; 
+    | 
+    | 	Substitute ( RecipientsTo ; ¶ ; ", " ) 
+    | 
+    | )
+    refs: fn:Let, fn:List, Selected_ActivityParty#cc_ActivityPartyEmail::EmailAddressFormatted#16, fn:Substitute
+  Comment: Comma separated emailaddresses
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Calculated name=BccArrayDisplay
+  Calculation table=UtilityEmailMessage:
+    | Let ( [ 
+    | 
+    | 	RecipientsTo = List ( Selected_ActivityParty#bcc_ActivityPartyEmail::EmailAddressFormatted ) 
+    | 
+    | ] ; 
+    | 
+    | 	Substitute ( RecipientsTo ; ¶ ; ", " ) 
+    | 
+    | )
+    refs: fn:Let, fn:List, Selected_ActivityParty#bcc_ActivityPartyEmail::EmailAddressFormatted#16, fn:Substitute
+  Comment: Comma separated emailaddresses
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=ToArraySearch
+  Comment: Used to click into the "To" box and search for an email address
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Normal name=UserId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Number fieldType=Normal name=SentInd
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=UtilityEmailMessage:
+      | If ( IsEmpty ( Date ); True; False )
+      refs: fn:If, fn:IsEmpty, UtilityEmailMessage::Date#14, fn:True, fn:False
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Number fieldType=Normal name=TemplateId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Text fieldType=Normal name=SentMailDisplay
+  Comment: The header and message are combined into a single field for the display of sent email messages. This is set via script.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=UtilityEmailMessage (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Normal name=AttachmentId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=28 dataType=Binary fieldType=Normal name=AttachmentContainer
+  Comment: This is temporarily used to get the path to the selected file
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Number fieldType=Calculated name=ValidatedInd
+  Calculation table=UtilityEmailMessage:
+    | If ( 
+    | 
+    | 	// If any of the following are true, then the email has not passed validation
+    | 
+    | 	// The subject is empty
+    | 	IsEmpty ( UtilityEmailMessage::Subject ) or 
+    | 
+    | 
+    | 	// The body is empty
+    | 	IsEmpty ( 
+    | 		Substitute ( 
+    | 
+    | 			// get everything up to the signature block separator
+    | 			Left ( UtilityEmailMessage::Message ; 
+    | 				Position ( UtilityEmailMessage::Message & "-- ¶" ; "-- ¶" ; 1 ; 1 ) - 1   
+    | 			) ; 
+    | 
+    | 			// strip carriage returns
+    | 			¶ ; 
+    | 			""
+    | 
+    | 		) 
+    | 	) or 
+    | 
+    | 	// There's no recipients
+    | 	UtilityEmailMessage::ActivityPartyArray = "[]" ; 
+    | 
+    | 
+    | 	// Invalid
+    | 	False ; 
+    | 
+    | 	// Valid
+    | 	True 
+    | 
+    | )
+    refs: fn:If, fn:IsEmpty, UtilityEmailMessage::Subject#6, fn:or, fn:Substitute, fn:Left, UtilityEmailMessage::Message#7, fn:Position, UtilityEmailMessage::ActivityPartyArray#10, fn:False, fn:True
+  Comment: Indicates that the email is ready to send (i.e., has: at least one recipient, a subject and a body)
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=31 dataType=Text fieldType=Normal name=EntityId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Number fieldType=Normal name=EntityTypeId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Normal name=OtherEmailAddress
+  Comment: Used to manually address an email without a relationship to a party
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

@@ -1,0 +1,193 @@
+# table 159: Test
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=159]
+# fields: 22
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=Test:
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=Test (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=Test (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=Test (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Test:
+      | // ensure this field always evaluates to true
+      | IsEmpty ( Self ) or not IsEmpty ( Self )
+      refs: fn:IsEmpty, fn:Self, fn:or, fn:not
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=TestCase
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=ScriptIdCached
+  Comment: The script we are going to test
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=Entity
+  Comment: The entity this test relates to
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=CustomerRequestId
+  Comment: If this test links directly to a customer test, let's make sure its captured
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=ActiveInd
+  Comment: This should have a related data to capture temporal data...
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=ScriptNameCached
+  Comment: The script we are going to test
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=TestGroupId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=FileName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=ExpectedResult
+  Comment: Error or Success
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=Test:
+    | // Created by Generator - 3/23/2018 5:18:10 PM
+    | // DO NOT format this JSON object!
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "ActiveInd" ; $ActiveInd ; JSONNumber ];
+    | 	[ "CustomerRequestId" ; $CustomerRequestId ; JSONString ];
+    | 	[ "Entity" ; $Entity ; JSONString ];
+    | 	[ "FileName" ; $FileName ; JSONString ];
+    | 	[ "Id" ; $Id ; JSONString ];
+    | 	[ "ScriptId" ; $ScriptId ; JSONString ];
+    | 	[ "ScriptName" ; $ScriptName ; JSONString ];
+    | 	[ "TestGroupId" ; $TestGroupId ; JSONString ];
+    | 	[ "TestName" ; $TestName ; JSONString ];
+    | 	[ "Type" ; $Type ; JSONString ]
+    |  
+    | )
+    refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONString
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=JSNObjectIdCached
+  Comment: The Parameter passed to the script we are testing
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Calculated name=LastResultFailInd
+  Calculation table=Test:
+    | If( Sum( Test_TestLine::LastResultFailInd ) > 0; True; False )
+    refs: fn:If, fn:Sum, Test_TestLine::LastResultFailInd#19, fn:True, fn:False
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Number fieldType=Calculated name=LastResultPassInd
+  Calculation table=Test:
+    | Let([
+    | 
+    | NumberOfResults = Count( Test_TestLine::Id );
+    | NumberPassed = Sum( Test_TestLine::LastResultPassInd )
+    | 
+    | ];
+    | 
+    | If( NumberOfResults = NumberPassed; True; False )
+    | 
+    | )
+    refs: fn:Let, fn:Count, Test_TestLine::Id#3, fn:Sum, Test_TestLine::LastResultPassInd#18, fn:If, fn:True, fn:False
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=TimeStamp fieldType=Normal name=LastResultTimestamp
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Normal name=TestLineId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=Subject
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

@@ -1,0 +1,198 @@
+# script 326: Create Card Token ( {card} )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO Payments / Public
+# source: ScriptCatalog/Script[@id=326]
+# steps: 47 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=324 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # exchanges card details for a token on Intuit Servers
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # use the token instead of the card
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} card
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {string} card.expYear
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} card.expMonth
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {string} card.cvc
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @param {string} card.number
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @param {object} [card.address]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @param {string} [card.address.region]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @param {string} [card.address.postalCode]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # @param {string} [card.address.streetAddress]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @param {string} [card.address.country]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    # @param {string} [card.address.city]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    # @param {string} [card.name]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18 // Insert Text [ $example ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |     "expYear": "2020",
+          |     "expMonth": "02",
+          |     "address": {
+          |       "region": "CA",
+          |       "postalCode": "94086",
+          |       "streetAddress": "1130 Kifer Rd",
+          |       "country": "US",
+          |       "city": "Sunnyvale"
+          |     },
+          |     "name": "emulate=0",
+          |     "cvc": "123",
+          |     "number": "4111111111111111"
+          |   }
+        Field: $example
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    # @returnSuccess {object} response
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    # @returnSuccess {string} value  the token value
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  26    Set Error Capture [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    # check for valid JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $cardData; Value:JSON.Format ( Get ( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $cardData
+  30    If [ Error.IsError ( $cardData ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  31    Exit Script [ Result: $cardData ]
+        DisableStepCollapsed state=False
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    # validate the JSON for required props, and logic
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $error; Value:JSON.Validator.SetJSON ( $cardData) & JSON.Validator.ApplyRules(List(
+        
+        
+        JSON.Validate.IsRequired ( "number" );
+        JSON.Validate.IsRequired ( "expMonth" );
+        JSON.Validate.IsRequired ( "expYear" );
+        JSON.Validate.IsRequired ( "cvc" )
+        
+        )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validator.SetJSON, cf:JSON.Validator.ApplyRules, fn:List, cf:JSON.Validate.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  36    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  37    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  38    End If
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $request; Value:JSONSetElement ( "" ; 
+        
+        ["data.card" ; $cardData; JSONObject] ;
+        ["method" ; "POST"; JSONString ];
+        ["path" ; "/tokens"; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Perform Script [ “Send Payment Request( {request} )”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=340 name="Send Payment Request( {request} )"
+  43    Set Variable [ $response; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  44    Exit Script [ Result: $response ]
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False

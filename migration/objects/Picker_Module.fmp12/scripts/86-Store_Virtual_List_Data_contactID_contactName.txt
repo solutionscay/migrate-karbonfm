@@ -1,0 +1,61 @@
+# script 86: Store Virtual List Data ( contactID ; contactName )
+# file: Picker Module.fmp12
+# folder: Modules / gi Virtual Lists / Virtual Lists Public
+# source: ScriptCatalog/Script[@id=86]
+# steps: 12 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=83 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #Array is a pipe-separated list of Contact ID and Names
+        
+        Example: 
+        	3|John Doe
+        	2|John Smith
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $contactID; Value:GetValue ( Get ( ScriptParameter ) ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue, fn:Get, fn:ScriptParameter
+        Name: $contactID
+   6    Set Variable [ $contactName; Value:GetValue ( Get ( ScriptParameter ) ; 2) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $contactName
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $$VirtualListArray; Value:AddRemoveListItems ( $$VirtualListArray ; $contactID & "|" & $contactName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:AddRemoveListItems
+        Repetition
+          Calculation:
+            | 1
+        Name: $$VirtualListArray
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Field [ VIRTUALLISTS::foundCount; ValueCount ( Picker::Results ) ]
+        DisableStepCollapsed state=False
+        refs: fn:ValueCount, Picker::Results#2
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True

@@ -1,0 +1,377 @@
+# table 133: Customer
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=133]
+# fields: 43
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Number fieldType=Normal name=taxable
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=contactGivenName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=contactFamilyName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=displayName
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Customer (inactive):
+      | Let ( [
+      | 	trigger = Self
+      | ] ;
+      | 	/* full */
+      | 		Substitute ( List (
+      | 			Customer::contactTitle ;
+      | 			Customer::contactGivenName ;
+      | 			Customer::contactMiddleName ;
+      | 			Customer::contactFamilyName ;
+      | 			Customer::contactSuffix ;
+      | 		) ;  "¶"; " " )
+      | )
+      refs: fn:Let, fn:Self, fn:Substitute, fn:List, Customer::contactTitle#27, Customer::contactGivenName#7, Customer::contactMiddleName#26, Customer::contactFamilyName#8, Customer::contactSuffix#28
+  Validation type=Always
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=printOnCheckName
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=Customer:
+      | If ( printOnCheckAsDisplayName ;
+      | 	displayName ;
+      | 	Self
+      | )
+      refs: fn:If, Customer::printOnCheckAsDisplayName#43, Customer::displayName#9, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=active
+  AutoEnter allowEditing=True value=ConstantData overwriteExistingValue=True constant=True calculation=True
+    ConstantData: 1
+    Calculation table=Customer:
+      | GetAsBoolean ( Self )
+      refs: fn:GetAsBoolean, fn:Self
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=primaryEmail
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=billAddressLine1
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=billAddressCity
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=billAddressCountry
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=billAddressState
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=billAddressPostalCode
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=shipAddressLine1
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | If ( shipSameAsBilling ;
+      | 	billAddressLine1 ;
+      | 	Self
+      | )
+      refs: fn:If, Customer::shipSameAsBilling#44, Customer::billAddressLine1#13, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Normal name=shipAddressCity
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | If ( shipSameAsBilling ;
+      | 	billAddressCity ;
+      | 	Self
+      | )
+      refs: fn:If, Customer::shipSameAsBilling#44, Customer::billAddressCity#14, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=shipAddressCountry
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | If ( shipSameAsBilling ;
+      | 	billAddressCountry ;
+      | 	Self
+      | )
+      refs: fn:If, Customer::shipSameAsBilling#44, Customer::billAddressCountry#15, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Normal name=shipAddressState
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | If ( shipSameAsBilling ;
+      | 	billAddressState ;
+      | 	Self
+      | )
+      refs: fn:If, Customer::shipSameAsBilling#44, Customer::billAddressState#16, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=shipAddressPostalCode
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | If ( shipSameAsBilling ;
+      | 	billAddressPostalCode ;
+      | 	Self
+      | )
+      refs: fn:If, Customer::shipSameAsBilling#44, Customer::billAddressPostalCode#17, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Normal name=companyName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Text fieldType=Normal name=primaryPhone
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Normal name=webAddress
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Normal name=contactMiddleName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Normal name=contactTitle
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=28 dataType=Text fieldType=Normal name=contactSuffix
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Text fieldType=Normal name=billAddressLine2
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Text fieldType=Normal name=shipAddressLine2
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | If ( shipSameAsBilling ;
+      | 	billAddressLine2 ;
+      | 	Self
+      | )
+      refs: fn:If, Customer::shipSameAsBilling#44, Customer::billAddressLine2#29, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Number fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=Always
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=38 dataType=Number fieldType=Normal name=qbo_send
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | Let(
+      | [
+      | x = GetField("")
+      | 
+      | ];
+      | Case(
+      |    $LL_IsUpdatingThisRecord ; Self;
+      |    1
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:GetField, fn:Case, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=Text fieldType=Normal name=alternatePhone
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=Text fieldType=Normal name=mobilePhone
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=41 dataType=Text fieldType=Normal name=notes
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=42 dataType=Text fieldType=Normal name=id_TaxCode
+  Comment: Default tax code
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=43 dataType=Number fieldType=Normal name=printOnCheckAsDisplayName
+  Comment: Boolean; if True, print on check name will be the same as display name
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=Customer:
+      | True
+      refs: fn:True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=44 dataType=Number fieldType=Normal name=shipSameAsBilling
+  Comment: Boolean; if True, shipping address will always be the same as billing address
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=Customer:
+      | True
+      refs: fn:True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Text fieldType=Normal name=resaleNum
+  Comment: Resale number or some additional info about the customer.
+  AutoEnter allowEditing=True
+  Validation maxLength=True type=Always
+    MaxDataLength value=16
+    StrictValidation value=True
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Text fieldType=Normal name=id_Term
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=48 dataType=Text fieldType=Normal name=qbo_error
+  Comment: error message returned by QBO when attempting to sync this record
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=49 dataType=Number fieldType=Normal name=qbo_Balance
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Number fieldType=Normal name=qbo_BalanceWithJobs
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=52 dataType=Text fieldType=Normal name=qbo_FullyQualifiedName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=Text fieldType=Normal name=qbo_TaxExemptionReasonId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Customer:
+      | Case ( taxable = 0 ; "NON")
+      refs: fn:Case, Customer::taxable#5
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=57 dataType=Text fieldType=Normal name=primaryFax
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=58 dataType=Number fieldType=Normal name=One
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=Customer:
+      | If(Self;1;1)
+      refs: fn:If, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

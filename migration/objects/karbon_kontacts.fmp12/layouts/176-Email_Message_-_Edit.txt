@@ -1,0 +1,481 @@
+# layout 176: Email Message - Edit
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity
+# source: LayoutCatalog/Layout[@id=176]
+# objects: 74
+# theme: Karbon-1.0
+# folder group: id=76 groupCollapsed=False includeInMenu=False
+
+Layout width=849 quickFind=True includeInMenu=False id=176 name="Email Message - Edit"
+  Table id=1065167 name=EmailMessage
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnLayoutExit id=109 triggerFlags=1(browse)
+      Script id=668 name="Trigger: Close Activity Window"
+      TriggerText: "Trigger: Close Activity Window"
+  Object type=Text key=147 LabelKey=0 flags=4 bounds=200,90,224,520
+    Text flags=10 tableViewVisibility=0 style=Label-Medium-Left: <<System::SystemEmailAddress>>
+      FieldList quickFind=True
+        Field table=System id=47 name=SystemEmailAddress
+    HideCondition findMode=False
+      Calculation:
+        | not EmailMessage::UseSystemSettingsInd
+        refs: fn:not, EmailMessage::UseSystemSettingsInd#26
+  Object type=Field key=35 LabelKey=0 flags=4 bounds=200,90,224,400
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+      Field: Selected_ActivityParty#from::PartyNameCached#13
+      ValueList: UtilityEmailMessage - User#37
+    HideCondition findMode=False
+      Calculation:
+        | EmailMessage::UseSystemSettingsInd
+        refs: EmailMessage::UseSystemSettingsInd#26
+  Object type=Field key=8 LabelKey=0 flags=1073741824 bounds=170,90,194,830
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Activity::Subject#22
+  Object type=Text key=9 LabelKey=0 bounds=170,10,195,80
+    Text flags=2 style=Label-Medium: Subject
+  Object type=Field key=10 LabelKey=0 flags=-1073741824 bounds=260,20,665,830
+    ScriptTriggers
+      Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+        Script id=384 name="Set Selection Position to 1"
+        TriggerText: "Set Selection Position to 1"
+    FieldObj numOfReps=1 flags=288 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Activity_ActivityMessage::Message#12
+  Object type=PopoverButton key=27 LabelKey=0 bounds=20,910,60,960
+    Text flags=2 style=Button-Muted: Schedule...
+    PopoverButtonObj buttonFlags=0 key=28 iconSize=16 displayType=1
+      Image name=a131_pieChart.svg
+      Object type=Popover key=28 LabelKey=0 style="Popover-White With Title" bounds=71,733,415,1138
+        TitleCalc
+          Calculation:
+            | "Schedule Email to send..."
+        PopoverObj position=1 key=27
+          Object type=Field key=29 LabelKey=30 bounds=151,755,180,905
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Large
+              Field: UtilityEmailMessage::Date#14
+          Object type=Text key=30 LabelKey=0 bounds=121,755,150,905
+            Text flags=2 style=Label-Large-Left: Date
+          Object type=Field key=31 LabelKey=32 bounds=230,755,259,905
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Large
+              Field: UtilityEmailMessage::Time#15
+              Display: time flags=131 hourStyle=0 minsecStyle=1 separator=: amString=" AM" pmString=" PM" ampmString=""
+          Object type=Text key=32 LabelKey=0 bounds=200,755,229,905
+            Text flags=2 style=Label-Large-Left: Time
+          Object type=Button key=33 LabelKey=0 bounds=345,755,385,905
+            Text flags=2 style=Button-SuccessPill: "Schedule for Later"
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Send Utility Email Message” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=333 name="Send Utility Email Message"
+          Object type=Text key=34 LabelKey=0 bounds=270,755,345,1115
+            Text flags=2: "Emails are sent on a schedule from the server. This email will not come directly from your account, since it will be sent from the system."
+  Object type=Text key=36 LabelKey=0 bounds=200,20,225,80
+    Text flags=2 style=Label-Medium: From
+  Object type=Text key=42 LabelKey=0 bounds=80,10,105,80
+    Text flags=2 style=Label-Medium: To
+  Object type=Text key=44 LabelKey=0 bounds=110,10,135,80
+    Text flags=2 style=Label-Medium: Cc
+  Object type=Text key=46 LabelKey=0 bounds=140,10,165,80
+    Text flags=2 style=Label-Medium: Bcc
+  Object type=Line key=47 LabelKey=0 flags=1073745922 bounds=240,20,240,830
+  Object type=PopoverButton key=96 LabelKey=0 flags=268435456 bounds=80,910,120,960
+    Text flags=2 style=Button-Invisible: Schedule...
+    PopoverButtonObj buttonFlags=0 key=97 iconSize=16 displayType=1
+      Image name=a79_records.svg
+      Object type=Popover key=97 LabelKey=0 style="Popover-White With Title" bounds=131,733,330,1138
+        TitleCalc
+          Calculation:
+            | "Apply Template…"
+        PopoverObj position=1 key=96
+          Object type=Field key=74 LabelKey=75 bounds=220,760,244,1110
+            FieldObj numOfReps=1 flags=525344 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Pop-up Medium"
+              Field: UtilityEmailMessage::TemplateId#23
+              ValueList: Template#30
+          Object type=Text key=75 LabelKey=0 bounds=190,760,213,910
+            Text flags=2 style=Label-Medium-Left: Template
+          Object type=Button key=104 LabelKey=0 flags=65536 bounds=270,880,300,990
+            Text flags=2: Apply…
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “New - Apply Template” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=346 name="New - Apply Template"
+  Object type=Button key=22 LabelKey=0 flags=268500992 bounds=10,470,50,520
+    Text flags=2 style=Button-Invisible: Send
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Button: Send Email Message” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=775 name="Button: Send Email Message"
+      Image name=send_mail.svg
+  Object type=Button key=77 LabelKey=0 flags=268435456 bounds=10,400,50,450
+    Text flags=2 style=Button-Invisible: "Save Draft"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Save Utility Email Message as Draft” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=517 name="Save Utility Email Message as Draft"
+      Image name=save-solid-2.svg
+  Object type=PopoverButton key=78 LabelKey=0 flags=268435456 bounds=10,330,50,380
+    Text flags=2 style=Button-Invisible: Attachments
+    PopoverButtonObj buttonFlags=0 key=79 iconSize=16 displayType=1
+      Image name=a111_attach.svg
+      Object type=Popover key=79 LabelKey=0 style="Popover-White With Title" bounds=61,107,450,604
+        TitleCalc
+          Calculation:
+            | "Attachments"
+        PopoverObj position=1 key=78
+          Object type=Button key=131 LabelKey=0 flags=65536 bounds=140,152,170,312
+            Text flags=2: Attach…
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Add Activity Attachment v2” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=701 name="Button: Add Activity Attachment v2"
+          Object type=Portal key=135 LabelKey=0 name="ExistingRecipientsPortal Copy" bounds=183,154,415,555
+            PortalObj portalFlags=17 numOfRows=5 initialRow=1
+              TableAliasKey: Activity_FileAttachment
+              FieldList
+                Field table=Activity_FileAttachment_File id=6 name=FileName
+              Object type=Field key=136 LabelKey=0 bounds=193,204,217,514
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                  Field: Activity_FileAttachment_File::FileName#6
+              Object type=Button key=137 LabelKey=0 flags=65536 bounds=193,166,213,186
+                Text flags=2 style=Button-RowDelete
+                ButtonObj buttonFlags=0 iconSize=20 displayType=1
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Delete Attachment” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Script id=360 name="Delete Attachment"
+                  Image name=a20_deleteCircleOutline.svg
+          Object type=Field key=140 LabelKey=0 flags=260 bounds=140,400,170,550
+            FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+              Field: UtilityEmailMessage::AttachmentContainer#28
+            HideCondition findMode=True
+              Calculation:
+                | True
+                refs: fn:True
+          Object type=Field key=170 LabelKey=0 flags=260 bounds=120,400,150,550
+            FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+              Field: Globals::File#32
+            HideCondition findMode=True
+              Calculation:
+                | True
+                refs: fn:True
+  Object type=PopoverButton key=105 LabelKey=0 flags=268435456 bounds=10,260,50,310
+    Text flags=2 style=Button-Invisible: Attachments
+    PopoverButtonObj buttonFlags=0 key=106 iconSize=16 displayType=1
+      Image name=a43_contact.svg
+      Object type=Popover key=106 LabelKey=0 style="Popover-White With Title" bounds=61,38,580,533
+        TitleCalc
+          Calculation:
+            | "Add Recipients"
+        PopoverObj position=1 key=105
+          Object type=Portal key=107 LabelKey=0 bounds=170,63,408,505
+            PortalObj portalFlags=29 numOfRows=4 initialRow=1
+              TableAliasKey: Selected_NetworkAddress
+              FieldList
+                Field table=Selected_NetworkAddress id=7 name=Address
+                Field table=Selected_NetworkAddress_ContactMethod_Party id=19 name=NameCached
+              SortList BlanksLast=False Maintain=True value=True
+                Sort type=Ascending
+                  PrimaryField
+                    Field table=Selected_NetworkAddress id=7 name=Address
+              Object type=Field key=109 LabelKey=0 bounds=197,73,221,475
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChromeMuted
+                  Field: Selected_NetworkAddress::Address#7
+              Object type=Field key=111 LabelKey=0 bounds=180,73,204,345
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                  Field: Selected_NetworkAddress_ContactMethod_Party::NameCached#19
+              Object type=Button key=115 LabelKey=0 flags=65537 bounds=179,425,201,465
+                ConditionalFormatting
+                  Item id=0 flags=3
+                    Condition op=0
+                      Calculation:
+                        | // this ContactMethodId is in the list of ContactMethodIds already in use for this recipient role (e.g., To)
+                        | IsInList ( List ( Selected_ActivityParty#bcc::ContactMethodId ) ; Selected_NetworkAddress::Id )
+                        refs: cf:IsInList, fn:List, Selected_ActivityParty#bcc::ContactMethodId#28, Selected_NetworkAddress::Id#1
+                    Format: color: rgba(60.3922%,60.3922%,60.3922%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+                Text flags=2 style=Button-Small-CommandLink-Center: Bcc
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Button: Add Party Email Address to Email Message ( To|Cc|Bcc, EmailAddress )”; Parameter: "Bcc" ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Calculation:
+                      | "Bcc"
+                    Script id=351 name="Button: Add Party Email Address to Email Message ( To|Cc|Bcc, EmailAddress )"
+              Object type=Button key=114 LabelKey=0 flags=65537 bounds=179,385,201,425
+                ConditionalFormatting
+                  Item id=0 flags=3
+                    Condition op=0
+                      Calculation:
+                        | // this ContactMethodId is in the list of ContactMethodIds already in use for this recipient role (e.g., To)
+                        | IsInList ( List ( Selected_ActivityParty#cc::ContactMethodId ) ; Selected_NetworkAddress::Id )
+                        refs: cf:IsInList, fn:List, Selected_ActivityParty#cc::ContactMethodId#28, Selected_NetworkAddress::Id#1
+                    Format: color: rgba(60.3922%,60.3922%,60.3922%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+                Text flags=2 style=Button-Small-CommandLink-Center: Cc
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Button: Add Party Email Address to Email Message ( To|Cc|Bcc, EmailAddress )”; Parameter: "Cc" ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Calculation:
+                      | "Cc"
+                    Script id=351 name="Button: Add Party Email Address to Email Message ( To|Cc|Bcc, EmailAddress )"
+              Object type=Button key=113 LabelKey=0 flags=65537 bounds=179,345,201,385
+                ConditionalFormatting
+                  Item id=0 flags=3
+                    Condition op=0
+                      Calculation:
+                        | // this ContactMethodId is in the list of ContactMethodIds already in use for this recipient role (e.g., To)
+                        | IsInList ( List ( Selected_ActivityParty#to::ContactMethodId ) ; Selected_NetworkAddress::Id )
+                        refs: cf:IsInList, fn:List, Selected_ActivityParty#to::ContactMethodId#28, Selected_NetworkAddress::Id#1
+                    Format: color: rgba(60.3922%,60.3922%,60.3922%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+                Text flags=2 style=Button-Small-CommandLink-Center: To
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Button: Add Party Email Address to Email Message ( To|Cc|Bcc, EmailAddress )”; Parameter: "To" ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Calculation:
+                      | "To"
+                    Script id=351 name="Button: Add Party Email Address to Email Message ( To|Cc|Bcc, EmailAddress )"
+              Object type=Button key=144 LabelKey=0 flags=4 bounds=199,75,221,305
+                Text flags=2 style=Button-Invisible: "no email address"
+                ButtonObj buttonFlags=0 iconSize=12 displayType=4
+                  Image name=a141_alert.svg
+                HideCondition findMode=False
+                  Calculation:
+                    | not IsEmpty ( Selected_NetworkAddress::Address )
+                    refs: fn:not, fn:IsEmpty, Selected_NetworkAddress::Address#7
+          Object type=Button key=93 LabelKey=0 name=LaunchPicker flags=65536 bounds=520,63,550,273
+            Text flags=2 style=_DEPRECATED_Button-Medium: "Email Address Search…"
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Open Card - EmailAddressPicker” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=329 name="Open Card - EmailAddressPicker"
+          Object type=Text key=161 LabelKey=0 bounds=420,63,444,505
+            Text flags=2 style=Label-Medium-Left: "Other email address (not associated with any contact)"
+          Object type=Field key=162 LabelKey=0 bounds=450,63,474,323
+            FieldObj numOfReps=1 flags=1048624 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+              Field: UtilityEmailMessage::OtherEmailAddress#35
+          Object type=Button key=163 LabelKey=0 flags=65537 bounds=450,424,472,464
+            ConditionalFormatting
+              Item id=0 flags=3
+                Condition op=0
+                  Calculation:
+                    | // this ContactMethodId is in the list of ContactMethodIds already in use for this recipient role (e.g., To)
+                    | IsInList ( List ( Selected_ActivityParty#bcc_ActivityPartyEmail::EmailAddress ) ; UtilityEmailMessage::OtherEmailAddress )
+                    refs: cf:IsInList, fn:List, Selected_ActivityParty#bcc_ActivityPartyEmail::EmailAddress#15, UtilityEmailMessage::OtherEmailAddress#35
+                Format: color: rgba(60.3922%,60.3922%,60.3922%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+            Text flags=2 style=Button-Small-CommandLink-Center: Bcc
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Add Other Email Address to Email Message ( To|Cc|Bcc, EmailAddress )”; Parameter: "Bcc" ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | "Bcc"
+                Script id=776 name="Button: Add Other Email Address to Email Message ( To|Cc|Bcc, EmailAddress )"
+          Object type=Button key=164 LabelKey=0 flags=65537 bounds=450,383,472,423
+            ConditionalFormatting
+              Item id=0 flags=3
+                Condition op=0
+                  Calculation:
+                    | // this ContactMethodId is in the list of ContactMethodIds already in use for this recipient role (e.g., To)
+                    | IsInList ( List ( Selected_ActivityParty#cc_ActivityPartyEmail::EmailAddress ) ; UtilityEmailMessage::OtherEmailAddress )
+                    refs: cf:IsInList, fn:List, Selected_ActivityParty#cc_ActivityPartyEmail::EmailAddress#15, UtilityEmailMessage::OtherEmailAddress#35
+                Format: color: rgba(60.3922%,60.3922%,60.3922%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+            Text flags=2 style=Button-Small-CommandLink-Center: Cc
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Add Other Email Address to Email Message ( To|Cc|Bcc, EmailAddress )”; Parameter: "Cc" ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | "Cc"
+                Script id=776 name="Button: Add Other Email Address to Email Message ( To|Cc|Bcc, EmailAddress )"
+          Object type=Button key=165 LabelKey=0 flags=65537 bounds=450,344,472,384
+            ConditionalFormatting
+              Item id=0 flags=3
+                Condition op=0
+                  Calculation:
+                    | // this ContactMethodId is in the list of ContactMethodIds already in use for this recipient role (e.g., To)
+                    | IsInList ( List ( Selected_ActivityParty#to_ActivityPartyEmail::EmailAddress ) ; UtilityEmailMessage::OtherEmailAddress )
+                    refs: cf:IsInList, fn:List, Selected_ActivityParty#to_ActivityPartyEmail::EmailAddress#15, UtilityEmailMessage::OtherEmailAddress#35
+                Format: color: rgba(60.3922%,60.3922%,60.3922%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+            Text flags=2 style=Button-Small-CommandLink-Center: To
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Add Other Email Address to Email Message ( To|Cc|Bcc, EmailAddress )”; Parameter: "To" ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | "To"
+                Script id=776 name="Button: Add Other Email Address to Email Message ( To|Cc|Bcc, EmailAddress )"
+          Object type=Text key=167 LabelKey=0 bounds=140,63,160,383
+            Text flags=2: "Select from related contact(s)"
+          Object type=Text key=168 LabelKey=0 bounds=490,63,514,505
+            Text flags=2 style=Label-Medium-Left: "Find an email address"
+  Object type=Text key=142 LabelKey=0 bounds=20,980,70,1480
+    Text flags=2: "@history 2018-07-19 dave@geistinteractive.com: the scheduling feature will be added at some point in the future #TODO"
+  Object type=Line key=143 LabelKey=0 flags=1073754114 bounds=60,0,60,881
+  Object type=Text key=145 LabelKey=0 bounds=200,600,225,830
+    Text flags=2 style=Label-Medium-Left: "Send with the system email account"
+  Object type=Field key=146 LabelKey=0 bounds=202,572,220,590
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Checkbox-Small
+      Field: EmailMessage::UseSystemSettingsInd#26
+      ValueList: Boolean#1
+  Object type=Text key=149 LabelKey=0 bounds=665,828,684,835
+  Object type=PopoverButton key=151 LabelKey=0 flags=268435456 bounds=10,540,50,590
+    Text flags=2 style=Button-Invisible
+    PopoverButtonObj buttonFlags=0 key=152 iconSize=16 displayType=1
+      Image name=a25_trash.svg
+      Object type=Popover key=152 LabelKey=0 bounds=61,488,117,643
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=1 key=151
+          Object type=Button key=153 LabelKey=0 flags=65536 bounds=74,503,104,633
+            Text flags=2 style=Button-Danger: Delete
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Delete and Close” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=693 name="Button: Delete and Close"
+  Object type=ButtonBar key=155 LabelKey=0 flags=1342177284 style=BB-BadgePurple bounds=20,369,40,389
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Activity_FileAttachment::qbo_id )
+        refs: fn:IsEmpty, Activity_FileAttachment::qbo_id#11
+    ButtonBarObj segmentKey=0
+      Object type=Button key=156 LabelKey=0 bounds=20,369,40,389
+        Text flags=2 style=BB-BadgePurple
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | Count ( Opportunity_ActivityEntity_Discussion_DiscussionComment_Deprecated::ONE )
+            refs: fn:Count, Opportunity_ActivityEntity_Discussion_DiscussionComment_Deprecated::ONE#7
+  Object type=ButtonBar key=171 LabelKey=0 style=BB-TextObject-Medium bounds=80,90,104,830
+    ButtonBarObj segmentKey=0
+      Object type=Button key=174 LabelKey=0 bounds=80,90,104,830
+        Text flags=2 style=BB-TextObject-Medium
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | Let ( [ 
+            | 
+            | 	RecipientsTo = List ( Selected_ActivityParty#to_ActivityPartyEmail::EmailAddressFormatted ) 
+            | 
+            | ] ; 
+            | 
+            | 	Substitute ( RecipientsTo ; ¶ ; ", " ) 
+            | 
+            | )
+            refs: fn:Let, fn:List, Selected_ActivityParty#to_ActivityPartyEmail::EmailAddressFormatted#16, fn:Substitute
+  Object type=ButtonBar key=175 LabelKey=0 style=BB-TextObject-Medium bounds=110,90,134,830
+    ButtonBarObj segmentKey=0
+      Object type=Button key=176 LabelKey=0 bounds=110,90,134,830
+        Text flags=2 style=BB-TextObject-Medium
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | Let ( [ 
+            | 
+            | 	RecipientsTo = List ( Selected_ActivityParty#cc_ActivityPartyEmail::EmailAddressFormatted ) 
+            | 
+            | ] ; 
+            | 
+            | 	Substitute ( RecipientsTo ; ¶ ; ", " ) 
+            | 
+            | )
+            refs: fn:Let, fn:List, Selected_ActivityParty#cc_ActivityPartyEmail::EmailAddressFormatted#16, fn:Substitute
+  Object type=ButtonBar key=177 LabelKey=0 style=BB-TextObject-Medium bounds=140,90,164,830
+    ButtonBarObj segmentKey=0
+      Object type=Button key=178 LabelKey=0 bounds=140,90,164,830
+        Text flags=2 style=BB-TextObject-Medium
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | Let ( [ 
+            | 
+            | 	RecipientsTo = List ( Selected_ActivityParty#bcc_ActivityPartyEmail::EmailAddressFormatted ) 
+            | 
+            | ] ; 
+            | 
+            | 	Substitute ( RecipientsTo ; ¶ ; ", " ) 
+            | 
+            | )
+            refs: fn:Let, fn:List, Selected_ActivityParty#bcc_ActivityPartyEmail::EmailAddressFormatted#16, fn:Substitute
+  Object type=PopoverButton key=116 LabelKey=0 flags=1342177540 bounds=81,808,103,830
+    Text flags=2 style=Button-Invisible-Circle: Attachments
+    PopoverButtonObj buttonFlags=0 key=117 iconSize=22 displayType=1
+      Image name=a20_deleteCircleOutline.svg
+      Object type=Popover key=117 LabelKey=0 name=RemoveRecipientsPopover style="Popover-White With Title" bounds=5,317,421,797
+        TitleCalc
+          Calculation:
+            | "Remove Recipients"
+        PopoverObj position=2 key=116
+          Object type=Portal key=118 LabelKey=0 name=ExistingRecipientsPortal bounds=80,348,377,768
+            PortalObj portalFlags=145 numOfRows=5 initialRow=1
+              TableAliasKey: Activity_ActivityParty
+              FieldList
+                Field table=Activity_ActivityParty_ActivityPartyEmail id=15 name=EmailAddress
+                Field table=Activity_ActivityParty_ActivityPartyRole id=8 name=Name
+                Field table=Activity_ActivityParty id=13 name=PartyNameCached
+              FilterCalc enable=True
+                Calculation:
+                  | // Only show To, Cc, Bcc
+                  | IsInList ( List ( 55; 56; 57 ) ; Activity_ActivityParty::ActivityPartyRoleId )
+                  refs: cf:IsInList, fn:List, Activity_ActivityParty::ActivityPartyRoleId#24
+              Object type=Field key=120 LabelKey=0 bounds=90,430,114,740
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                  Field: Activity_ActivityParty_ActivityPartyEmail::EmailAddress#15
+              Object type=Button key=125 LabelKey=0 flags=65536 bounds=90,360,110,380
+                Text flags=2 style=Button-RowDelete
+                ButtonObj buttonFlags=0 iconSize=20 displayType=1
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Delete Email Recipient” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Script id=353 name="Delete Email Recipient"
+                  Image name=a20_deleteCircleOutline.svg
+              Object type=Field key=126 LabelKey=0 bounds=90,390,114,460
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                  Field: Activity_ActivityParty_ActivityPartyRole::Name#8
+              Object type=Field key=127 LabelKey=0 bounds=110,430,134,740
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChromeMuted
+                  Field: Activity_ActivityParty::PartyNameCached#13
+    HideCondition findMode=True
+      Calculation:
+        | True
+        refs: fn:True
+  Object type=Button key=154 LabelKey=0 flags=65540 bounds=81,808,103,830
+    Text flags=2 style=Button-Invisible-Circle
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Go to Remove Recipients Popover” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=352 name="Go to Remove Recipients Popover"
+      Image name=a20_deleteCircleOutline.svg
+    HideCondition findMode=False
+      Calculation:
+        | not 
+        | 
+        | ( not IsEmpty ( Selected_ActivityParty#to::Id ) or 
+        | not IsEmpty ( Selected_ActivityParty#cc::Id ) or 
+        | not IsEmpty ( Selected_ActivityParty#bcc::Id ) )
+        refs: fn:not, fn:IsEmpty, Selected_ActivityParty#to::Id#23, fn:or, Selected_ActivityParty#cc::Id#23, Selected_ActivityParty#bcc::Id#23

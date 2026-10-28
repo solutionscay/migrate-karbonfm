@@ -1,0 +1,89 @@
+# script 689: _btn: Charge Card On Window
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO Payments / Private
+# source: ScriptCatalog/Script[@id=689]
+# steps: 13 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=332 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+   4    Set Variable [ $address; Value:JSONSetElement ( "{}" ; 
+        	[ "region" ; QBO::CardRegion ; JSONString ] ;
+        	[ "postalCode" ; QBO::CardPostalCode ; JSONString ] ;
+        	[ "streetAddress" ; QBO::CardStreetAddress ; JSONString ] ;
+        	[ "city" ; QBO::CardRegion ; JSONString ] 
+        
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, QBO::CardRegion#61, fn:JSONString, QBO::CardPostalCode#60, QBO::CardStreetAddress#58
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+   5    Set Variable [ $card; Value:JSONSetElement ( "{} "; 
+        
+        ["expYear"; QBO::CardExpYear ; JSONString ];
+        ["expMonth"; QBO::CardExpMonth ; JSONString ];
+        ["cvc"; QBO::CardCVC ; JSONString ];
+        
+        ["name"; QBO::CardName ; JSONString ];
+        ["address" ; $address ; JSONObject] ; 
+        
+        ["number"; QBO::CardNumber ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, QBO::CardExpYear#52, fn:JSONString, QBO::CardExpMonth#53, QBO::CardCVC#54, QBO::CardName#57, fn:JSONObject, QBO::CardNumber#51
+        Repetition
+          Calculation:
+            | 1
+        Name: $card
+   6    Set Variable [ $chargeData; Value:JSONSetElement ( "{}"; 
+        
+        ["card"; $card ; JSONObject ];
+        ["amount"; QBO::CardAmount ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject, QBO::CardAmount#55, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $chargeData
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “_clear credit card fields” ]
+        DisableStepCollapsed state=False
+        Script id=684 name="_clear credit card fields"
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Perform Script [ “Charge Card ( {card, amount, currency} )”; Parameter: $chargeData ]
+        DisableStepCollapsed state=False
+        Script id=682 name="Charge Card ( {card, amount, currency} )"
+  11    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Field [ QBO::CardResult; $result ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=56 name=CardResult

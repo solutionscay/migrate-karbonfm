@@ -1,0 +1,272 @@
+# layout 184: Chat
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity
+# source: LayoutCatalog/Layout[@id=184]
+# objects: 35
+# theme: Karbon-1.0
+# folder group: id=76 groupCollapsed=False includeInMenu=False
+
+Layout width=1020 quickFind=True includeInMenu=False id=184 name=Chat
+  Table id=1065364 name=Chat
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnRecordLoad id=103 triggerFlags=1(browse)
+      Script id=835 name="Trigger: Handle Chat Record Load"
+      TriggerText: "Trigger: Handle Chat Record Load"
+  Object type=Rect key=1 LabelKey=0 name=col-2 flags=260 bounds=0,400,800,1020
+    HideCondition findMode=True
+      Calculation:
+        | True
+        refs: fn:True
+  Object type=Rect key=11 LabelKey=0 name=col-1 flags=260 bounds=0,20,800,380
+    HideCondition findMode=True
+      Calculation:
+        | True
+        refs: fn:True
+  Object type=Portal key=12 LabelKey=0 flags=-2147483648 bounds=80,0,800,380
+    PortalObj portalFlags=277 numOfRows=10 initialRow=1
+      TableAliasKey: Chat
+      FieldList
+        Field table=Activity id=22 name=Subject
+        Field table=Activity id=56 name=DateDisplay
+        Field table=Activity_ActivityParty id=13 name=PartyNameCached
+        Field table=Activity_ActivityParty_Party id=32 name=Photo
+      Object type=Field key=13 LabelKey=0 flags=1 bounds=111,70,147,370
+        ConditionalFormatting
+          Item id=0 flags=3
+            Condition op=0
+              Calculation:
+                | Get ( ActiveRecordNumber ) = Get ( RecordNumber )
+                refs: fn:Get, fn:ActiveRecordNumber, fn:RecordNumber
+            Format: color: rgba(100%,100%,100%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+          Field: Activity::Subject#22
+      Object type=Field key=14 LabelKey=0 flags=1 bounds=90,170,111,370
+        ConditionalFormatting
+          Item id=0 flags=3
+            Condition op=0
+              Calculation:
+                | Get ( ActiveRecordNumber ) = Get ( RecordNumber )
+                refs: fn:Get, fn:ActiveRecordNumber, fn:RecordNumber
+            Format: color: rgba(80.3922%,80.3922%,80.3922%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+        FieldObj numOfReps=1 flags=1048628 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+          Field: Activity::DateDisplay#56
+          Display: date format=5 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"; time flags=131 hourStyle=0 minsecStyle=1 separator=: amString=" AM" pmString=" PM" ampmString=""
+      Object type=Field key=15 LabelKey=0 flags=1 bounds=90,70,116,240
+        ConditionalFormatting
+          Item id=0 flags=3
+            Condition op=0
+              Calculation:
+                | Get ( ActiveRecordNumber ) = Get ( RecordNumber )
+                refs: fn:Get, fn:ActiveRecordNumber, fn:RecordNumber
+            Format: color: rgba(100%,100%,100%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+          Field: Activity_ActivityParty::PartyNameCached#13
+      Object type=Field key=16 LabelKey=0 bounds=90,10,140,60
+        FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Activity_ActivityParty_Party::Photo#32
+      Object type=Line key=17 LabelKey=0 flags=12288 bounds=160,70,160,380
+  Object type=Portal key=18 LabelKey=0 name=ChatPortal flags=-1073741824 bounds=100,400,737,1020
+    PortalObj portalFlags=277 numOfRows=7 initialRow=1
+      TableAliasKey: Chat_ChatMessage
+      FieldList
+        Field table=Chat_ChatMessage id=12 name=Message
+        Field table=Chat_ChatMessage id=12 name=Message
+        Field table=Chat_ChatMessage id=19 name=DeliveredTimestamp
+        Field table=Chat_ChatMessage id=19 name=DeliveredTimestamp
+      Object type=Text key=19 LabelKey=0 flags=1342177284 bounds=160,929,180,1009
+        Text flags=2: Delivered
+        HideCondition findMode=False
+          Calculation:
+            | Chat_ChatMessage::IncomingInd or 
+            | 
+            | not Chat_ChatMessage::StatusDeliveredInd
+            | 
+            | or
+            | 
+            | IsEmpty ( 
+            | 	List ( 
+            | 	Chat_ChatMessage::StatusUndeliveredInd ;
+            | 	Chat_ChatMessage::StatusQueuedInd ;
+            | 	 Chat_ChatMessage::StatusFailedInd ;
+            |  	Chat_ChatMessage::StatusDeliveredInd)
+            | )
+            refs: Chat_ChatMessage::IncomingInd#21, fn:or, fn:not, Chat_ChatMessage::StatusDeliveredInd#24, fn:IsEmpty, fn:List, Chat_ChatMessage::StatusUndeliveredInd#29, Chat_ChatMessage::StatusQueuedInd#26, Chat_ChatMessage::StatusFailedInd#25
+      Object type=Text key=20 LabelKey=0 flags=1342177280 bounds=160,929,180,1009
+        Text flags=2: Sending
+      Object type=Field key=22 LabelKey=0 flags=4 bounds=110,410,156,770
+        FieldObj numOfReps=1 flags=262436 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+          Field: Chat_ChatMessage::Message#12
+        HideCondition findMode=False
+          Calculation:
+            | Chat_ChatMessage::OutgoingInd
+            refs: Chat_ChatMessage::OutgoingInd#22
+      Object type=Field key=23 LabelKey=0 flags=1342177284 bounds=111,650,157,1010
+        ScriptTriggers
+          Trigger event=OnObjectKeystroke id=5 triggerFlags=1(browse)
+            Script id=0 name=<unknown> ref=none
+            TriggerText: "<unknown>"
+          Trigger event=OnObjectValidate id=6 triggerFlags=1(browse)
+            Script id=0 name=<unknown> ref=none
+            TriggerText: "<unknown>"
+        FieldObj numOfReps=1 flags=262436 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+          Field: Chat_ChatMessage::Message#12
+        HideCondition findMode=False
+          Calculation:
+            | Chat_ChatMessage::IncomingInd
+            refs: Chat_ChatMessage::IncomingInd#21
+      Object type=Field key=24 LabelKey=0 flags=4 bounds=159,410,180,770
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+          Field: Chat_ChatMessage::DeliveredTimestamp#19
+          Display: date format=2 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"; time flags=131 hourStyle=0 minsecStyle=1 separator=: amString=" AM" pmString=" PM" ampmString=""
+        HideCondition findMode=False
+          Calculation:
+            | Chat_ChatMessage::OutgoingInd
+            refs: Chat_ChatMessage::OutgoingInd#22
+      Object type=PopoverButton key=28 LabelKey=0 flags=1342177284 bounds=158,959,180,1009
+        Text flags=2: Failed
+        PopoverButtonObj buttonFlags=0 key=29 iconSize=20 displayType=0
+          Object type=Popover key=29 LabelKey=0 bounds=191,879,261,1089
+            PopoverObj flags=2 position=1 key=28
+              Object type=Text key=30 LabelKey=0 bounds=194,888,255,1079
+                Text flags=2
+                  | Message not delivered.
+                  | 
+                  | Perhaps this is not a valid number.
+        HideCondition findMode=False
+          Calculation:
+            | Chat_ChatMessage::IncomingInd or 
+            | 
+            | Chat_ChatMessage::StatusDeliveredInd
+            | 
+            | or
+            | 
+            | IsEmpty ( 
+            | 	List ( 
+            | Chat_ChatMessage::StatusUndeliveredInd ;
+            | Chat_ChatMessage::StatusQueuedInd ;
+            | Chat_ChatMessage::StatusFailedInd ;
+            | Chat_ChatMessage::StatusDeliveredInd)
+            | )
+            refs: Chat_ChatMessage::IncomingInd#21, fn:or, Chat_ChatMessage::StatusDeliveredInd#24, fn:IsEmpty, fn:List, Chat_ChatMessage::StatusUndeliveredInd#29, Chat_ChatMessage::StatusQueuedInd#26, Chat_ChatMessage::StatusFailedInd#25
+      Object type=Field key=47 LabelKey=0 flags=1342177284 bounds=160,650,180,844
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+          Field: Chat_ChatMessage::DeliveredTimestamp#19
+          Display: date format=2 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"; time flags=131 hourStyle=0 minsecStyle=1 separator=: amString=" AM" pmString=" PM" ampmString=""
+        HideCondition findMode=False
+          Calculation:
+            | Chat_ChatMessage::IncomingInd
+            refs: Chat_ChatMessage::IncomingInd#21
+      Object type=ButtonBar key=25 LabelKey=0 flags=1342177280 bounds=120,800,150,850
+        ButtonBarObj segmentKey=0
+          Object type=Button key=26 LabelKey=0 flags=65540 bounds=120,800,150,850
+            Text flags=2
+            ButtonObj buttonFlags=3 iconSize=12 displayType=5
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Show Chat Message Files” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=836 name="Button: Show Chat Message Files"
+              Image name=a111_attach.svg
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( ChatMessage_FileAttachment_File::Id )
+                refs: fn:IsEmpty, ChatMessage_FileAttachment_File::Id#1
+            LabelCalc
+              Calculation:
+                | Count ( ChatMessage_FileAttachment_File::ONE )
+                refs: fn:Count, ChatMessage_FileAttachment_File::ONE#25
+  Object type=Field key=31 LabelKey=0 bounds=20,20,50,320
+    ScriptTriggers
+      Trigger event=OnObjectSave id=4 triggerFlags=1(browse)
+        Script id=826 name="Trigger Chat Search"
+        TriggerText: "Trigger Chat Search"
+    FieldObj numOfReps=1 flags=1179872 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: UtilityChat::Chat_Find#8
+      PlaceholderText findMode=True
+        Calculation:
+          | "search"
+  Object type=Field key=32 LabelKey=0 name=field.MessageInput flags=-536870912 bounds=750,400,780,1010
+    ScriptTriggers
+      Trigger event=OnObjectKeystroke id=5 triggerFlags=1(browse)
+        Script id=827 name="Trigger: Send Chat Message"
+        TriggerText: "Trigger: Send Chat Message"
+    FieldObj numOfReps=1 flags=1179872 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Chat::MessageInput#30
+      PlaceholderText findMode=True
+        Calculation:
+          | "Text message"
+  Object type=Field key=33 LabelKey=0 bounds=30,400,54,620
+    FieldObj numOfReps=1 flags=1179684 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Activity_ActivityParty::PartyNameCached#13
+      PlaceholderText findMode=True
+        Calculation:
+          | "no contact entered"
+  Object type=Button key=34 LabelKey=0 name=Button.AddPhone bounds=20,330,56,370
+    Text flags=2
+    ButtonObj buttonFlags=0 iconSize=18 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Button: Launch Phone Picker from Chat” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=831 name="Button: Launch Phone Picker from Chat"
+      Image name=a74_noteOutline.svg
+  Object type=PopoverButton key=36 LabelKey=0 name="Delete Popover" flags=1342177280 bounds=20,990,50,1020
+    Text flags=2
+    PopoverButtonObj buttonFlags=0 key=37 iconSize=20 displayType=1
+      Image name=a25_trash.svg
+      Object type=Popover key=37 LabelKey=0 bounds=61,785,230,1226
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=1 key=36
+          Object type=Text key=38 LabelKey=0 bounds=84,803,138,1207
+            Text flags=2: "Permanently delete this conversation? You cannot undo this action."
+          Object type=Button key=39 LabelKey=0 bounds=160,1053,200,1163
+            Text flags=2: Cancel
+            ButtonObj buttonFlags=0 iconSize=20 displayType=0
+              Step enable=True id=169 name="Close Popover"
+                StepText: Close Popover
+                DisableStepCollapsed state=False
+          Object type=Button key=40 LabelKey=0 bounds=160,853,200,963
+            Text flags=2: Delete
+            ButtonObj buttonFlags=0 iconSize=20 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Delete Chat” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=828 name="Delete Chat"
+          Object type=Text key=41 LabelKey=0 bounds=160,993,200,1023
+            Text flags=2: or
+  Object type=Line key=42 LabelKey=0 flags=-2147475456 bounds=0,380,800,380
+  Object type=Field key=43 LabelKey=0 bounds=49,400,73,620
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Chat::PhoneList#28
+  Object type=Button key=44 LabelKey=0 flags=1342259204 bounds=20,950,50,980
+    ToolTip
+      Calculation:
+        | "A new message has arrived. Click to refresh."
+    Text flags=2
+    ButtonObj buttonFlags=0 iconSize=20 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Timer: Refresh Chat Portal” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=829 name="Timer: Refresh Chat Portal"
+      Image name=a123_refresh.svg
+    HideCondition findMode=False
+      Calculation:
+        | /*Let ( trigger = If ( activity_sms::TestGlobal <> ACTIVITY::Subject ; BE_ScriptExecute ( "Timer: Refresh SMS Portal" )) ; 
+        | 	True
+        | )*/
+  Object type=Text key=46 LabelKey=0 bounds=10,400,27,486
+    Text: "Discussion with"
+  Object type=Text key=48 LabelKey=0 flags=1342177284 bounds=0,840,30,900
+    Text flags=6: DEV
+    HideCondition findMode=False
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode

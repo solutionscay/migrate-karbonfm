@@ -1,0 +1,69 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/427-Convert_QBO_SalesReceipt_Into_Karbon_SalesReceipt.txt,4ba7f80d8fb6686496c04d458c781fa1f9f5791c79234f1ffc6899b98f3e31b5,scripts,karbon_kontroller.fmp12,427,Convert QBO SalesReceipt Into Karbon SalesReceipt,integration,external-adapter,tier1,"Converts a QBO SalesReceipt JSON (sent by LedgerLink) into the Karbon SalesReceipt JSON: reads address, email, totals, tax and date fields, takes the shipping line (item SHIPPING_ITEM_ID) out as shipAmt, keeps only item lines, looks up the Karbon ids for the transaction, customer and deposit account (Lookup FMId), converts each line with Convert QBO SalesLine, and returns the Karbon JSON.",none,none,"karbon_kontroller.fmp12/scripts/271 (step 92)
+karbon_kontroller.fmp12/scripts/271 (step 99)
+karbon_kontroller.fmp12/scripts/271 (step 106)
+karbon_kontroller.fmp12/scripts/400 (step 130)","karbon_kontroller.fmp12/scripts/425-Handle_Changed_or_New_QBO_SalesReceipt_QBO_SalesReceipt.txt (step 25)
+karbon_tester.fmp12/scripts/257-Convert_QBO_SalesReceipt_to_Karbon.txt (step 13)",none,"Shipping is carried as a line with the literal item id SHIPPING_ITEM_ID (steps 76-80). Payment method, class and discount are not converted. Customers are resolved by a handler because ZeitGeist overrides them (step 96)."
+karbon_kontroller.fmp12/scripts/447-Handle_Sales_Receipt_Push_to_QBO.txt,5d5df3df609cae687ccf171e547688e28f041811c7d7a579e4bfcfb6ae297def,scripts,karbon_kontroller.fmp12,447,Handle Sales Receipt Push to QBO,integration,external-adapter,tier1,"Pushes a Karbon sales receipt to QuickBooks Online. Sends the customer to QBO first if it has no QBO id (and records an external link), converts the receipt with Convert Karbon SalesReceipt, sends it to QBO through LedgerLink, then stores the QBO id and document number on the receipt, clears the send flag, and stores the QBO line ids and numbers on the lines. A failed send changes status Edit to 'Need to Send'.","SalesTransaction::id_Customer#7
+SalesTransaction::id#1
+ExternalLink::ExternalId#10
+ExternalLink::InternalId#2
+ExternalLink::ExternalLinkTypeId#9
+DBTransactions::SalesTransactionId#93
+SalesTransaction::status#68
+SalesTransaction_SalesLine::id#1","DBTransactions::SalesTransactionId#93 (step 84, current record (transaction record))
+SalesTransaction::ONE#67 (step 87, new record (get-or-create and lock by the DBTransactions key))
+SalesTransaction::status#68 (step 107, related via SalesTransaction)
+SalesTransaction::qbo_id#2 (step 118, related via SalesTransaction)
+SalesTransaction::docNumber#4 (step 126, related via SalesTransaction)
+SalesTransaction::qbo_send#3 (step 134, related via SalesTransaction)
+DBTransactions::SalesLineId#26 (step 155, current record (transaction record))
+SalesLine::ONE#18 (step 157, new record (get-or-create and lock by the DBTransactions key))
+SalesLine::qbo_lineNum#4 (step 161, related via SalesLine)
+SalesLine::qbo_id#2 (step 165, related via SalesLine)","karbon_LedgerLink.fmp12/scripts/302 (step 56)
+karbon_kontroller.fmp12/scripts/315 (step 67)
+karbon_kontroller.fmp12/scripts/28 (step 78)
+karbon_kontroller.fmp12/scripts/449 (step 93)
+karbon_LedgerLink.fmp12/scripts/292 (step 101)
+karbon_kontroller.fmp12/scripts/29 (step 183)
+karbon_kontroller.fmp12/scripts/31 (step 184)","karbon_LedgerLink.fmp12/scripts/632-Handle_SalesReceipt_Push.txt (step 8, through data source DataSourceControllerFile, ref=external)",none,"Step 95-97 set $error when the conversion fails but do not exit, so the error JSON is sent to QBO (steps 100-101). The script reads FmId (step 49) and is called with parameter key FmId by LedgerLink 632. Line matching assumes the sales-line order equals the QBO Line order (steps 147-167). ExternalLinkTypeId 5 means QBO customer."
+karbon_kontroller.fmp12/scripts/449-Convert_Karbon_SalesReceipt_into_QBO_SalesReceipt.txt,f6c4f56fc7c588a4b5bd1058d66bd126079dca7495232469644b583aa76f4d65,scripts,karbon_kontroller.fmp12,449,Convert Karbon SalesReceipt into QBO SalesReceipt,integration,external-adapter,tier1,"Converts a Karbon sales receipt (by sales-transaction id) into the QBO SalesReceipt JSON: reads the transaction fields (addresses, email, memo, dates, shipping, totals, deposit account, reference number), maps the customer and deposit account to QBO ids (Lookup QBOId), converts each sales line with Convert Karbon SalesLine, adds shipping as a SHIPPING_ITEM_ID line, and marks the email status NeedToSend when a bill email exists.","DBTransactions::SalesTransactionId#93
+SalesTransaction::dueDate#22
+SalesTransaction::deposit#51
+Invoice::id_Term#18
+SalesTransaction::id_Customer#7
+SalesTransaction::billAddressLine1#8
+SalesTransaction::billAddressLine2#9
+SalesTransaction::billAddressCity#10
+SalesTransaction::billAddressState#15
+SalesTransaction::billAddressPostalCode#14
+SalesTransaction::billAddressCountry#11
+SalesTransaction::docNumber#4
+SalesReceipt::id_AccountDeposit#71
+SalesReceipt::paymentRefNum#75
+SalesTransaction::customerMemo#27
+SalesTransaction::privateNote#6
+SalesTransaction::date#5
+SalesTransaction::shipAddressState#47
+SalesTransaction::shipAddressLine1#44
+SalesTransaction::shipAddressLine2#45
+SalesTransaction::shipAddressCity#42
+SalesTransaction::shipAddressPostalCode#46
+SalesTransaction::shipAddressCountry#43
+SalesTransaction::shipAmt#41
+SalesTransaction::shipDate#39
+SalesTransaction::shipMethod#40
+SalesTransaction::totalAmt#25
+SalesTransaction::trackingNum#38
+SalesTransaction::billEmailAddress#29
+SalesTransaction_SalesLine::id#1","DBTransactions::SalesTransactionId#93 (step 26, current record (transaction record))
+SalesTransaction::ONE#67 (step 29, new record (get-or-create and lock by the DBTransactions key))
+DBTransactions::SalesLineId#26 (step 142, current record (transaction record))
+SalesLine::ONE#18 (step 143, new record (get-or-create and lock by the DBTransactions key))","karbon_kontroller.fmp12/scripts/28 (step 20)
+karbon_LedgerLink.fmp12/scripts/1 (step 37)
+karbon_kontroller.fmp12/scripts/327 (step 104)
+karbon_kontroller.fmp12/scripts/327 (step 110)
+karbon_kontroller.fmp12/scripts/416 (step 147)
+karbon_kontroller.fmp12/scripts/29 (step 220)
+karbon_kontroller.fmp12/scripts/31 (step 221)","karbon_kontroller.fmp12/scripts/447-Handle_Sales_Receipt_Push_to_QBO.txt (step 93)
+karbon_tester.fmp12/scripts/260-Convert_Karbon_SalesReceipt_to_QBO_SalesReceipt.txt (step 13)",none,"$QBOId and $Entity are never set (the QBO read-back in steps 35-52 never runs, and $Id from step 98 stays empty, so an update never carries a QBO Id). Step 119 uses $date, which is never set (step 76 sets $TxnDate), so TxnDate is blank. Step 60 reads Invoice::id_Term (an invoice table occurrence). Discount lines are not built (steps 164-169 disabled)."

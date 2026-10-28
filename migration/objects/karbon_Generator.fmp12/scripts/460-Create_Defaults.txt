@@ -1,0 +1,228 @@
+# script 460: Create Defaults
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=460]
+# steps: 50 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-08-17 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ not IsEmpty ( List ( ApiGeneratorLine::default ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:List, ApiGeneratorLine::default#20
+   5    #We have defaults
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Insert Text [ $DefaultsLineTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSONSetElement ( $Defaults ; "{Key}" ; {Value} ; {JsonType} )
+        Field: $DefaultsLineTemplate
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $end; Value:Count ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Count, ApiGeneratorLine::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+   9    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  10    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    If [ not IsEmpty ( ApiGeneratorLine::default ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, ApiGeneratorLine::default#20
+  13 // Set Variable [ $IsNumber; Value:ApiGeneratorLine::default = GetAsNumber ( ApiGeneratorLine::default ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::default#20, fn:GetAsNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $IsNumber
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ ApiGeneratorLine::default = GetAsNumber ( ApiGeneratorLine::default ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::default#20, fn:GetAsNumber
+  16    #the default is a number
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $Value; Value:ApiGeneratorLine::default ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::default#20
+        Repetition
+          Calculation:
+            | 1
+        Name: $Value
+  18    Set Variable [ $JsonType; Value:"JSONNumber" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JsonType
+  19    Else If [ IsValidExpression ( ApiGeneratorLine::default ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsValidExpression, ApiGeneratorLine::default#20
+  20    #the default is a valid FileMaker expression [e.g., Get ( CurrentDate )]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $Value; Value:ApiGeneratorLine::default ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::default#20
+        Repetition
+          Calculation:
+            | 1
+        Name: $Value
+  22    Set Variable [ $JsonType; Value:"JSONString" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JsonType
+  23    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #all others: assume it's a string
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $Value; Value:Quote ( ApiGeneratorLine::default ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Quote, ApiGeneratorLine::default#20
+        Repetition
+          Calculation:
+            | 1
+        Name: $Value
+  26    Set Variable [ $JsonType; Value:"JSONString" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JsonType
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $ThisDefault; Value:Substitute ( $DefaultsLineTemplate ; 
+        	[ "{Key}" ; ApiGeneratorLine::JsonPropertyName ] ; 
+        	[ "{JsonType}" ; $JsonType ] ; 
+        	[ "{Value}" ; $Value ]  
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisDefault
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $Defaults; Value:List ( $Defaults ; 
+        	ScriptStep_InsertCalculatedResult ( "$Defaults" ; $ThisDefault ; 1 ) 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_InsertCalculatedResult
+        Name: $Defaults
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Exit Loop If [ IsEmpty ( ApiGeneratorLine::Id ) or Get ( ActivePortalRowNumber ) = $end ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ApiGeneratorLine::Id#1, fn:or, fn:Get, fn:ActivePortalRowNumber
+  35    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  36    End Loop
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $XML; Value:List( $XML; ScriptStep_Comment ( "Set default values" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  39    Set Variable [ $XML; Value:List( $XML; $Defaults ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  40    Set Variable [ $XML; Value:List( $XML; ScriptStep_InsertCalculatedResult ( "$json" ; "JSON.Merge ( $Defaults ; $json )" ; 1 ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_InsertCalculatedResult
+        Name: $XML
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #We don't have defaults
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $XML; Value:List( $XML; ScriptStep_InsertCalculatedResult ( "$json" ; "Get ( ScriptParameter )" ; 1 ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_InsertCalculatedResult
+        Name: $XML
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Exit Script [ Result: $XML ]
+        DisableStepCollapsed state=False

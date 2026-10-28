@@ -1,0 +1,51 @@
+# table 133: RequestHistory
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=133]
+# fields: 7
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=request
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=response
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Calculated name=url
+  Calculation table=RequestHistory:
+    | jsonGet(RequestHistory::request; "url")
+    refs: cf:jsonGet, RequestHistory::request#1
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Calculated name=method
+  Calculation table=RequestHistory:
+    | jsonGet(RequestHistory::request; "method")
+    refs: cf:jsonGet, RequestHistory::request#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=TimeStamp fieldType=Normal name=createdAt
+  AutoEnter allowEditing=True value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Number fieldType=Calculated name=responseCode
+  Calculation table=RequestHistory:
+    | jsonGet(response; "code")
+    refs: cf:jsonGet, RequestHistory::response#2
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=idRequest
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

@@ -1,0 +1,409 @@
+# script 612: Delete FileAttachment { data }
+# file: karbon_kontroller.fmp12
+# folder: API / File
+# source: ScriptCatalog/Script[@id=612]
+# steps: 115 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=549 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Deletes a FileAttachment
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} FileAttachment
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} FileAttachment.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {string} FileAttachment.AttachmentId parent Attachable record
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnSuccess {object} result.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@history  barbara@geistinteractive - 28 Sept 2018
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  27    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  37    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $FileAttachment; Value:JSON.Format( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileAttachment
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ Error.IsError ( $FileAttachment ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  48    Set Variable [ $error; Value:$FileAttachment ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  49    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  50    End If
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Set Variable [ $error; Value:JSON.Validate.This ( $FileAttachment ) & JSON.Validate.ApplyRules ( 
+               List ( 
+                       JSON.Validate.Rule.IsRequired ( "Id" ) ; 
+                       "" ; // additional tests  
+               )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  55    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Variable [ $Id; Value:JSONGetElement( $FileAttachment ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  63    Set Variable [ $AttachmentId; Value:JSONGetElement( $FileAttachment ; "AttachmentId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AttachmentId
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #Create/connect to the FileAttachment record
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    If [ DBTransactions::FileAttachmentId <> $Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::FileAttachmentId#104
+  72    Set Field [ DBTransactions::FileAttachmentId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=104 name=FileAttachmentId
+  73    End If
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Set Field [ FileAttachment::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=FileAttachment id=13 name=ONE
+  76    Set Variable [ $error; Value:Error.Last ( "Creating/locking the FileAttachment record. " ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  77    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #Create/connect to the File record and mark it to send. this will delete this attachment in QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    If [ DBTransactions::FileId  <> $AttachmentId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::FileId#103
+  81    Set Field [ DBTransactions::FileId; $AttachmentId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=103 name=FileId
+  82    End If
+        DisableStepCollapsed state=False
+  83    Set Field [ File::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=File id=25 name=ONE
+  84    Set Variable [ $error; Value:Error.Last ( "Creating/locking the File record. " ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  85    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    Set Field [ File::qbo_send; 1 ]
+        DisableStepCollapsed state=False
+        Field table=File id=20 name=qbo_send
+  88    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    #DELETE FileAttachment
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    Perform Script [ “Delete First Portal Row (portalLayoutObjectName)”; Parameter: "FileAttachmentPortal" ]
+        DisableStepCollapsed state=False
+        Script id=33 name="Delete First Portal Row (portalLayoutObjectName)"
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  97    Set Variable [ $error; Value:$ScriptResult ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  98    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  99    End If
+        DisableStepCollapsed state=False
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Set Variable [ $result; Value:JSONSetElement( "{}"; "Result" ; True ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 104    End Loop
+        DisableStepCollapsed state=False
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 112    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 113    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    Exit Script [ Result: Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult

@@ -1,0 +1,53 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/602-wip_Create_Opportunity_json.txt,076657786921ccd137010dbc63360d8deb8768e770103f8a84654b8dda0ac640,scripts,karbon_kontroller.fmp12,602,#wip Create Opportunity { json },data-change,server-domain,tier1,"API operation that creates an Opportunity for a Party from JSON inside a transaction. Applies defaults (current, probability ""unknown"", start date today), requires PartyId, clears LeadId when the party already has a customer role, saves the opportunity fields and the cached party name, then sets the status to New (id 1) through script 608. Returns the Opportunity Id or an error.","DBTransactions::OpportunityId#60 (step 101)
+DBTransactions::PartyId#25 (step 111)
+PartyRole::Id#16, PartyRole::PartyId#45, PartyRole::CustomerInd#42 (SQL.GetColumn2Fields step 116)
+Party::NameCached#19 (step 132)
+DBTransactions::OpportunityId#60 (step 145)
+Opportunity::Id#1 (step 155)","DBTransactions::OpportunityId#60 (step 102, current record)
+Opportunity::ONE#20 (step 105, new record)
+DBTransactions::PartyId#25 (step 112, current record)
+Opportunity::ActiveInd#59 (step 127, related via Opportunity)
+Opportunity::EndDate#58 (step 128, related via Opportunity)
+Opportunity::LeadId#60 (step 129, related via Opportunity)
+Opportunity::Notes#35 (step 130, related via Opportunity)
+Opportunity::PartyId#55 (step 131, related via Opportunity)
+Opportunity::PartyNameCached#64 (step 132, related via Opportunity)
+Opportunity::Probability#54 (step 133, related via Opportunity)
+Opportunity::SalespersonId#56 (step 134, related via Opportunity)
+Opportunity::StartDate#57 (step 135, related via Opportunity)
+Opportunity::StatusCached#50 (step 136, related via Opportunity)
+Opportunity::Value#53 (step 137, related via Opportunity)","karbon_kontroller.fmp12/scripts/28 (step 44)
+karbon_kontroller.fmp12/scripts/608 (step 146)
+karbon_kontroller.fmp12/scripts/29 (step 168)
+karbon_kontroller.fmp12/scripts/31 (step 169)","objects/karbon_kontacts.fmp12/scripts/610-btn_Create_Opportunity_From_Party.txt
+objects/karbon_kontacts.fmp12/scripts/615-OnTimer_Handle_Create_Opportunity.txt",none,"$Id is never set (steps 101-102), so OpportunityId is blanked or left as is and the new Opportunity id depends on the Opportunity::ONE create. $CurrentInd (step 127) is never parsed from the JSON, so ActiveInd is written empty, then fixed by script 608 from the status. $Defaults starts empty (""CurrentInd"" default is set but never read). The ""#wip"" prefix suggests unfinished work. Opportunity::LeadId and DBTransactions::OpportunityId share field id 60 in different tables."
+karbon_kontroller.fmp12/scripts/608-wip_Update_Opportunity_Status_json.txt,f3bc56f5a744641dc502d6158b398a2c8e65fdd67fbc57e53d485dd337442fe9,scripts,karbon_kontroller.fmp12,608,#wip Update Opportunity Status { json },data-change,server-domain,tier1,"API operation that sets the status of an Opportunity inside a transaction. Saves the status and cached status name. If the status is an active one it reopens the opportunity (active, end date cleared) and its lead role; otherwise it closes the opportunity with an end date (default today) and ends the lead role. Returns the Opportunity Id or an error.","DBTransactions::OpportunityId#60 (step 84)
+Opportunity::LeadId#60 (step 88)
+OpportunityStatus::Name#50 (step 103)
+OpportunityStatus::ActiveInd#62 (step 105)
+Lead::Id#1 (steps 111, 121)
+Opportunity::Id#1 (step 129)","DBTransactions::OpportunityId#60 (step 85, current record)
+DBTransactions::OpportunityStatusId#114 (step 87, current record)
+DBTransactions::PartyRoleId#68 (step 88, current record)
+Opportunity::ONE#20 (step 90, record found in step 85)
+Opportunity::Id#1 (step 101, related via Opportunity)
+Opportunity::OpportunityStatusId#61 (step 102, related via Opportunity)
+Opportunity::StatusCached#50 (step 103, related via Opportunity)
+Opportunity::ActiveInd#59 (step 107, related via Opportunity (1 when status active, step 117 sets 0))
+Opportunity::EndDate#58 (step 108, related via Opportunity (cleared; step 118 sets $EndDate))
+PartyRole::CurrentInd#22 (step 112, related via Lead (reopen; step 122 sets 0))
+PartyRole::ThruDate#21 (step 113, related via Lead (cleared; step 123 sets $EndDate))","karbon_kontroller.fmp12/scripts/28 (step 35)
+karbon_kontroller.fmp12/scripts/29 (step 142)
+karbon_kontroller.fmp12/scripts/31 (step 143)","objects/karbon_kontacts.fmp12/scripts/612-btn_Change_Opportunity_Status.txt
+objects/karbon_kontroller.fmp12/scripts/602-wip_Create_Opportunity_json.txt",none,"Step 101 writes the primary key Opportunity::Id with $Id; confirm this is intended. The lead PartyRole is reached through the Lead relationship built from DBTransactions::PartyRoleId (step 88). Which statuses are active is data in OpportunityStatus.ActiveInd, not in the script. The ""#wip"" prefix suggests unfinished work."
+karbon_kontroller.fmp12/scripts/682-Get_Active_Opportunities_Status_Value.txt,a6028dbb6e63c457425497ba554b30871e4d5947f3a8933a23d6d037af1b6919,scripts,karbon_kontroller.fmp12,682,Get Active Opportunities Status Value,find-query,server-query,tier1,"Returns the total opportunity value per status as JSON, for charts and list views. Finds Opportunities by ActiveInd (default 1), sorts by status, and walks each status group with sub-summaries to build {""name"":""Opportunities"",""<Status>"":<total>} inside an array. Restores the original layout.","f_Opportunity::ActiveInd#59 (find criterion step 83)
+f_Opportunity::StatusCached#50 (sort step 98; step 104)
+f_Opportunity::ValueTotal#63 (GetSummary step 103)
+f_Opportunity::Count#68 (GetSummary step 105)",none,none,"objects/karbon_kontacts.fmp12/scripts/733-LoadData.txt
+objects/karbon_kontacts.fmp12/scripts/767-Set_up_Opportunity_List_View.txt
+objects/karbon_kontroller.fmp12/scripts/687-Create_Opp_Chart.txt",none,"Which opportunities count as active is defined by the ActiveInd flag set by script 608. Status names have spaces removed to make JSON keys. The result is a one-element array. Depends on f_Opportunity summary fields (ValueTotal, Count) being subsummaries by StatusCached."
+karbon_kontroller.fmp12/scripts/688-New_Script_-_jer_is_this_deprecated.txt,6e7593e4874ba1fd6ee5d063bdb40500252a3458a6e0af079901e3432c13da7e,scripts,karbon_kontroller.fmp12,688,New Script - @jer is this deprecated?,find-query,drop-candidate,tier3,"Older copy of ""Get Active Opportunities Status Value"": finds Opportunities by ActiveInd, sorts by status and returns total value per status as JSON. Named by the developer as possibly deprecated. Its effect owner would be server-query.","Opportunity::ActiveInd#59 (find criterion step 82)
+f_Opportunity::StatusCached#50 (sort step 97; step 102)
+f_Opportunity::ValueTotal#63 (GetSummary step 101)
+f_Opportunity::Count#68 (GetSummary step 103)",none,none,none found,none,"No caller found; the name asks ""@jer is this deprecated?"". Step 82 sets Opportunity::ActiveInd while the layout is f_Opportunity (different table occurrence from script 682, which uses f_Opportunity::ActiveInd). Confirm the script can be dropped."

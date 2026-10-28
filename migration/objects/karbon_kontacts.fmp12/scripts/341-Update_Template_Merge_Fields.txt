@@ -1,0 +1,228 @@
+# script 341: Update Template Merge Fields
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Template
+# source: ScriptCatalog/Script[@id=341]
+# steps: 56 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=339 groupCollapsed=True includeInMenu=False
+
+   1    #@history 2018-07-15 dave@geistinteractive.com - gets a list of merge field names from the current template
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Get a list of merge fields in this template
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $Data; Value:JSONSetElement ( "{}" ; 
+        	[ "String" ; Template::Message ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Template::Message#7, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Data
+   7    Perform Script [ “Return Merge Field Names { Data }” from file: “karbon_kontroller”; Parameter: $Data ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=478 name="Return Merge Field Names { Data }" in=karbon_kontroller.fmp12
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  10    #TODO: handle error
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $MergeFieldNames; Value:JSONGetElement ( $result ; "MergeFieldNames" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $MergeFieldNames
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #Add merge fields to template
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $param; Value:JSONSetElement ( "{}" ; 
+        	[ "TemplateId" ; Template::Id ; JSONString ] ; 
+        	[ "Fields" ; $MergeFieldNames ; JSONArray ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Template::Id#1, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “Create or Patch Merge Fields { MergeField }” from file: “karbon_kontroller”; Parameter: $param ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=481 name="Create or Patch Merge Fields { MergeField }" in=karbon_kontroller.fmp12
+  18    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #BUILD THE VIRTUAL LIST
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #start our virtual list with a list of all available merge fields based on the activity ID
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Field [ VirtualList::Data; List( Template_MergeField#byActivityType::Name ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, Template_MergeField#byActivityType::Name#31
+        Field table=VirtualList id=14 name=Data
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #get a list of all merge fields in use in this template
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $mergeFieldsInUse; Value:List ( Template_TemplateMergeField::Name ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Template_TemplateMergeField::Name#58
+        Repetition
+          Calculation:
+            | 1
+        Name: $mergeFieldsInUse
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #merge the two lists together so our virtual list includes both
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  32    Set Variable [ $end; Value:ValueCount ( $mergeFieldsInUse ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $thisField; Value:GetValue ( $mergeFieldsInUse ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisField
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #Add this merge field if it's not already in our virtual list
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    If [ not IsInList ( VirtualList::Data ; $thisField ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:IsInList, VirtualList::Data#14
+  42    Set Field [ VirtualList::Data; List ( VirtualList::Data ; $thisField ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, VirtualList::Data#14
+        Field table=VirtualList id=14 name=Data
+  43    End If
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    End Loop
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Field [ VirtualListRows::Template.FieldsInUse; $mergeFieldsInUse ]
+        DisableStepCollapsed state=False
+        Field table=VirtualListRows id=9 name=Template.FieldsInUse
+  50    Set Field [ VirtualListRows::Template.Id; Template::Id ]
+        DisableStepCollapsed state=False
+        refs: Template::Id#1
+        Field table=VirtualListRows id=6 name=Template.Id
+  51    Set Field [ VirtualList::FoundCount; ValueCount ( $$virtualListValues ) ]
+        DisableStepCollapsed state=False
+        refs: fn:ValueCount
+        Field table=VirtualList id=12 name=FoundCount
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

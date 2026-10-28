@@ -1,0 +1,287 @@
+# table 149: Vendor
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=149]
+# fields: 34
+# records: 0
+
+Field id=1 dataType=Number fieldType=Normal name=active
+  AutoEnter allowEditing=True value=ConstantData overwriteExistingValue=True constant=True calculation=True
+    ConstantData: 1
+    Calculation table=Vendor:
+      | GetAsBoolean ( Self )
+      refs: fn:GetAsBoolean, fn:Self
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=alternatePhone
+  Comment: not present in QBO object
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=billAddressCity
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=billAddressCountry
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=billAddressLine1
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=billAddressLine2
+  Comment: not present in QBO object
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=billAddressPostalCode
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=billAddressState
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=companyName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=contactFamilyName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Normal name=contactGivenName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=contactMiddleName
+  Comment: not present in QBO object
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=contactSuffix
+  Comment: not present in QBO object
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=contactTitle
+  Comment: not present in QBO object
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=displayName
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Vendor (inactive):
+      | Let ( [
+      | 	trigger = Self
+      | ] ;
+      | 	/* full */
+      | 		Substitute ( List (
+      | 		
+      | 			Vendor::contactGivenName ;
+      | 			Vendor::contactMiddleName ;
+      | 			Vendor::contactFamilyName ;
+      | 			
+      | 			companyName
+      | 		) ;  "¶"; " " )
+      | )
+      refs: fn:Let, fn:Self, fn:Substitute, fn:List, Vendor::contactGivenName#11, Vendor::contactMiddleName#12, Vendor::contactFamilyName#10, Vendor::companyName#9
+  Validation type=Always
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Vendor:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Normal name=mobilePhone
+  Comment: not present in QBO object
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Normal name=primaryEmail
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Text fieldType=Normal name=primaryPhone
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Number fieldType=Normal name=printOnCheckAsDisplayName
+  Comment: Boolean; if True, print on check name will be the same as display name
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=Vendor:
+      | True
+      refs: fn:True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Normal name=printOnCheckName
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=Vendor:
+      | If ( printOnCheckAsDisplayName ;
+      | 	displayName ;
+      | 	Self
+      | )
+      refs: fn:If, Vendor::printOnCheckAsDisplayName#25, Vendor::displayName#15, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Normal name=qbo_Balance
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Text fieldType=Normal name=qbo_error
+  Comment: error message returned by QBO when attempting to sync this record
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=31 dataType=Number fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=Always
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=32 dataType=Number fieldType=Normal name=qbo_send
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Vendor:
+      | Let(
+      | [
+      | x = GetField("")
+      | 
+      | ];
+      | Case(
+      |    $LL_IsUpdatingThisRecord ; Self;
+      |    1
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:GetField, fn:Case, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=42 dataType=Text fieldType=Normal name=webAddress
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=43 dataType=Text fieldType=Normal name=taxIdentifer
+  Comment: not present in QBO object
+  AutoEnter allowEditing=True
+  Validation message=True maxLength=True type=Always
+    MaxDataLength value=100
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=44 dataType=Number fieldType=Normal name=Vendor1099
+  AutoEnter allowEditing=True value=ConstantData overwriteExistingValue=True constant=True calculation=True
+    ConstantData: 0
+    Calculation table=Vendor:
+      | GetAsBoolean ( Self )
+      refs: fn:GetAsBoolean, fn:Self
+  Validation type=OnlyDuringDataEntry
+    Range to=1 from=0
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=45 dataType=Text fieldType=Normal name=acctNum
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Text fieldType=Normal name=qbo_TermRef
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Text fieldType=Normal name="qbo_ CurrencyRef"
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: USD
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=49 dataType=Text fieldType=Normal name=primaryFax
+  Comment: not present in QBO object
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Text fieldType=Normal name=id_Term
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Normal name=Notes
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

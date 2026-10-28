@@ -1,0 +1,123 @@
+# script 220: Set Script Array
+# file: Picker Module.fmp12
+# folder: Modules / Schema
+# source: ScriptCatalog/Script[@id=220]
+# steps: 27 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=219 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $FileName; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $ScriptId; Value:ScriptIDs ( $fileName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ScriptIDs
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptId
+   5    Set Variable [ $ScriptNames; Value:ScriptNames ( $fileName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ScriptNames
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptNames
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #Turn into an array
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $ScriptCount; Value:ValueCount ( $ScriptId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptCount
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $ScriptArray; Value:"[]" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptArray
+  11    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  13    Exit Loop If [ $i > $ScriptCount ]
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $ScriptObject; Value:JSONSetElement ( "" ; 
+        	[ "ScriptId" ; GetValue ( $ScriptId ; $i ) ; JSONString];
+        	[ "ScriptName" ; GetValue ( $ScriptNames ; $i ) ; JSONString]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:GetValue, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptObject
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $ScriptArray; Value:JSONSetElement ( $ScriptArray ; $i - 1 ; $ScriptObject ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Name: $ScriptArray
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    End Loop
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ Picker::Schema_ScriptsArray; $ScriptArray ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=35 name=Schema_ScriptsArray
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Field [ VIRTUALLISTS::foundCount; JSON.ArrayLength ( $ScriptArray ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.ArrayLength
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Refresh Window
+        [ Flush cached join results ]
+        Option state=True
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False

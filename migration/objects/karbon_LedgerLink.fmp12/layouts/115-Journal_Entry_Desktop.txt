@@ -1,0 +1,232 @@
+# layout 115: Journal Entry | Desktop
+# file: karbon_LedgerLink.fmp12
+# folder: Application / Desktop
+# source: LayoutCatalog/Layout[@id=115]
+# objects: 31
+# theme: LedgerLink PC
+# folder group: id=88 groupCollapsed=True includeInMenu=False
+
+Layout width=1024 quickFind=True includeInMenu=True id=115 name="Journal Entry | Desktop"
+  Table id=1065128 name=JournalEntry
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnRecordCommit id=104 triggerFlags=1(browse)
+      Script id=561 name="Journal OnCommit Trigger"
+      TriggerText: "Journal OnCommit Trigger"
+    Trigger event=OnModeExit id=107 triggerFlags=2(find)
+      Script id=491 name="Exit Find Mode Trigger"
+      TriggerText: "Exit Find Mode Trigger"
+  Object type=Rect key=305 LabelKey=0 style=shape.form.portalHeader bounds=112,1049,194,1208
+  Object type=Button key=10 LabelKey=0 bounds=0,0,39,42
+    Text flags=2 style=button.nav
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Display Main Nav” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=463 name="Display Main Nav"
+      Image name=a3_list.svg
+  Object type=Text key=39 LabelKey=0 bounds=0,42,39,331
+    Text flags=2 style=text.header.title.left: "Journal Entry"
+  Object type=Text key=65 LabelKey=0 flags=260 bounds=41,24,81,640
+    Text flags=14 tableViewVisibility=0 style=text.header.title.left: <<docNumber>>
+      FieldList quickFind=False
+        Field table=JournalEntry id=2 name=docNumber
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Field key=76 LabelKey=0 flags=4 bounds=48,24,72,280
+    FieldObj numOfReps=1 flags=1179680 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=edit.view.left
+      Field: JournalEntry::docNumber#2
+      PlaceholderText findMode=True
+        Calculation:
+          | "Invoice No."
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+  Object type=Button key=205 LabelKey=0 flags=1342193925 bounds=0,928,40,1024
+    ConditionalFormatting
+      Item id=0 flags=1
+        Condition op=0
+          Calculation:
+            | JournalEntry::qbo_send
+            refs: JournalEntry::qbo_send#5
+        Format: -fm-underline: underline; -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | Case (
+        | 	IsEmpty (JournalEntry::qbo_id ) ;
+        | 	"New record hasn't been sent to QBO yet." ;
+        | 
+        | 	JournalEntry::qbo_send ;
+        | 	"Record has been changed and needs to be sent to QBO."
+        | )
+        refs: fn:Case, fn:IsEmpty, JournalEntry::qbo_id#4, JournalEntry::qbo_send#5
+    Text flags=6 style=button.nav: Sync
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Sync QBO with FM, Show Progress Card” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=242 name="Sync QBO with FM, Show Progress Card"
+      Image name=a125_sync.svg
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+  Object type=Button key=206 LabelKey=0 flags=1342177540 bounds=133,1057,173,1201
+    Text flags=6 style=button.nav: "Open in QBO"
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "JournalEntry" ; JSONString];
+          | 	[ "QBOId" ;  JournalEntry::qbo_id ; JSONString ]
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "JournalEntry" ; JSONString];
+          | 	[ "QBOId" ;  JournalEntry::qbo_id ; JSONString ]
+          | )
+          refs: fn:JSONSetElement, fn:JSONString, JournalEntry::qbo_id#4
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a11_share.svg
+    HideCondition findMode=True
+      Calculation:
+        | IsEmpty ( JournalEntry::qbo_id )
+        | or
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:IsEmpty, JournalEntry::qbo_id#4, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=276 LabelKey=0 bounds=121,24,145,144
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: JournalEntry::date#1
+  Object type=Text key=277 LabelKey=0 bounds=97,24,121,144
+    Text flags=6 style=text.form.field.label: "Journal date"
+  Object type=Field key=278 LabelKey=0 bounds=121,160,145,416
+    FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: JournalEntry::docNumber#2
+  Object type=Text key=279 LabelKey=0 bounds=97,160,121,280
+    Text flags=6 style=text.form.field.label: "Journal no."
+  Object type=Rect key=280 LabelKey=0 flags=1073741824 style=shape.form.portalHeader bounds=184,24,208,1000
+  Object type=Portal key=281 LabelKey=0 flags=-1073741824 bounds=208,24,600,1000
+    PortalObj portalFlags=277 numOfRows=10 initialRow=1
+      TableAliasKey: JournalEntryItem
+      FieldList
+        Field table=JournalEntryItem id=5 name=amount_debit
+        Field table=JournalEntryItem id=7 name=id_Account
+        Field table=JournalEntryItem id=11 name=amount_credit
+        Field table=JournalEntryItem id=4 name=description
+      Object type=Text key=282 LabelKey=0 bounds=216,24,240,64
+        Text flags=14 tableViewVisibility=0 style=text.list.field.center: {{RecordNumber}}
+          FieldList quickFind=False
+      Object type=Field key=283 LabelKey=0 flags=4 bounds=216,304,240,424
+        ScriptTriggers
+          Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+            Script id=569 name="Clear Amount (type)"
+              Calculation:
+                | "credit"
+            TriggerText: "Clear Amount (type)"; Parameter: "credit"
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: JournalEntryItem::amount_debit#5
+          Display: number flags=268 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( JournalEntryItem::id_Account )
+            refs: fn:IsEmpty, JournalEntryItem::id_Account#7
+      Object type=Field key=284 LabelKey=0 bounds=216,64,240,272
+        FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: JournalEntryItem::id_Account#7
+          ValueList: Account Id#6
+      Object type=Button key=285 LabelKey=0 flags=1342177284 bounds=209,960,247,999
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=104 name="Delete Portal Row"
+            StepText: Delete Portal Row
+            NoInteract state=False
+            DisableStepCollapsed state=False
+          Image name=a25_trash.svg
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( JournalEntryItem::id )
+            refs: fn:IsEmpty, JournalEntryItem::id#1
+      Object type=Button key=286 LabelKey=0 flags=16385 bounds=216,272,240,296
+        ConditionalFormatting
+          Item id=0 flags=129
+            Condition op=0
+              Calculation:
+                | IsEmpty ( JournalEntryItem::id_Account )
+                refs: fn:IsEmpty, JournalEntryItem::id_Account#7
+            Format: -fm-icon-color: rgba(0%,0%,0%,0);
+        ToolTip
+          Calculation:
+            | "remove value"
+        Text flags=6 style=button.field
+        ButtonObj buttonFlags=0 iconSize=14 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ JournalEntryItem::id_Account; "" ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | ""
+            Field table=JournalEntryItem id=7 name=id_Account
+          Image name=a32_smallXOutline.svg
+      Object type=Field key=297 LabelKey=0 flags=4 bounds=216,432,240,552
+        ScriptTriggers
+          Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+            Script id=569 name="Clear Amount (type)"
+              Calculation:
+                | "debit"
+            TriggerText: "Clear Amount (type)"; Parameter: "debit"
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: JournalEntryItem::amount_credit#11
+          Display: number flags=268 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( JournalEntryItem::id_Account )
+            refs: fn:IsEmpty, JournalEntryItem::id_Account#7
+      Object type=Field key=298 LabelKey=0 flags=1073741828 bounds=216,560,240,768
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: JournalEntryItem::description#4
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( JournalEntryItem::id_Account )
+            refs: fn:IsEmpty, JournalEntryItem::id_Account#7
+  Object type=Text key=292 LabelKey=0 bounds=184,64,208,272
+    Text flags=6 style=text.form.portal.label.left: ACCOUNT
+  Object type=Text key=293 LabelKey=0 bounds=184,304,208,424
+    Text flags=6 style=text.form.portal.label.right: debits
+  Object type=Text key=294 LabelKey=0 bounds=184,432,208,552
+    Text flags=6 style=text.form.portal.label.right: credits
+  Object type=Text key=295 LabelKey=0 bounds=184,560,208,690
+    Text flags=6 style=text.form.portal.label.left: description
+  Object type=Text key=296 LabelKey=0 flags=1342177280 bounds=184,807,208,937
+    Text flags=6 style=text.form.portal.label.left: name
+  Object type=Field key=299 LabelKey=0 flags=-1610612736 bounds=615,294,639,414
+    FieldObj numOfReps=1 flags=32820 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.right
+      Field: JournalEntry::totalAmt_debits#8
+      Display: number flags=268 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Field key=300 LabelKey=0 flags=-1610612736 bounds=615,422,639,542
+    FieldObj numOfReps=1 flags=32820 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.right
+      Field: JournalEntry::totalAmt_credits#6
+      Display: number flags=268 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=301 LabelKey=0 flags=-1610612736 bounds=615,167,639,287
+    Text flags=6 style=text.form.field.label.right: Total
+  Object type=Field key=302 LabelKey=303 flags=-536870912 bounds=691,24,747,424
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: JournalEntry::privateNote#7
+  Object type=Text key=303 LabelKey=0 flags=-1610612736 bounds=667,24,691,193
+    Text flags=6 style=text.form.field.label: Memo
+  Object type=Text key=304 LabelKey=0 flags=4 bounds=105,439,145,753
+    Text flags=2
+      | Something's not quite right
+      | Please balance debits and credits
+    HideCondition findMode=False
+      Calculation:
+        | JournalEntry::totalAmt_credits=JournalEntry::totalAmt_debits
+        refs: JournalEntry::totalAmt_credits#6, JournalEntry::totalAmt_debits#8

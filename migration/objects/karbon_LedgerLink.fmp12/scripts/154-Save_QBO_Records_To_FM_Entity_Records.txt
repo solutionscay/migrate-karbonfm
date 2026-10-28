@@ -1,0 +1,172 @@
+# script 154: Save QBO Records To FM ( {Entity, Records )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Public / General
+# source: ScriptCatalog/Script[@id=154]
+# steps: 42 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=594 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Saves the data from Pull From QBO into FileMaker
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} params.Entity the target Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {array} params.Records an array of records to Save
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @returnSuccess {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnSuccess {number} error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @returnError {number} error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  19    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  20    Set Variable [ $Records; Value:JSONGetElement ( $params ;  "Records" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Records
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $list; Value:JSONListValues($Records ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListValues
+        Repetition
+          Calculation:
+            | 1
+        Name: $list
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  27    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $record; Value:GetValue($list ; $n) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $record
+  29    Exit Loop If [ IsEmpty ( $record ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "Record" ; $Record ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Perform Script [ “Save QBO Record To FM ( {Entity, Record )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=113 name="Save QBO Record To FM ( {Entity, Record )"
+  35    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  36    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $n; Value:$n  + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  40    End Loop
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False

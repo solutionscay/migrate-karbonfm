@@ -1,0 +1,52 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_LedgerLink.fmp12/scripts/848-Purchase_Line_Field_Map_Set.txt,b248396c97c13f9ebed93eece07450978d69f10757d4fce3052829f4d088c362,scripts,karbon_LedgerLink.fmp12,848,Purchase Line :: Field Map :: Set,integration,external-adapter,tier2,"Saves one QBO purchase line (JSON) into the qbo_PurchaseLine record: reads amount and detail type, maps customer, item and account ids from QBO to Karbon ids, sets taxable when the tax code is not NON, and fills the item-based or account-based fields.",none,"qbo_PurchaseLine::amount#14 (step 67, current record)
+qbo_PurchaseLine::description#20 (step 68, current record)
+qbo_PurchaseLine::taxable#28 (step 69, current record)
+qbo_PurchaseLine::detailType#29 (step 72, current record)
+qbo_PurchaseLine::id_Customer#23 (step 75, current record)
+qbo_PurchaseLine::id_Item#22 (step 76, current record)
+qbo_PurchaseLine::unitPrice#26 (step 77, current record)
+qbo_PurchaseLine::qty#25 (step 78, current record)
+qbo_PurchaseLine::billableStatus#24 (step 79, current record)
+qbo_PurchaseLine::id_Account#12 (step 82, current record)
+qbo_PurchaseLine::id_Customer#23 (step 83, current record)
+qbo_PurchaseLine::billableStatus#24 (step 84, current record)",none,karbon_LedgerLink.fmp12/scripts/255-Call_Set_Field_Lines_Scripts_Entity_Line.txt (step 34),none,Runs in the context of the target line record (header comment). $Description is set at step 68 but never parsed from JSON. Uses custom function QBO.LookupFMId. Writes are in a branch by DetailType (ItemBased or AccountBased).
+karbon_LedgerLink.fmp12/scripts/849-Purchase_Line_Field_Map_Get.txt,f228f00423f8c940edc5b81ee182adf650cd423d1b557e90ca6a69f53da2cd78,scripts,karbon_LedgerLink.fmp12,849,Purchase Line :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QBO purchase-line JSON from a qbo_PurchaseLine record: amount, description (return -> line feed), detail type chosen by whether an account or an item is set, QBO ids from QBO.LookupQBOId, TAX/NON tax code, and fixed BillableStatus NotBillable.","qbo_PurchaseLine::amount#14
+qbo_PurchaseLine::description#20
+qbo_PurchaseLine::taxable#28
+qbo_PurchaseLine::id_Item#22
+qbo_PurchaseLine::unitPrice#26
+qbo_PurchaseLine::qty#25
+qbo_PurchaseLine::id_Customer#23
+qbo_PurchaseLine::id_Account#12",none,none,karbon_LedgerLink.fmp12/scripts/296-Call_Get_Field_Lines_Scripts_Entity_CurrenQBOLIneData.txt (step 37),none,BillableStatus is always 'NotBillable' (step 15) although the record has billableStatus; class and customer for item-based lines are not written. $json is passed in and extended.
+karbon_LedgerLink.fmp12/scripts/850-SalesReceipt_Field_Map_Get.txt,15c8a1405288b3b60e6ab95e3fe710f62f1c2cd53ceaf5fb2974c4ab92a51db2,scripts,karbon_LedgerLink.fmp12,850,SalesReceipt :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QBO SalesReceipt JSON from a qbo_SalesReceipt record: dates, document number, deposit account, customer, payment method, class, department, bill and ship addresses, tax, memo, totals and a shipping line; removes any Deposit property first.","qbo_SalesReceipt::date#5
+qbo_SalesReceipt::docNumber#4
+qbo_SalesReceipt::id_AccountDeposit#71
+qbo_SalesReceipt::id_Customer#7
+qbo_SalesReceipt::id_Class#49
+qbo_SalesReceipt::id_Department#50
+qbo_SalesReceipt::billAddressLine1#8
+qbo_SalesReceipt::billAddressLine2#9
+qbo_SalesReceipt::billAddressPostalCode#14
+qbo_SalesReceipt::billAddressState#15
+qbo_SalesReceipt::billAddressCountry#11
+qbo_SalesReceipt::billEmailAddress#29
+qbo_SalesReceipt::emailStatus#72
+qbo_SalesReceipt::shipAddressLine1#44
+qbo_SalesReceipt::shipAddressLine2#45
+qbo_SalesReceipt::shipAddressCity#42
+qbo_SalesReceipt::shipAddressPostalCode#46
+qbo_SalesReceipt::shipAddressState#47
+qbo_SalesReceipt::id_TaxCode#31
+qbo_SalesReceipt::totalTax#30
+qbo_SalesReceipt::customerMemo#27
+qbo_SalesReceipt::privateNote#6
+qbo_SalesReceipt::totalAmt#25
+qbo_SalesReceipt::shipAmt#41",none,none,none found,none,BillAddr.City reads billAddressLine2 (step 23) and ShipAddr.Country reads billAddressCountry (step 35). $Id and $PaymentMethodRef.value are never set. Not called by the Get dispatcher (Call Get Field Scripts has no SalesReceipt branch).
+karbon_LedgerLink.fmp12/scripts/851-SalesReceipt_Line_Field_Map_Get.txt,3cd8de194f793f52842acdb8b22b1eda31113d1f244e4b6ca966efae15b61600,scripts,karbon_LedgerLink.fmp12,851,SalesReceipt Line :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QBO SalesReceipt line JSON from a qbo_SalesReceiptItem record: description, line number, amount, item id (QBO.LookupQBOId), TAX/NON tax code, unit price and quantity, with detail type SalesItemLineDetail.","qbo_SalesReceiptItem::description#5
+qbo_SalesReceiptItem::qbo_lineNum#4
+qbo_SalesReceiptItem::amount#6
+qbo_SalesReceiptItem::id_Item#9
+qbo_SalesReceiptItem::taxable#11
+qbo_SalesReceiptItem::unitPrice#7
+qbo_SalesReceiptItem::qty#8",none,none,karbon_LedgerLink.fmp12/scripts/296-Call_Get_Field_Lines_Scripts_Entity_CurrenQBOLIneData.txt (dead code),none,"Only caller (Call Get Field Lines, step 30) is disabled, so this script is dead code. LineNum is written as JSONString (step 43)."

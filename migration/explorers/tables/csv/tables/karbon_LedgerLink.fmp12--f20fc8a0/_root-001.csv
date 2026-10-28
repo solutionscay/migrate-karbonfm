@@ -1,0 +1,402 @@
+source_id,source_hash,kind,file,id,name,role,fields,regular,calculated,summary,global,container,repeating,keys,logic,logic_count,target,open_question
+karbon_LedgerLink.fmp12/tables/130-Account.txt,d028d91fea2644e0d6db6a48ec363031fbb559ed54ee073cf66846278963dd9a,tables,karbon_LedgerLink.fmp12,130,Account,entity,21,15,6,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+6 subAccount | auto-calc | coerces the entered value to a boolean 0/1 (overwrites an existing value; user can edit)
+15 nameForCOGSValueList | calc-stored | returns name when accountType is ""Cost of Goods Sold"", otherwise empty; feeds a value list of COGS accounts
+16 nameForIncomeValueList | calc-stored | returns name when accountType is ""Income"", otherwise empty; feeds a value list of income accounts
+17 nameForInventoryValueList | calc-stored | returns name when accountSubType is ""Inventory"", otherwise empty; feeds a value list of inventory accounts
+18 qbo_send | auto-calc | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit)
+20 nameForPayableValueList | calc-stored | returns name when accountSubType is ""AccountsPayable"", otherwise empty; feeds a value list of payable accounts
+21 nameForExpenseValueList | calc-stored | returns name when accountType contains ""Expense"", otherwise empty; feeds a value list of expense accounts
+22 nameForBankValueLis | calc-stored | returns name when accountType is ""Bank"" or accountSubType is ""UndepositedFunds"", otherwise empty; feeds a bank account value list (field name is truncated: nameForBankValueLis)",10,table,Chart of accounts mirrored from QuickBooks Online. qbo_send is set to 1 on every edit unless script variable $LL_IsUpdatingThisRecord is on; confirm the sync design (dirty flag) is rebuilt.
+karbon_LedgerLink.fmp12/tables/131-Class.txt,8ed05b1709382bd650af460f2ffb99652bffda83f69db31aeeaa134df3a4dece,tables,karbon_LedgerLink.fmp12,131,Class,lookup,7,7,0,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict","5 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+8 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override",2,table,none
+karbon_LedgerLink.fmp12/tables/132-CompanyInfo.txt,7d9b764198e280a134fb9269b75afec44d8add8dd15ab3856c6fe84905fd514b,tables,karbon_LedgerLink.fmp12,132,CompanyInfo,settings-globals,50,50,0,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+42 companyStartDate | validate-rule (always) | validation (always): strict data type FourDigitYear
+50 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override",4,table,One record per QuickBooks company (QuickBooks CompanyInfo); confirm the target needs a multi-company table or a single config row.
+karbon_LedgerLink.fmp12/tables/133-Customer.txt,dea89c47cdb3a540c34c1b9e9af29f610801575924de390cf637142d38997e31,tables,karbon_LedgerLink.fmp12,133,Customer,entity,43,43,0,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict; parent side of Invoice::id_Customer, Payment::id_Customer, Estimate::id_Customer, PurchaseOrder::id_Customer
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+9 displayName | validate-rule (always) | validation (always): not empty, no user override
+10 printOnCheckName | auto-calc | equals displayName while printOnCheckAsDisplayName is on, otherwise keeps its own value (overwrites an existing value; user can edit)
+11 active | auto-calc, auto-data, validate-rule (always) | coerces the entered value to a boolean 0/1 (overwrites an existing value; user can edit); default constant '1'; validation (always): strict data type Numeric, range 0 to 1, no user override
+18 shipAddressLine1 | auto-calc | equals billAddressLine1 while shipSameAsBilling is on, otherwise keeps its own value (overwrites an existing value; user can edit)
+19 shipAddressCity | auto-calc | equals billAddressCity while shipSameAsBilling is on, otherwise keeps its own value (overwrites an existing value; user can edit)
+20 shipAddressCountry | auto-calc | equals billAddressCountry while shipSameAsBilling is on, otherwise keeps its own value (overwrites an existing value; user can edit)
+21 shipAddressState | auto-calc | equals billAddressState while shipSameAsBilling is on, otherwise keeps its own value (overwrites an existing value; user can edit)
+22 shipAddressPostalCode | auto-calc | equals billAddressPostalCode while shipSameAsBilling is on, otherwise keeps its own value (overwrites an existing value; user can edit)
+30 shipAddressLine2 | auto-calc | equals billAddressLine2 while shipSameAsBilling is on, otherwise keeps its own value (overwrites an existing value; user can edit)
+36 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+38 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+43 printOnCheckAsDisplayName | auto-calc, validate-rule (always) | defaults to true (1) (only fills an empty field; user can edit); validation (always): strict data type Numeric, range 0 to 1, no user override
+44 shipSameAsBilling | auto-calc, validate-rule (always) | defaults to true (1) (only fills an empty field; user can edit); validation (always): strict data type Numeric, range 0 to 1, no user override
+46 resaleNum | validate-rule (always) | validation (always): max length 16, no user override
+48 qbo_error | auto-data | default constant empty text
+56 qbo_TaxExemptionReasonId | auto-calc | enters ""NON"" (non-taxable code) when taxable is 0, otherwise empty; overwrites
+58 One | auto-calc | always 1 (If(Self;1;1)); used as the left key of the ""customer, unpaid invoices"" relationship against Invoice::paidInd",18,table,"active carries both a default constant 1 and an auto-enter calculation GetAsBoolean(Self), both shown as active in the DDR. One is related to Invoice::paidInd by NotEqual (all unpaid invoices of a customer). qbo_send is set to 1 on every edit unless script variable $LL_IsUpdatingThisRecord is on; confirm the sync design (dirty flag) is rebuilt."
+karbon_LedgerLink.fmp12/tables/134-Department.txt,5cc7e392a7882b132a6f460abe20bd2d76586d02f9707d8e7506f15839ba2cd6,tables,karbon_LedgerLink.fmp12,134,Department,lookup,7,7,0,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict","5 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+8 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override",2,table,none
+karbon_LedgerLink.fmp12/tables/135-Invoice.txt,a5d2a7143d1ec648540e8c5c80b00c165100094f99eeb2c392572fe16f2e45b9,tables,karbon_LedgerLink.fmp12,135,Invoice,entity,52,40,9,1,2,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of InvoiceItem::id_Invoice, PaymentLine::id_Invoice, AttachableRef::EntityId
+qbo_id | unique validation (QuickBooks Online id; constant default)
+id_Customer | FK -> Customer::id
+id_Term | FK -> Term::id
+id_TaxCode | FK -> TaxCode::id
+id_Department | FK -> Department::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""Invoice id must exist and be unique.""
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+3 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+4 docNumber | validate-rule | validation (only during data entry): max length 21
+5 date | auto-calc, validate-rule (always) | defaults to the current date (only fills an empty field; user can edit); validation (always): strict data type FourDigitYear
+8 billAddressLine1 | auto-calc | copies Invoice_Customer::billAddressLine1 from the related record (overwrites an existing value; user can edit)
+9 billAddressLine2 | auto-calc | copies Invoice_Customer::billAddressLine2 from the related record (overwrites an existing value; user can edit)
+10 billAddressCity | auto-calc | copies Invoice_Customer::billAddressCity from the related record (overwrites an existing value; user can edit)
+11 billAddressCountry | auto-calc | copies Invoice_Customer::billAddressCountry from the related record (overwrites an existing value; user can edit)
+14 billAddressPostalCode | auto-calc | copies Invoice_Customer::billAddressPostalCode from the related record (overwrites an existing value; user can edit)
+15 billAddressState | auto-calc | copies Invoice_Customer::billAddressState from the related record (overwrites an existing value; user can edit)
+22 dueDate | validate-rule (always) | validation (always): strict data type FourDigitYear
+25 totalAmt | validate-rule (always) | validation (always): strict data type Numeric
+26 balance | validate-rule (always) | validation (always): strict data type Numeric
+28 id_Term | auto-calc | copies Customer::id_Term from the related record (overwrites an existing value; user can edit)
+29 billEmailAddress | auto-calc | copies Invoice_Customer::primaryEmail from the related record (overwrites an existing value; user can edit)
+30 totalTax | validate-rule (always) | validation (always): strict data type Numeric
+31 id_TaxCode | auto-calc | copies Customer::id_TaxCode from the related record (overwrites an existing value; user can edit)
+32 deleted | validate-rule (always) | validation (always): range 0 to 1, no user override
+35 qbo_error | auto-data | default constant empty text
+36 period | calc-stored | accounting period YYYYMM built from the date field
+37 totalAmtSummary | summary | total of totalAmt (field 25) over the current found set or sort group (Together repetitions)
+42 shipAddressCity | auto-calc | copies Invoice_Customer::shipAddressCity from the related record (overwrites an existing value; user can edit)
+43 shipAddressCountry | auto-calc | copies Invoice_Customer::shipAddressCountry from the related record (overwrites an existing value; user can edit)
+44 shipAddressLine1 | auto-calc | copies Invoice_Customer::shipAddressLine1 from the related record (overwrites an existing value; user can edit)
+45 shipAddressLine2 | auto-calc | copies Invoice_Customer::shipAddressLine2 from the related record (overwrites an existing value; user can edit)
+46 shipAddressPostalCode | auto-calc | copies Invoice_Customer::shipAddressPostalCode from the related record (overwrites an existing value; user can edit)
+47 shipAddressState | auto-calc | copies Invoice_Customer::shipAddressState from the related record (overwrites an existing value; user can edit)
+57 paidInd | calc-stored | true when balance equals 0 (paid indicator); stored
+58 totalPaid | calc-unstored | sum of Invoice_PaymentLine::amount (payments applied to this invoice)
+59 countOfPayment | calc-unstored | count of related Invoice_PaymentLine records
+62 RETAINER | calc-stored | formula not in DDR (calculated field, stored)
+65 totalRetainerAmount | calc-unstored | sum of InvoiceItem::retainerAmount over the invoice lines
+66 totalRevenue | calc-unstored | totalAmt minus totalRetainerAmount (revenue excluding retainer lines)
+67 ONE | auto-calc | always re-evaluates to 1 when its own value changes (Let with Self as trigger); constant-true helper (overwrites an existing value; user can edit)
+69 balanceView | calc-unstored | balance, or totalAmtView when balance is empty (""handling the posting to qbo issue"")
+70 totalAmtView | calc-unstored | totalAmt, or the sum of InvoiceItem::amount when totalAmt is empty",37,table,RETAINER is a calculated field with no formula in the DDR (formula not in DDR). retainerAmount on InvoiceItem tests a hard-coded item id. qbo_send is set to 1 on every edit unless script variable $LL_IsUpdatingThisRecord is on; confirm the sync design (dirty flag) is rebuilt.
+karbon_LedgerLink.fmp12/tables/136-InvoiceItem.txt,14ebe6f12b63920948c9cc9ee5577ed93260835fcf64918a9446ce36c16ada44,tables,karbon_LedgerLink.fmp12,136,InvoiceItem,entity,15,11,2,2,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+id_Invoice | FK -> Invoice::id
+id_Item | FK -> Item::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""InvoiceItem id must exist and be unique.""
+2 qbo_id | auto-data | default constant empty text
+4 qbo_lineNum | auto-calc, validate-rule (always) | defaults to the current UTC time in milliseconds so new lines sort after earlier ones; used as line sort order (only fills an empty field; user can edit); validation (always): strict data type Numeric
+5 description | auto-calc, validate-rule (always) | copies Invoice_InvoiceItem_Item::description from the related record (overwrites an existing value; user can edit); validation (always): max length 4000, no user override
+6 amount | auto-calc, validate-rule | line amount: round(qty (1 when empty) x unitPrice, 2) when an item is selected, empty for a description-only line (no item); matches the QuickBooks Online screen logic; re-evaluates on change; validation (only during data entry): strict data type Numeric, no user override
+7 unitPrice | auto-calc, validate-rule (always) | unit price: when the user changes the item field (Get(ActiveFieldName) equals the item key field name) it takes the default unit price of the related item, otherwise rounds the entered value to 7 decimals; the lookup option is switched off; set it from the item yourself when the item is set by script; validation (always): strict data type Numeric
+8 qty | auto-calc, validate-rule (always) | rounds the entered value to 7 decimals (overwrites an existing value; user can edit); validation (always): strict data type Numeric
+9 id_Item | validate-rule | validation (only during data entry): no user override, message ""A Product/Service must be selected.""
+10 id_Invoice | validate-rule (always) | validation (always): not empty, no user override
+11 taxable | auto-calc, validate-rule (always) | copies Invoice_InvoiceItem_Item::taxable from the related record (overwrites an existing value; user can edit); validation (always): strict data type Numeric, range 0 to 1, no user override
+12 amountTaxable | calc-stored | amount when taxable is on, otherwise 0; feeds the taxable subtotal
+13 summaryTotalAmountTaxable | summary | total of amountTaxable (field 12) over the current found set or sort group (Together repetitions)
+14 summaryTotalAmount | summary | total of amount (field 6) over the current found set or sort group (Together repetitions)
+17 retainerAmount | calc-stored | amount when id_Item equals the hard-coded Item id ""FB50FC5C-42B6-4AB4-A610-D708FB9DA7C2"" (retainer product), otherwise 0; stored
+18 ONE | auto-calc | always re-evaluates to 1 when its own value changes (Let with Self as trigger); constant-true helper (overwrites an existing value; user can edit)",15,table,"retainerAmount compares id_Item to a hard-coded Item id (the retainer product); confirm which Item that is and where the constant should live. amount re-evaluates always, and unitPrice reads Get(ActiveFieldName), so the logic depends on the screen."
+karbon_LedgerLink.fmp12/tables/137-Item.txt,8c7ed51583424d88ca036aecfd348386489d7081ae456dca11b214f5c00bf841,tables,karbon_LedgerLink.fmp12,137,Item,entity,24,23,1,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of InvoiceItem::id_Item, PurchaseOrderLine::id_Item, BillLine::id_Item, EstimateItem::id_Item
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+4 active | auto-data, validate-rule (always) | default constant '1'; validation (always): range 0 to 1, no user override
+5 description | validate-rule (always) | validation (always): max length 4000, no user override
+7 name | validate-rule (always) | validation (always): max length 100, no user override
+8 purchaseCost | validate-rule (always) | validation (always): strict data type Numeric
+9 purchaseDesc | validate-rule | validation (only during data entry): max length 1000
+13 qtyOnHand | validate-rule (always) | validation (always): strict data type Numeric
+17 subItem | validate-rule (always) | validation (always): strict data type Numeric
+19 taxable | validate-rule (always) | validation (always): strict data type Numeric
+20 trackQtyOnHand | validate-rule (always) | validation (always): strict data type Numeric
+21 type | validate-rule (always) | validation (always): value list id=19 name=""Item type"", no user override
+22 unitPrice | validate-rule (always) | validation (always): strict data type Numeric
+24 level | validate-rule (always) | validation (always): strict data type Numeric
+26 qbo_error | auto-data | default constant empty text
+29 sku | validate-rule (always) | validation (always): max length 100, no user override
+34 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+35 nameForActiveValueList | calc-stored | returns name when active is on, otherwise empty; feeds a value list of active items",18,table,none
+karbon_LedgerLink.fmp12/tables/138-Payment.txt,c6ef78c6a8539670590ce05984664dcacbcd138e845bf7f424d91d057002835c,tables,karbon_LedgerLink.fmp12,138,Payment,entity,17,13,4,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of PaymentLine::id_Payment
+qbo_id | unique validation (QuickBooks Online id; constant default)
+id_Customer | FK -> Customer::id
+id_PaymentMethod | FK -> PaymentMethod::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+3 date | validate-rule (always) | validation (always): strict data type FourDigitYear
+10 qbo_error | auto-data | default constant empty text
+11 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+12 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+17 BillTo.C.ID_MatchOpen | calc-stored | id_Customer plus ""_Open"", a key text to match payments to open invoices
+19 TotalAllocatedPayments | calc-unstored | sum of Payment_PaymentLine::amount (amount of the payment applied to invoices)
+20 TotalUnallocated | calc-unstored | 0 when amount is 0 or less, otherwise amount minus TotalAllocatedPayments (unapplied part of the payment)
+21 IncludedInVoiceIDs | calc-unstored | list of Payment_PaymentLine::id_Invoice (invoices paid by this payment)",9,table,none
+karbon_LedgerLink.fmp12/tables/139-PaymentLine.txt,a11c561c19b6ae4733da46e676abc699bb96c700fe178ae8da81f1de15535e7a,tables,karbon_LedgerLink.fmp12,139,PaymentLine,join,12,9,3,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+id_Payment | FK -> Payment::id
+id_Invoice | FK -> Invoice::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+6 qbo_id | auto-data | default constant empty text
+9 qbo_lineNum | auto-calc, validate-rule (always) | defaults to the current UTC time in milliseconds so new lines sort after earlier ones; used as line sort order (only fills an empty field; user can edit); validation (always): strict data type Numeric
+10 qbo_error | auto-data | default constant empty text
+15 id_Customer | auto-calc | copies Invoice_PaymentLine_Payment::id_Customer from the related record (only fills an empty field; user can edit)
+16 BillTo.C.ID_yes | calc-stored | id_Customer plus ""_yes"", a key text for relationships that filter payment lines by customer
+17 TransactionDate | calc-unstored | date of the related Invoice
+18 TransactionDocNumber | calc-unstored | docNumber of the related Invoice",8,table,Links Payment to Invoice (amount applied). id_JournalEntry has no relationship in the graph.
+karbon_LedgerLink.fmp12/tables/140-PaymentMethod.txt,d18000c8788f6fc35d8620d0267427a1435be766c6b0e13605e5cd50e3b17c1a,tables,karbon_LedgerLink.fmp12,140,PaymentMethod,lookup,6,6,0,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of Payment::id_PaymentMethod","3 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+6 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override",2,table,none
+karbon_LedgerLink.fmp12/tables/141-Preferences.txt,b535491e5916e0422869e287b1e3b3c5d07c90456a3ac9a15b80aaa07c6a528d,tables,karbon_LedgerLink.fmp12,141,Preferences,settings-globals,9,9,0,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+8 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override",3,table,Mirror of QuickBooks company preferences (single record per company).
+karbon_LedgerLink.fmp12/tables/142-QBOConfig.txt,379ebe9ef415e8b4cfd6bd9bd397d6e890f17df7267d4e4673f65ff475ef57c6,tables,karbon_LedgerLink.fmp12,142,QBOConfig,settings-globals,16,12,2,0,2,0,0,none,"2 maxResult | auto-calc, validate-rule | forces the number of records fetched per request into 10..1000: values below 10 or above 1000 become 500; re-evaluates on change; validation (only during data entry): strict data type Numeric
+13 metaData | auto-serial, auto-calc | keeps the field empty (the auto-enter returns """" in both branches); its meaning is stored in the serial next value, first value is the version string, and creating a new record would increment it; global storage; serial number, next value 1.1, increment 1, generated OnCreation
+14 versionForDisplay | auto-calc | copies qbo_meta::FileVersion from the related record (overwrites an existing value; user can edit)
+15 oldestGetDate | validate-rule (always) | validation (always): strict data type FourDigitYear, no user override
+20 One | calc-stored | constant 1
+21 ConfigAsJSON | calc-stored | JSON of the QuickBooks connection: companyId, apiKey, sandbox flag, payments flag, license (contains secrets); a trailing comment says ""proxy2 replace""",6,config,"secret: ApiKey, RefreshToken, License, ActivationId and CompanyID are stored as plain text fields. metaData uses the serial next value as a version store (1.1), not field content. DataSourceDataFile/ControllerFile are file paths."
+karbon_LedgerLink.fmp12/tables/143-TaxCode.txt,3a01d39d2f70cf38ef648a02a9ce04e16ad0d65da95020d0a6b3def6377c26d2,tables,karbon_LedgerLink.fmp12,143,TaxCode,lookup,12,10,2,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict; parent side of Invoice::id_TaxCode, Estimate::id_TaxCode, Bill::id_TaxCode
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 active | auto-data, validate-rule (always) | default constant '1'; validation (always): strict data type Numeric, range 0 to 1, no user override
+2 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+3 name | validate-rule (always) | validation (always): not empty, max length 100, no user override
+4 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+6 description | validate-rule (always) | validation (always): max length 100, no user override
+7 taxable | auto-data, validate-rule (always) | default constant '1'; validation (always): strict data type Numeric, range 0 to 1, no user override
+8 taxGroup | auto-data, validate-rule (always) | default constant '1'; validation (always): strict data type Numeric, range 0 to 1, no user override
+10 percentage | auto-calc | formula is only a comment (Sum of related tax rates, switched off), so it returns empty; overwrites
+11 nameAndPercentage | calc-stored | name followed by "" ("" percentage ""%)""
+12 nameForActiveValueList | calc-stored | returns nameAndPercentage when active is on, otherwise empty; feeds a value list
+13 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override",11,table,none
+karbon_LedgerLink.fmp12/tables/144-TaxRate.txt,4b6408a0b0ed67f4f4409c21c43ac656e7073baa69498662541376b7961449db,tables,karbon_LedgerLink.fmp12,144,TaxRate,lookup,10,10,0,0,0,0,0,id | auto-enter UUID (no unique validation); parent side of QBO::id_TaxRate,"1 active | auto-data, validate-rule (always) | default constant '1'; validation (always): strict data type Numeric, range 0 to 1, no user override
+2 id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)
+3 name | validate-rule (always) | validation (always): max length 100, no user override
+6 description | validate-rule (always) | validation (always): max length 100, no user override
+12 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override",5,table,none
+karbon_LedgerLink.fmp12/tables/145-Term.txt,41bab3b99aca69f6d0b3c05d92a53451fdbf09be507bcef015ae359abd4cb9cc,tables,karbon_LedgerLink.fmp12,145,Term,lookup,14,13,1,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of Invoice::id_Term
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+3 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+5 name | validate-rule (always) | validation (always): max length 31, no user override
+6 discountPercent | validate-rule (always) | validation (always): strict data type Numeric, range 0 to 100
+11 active | auto-data, validate-rule (always) | default constant '1'; validation (always): strict data type Numeric, range 0 to 1, no user override
+14 dueDays | validate-rule (always) | validation (always): strict data type Numeric, range 0 to 999, no user override
+15 discountDays | validate-rule (always) | validation (always): strict data type Numeric, range 0 to 999, no user override
+16 dayOfMonthDue | validate-rule (always) | validation (always): strict data type Numeric, range 0 to 31, no user override
+17 dueNextMonthDays | validate-rule (always) | validation (always): strict data type Numeric, range 0 to 999, no user override
+18 discountDayOfMonth | validate-rule (always) | validation (always): strict data type Numeric, range 0 to 31, no user override
+19 nameForActiveValueList | calc-stored | returns name when active is on, otherwise empty; feeds a value list of active terms
+20 ""name Copy"" | validate-rule (always) | validation (always): max length 31, no user override",13,table,none
+karbon_LedgerLink.fmp12/tables/146-QBOEntity.txt,ee15aa2964233281be888543bffa10625d236e6753c34870224f5e6c5eba648a,tables,karbon_LedgerLink.fmp12,146,QBOEntity,settings-globals,29,22,5,0,2,0,0,"name | not empty, unique, strict; parent side of QBO::selectedEntityName","1 name | validate-rule (always) | validation (always): not empty, unique, no user override
+11 send | auto-calc, auto-data, validate-rule (always) | forced to 0 when sendAllowed is off (If(sendAllowed;Self;0)); re-evaluates on change; ""send"" also has a default constant 1; default constant '1'; validation (always): range 0 to 1, no user override
+12 get | auto-data, validate-rule (always) | default constant '1'; validation (always): range 0 to 1, no user override
+16 sendAllowed | auto-data, validate-rule (always) | default constant '1'; validation (always): range 0 to 1, no user override
+17 deleteAllowed | auto-data, validate-rule (always) | default constant '1'; validation (always): range 0 to 1, no user override
+24 getInactive | auto-calc, auto-data, validate-rule (always) | keeps its value only for entities whose resourceGroup is ""name""; otherwise empty; also has a default constant 1; default constant '1'; validation (always): range 0 to 1, no user override
+34 getTimeStamp | calc-stored | converts the ISO text in getQBOTimeStamp to a timestamp with custom function Timestamp.FromISO
+35 displaySendError | calc-stored | sendError pretty-printed JSON with tabs replaced by two spaces
+36 displayGetError | calc-stored | getError pretty-printed JSON with tabs replaced by two spaces
+37 asJSONForSyncLog | calc-unstored | builds the sync-log JSON for the entity: send on/last time/record and success counts/duration, get on/last time/record count/duration, and last errors when present (uses custom function Config(name))
+38 test | calc-unstored | returns global variable $$LL_API_Config (debug)",11,config,"send and getInactive show both a default constant 1 and an auto-enter calculation as active in the DDR; which wins? 19 records: sync settings and counters per QuickBooks entity; confirm they are configuration, not data to migrate."
+karbon_LedgerLink.fmp12/tables/147-QBO.txt,6fd24f562a6b35501010d0ca05752a2138e8b8740d3bd338a04d6315ed2a7a05,tables,karbon_LedgerLink.fmp12,147,QBO,settings-globals,65,33,4,0,29,0,0,none,"11 one | calc-unstored | constant 1
+18 lastSyncTimestampLocal | calc-unstored | lastSyncTimestampUTC plus the local time offset (current local timestamp minus current UTC seconds)
+35 lastCommitUTC | auto-calc | sets itself to the current UTC time in milliseconds each time it is re-evaluated (Let x = GetField(""""), a self trigger); overwrites
+69 AsJSONForEntities | calc-unstored | JSON object text of the per-entity sync logs from QBOEntity::asJSONForSyncLog, joined with commas
+70 AsJSONForSupport | calc-unstored | support JSON, formatted: Entities, License, CompanyId, Sandbox, Payments (from QBOConfig) and Version (meta::FileVersion)",5,session-state,"secret: CardNumber, CardExpYear, CardExpMonth, CardCVC, BankAccountRoutingNumber and BankAccountAccountNumber are globals that hold payment card and bank data entered at run time; keep them out of stored data. The id_* fields are single-record pointers to the currently selected record of each table (they act as left keys of the QBO relationships)."
+karbon_LedgerLink.fmp12/tables/148-HTTPRequestLog.txt,b12295154ef3d7d5d0ef2c5fe571b036afd7f05ef8c66b6928c946952ca5ac1d,tables,karbon_LedgerLink.fmp12,148,HTTPRequestLog,log-audit,5,5,0,0,0,0,0,Id | auto-enter UUID; parent side of QBO::id_Log,"1 Id | auto-calc | auto-enters a new UUID, Get(UUID) (only fills an empty field; user can edit)
+5 z_creationTimestamp | auto-calc | creation timestamp: Get(CurrentHostTimestamp); overwrites",2,table,none
+karbon_LedgerLink.fmp12/tables/149-Vendor.txt,1b145919c8c2f265735056b1ebcff0413c6b3e34ef7cf9e8d380d6b399a6b100,tables,karbon_LedgerLink.fmp12,149,Vendor,entity,34,34,0,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of Bill::id_Vendor, PurchaseOrder::id_Vendor, QBO::id_Vendor
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 active | auto-calc, auto-data, validate-rule (always) | coerces the entered value to a boolean 0/1 (overwrites an existing value; user can edit); default constant '1'; validation (always): strict data type Numeric, range 0 to 1, no user override
+15 displayName | validate-rule (always) | validation (always): not empty, no user override
+18 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override
+25 printOnCheckAsDisplayName | auto-calc, validate-rule (always) | defaults to true (1) (only fills an empty field; user can edit); validation (always): strict data type Numeric, range 0 to 1, no user override
+26 printOnCheckName | auto-calc | equals displayName while printOnCheckAsDisplayName is on, otherwise keeps its own value (overwrites an existing value; user can edit)
+29 qbo_error | auto-data | default constant empty text
+31 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+32 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+43 taxIdentifer | validate-rule (always) | validation (always): max length 100, no user override
+44 Vendor1099 | auto-calc, auto-data, validate-rule | coerces the entered value to a boolean 0/1 (overwrites an existing value; user can edit); default constant '0'; validation (only during data entry): range 0 to 1
+47 ""qbo_ CurrencyRef"" | auto-data | default constant 'USD'",11,table,Vendor qbo_id is a number with a unique rule; Vendor1099 shows both a constant default 0 and GetAsBoolean(Self). displayName auto-enter calculation is switched off but NotEmpty validation remains. qbo_send is set to 1 on every edit unless script variable $LL_IsUpdatingThisRecord is on; confirm the sync design (dirty flag) is rebuilt.
+karbon_LedgerLink.fmp12/tables/150-JournalEntry.txt,4baf791bb7627a2486adbf38d0e2747492a6c03040d00b1ee33c2f37d90189cd,tables,karbon_LedgerLink.fmp12,150,JournalEntry,entity,9,9,0,0,0,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of JournalEntryItem::id_JournalEntry
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 date | auto-calc, validate-rule (always) | defaults to the current date (only fills an empty field; user can edit); validation (always): strict data type FourDigitYear
+2 docNumber | validate-rule | validation (only during data entry): max length 21
+3 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""Invoice id must exist and be unique.""
+4 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+5 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+6 totalAmt_credits | validate-rule (always) | validation (always): strict data type Numeric",6,table,"The id message says ""Invoice id must exist and be unique"" (copy and paste text). qbo_send is set to 1 on every edit unless script variable $LL_IsUpdatingThisRecord is on; confirm the sync design (dirty flag) is rebuilt."
+karbon_LedgerLink.fmp12/tables/151-JournalEntryItem.txt,ac76b164a437ca470567aa002fdbf189372298e4a3f9b3fab2002271d15c9385,tables,karbon_LedgerLink.fmp12,151,JournalEntryItem,entity,12,10,0,2,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+id_JournalEntry | FK -> JournalEntry::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""JournalEntry Item Id must be Unique""
+2 id_JournalEntry | validate-rule (always) | validation (always): not empty, no user override, message ""Id_JournalEntry is required""
+3 qbo_id | auto-data | default constant empty text
+12 amount | auto-calc | amount_credit plus amount_debit; overwrites
+13 summaryTotalAmountCredit | summary | total of amount_credit (field 11) over the current found set or sort group (Together repetitions)
+14 summaryTotalAmountDebit | summary | total of amount_debit (field 5) over the current found set or sort group (Together repetitions)",6,table,none
+karbon_LedgerLink.fmp12/tables/152-PurchaseOrder.txt,b00ce9049e0efbc886836147d53e8756bb837bc8dbfb8ca378fffac49163f391,tables,karbon_LedgerLink.fmp12,152,PurchaseOrder,entity,39,35,3,1,0,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of PurchaseOrderLine::id_PurchaseOrder
+qbo_id | unique validation (QuickBooks Online id; constant default)
+id_Vendor | FK -> Vendor::id
+id_Customer | FK -> Customer::id (ship to)","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""Invoice id must exist and be unique.""
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+3 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+4 docNumber | validate-rule | validation (only during data entry): max length 21
+5 date | auto-calc, validate-rule (always) | defaults to the current date (only fills an empty field; user can edit); validation (always): strict data type FourDigitYear
+8 billAddressLine1 | auto-calc | copies PurchaseOrder_Vendor::billAddressLine1 from the related record (overwrites an existing value; user can edit)
+9 billAddressLine2 | auto-calc | copies PurchaseOrder_Vendor::billAddressLine2 from the related record (overwrites an existing value; user can edit)
+10 billAddressCity | auto-calc | copies PurchaseOrder_Vendor::billAddressCity from the related record (overwrites an existing value; user can edit)
+11 billAddressCountry | auto-calc | copies PurchaseOrder_Vendor::billAddressCountry from the related record (overwrites an existing value; user can edit)
+14 billAddressPostalCode | auto-calc | copies PurchaseOrder_Vendor::billAddressPostalCode from the related record (overwrites an existing value; user can edit)
+15 billAddressState | auto-calc | copies PurchaseOrder_Vendor::billAddressState from the related record (overwrites an existing value; user can edit)
+22 dueDate | validate-rule (always) | validation (always): strict data type FourDigitYear
+25 totalAmt | validate-rule (always) | validation (always): strict data type Numeric
+26 balance | validate-rule (always) | validation (always): strict data type Numeric
+29 billEmailAddress | auto-calc | copies PurchaseOrder_Vendor::primaryEmail from the related record (overwrites an existing value; user can edit)
+32 deleted | validate-rule (always) | validation (always): range 0 to 1, no user override
+35 qbo_error | auto-data | default constant empty text
+36 period | calc-stored | accounting period YYYYMM built from the date field
+37 totalAmtSummary | summary | total of totalAmt (field 25) over the current found set or sort group (Together repetitions)
+55 shipAddressCity | auto-calc | copies PurchaseOrder_Customer::shipAddressCity from the related record (overwrites an existing value; user can edit)
+56 shipAddressCountry | auto-calc | copies PurchaseOrder_Customer::shipAddressCountry from the related record (overwrites an existing value; user can edit)
+57 shipAddressLine1 | auto-calc | copies PurchaseOrder_Customer::shipAddressLine1 from the related record (overwrites an existing value; user can edit)
+58 shipAddressLine2 | auto-calc | copies PurchaseOrder_Customer::shipAddressLine2 from the related record (overwrites an existing value; user can edit)
+59 shipAddressPostalCode | auto-calc | copies PurchaseOrder_Customer::shipAddressPostalCode from the related record (overwrites an existing value; user can edit)
+60 shipAddressState | auto-calc | copies PurchaseOrder_Customer::shipAddressState from the related record (overwrites an existing value; user can edit)
+62 detail_type_AccountBasedExpenseLineDetail | calc-stored | constant text ""AccountBasedExpenseLineDetail""
+63 detail_type_ItemBasedExpenseLineDetail | calc-stored | constant text ""ItemBasedExpenseLineDetail""",27,table,"Message text says ""Invoice id must exist and be unique"" (copy and paste). Bill and ship-to address fields copy from Vendor and Customer."
+karbon_LedgerLink.fmp12/tables/153-PurchaseOrderLine.txt,058bacbfe1710f074b420fb942dc467655f0025441ba8d6077e240f73fe11b8e,tables,karbon_LedgerLink.fmp12,153,PurchaseOrderLine,entity,17,14,1,2,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+id_PurchaseOrder | FK -> PurchaseOrder::id
+id_Item | FK -> Item::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""InvoiceItem id must exist and be unique.""
+2 qbo_id | auto-data | default constant empty text
+4 qbo_lineNum | auto-calc, validate-rule (always) | defaults to the current UTC time in milliseconds so new lines sort after earlier ones; used as line sort order (only fills an empty field; user can edit); validation (always): strict data type Numeric
+5 description | auto-calc, validate-rule (always) | copies Invoice_InvoiceItem_Item::description from the related record (overwrites an existing value; user can edit); validation (always): max length 4000, no user override
+6 amount | auto-calc, validate-rule | line amount: round(qty (1 when empty) x unitPrice, 2) when an item or an expense account is selected, empty for a description-only line (neither selected); matches the QuickBooks Online screen logic; re-evaluates on change; validation (only during data entry): strict data type Numeric, no user override
+7 unitPrice | auto-calc, validate-rule (always) | unit price: when the user changes the item field (Get(ActiveFieldName) equals the item key field name) it takes the default unit price of the related item, otherwise rounds the entered value to 7 decimals; the lookup option is switched off; set it from the item yourself when the item is set by script; validation (always): strict data type Numeric
+8 qty | auto-calc, validate-rule (always) | rounds the entered value to 7 decimals (overwrites an existing value; user can edit); validation (always): strict data type Numeric
+9 id_Item | validate-rule | validation (only during data entry): no user override, message ""A Product/Service must be selected.""
+10 id_PurchaseOrder | validate-rule (always) | validation (always): not empty, no user override
+11 taxable | auto-calc, validate-rule (always) | copies Invoice_InvoiceItem_Item::taxable from the related record (overwrites an existing value; user can edit); validation (always): strict data type Numeric, range 0 to 1, no user override
+12 amountTaxable | calc-stored | amount when taxable is on, otherwise 0; feeds the taxable subtotal
+13 summaryTotalAmountTaxable | summary | total of amountTaxable (field 12) over the current found set or sort group (Together repetitions)
+14 summaryTotalAmount | summary | total of amount (field 6) over the current found set or sort group (Together repetitions)",13,table,"unitPrice reads the related Item through relationship PurchaseOrder_PurchaseOrderLine~ItemBasedExpenseLineDetail_Item; detailType matches PurchaseOrder::detail_type_* constants (filter, not a key)."
+karbon_LedgerLink.fmp12/tables/154-Bill.txt,d65a70bc75a3c494024aa49d0cf7883f0d9fe5767b9bba147134635e5b3833a8,tables,karbon_LedgerLink.fmp12,154,Bill,entity,23,20,2,1,0,0,0,"Id | auto-enter UUID, not empty, unique, strict; parent side of BillLine::id_Bill
+qbo_Id | unique validation (QuickBooks Online id)
+id_Vendor | FK -> Vendor::id
+id_TaxCode | FK -> TaxCode::id","3 DueDate | validate-rule (always) | validation (always): strict data type FourDigitYear
+5 TxnDate | validate-rule (always) | validation (always): strict data type FourDigitYear
+8 qbo_Id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+9 Id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""Bill id must exist and be unique.""
+10 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+12 qbo_error | auto-data | default constant empty text
+19 deleted | validate-rule (always) | validation (always): range 0 to 1, no user override
+21 docNumber | validate-rule | validation (only during data entry): max length 21
+30 totalAmt | validate-rule (always) | validation (always): strict data type Numeric
+31 totalAmtSummary | summary | total of totalAmt (field 30) over the current found set or sort group (Together repetitions)
+40 balance | validate-rule (always) | validation (always): strict data type Numeric
+42 totalTax | validate-rule (always) | validation (always): strict data type Numeric
+45 detail_type_ItemBasedExpenseLineDetail | calc-stored | constant text ""ItemBasedExpenseLineDetail""
+46 detail_type_AccountBasedExpenseLineDetail | calc-stored | constant text ""AccountBasedExpenseLineDetail""",14,table,id_APAccount has no relationship in the graph. detail_type_* constants filter BillLine by detailType.
+karbon_LedgerLink.fmp12/tables/155-BillLine.txt,8ae296eb6d045f532c3c63250a39ca4020787b8d510b494688bc45dfaba85cd7,tables,karbon_LedgerLink.fmp12,155,BillLine,entity,21,18,1,2,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+id_Bill | FK -> Bill::Id
+id_Item | FK -> Item::id","3 qbo_error | auto-data | default constant empty text
+4 qbo_id | auto-data | default constant empty text
+6 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+9 description | auto-calc, validate-rule (always) | copies Invoice_InvoiceItem_Item::description from the related record (overwrites an existing value; user can edit); validation (always): max length 4000, no user override
+10 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""InvoiceItem id must exist and be unique.""
+12 id_Item | validate-rule | validation (only during data entry): no user override, message ""A Product/Service must be selected.""
+15 qbo_lineNum | auto-calc, validate-rule (always) | defaults to the current UTC time in milliseconds so new lines sort after earlier ones; used as line sort order (only fills an empty field; user can edit); validation (always): strict data type Numeric
+21 amount | auto-calc, validate-rule | line amount: round(qty (1 when empty) x unitPrice, 2) when an item or an expense account is selected, empty for a description-only line (neither selected); matches the QuickBooks Online screen logic; re-evaluates on change; validation (only during data entry): strict data type Numeric, no user override
+22 qty | auto-calc, validate-rule (always) | rounds the entered value to 7 decimals (overwrites an existing value; user can edit); validation (always): strict data type Numeric
+23 unitPrice | auto-calc, validate-rule (always) | unit price: when the user changes the item field (Get(ActiveFieldName) equals the item key field name) it takes the default unit price of the related item, otherwise rounds the entered value to 7 decimals; the lookup option is switched off; set it from the item yourself when the item is set by script; validation (always): strict data type Numeric
+31 summaryTotalAmount | summary | total of amount (field 21) over the current found set or sort group (Together repetitions)
+34 taxable | auto-calc, validate-rule (always) | copies Bill_BillLine~ItemBasedExpenseType_Item::taxable from the related record (overwrites an existing value; user can edit); validation (always): strict data type Numeric, range 0 to 1, no user override
+35 amountTaxable | calc-stored | amount when taxable is on, otherwise 0; feeds the taxable subtotal
+36 summaryTotalAmountTaxable | summary | total of amountTaxable (field 35) over the current found set or sort group (Together repetitions)",14,table,none
+karbon_LedgerLink.fmp12/tables/156-GLOBAL.txt,554fd90ad6c00979470f94b736fd1ee9f845af713a15515c263cff764e5725ea,tables,karbon_LedgerLink.fmp12,156,GLOBAL,settings-globals,3,0,1,0,2,0,0,none,2 DYNAMICVALUELIST | calc-unstored | returns global variable $$DYNAMICVALUELIST (a runtime-built value list),1,session-state,none
+karbon_LedgerLink.fmp12/tables/157-Estimate.txt,aa0dc40fe93c37a5c5cf68ef1b1228bedebe6974eeb83de65bcce4949fbb72a7,tables,karbon_LedgerLink.fmp12,157,Estimate,entity,44,42,1,1,0,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of EstimateItem::id_Estimate
+qbo_id | unique validation (QuickBooks Online id; constant default)
+id_Customer | FK -> Customer::id
+id_TaxCode | FK -> TaxCode::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""Invoice id must exist and be unique.""
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+3 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+4 docNumber | validate-rule | validation (only during data entry): max length 21
+5 date | auto-calc, validate-rule (always) | defaults to the current date (overwrites an existing value; user can edit); validation (always): strict data type FourDigitYear
+8 billAddressLine1 | auto-calc | copies Estimate_Customer::billAddressLine1 from the related record (overwrites an existing value; user can edit)
+9 billAddressLine2 | auto-calc | copies Estimate_Customer::billAddressLine2 from the related record (overwrites an existing value; user can edit)
+10 billAddressCity | auto-calc | copies Estimate_Customer::billAddressCity from the related record (overwrites an existing value; user can edit)
+11 billAddressCountry | auto-calc | copies Estimate_Customer::billAddressCountry from the related record (overwrites an existing value; user can edit)
+14 billAddressPostalCode | auto-calc | copies Estimate_Customer::billAddressPostalCode from the related record (overwrites an existing value; user can edit)
+15 billAddressState | auto-calc | copies Estimate_Customer::billAddressState from the related record (overwrites an existing value; user can edit)
+22 dueDate | validate-rule (always) | validation (always): strict data type FourDigitYear
+25 totalAmt | validate-rule (always) | validation (always): strict data type Numeric
+28 id_Term | auto-calc | copies Customer::id_Term from the related record (overwrites an existing value; user can edit)
+29 billEmailAddress | auto-calc | copies Estimate_Customer::primaryEmail from the related record (overwrites an existing value; user can edit)
+30 totalTax | validate-rule (always) | validation (always): strict data type Numeric
+31 id_TaxCode | auto-calc | copies Customer::id_TaxCode from the related record (overwrites an existing value; user can edit)
+32 deleted | validate-rule (always) | validation (always): range 0 to 1, no user override
+35 qbo_error | auto-data | default constant empty text
+36 period | calc-stored | accounting period YYYYMM built from the date field
+37 totalAmtSummary | summary | total of totalAmt (field 25) over the current found set or sort group (Together repetitions)
+42 shipAddressCity | auto-calc | copies Estimate_Customer::shipAddressCity from the related record (overwrites an existing value; user can edit)
+43 shipAddressCountry | auto-calc | copies Estimate_Customer::shipAddressCountry from the related record (overwrites an existing value; user can edit)
+44 shipAddressLine1 | auto-calc | copies Estimate_Customer::shipAddressLine1 from the related record (overwrites an existing value; user can edit)
+45 shipAddressLine2 | auto-calc | copies Estimate_Customer::shipAddressLine2 from the related record (overwrites an existing value; user can edit)
+46 shipAddressPostalCode | auto-calc | copies Estimate_Customer::shipAddressPostalCode from the related record (overwrites an existing value; user can edit)
+47 shipAddressState | auto-calc | copies Estimate_Customer::shipAddressState from the related record (overwrites an existing value; user can edit)
+52 TxnStatus | auto-data | default constant 'Pending'",28,table,"TxnStatus defaults to constant ""Pending""."
+karbon_LedgerLink.fmp12/tables/158-EstimateItem.txt,e0750636810868dee3457e3009273db26c156f40f02a4d31db3b6a511ebfa3e1,tables,karbon_LedgerLink.fmp12,158,EstimateItem,entity,13,10,1,2,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+id_Estimate | FK -> Estimate::id
+id_Item | FK -> Item::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""InvoiceItem id must exist and be unique.""
+2 qbo_id | auto-data | default constant empty text
+4 qbo_lineNum | auto-calc, validate-rule (always) | defaults to the current UTC time in milliseconds so new lines sort after earlier ones; used as line sort order (only fills an empty field; user can edit); validation (always): strict data type Numeric
+5 description | auto-calc, validate-rule (always) | copies Invoice_InvoiceItem_Item::description from the related record (overwrites an existing value; user can edit); validation (always): max length 4000, no user override
+6 amount | auto-calc, validate-rule | line amount: round(qty (1 when empty) x unitPrice, 2) when an item is selected, empty for a description-only line (no item); matches the QuickBooks Online screen logic; re-evaluates on change; validation (only during data entry): strict data type Numeric, no user override
+7 unitPrice | auto-calc, validate-rule (always) | unit price: when the user changes the item field (Get(ActiveFieldName) equals the item key field name) it takes the default unit price of the related item, otherwise rounds the entered value to 7 decimals; the lookup option is switched off; set it from the item yourself when the item is set by script; validation (always): strict data type Numeric
+8 qty | auto-calc, validate-rule (always) | rounds the entered value to 7 decimals (overwrites an existing value; user can edit); validation (always): strict data type Numeric
+9 id_Item | validate-rule | validation (only during data entry): no user override, message ""A Product/Service must be selected.""
+10 id_Estimate | validate-rule (always) | validation (always): not empty, no user override
+11 taxable | auto-calc, validate-rule (always) | copies Estimate_EstimateItem_Item::taxable from the related record (overwrites an existing value; user can edit); validation (always): strict data type Numeric, range 0 to 1, no user override
+12 amountTaxable | calc-stored | amount when taxable is on, otherwise 0; feeds the taxable subtotal
+13 summaryTotalAmountTaxable | summary | total of amountTaxable (field 12) over the current found set or sort group (Together repetitions)
+14 summaryTotalAmount | summary | total of amount (field 6) over the current found set or sort group (Together repetitions)",13,table,none
+karbon_LedgerLink.fmp12/tables/160-SalesReceipt.txt,2fb79e37c3becc7d30728ecef534b38395e47a83f13e576b37042a6805d1c2fc,tables,karbon_LedgerLink.fmp12,160,SalesReceipt,entity,49,40,7,1,1,0,0,"id | auto-enter UUID, not empty, unique, strict ; parent side of SalesReceiptItem::id_SalesReceipt
+qbo_id | unique validation (QuickBooks Online id; constant default)","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""Invoice id must exist and be unique.""
+2 qbo_id | auto-data, validate-rule (always) | default constant empty text; validation (always): unique, no user override
+3 qbo_send | auto-calc, validate-rule (always) | defaults to 1 so the record is flagged to send to QuickBooks Online; stays as is while script variable $LL_IsUpdatingThisRecord is set (a pull from QBO); GetField("""") only forces re-evaluation (overwrites an existing value; user can edit); validation (always): range 0 to 1, no user override
+4 docNumber | validate-rule | validation (only during data entry): max length 21
+5 date | auto-calc, validate-rule (always) | defaults to the current date (only fills an empty field; user can edit); validation (always): strict data type FourDigitYear
+8 billAddressLine1 | auto-calc | copies Invoice_Customer::billAddressLine1 from the related record (overwrites an existing value; user can edit)
+9 billAddressLine2 | auto-calc | copies Invoice_Customer::billAddressLine2 from the related record (overwrites an existing value; user can edit)
+10 billAddressCity | auto-calc | copies Invoice_Customer::billAddressCity from the related record (overwrites an existing value; user can edit)
+11 billAddressCountry | auto-calc | copies Invoice_Customer::billAddressCountry from the related record (overwrites an existing value; user can edit)
+14 billAddressPostalCode | auto-calc | copies Invoice_Customer::billAddressPostalCode from the related record (overwrites an existing value; user can edit)
+15 billAddressState | auto-calc | copies Invoice_Customer::billAddressState from the related record (overwrites an existing value; user can edit)
+25 totalAmt | validate-rule (always) | validation (always): strict data type Numeric
+28 id_Term | auto-calc | copies Customer::id_Term from the related record (overwrites an existing value; user can edit)
+29 billEmailAddress | auto-calc | copies Invoice_Customer::primaryEmail from the related record (overwrites an existing value; user can edit)
+30 totalTax | validate-rule (always) | validation (always): strict data type Numeric
+31 id_TaxCode | auto-calc | copies Customer::id_TaxCode from the related record (overwrites an existing value; user can edit)
+32 deleted | validate-rule (always) | validation (always): range 0 to 1, no user override
+35 qbo_error | auto-data | default constant empty text
+36 period | calc-stored | accounting period YYYYMM built from the date field
+37 totalAmtSummary | summary | total of totalAmt (field 25) over the current found set or sort group (Together repetitions)
+42 shipAddressCity | auto-calc | copies Invoice_Customer::shipAddressCity from the related record (overwrites an existing value; user can edit)
+43 shipAddressCountry | auto-calc | copies Invoice_Customer::shipAddressCountry from the related record (overwrites an existing value; user can edit)
+44 shipAddressLine1 | auto-calc | copies Invoice_Customer::shipAddressLine1 from the related record (overwrites an existing value; user can edit)
+45 shipAddressLine2 | auto-calc | copies Invoice_Customer::shipAddressLine2 from the related record (overwrites an existing value; user can edit)
+46 shipAddressPostalCode | auto-calc | copies Invoice_Customer::shipAddressPostalCode from the related record (overwrites an existing value; user can edit)
+47 shipAddressState | auto-calc | copies Invoice_Customer::shipAddressState from the related record (overwrites an existing value; user can edit)
+58 totalPaid | calc-unstored | sum of Invoice_PaymentLine::amount (uses the invoice payment-line relationship)
+59 countOfPayment | calc-unstored | count of Invoice_PaymentLine::id (uses the invoice payment-line relationship)
+62 RETAINER | calc-stored | formula not in DDR (calculated field, stored)
+65 totalRetainerAmount | calc-unstored | sum of SalesReceiptItem::retainerAmount
+66 totalRevenue | calc-unstored | totalAmt minus totalRetainerAmount
+67 ONE | auto-calc | always re-evaluates to 1 when its own value changes (Let with Self as trigger); constant-true helper (overwrites an existing value; user can edit)
+70 totalAmtView | calc-unstored | totalAmt, or the sum of SalesReceiptItem::amount when totalAmt is empty",33,table,"RETAINER has no formula in the DDR. totalPaid and countOfPayment use Invoice_PaymentLine, i.e. payment lines of an invoice, not of this receipt; check. id_Customer has no relationship in the graph. qbo_send is set to 1 on every edit unless script variable $LL_IsUpdatingThisRecord is on; confirm the sync design (dirty flag) is rebuilt."
+karbon_LedgerLink.fmp12/tables/161-SalesReceiptItem.txt,fd56f1772f1c4c68c5abaa1f82bd94c8b18fcb055358f73c5a809146ed58b155,tables,karbon_LedgerLink.fmp12,161,SalesReceiptItem,entity,15,11,2,2,0,0,0,"id | auto-enter UUID, not empty, unique, strict
+id_SalesReceipt | FK -> SalesReceipt::id","1 id | auto-calc, validate-rule (always) | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit); validation (always): not empty, unique, no user override, message ""InvoiceItem id must exist and be unique.""
+2 qbo_id | auto-data | default constant empty text
+4 qbo_lineNum | auto-calc, validate-rule (always) | defaults to the current UTC time in milliseconds so new lines sort after earlier ones; used as line sort order (only fills an empty field; user can edit); validation (always): strict data type Numeric
+5 description | auto-calc, validate-rule (always) | copies Invoice_InvoiceItem_Item::description from the related record (overwrites an existing value; user can edit); validation (always): max length 4000, no user override
+6 amount | auto-calc, validate-rule | line amount: round(qty (1 when empty) x unitPrice, 2) when an item is selected, empty for a description-only line (no item); matches the QuickBooks Online screen logic; re-evaluates on change; validation (only during data entry): strict data type Numeric, no user override
+7 unitPrice | auto-calc, validate-rule (always) | unit price: when the user changes the item field (Get(ActiveFieldName) equals the item key field name) it takes the default unit price of the related item, otherwise rounds the entered value to 7 decimals; the lookup option is switched off; set it from the item yourself when the item is set by script; validation (always): strict data type Numeric
+8 qty | auto-calc, validate-rule (always) | rounds the entered value to 7 decimals (overwrites an existing value; user can edit); validation (always): strict data type Numeric
+9 id_Item | validate-rule | validation (only during data entry): no user override, message ""A Product/Service must be selected.""
+10 id_SalesReceipt | validate-rule (always) | validation (always): not empty, no user override
+11 taxable | auto-calc, validate-rule (always) | copies Invoice_InvoiceItem_Item::taxable from the related record (overwrites an existing value; user can edit); validation (always): strict data type Numeric, range 0 to 1, no user override
+12 amountTaxable | calc-stored | amount when taxable is on, otherwise 0; feeds the taxable subtotal
+13 summaryTotalAmountTaxable | summary | total of amountTaxable (field 12) over the current found set or sort group (Together repetitions)
+14 summaryTotalAmount | summary | total of amount (field 6) over the current found set or sort group (Together repetitions)
+17 retainerAmount | calc-stored | amount when id_Item equals the hard-coded Item id ""FB50FC5C-42B6-4AB4-A610-D708FB9DA7C2"" (retainer product), otherwise 0; stored
+18 ONE | auto-calc | always re-evaluates to 1 when its own value changes (Let with Self as trigger); constant-true helper (overwrites an existing value; user can edit)",15,table,retainerAmount tests a hard-coded Item id.

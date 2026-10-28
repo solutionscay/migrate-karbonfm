@@ -1,0 +1,278 @@
+# script 207: ShellWords (command) 
+# file: karbon_Generator.fmp12
+# folder: App Modules / cURL Parser / Private 2
+# source: ScriptCatalog/Script[@id=207]
+# steps: 60 (2 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=204 groupCollapsed=False includeInMenu=True
+
+   1    ############################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #PURPOSE:
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #	Mimics ShellWords on NPM 
+        	Parses the commmand line based on rules of the UNIX Bourne shell
+        	Includes simple testing (needs uncommenting)
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #PARAMETERS:
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #	command = string - entire cURL command
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #RETURNS:
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #	argsList - command line args as value list
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #DEPENDANCIES:
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #	Base Elements Plugin for RegEx
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #AUTHOR:
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #	Charles Delfs cdelfs@delfsengineering.ca
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    ############################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $command; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $command
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #============  Enable for local testing  =====================
+        DisableStepCollapsed state=False
+        Restore state=False
+  23 // Set Variable [ $command; Value:// Sample commands lines to test
+        
+        "curl -v 'https://us-extract.api.smartystreets.com/?
+        			auth-id=YOUR_AUTH_ID&
+        			auth-token=YOUR_AUTH_TOKEN'
+        	-H 'Content-Type: text/plain'
+        	--data-binary '
+        		There are addresses everywhere.
+        		1109 Ninth 85007
+        		SmartyStreets can find them.
+        		3785 Las Vegs Av.
+        		Los Vegas, Nevada
+        		That is all.'" ]
+        DisableStepCollapsed state=False
+        Name: $command
+  24    #==============================================================
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #Pre Filtering
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $command; Value:Substitute ( $command;
+        	[ ¶ ; "" ] // returns
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $command
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $remainder; Value:$command ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $remainder
+  31    Set Variable [ $argList; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $argList
+  32    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Exit Loop If [ Substitute ( $remainder ; 
+        	[ " " ; ""  ];  // space
+        	[ ¶ ; "" ] ; 
+        	[ "	" ; "" ] )  // tab
+        
+        	= ""
+        
+        // could be cases where $remiander has many spaces ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute
+  34    Set Variable [ $arg; Value:<Function Missing> ( $remainder ; "(\".*?\")|('(.|\n)*?')|[^\"\s ]\S*"  ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $arg
+  35    Set Variable [ $remainder; Value:<Function Missing> ( $remainder ; "(\".*?\")|('(.|\n)*?')|[^\"\s ]\S*"   ; "" ; "" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $remainder
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #=====  Add additional filters here as they arise ================
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ // Filter for odd chars - backslash used to conitinue line
+        
+           $arg = "\\"  // escaped '/'
+        or $arg = "¶" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  39    Set Variable [ $arg; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $arg
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #remove any wrapping quotes
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Variable [ $arg; Value:Let([
+        	~leftEnd = Left( $arg ; 1 ) ;
+        	~rightEnd = Right( $arg ; 1 ) ;
+        
+        	$arg = If ( ~leftEnd ="\"" or ~leftEnd ="'" ; 
+        			Middle( $arg ;2 ; Length($arg) ) ;
+        			$arg	
+        			);
+        
+        	$arg = If ( ~rightEnd ="\"" or ~rightEnd ="'" ; 
+        			Left ($arg ;	Length($arg) -1) ;
+        			$arg
+        			)
+        
+        ];
+        $arg
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Left, fn:Right, fn:If, fn:or, fn:Middle, fn:Length
+        Name: $arg
+  44    #Remove tabs
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $arg; Value:Substitute ( $arg ;
+        	["	" ; "" ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $arg
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $argsList; Value:List( $argsList ; $arg ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $argsList
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    End Loop
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #============  Enable for local testing  =====================
+        DisableStepCollapsed state=False
+        Restore state=False
+  52 // Show Custom Dialog [ Title: "Test Result"; Message:    "-----------  Command:  ---------¶" & $command 
+        
+        &"¶¶-----------  Result: ---------¶ " 
+        &$argsList; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  53    #==============================================================
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    If [ $$curlTestRunning ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $$CURL_TEST_ARGLIST; Value:$argsList ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$CURL_TEST_ARGLIST
+  57    End If
+        DisableStepCollapsed state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Exit Script [ Result: $argsList ]
+        DisableStepCollapsed state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False

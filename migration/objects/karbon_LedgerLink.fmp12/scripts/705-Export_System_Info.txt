@@ -1,0 +1,67 @@
+# script 705: Export System Info
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Configuration and Log
+# source: ScriptCatalog/Script[@id=705]
+# steps: 12 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=577 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Go to Layout [ “SyncLog” (QBO) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=35 name=SyncLog
+   3    Set Variable [ $toexport; Value:QBO::AsJSONForSupport ]
+        DisableStepCollapsed state=False
+        Value
+          refs: QBO::AsJSONForSupport#70
+        Repetition
+          Calculation:
+            | 1
+        Name: $toexport
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $fileName; Value: "LedgerLinkInfo.json" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $fileName
+   6    Set Variable [ $exportPath; Value:Get(DesktopPath) & $fileName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:DesktopPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $exportPath
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Field [ QBO::TempGlobalContainer; $toexport ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=71 name=TempGlobalContainer
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Export Field Contents [ QBO::TempGlobalContainer; “$exportPath”; Create folders:Yes ]
+        CreateDirectories state=True
+        DisableStepCollapsed state=False
+        AutoOpen state=False
+        CreateEmail state=False
+        UniversalPathList: $exportPath
+        Field table=QBO id=71 name=TempGlobalContainer
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Show Custom Dialog [ Title: "Exported To Desktop"; Message: Quote($fileName) & " was export to your Desktop "; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:Quote
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False

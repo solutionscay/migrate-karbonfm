@@ -1,0 +1,166 @@
+# script 635: Delete QBO Entity ( {Entity, QBOId} )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO / Public
+# source: ScriptCatalog/Script[@id=635]
+# steps: 30 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=58 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $params; Value:Get ( ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $Entity; Value:JSONGetElement ( $params ; "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+   6    Set Variable [ $QBOId; Value:JSONGetElement ( $params ; "QBOId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOId
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #read the entity to get the synctoken
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "QBOId" ; $QBOId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  10    Perform Script [ “Read({Entity, QBOId })”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=1 name="Read({Entity, QBOId })"
+  11    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  12    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  13    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Id; Value:JSONGetElement ( $result ; $Entity & ".Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  17    Set Variable [ $SyncToken; Value:JSONGetElement ( $result ; $Entity & ".SyncToken" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SyncToken
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $data; Value:JSONSetElement ( ""; 
+        [ "Id" ; $Id ; JSONString] ;
+        [ "SyncToken" ; $SyncToken ; JSONString ]
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #send delete request
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $request; Value:JSONSetElement ( "" ;
+        
+        
+        	[ "path"; "/" & $Entity ; JSONString ];
+        	[ "method" ; "POST" ; JSONString ];
+        	[ "data" ; $data ; JSONObject ] ;
+        	[ "query.operation" ; "delete" ; JSONString] 
+        
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  23    Perform Script [ “Send QBO Request”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=18 name="Send QBO Request"
+  24    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  25    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  26    Set Variable [ $error; Value:$result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  27    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False

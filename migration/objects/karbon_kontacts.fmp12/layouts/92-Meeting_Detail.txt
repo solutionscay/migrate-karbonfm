@@ -1,0 +1,234 @@
+# layout 92: Meeting Detail
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity
+# source: LayoutCatalog/Layout[@id=92]
+# objects: 39
+# theme: Karbon-1.0
+# folder group: id=76 groupCollapsed=False includeInMenu=False
+
+Layout width=1080 quickFind=True includeInMenu=False id=92 name="Meeting Detail"
+  Table id=1065333 name=Meeting
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnLayoutExit id=109 triggerFlags=1(browse)
+      Script id=668 name="Trigger: Close Activity Window"
+      TriggerText: "Trigger: Close Activity Window"
+  Object type=Field key=42 LabelKey=43 bounds=180,110,204,370
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Event::StartDate#56
+      Display: date format=5 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"
+      PlaceholderText findMode=True
+        Calculation:
+          | "date"
+  Object type=Text key=43 LabelKey=0 bounds=180,30,204,100
+    Text flags=2 style=Label-Medium: Starts
+  Object type=Field key=44 LabelKey=0 bounds=60,20,110,520
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Large
+      Field: Activity::Subject#22
+      PlaceholderText findMode=True
+        Calculation:
+          | "Type the name of this event…"
+  Object type=Text key=47 LabelKey=0 bounds=0,0,40,540
+    Text flags=2 style=H1-CardHeader: Meeting
+  Object type=Field key=48 LabelKey=49 bounds=470,110,560,520
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Activity_ActivityMessage::Message#12
+  Object type=Text key=49 LabelKey=0 bounds=470,30,494,100
+    Text flags=2 style=Label-Medium: Notes
+  Object type=Field key=54 LabelKey=0 bounds=180,390,204,520
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Event::StartTime#76
+      Display: time flags=131 hourStyle=0 minsecStyle=1 separator=: amString=" AM" pmString=" PM" ampmString=""
+      PlaceholderText findMode=True
+        Calculation:
+          | "time"
+  Object type=Line key=65 LabelKey=0 flags=12288 style=Line-Thin bounds=130,20,130,520
+  Object type=Field key=66 LabelKey=0 bounds=140,110,158,127
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Checkbox-Medium
+      Field: Event::AllDayEventInd#198
+      ValueList: Boolean#1
+  Object type=Text key=67 LabelKey=0 bounds=140,140,160,370
+    Text flags=2: "All-day event"
+  Object type=Field key=68 LabelKey=69 bounds=220,110,244,370
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Event::EndDate#189
+      Display: date format=5 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"
+      PlaceholderText findMode=True
+        Calculation:
+          | "date"
+  Object type=Text key=69 LabelKey=0 bounds=220,30,244,100
+    Text flags=2 style=Label-Medium: Ends
+  Object type=Field key=70 LabelKey=0 bounds=220,390,244,520
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Event::EndTime#77
+      Display: time flags=131 hourStyle=0 minsecStyle=1 separator=: amString=" AM" pmString=" PM" ampmString=""
+      PlaceholderText findMode=True
+        Calculation:
+          | "time"
+  Object type=Field key=71 LabelKey=72 bounds=260,110,284,520
+    FieldObj numOfReps=1 flags=131104 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Event::Location#192
+  Object type=Text key=72 LabelKey=0 bounds=260,30,284,100
+    Text flags=2 style=Label-Medium: Location
+  Object type=Portal key=73 LabelKey=0 bounds=329,110,451,520
+    PortalObj portalFlags=156 numOfRows=3 initialRow=1 style="Standard Portal"
+      TableAliasKey: Activity_ActivityParty
+      FieldList
+        Field table=Activity_ActivityParty id=13 name=PartyNameCached
+      SortList BlanksLast=False Maintain=True value=True
+        Sort type=Ascending
+          PrimaryField
+            Field table=Activity_ActivityParty id=13 name=PartyNameCached
+      FilterCalc enable=True
+        Calculation:
+          | Activity_ActivityParty::ActivityPartyRoleId = 60 // participant
+          refs: Activity_ActivityParty::ActivityPartyRoleId#24
+      Object type=Field key=74 LabelKey=0 bounds=340,120,364,480
+        FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+          Field: Activity_ActivityParty::PartyNameCached#13
+      Object type=PopoverButton key=79 LabelKey=0 bounds=342,490,362,510
+        Text flags=2 style=Button-RowDelete
+        PopoverButtonObj buttonFlags=0 key=80 iconSize=14 displayType=1
+          Image name=a27_XCircle.svg
+          Object type=Popover key=80 LabelKey=0 bounds=320,379,380,479
+            TitleCalc
+              Calculation:
+                | "Popover"
+            PopoverObj flags=2 position=2 key=79
+              Object type=Button key=81 LabelKey=0 flags=65536 bounds=335,394,365,464
+                Text flags=2 style=Button-Danger: Delete
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=104 name="Delete Portal Row"
+                    StepText
+                      | Delete Portal Row
+                      | [ No dialog ]
+                    NoInteract state=True
+                    DisableStepCollapsed state=False
+  Object type=Text key=75 LabelKey=0 bounds=340,30,364,100
+    Text flags=2 style=Label-Medium: With
+  Object type=Button key=77 LabelKey=0 flags=65536 bounds=300,440,322,520
+    Text flags=2 style=Button-SuccessPill: Add…
+    ButtonObj buttonFlags=0 iconSize=12 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Button: Launch Party Picker For Meeting Attendee” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=675 name="Button: Launch Party Picker For Meeting Attendee"
+      Image name=a43_contact.svg
+  Object type=Rect key=82 LabelKey=0 flags=-1073741824 style=Shape-Discussion bounds=0,540,580,1080
+  Object type=Portal key=83 LabelKey=0 name=DiscussionPortal flags=-1073741824 bounds=119,550,523,1060
+    PortalObj portalFlags=273 numOfRows=4 initialRow=1
+      TableAliasKey: Selected_Discussion_ActivityComment
+      FieldList
+        FieldReference id=19 name=Time repetition=1 UUID=""
+          TableOccurrenceReference id=1065343 name=Selected_Discussion_ActivityComment UUID=""
+        FieldReference id=18 name=Date repetition=1 UUID=""
+          TableOccurrenceReference id=1065343 name=Selected_Discussion_ActivityComment UUID=""
+        FieldReference id=106 name=CreationTimestamp repetition=1 UUID=""
+          TableOccurrenceReference id=1065344 name=Selected_Discussion_ActivityComment_Party UUID=""
+        Field table=Selected_Discussion_ActivityComment id=10 name=Comment
+      Object type=Text key=84 LabelKey=0 bounds=128,560,148,1040
+        Text flags=10 tableViewVisibility=0 style=Label-Small-Left-Muted: <<Selected_Discussion_ActivityComment_Party::CreationTimestamp>>
+          FieldList quickFind=True
+            Field table=Selected_Discussion_ActivityComment_Party id=106 name=CreationTimestamp
+      Object type=Field key=85 LabelKey=0 flags=1073741824 bounds=148,560,210,1050
+        FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+          Field: Selected_Discussion_ActivityComment::Comment#10
+      Object type=Text key=86 LabelKey=0 flags=1342177280 bounds=128,720,190,1050
+        Text flags=10 tableViewVisibility=0 style=Label-Small-Left-Muted: "<<Selected_Discussion_ActivityComment::Date>> <<Selected_Discussion_ActivityComment::Time>>"
+          FieldList quickFind=True
+            Field table=Selected_Discussion_ActivityComment id=18 name=Date
+            Field table=Selected_Discussion_ActivityComment id=19 name=Time
+      Object type=Line key=87 LabelKey=0 flags=1073745920 style=Line-Thin bounds=219,559,219,1060
+  Object type=Text key=88 LabelKey=0 bounds=13,560,37,1020
+    Text flags=2 style=H3-Primary: Discuss
+  Object type=Field key=89 LabelKey=0 flags=1073741828 bounds=60,560,110,1050
+    ScriptTriggers
+      Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+        Script id=694 name="_wip_Button: Add Comment to Activity Discussion v2"
+        TriggerText: "_wip_Button: Add Comment to Activity Discussion v2"
+    FieldObj numOfReps=1 flags=1179744 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: UtilityDiscussion::Notes#9
+      PlaceholderText findMode=True
+        Calculation:
+          | "Enter a comment and hit return"
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( UtilityDiscussion::SubscriberPartyIds )
+        refs: fn:IsEmpty, UtilityDiscussion::SubscriberPartyIds#19
+  Object type=ButtonBar key=90 LabelKey=0 style=BB-BadgePurple bounds=10,640,40,670
+    ButtonBarObj segmentKey=0
+      Object type=Button key=91 LabelKey=0 flags=1 bounds=10,640,40,670
+        ConditionalFormatting
+          Item id=0 flags=5
+            Condition op=0
+              Calculation:
+                | IsEmpty ( Selected_Discussion::ONE )
+                refs: fn:IsEmpty, Selected_Discussion::ONE#7
+            Format: background-color: rgba(36.3922%,36.3922%,36.3922%,1);
+        Text flags=2 style=BB-BadgePurple
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | Count ( Selected_Discussion_ActivityComment::ONE )
+            refs: fn:Count, Selected_Discussion_ActivityComment::ONE#7
+  Object type=Text key=101 LabelKey=0 flags=-1610612736 bounds=530,550,570,930
+    Text flags=10 tableViewVisibility=0 style=Label-Small-Left: "Subscribers: <<UtilityDiscussion::SubscriberListName>>"
+      FieldList quickFind=True
+        Field table=UtilityDiscussion id=20 name=SubscriberListName
+  Object type=Text key=103 LabelKey=0 flags=-1073741820 bounds=280,710,410,890
+    Text flags=2 style=H1-Primary: "Select at least one subscriber"
+    HideCondition findMode=False
+      Calculation:
+        | not IsEmpty ( UtilityDiscussion::SubscriberPartyIds )
+        refs: fn:not, fn:IsEmpty, UtilityDiscussion::SubscriberPartyIds#19
+  Object type=PopoverButton key=104 LabelKey=0 flags=-1610612736 bounds=540,0,580,50
+    Text flags=2 style=Button-Invisible
+    PopoverButtonObj buttonFlags=0 key=105 iconSize=16 displayType=1
+      Image name=a25_trash.svg
+      Object type=Popover key=105 LabelKey=0 bounds=591,5,647,160
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=1 key=104
+          Object type=Button key=106 LabelKey=0 flags=65536 bounds=604,20,634,150
+            Text flags=2 style=Button-Danger: Delete
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Delete and Close” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=693 name="Button: Delete and Close"
+  Object type=Button key=107 LabelKey=0 name=Button.AddSubscribers flags=-268435456 bounds=494,1100,530,1260
+    Text flags=2: "Manage Subscribers v1"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Button: Launch Party Picker For Subscriber { layoutObjectName }_deprecated”; Parameter: JSONSetElement ( "{}" ; 
+          | 
+          | ["layoutObjectName" ; "text.discuss" ; JSONString ] ;
+          | [ "DisplayPartyIds" ;  UtilityDiscussion::DisplayPartyIds ; JSONString ] ;
+          | [ "SubscriberPartyIds" ;  UtilityDiscussion::SubscriberPartyIds ; JSONString ]
+          |  ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ( "{}" ; 
+          | 
+          | ["layoutObjectName" ; "text.discuss" ; JSONString ] ;
+          | [ "DisplayPartyIds" ;  UtilityDiscussion::DisplayPartyIds ; JSONString ] ;
+          | [ "SubscriberPartyIds" ;  UtilityDiscussion::SubscriberPartyIds ; JSONString ]
+          |  )
+          refs: fn:JSONSetElement, fn:JSONString, UtilityDiscussion::DisplayPartyIds#21, UtilityDiscussion::SubscriberPartyIds#19
+        Script id=718 name="Button: Launch Party Picker For Subscriber { layoutObjectName }_deprecated"
+      Image name=a45_contacts.svg
+  Object type=Button key=108 LabelKey=0 name="Button.AddSubscribers 2" flags=-268435456 bounds=534,900,570,1060
+    Text flags=2: "Manage Subscribers"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Manage Subscribers v2” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=842 name="btn: Manage Subscribers v2"
+      Image name=a45_contacts.svg

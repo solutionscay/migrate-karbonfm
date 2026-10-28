@@ -1,0 +1,235 @@
+# script 246: Add New Email Address
+# file: Picker Module.fmp12
+# folder: Modules / EmailAddress Picker
+# source: ScriptCatalog/Script[@id=246]
+# steps: 53 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=207 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-07-16 dave@geistinteractive.com - Adds an email address to a party that doesn't have one, and refreshes the view
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Freeze Window
+        DisableStepCollapsed state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #Add the new email address and link to this party
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Address" ; Picker::Email.NewEmailAddress ; JSONString ];
+        	[ "Label" ; Picker::Email.NewEmailLabel ; JSONString ];
+        	[ "PartyId" ; VIRTUALLISTS_Rows::Email.PartyId ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ];
+        	[ "Type" ; "Email" ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Picker::Email.NewEmailAddress#37, fn:JSONString, Picker::Email.NewEmailLabel#38, VIRTUALLISTS_Rows::Email.PartyId#33, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   9    Perform Script [ “Create or Update Network Address { data }” from file: “karbon_kontroller”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        FileReference id=7 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=207 name="Create or Update Network Address { data }" in=karbon_kontroller.fmp12
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #Error trap
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  13    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  14    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  15    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #We need to get the updated row data for this newly added email address
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $Id; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  22    Set Variable [ $newRow; Value:SQL.GetColumn ( NetworkAddress::AsJsonEmailSearch ; NetworkAddress::Id ; $Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, NetworkAddress::AsJsonEmailSearch#44, NetworkAddress::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $newRow
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #Find the position of the old object in the found objects and replace it
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $recordNumber; Value:Get ( RecordNumber ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:RecordNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $recordNumber
+  28    Set Variable [ $PartyId; Value:VIRTUALLISTS_Rows::Email.PartyId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: VIRTUALLISTS_Rows::Email.PartyId#33
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+  29    Set Variable [ $i; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  30    Set Variable [ $end; Value:ValueCount ( Picker::Email.Found ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount, Picker::Email.Found#36
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+  31    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Exit Loop If [ $i > $end ]
+        DisableStepCollapsed state=False
+  33    If [ JSONGetElement ( GetValue ( Picker::Email.Found ; $i ) ; "PartyId" ) = $PartyId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement, fn:GetValue, Picker::Email.Found#36
+  34    Set Variable [ $newRowData; Value:List ( 
+        	LeftValues ( Picker::Email.Found ; $i - 1 ) ; 
+        	$newRow ; 
+        	MiddleValues ( Picker::Email.Found ; $i + 1 ; 9999999 )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:LeftValues, Picker::Email.Found#36, fn:MiddleValues
+        Name: $newRowData
+  35    Set Variable [ $newRowData; Value:Substitute ( $newRowData ; "¶¶" ; ¶ ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $newRowData
+  36    Set Field [ Picker::Email.Found; $newRowData ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=36 name=Email.Found
+  37    End If
+        DisableStepCollapsed state=False
+  38    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  39    End Loop
+        DisableStepCollapsed state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #clear the globals and close the popover
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Field [ Picker::Email.NewEmailAddress; "" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=37 name=Email.NewEmailAddress
+  45    Set Field [ Picker::Email.NewEmailLabel; "" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=38 name=Email.NewEmailLabel
+  46    Close Popover
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #Go to the previous record number
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  50    Sort Records [ Keep records in sorted order; Specified Sort Order: VIRTUALLISTS_Rows::Email.PartyName; ascending
+        VIRTUALLISTS_Rows::Email.EmailAddress; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=VIRTUALLISTS_Rows id=34 name=Email.PartyName
+          Sort type=Ascending
+            PrimaryField
+              Field table=VIRTUALLISTS_Rows id=31 name=Email.EmailAddress
+  51    Go to Record/Request/Page [ $recordNumber ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

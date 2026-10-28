@@ -1,0 +1,213 @@
+# script 1228: Compile URL( url ; hash )
+# file: karbon_charts.fmp12
+# folder: FM WebViewer Bridge / Private
+# source: ScriptCatalog/Script[@id=1228]
+# steps: 46 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=1227 groupCollapsed=True includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Compiles the url and the hash together for each platform
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @module fm-webviewer-bridge
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} params.url the url to the web app
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {object} params.hash the complete oject to add to the hash
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $url; Value:JSONGetElement ($params ; "url") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  17    If [ IsEmpty ( $url ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  18    Set Variable [ $error; Value:JSONSetElement ("";
+        
+           ["descriptor"; "url is required" ; JSONString];
+           ["script"; Get(ScriptName); JSONString];
+           ["data" ; Get(ScriptParameter) ; ""];
+           ["errorCode" ; -2 ; JSONNumber ];
+           ["type" ; "FM WebVeiwer Bridge"; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Get, fn:ScriptName, fn:ScriptParameter, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  19    Show Custom Dialog [ Title: "Developer Error"; Message: JSONFormatElements ( $error ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  20    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  21    End If
+        DisableStepCollapsed state=False
+  22    Set Variable [ $hash; Value:JSONGetElement ($params ; "hash") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $hash
+  23    Set Variable [ $test; Value:JSONFormatElements($hash) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements
+        Repetition
+          Calculation:
+            | 1
+        Name: $test
+  24    If [ Left($test ; 1 )= "?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left
+  25    Set Variable [ $hash; Value:JSONSetElement ( "" ; "value"; $hash; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $hash
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    If [ Get(SystemPlatform)=1 or Get(SystemPlatform) = 3 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:SystemPlatform, fn:or
+  29    Set Variable [ $hash; Value:GetAsURLEncoded (
+        $hash
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsURLEncoded
+        Repetition
+          Calculation:
+            | 1
+        Name: $hash
+  30    End If
+        DisableStepCollapsed state=False
+  31    Set Variable [ $hash; Value:"#" & $hash ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $hash
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    If [ Length($hash) > 2000 and Get(SystemPlatform) = -2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Length, fn:and, fn:Get, fn:SystemPlatform
+  35    Go to Object [ Object Name: "CopyPasteField"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  36    Set Variable [ $error; Value:Get(LastError) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LastError
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  37    If [ $error ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Show Custom Dialog [ Title: "Developer Error"; Message: "Windows Requires a global text field on this layout with the Layout object name of "& Quote("WebViewer.CopyPastField"); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:Quote
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  39    End If
+        DisableStepCollapsed state=False
+  40    Insert Calculated Result [ $hash ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+  41    Copy [  ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+  42    Set Variable [ $hash; Value:"#giant" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $hash
+  43    End If
+        DisableStepCollapsed state=False
+  44    Set Variable [ $url; Value:$url  & $hash ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  45    Exit Script [ Result: $url ]
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False

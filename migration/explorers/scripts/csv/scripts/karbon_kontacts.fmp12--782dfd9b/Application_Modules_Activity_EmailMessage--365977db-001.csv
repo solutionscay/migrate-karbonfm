@@ -1,0 +1,60 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/691-Button_Create_Email_Message_From_Opportunity.txt,f6a6f95b4806709d2a7b3317396ba3713e9e1fbf8f70067faa6bac1289ec9c1f,scripts,karbon_kontacts.fmp12,691,Button: Create Email Message From Opportunity,orchestration,server-domain,tier2,"Creates an email message activity from an opportunity: picks the ""to"" recipient (primary contact of the organization, else the first related person; or the opportunity's person party), sets the current user and party in the selector globals to resolve the user's email signature (user signature, else the default template with name, employer, title, phone), then calls ""Create EmailMessage { data }"" in karbon_kontroller with ActivityParty (role 55), EntityId = the opportunity, EntityTypeId 13 and the signature as message, and opens the created activity.","Opportunity_Party::OrganizationInd#18
+Opportunity::PrimaryContactPartyId#70
+Opportunity_Party#PrimaryContact::NameCached#19
+Opportunity_Party#PrimaryContact::EmailAddressCached#127
+Opportunity_Party#PrimaryContact::EmailAddressIdCached#145
+Opportunity_Party#PrimaryContact::Id#1
+Opportunity_Party_PartyRelation_Party::NameCached#19
+Opportunity_Party_PartyRelation_Party::EmailAddressCached#127
+Opportunity_Party_PartyRelation_Party::EmailAddressIdCached#145
+Opportunity_Party_PartyRelation_Party::Id#1
+Opportunity_Party::NameCached#19
+Opportunity_Party::EmailAddressCached#127
+Opportunity_Party::EmailAddressIdCached#145
+Opportunity_Party::Id#1
+meta#dataFile::CurrentUserId#3
+session::CurrentUserPartyId#63
+Selected_User::EmailSignature#120
+System::DefaultEmailSignatureTemplate#63
+Selected_Party::NameCached#19
+Selected_Party_Person::EmployerName#131
+Selected_Party_Person::JobTitle#14
+Selected_Party::PhoneNumberCached#125
+Opportunity::Id#1","selector::UserId#24 (Set Field step 22, global)
+selector::PartyId#6 (Set Field step 23, global)","karbon_kontroller.fmp12/scripts/389 ""Create EmailMessage { data }"" (step 34) [other file: karbon_kontroller]
+karbon_kontacts.fmp12/scripts/291 ""Open Activity { Id }"" (step 45)",objects/karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt,none,"ActivityPartyRoleId 55 (to recipient) and EntityTypeId 13 (opportunity) are hard-coded ids. Step 17 sets ""EmailAddress"" to Opportunity_Party::EmailAddressIdCached (the contact-method id) instead of EmailAddressCached for the person branch, so the email text is wrong (likely bug). The organization branch (step 12) uses the first related party, with no check that one exists. Message is only the signature text; any subject/body is added by karbon_kontroller script 389. Script is in the Scripts menu (includeInMenu=True)."
+karbon_kontacts.fmp12/scripts/692-Open_Email_Message_in_New_Window_Id.txt,59bd2fdbed8368da8a766078cbfedb812224a2288fc96399aa8e83ef02605662,scripts,karbon_kontacts.fmp12,692,Open Email Message in New Window { Id },navigation,client-ui,tier3,"Opens an email message in a new window: a sent message opens on the view-only layout; otherwise requires an Id parameter, preselects the quick recipient list (the ""to"" parties, their related parties and their email contact methods) in the selector globals and opens the ""Email Message - Edit"" layout in a new 900x830 window focused on the subject.","Selected_Activity_EmailMessage::SentInd#9
+Selected_ActivityParty#to::PartyId#7
+selector::PartyId#6
+Selected_Party_PartyRelation::PartyIdTo#6
+Selected_Party_ContactMethod_NetworkAddress#email::Id#1","selector::PartyId#6 (Set Field step 17, global)
+selector::PartyId#6 (Set Field step 18, global)
+selector::ContactMethodId#10 (Set Field step 21, global)",none,objects/karbon_kontacts.fmp12/scripts/291-Open_Activity_Id.txt,none,"Step 24 (UtilityEmailMessage::ActivityPartyArray) is disabled. The parameter Id is only tested for emptiness; the record shown comes from the Selected_Activity_EmailMessage relationship set elsewhere (by the caller, 291). The view-only branch (steps 4-7) runs before the Id check."
+karbon_kontacts.fmp12/scripts/770-Button_Create_Email_Message_From_Party.txt,a32047797abe2ad43002d16e5cf9a57fe946961b0444b63a361db846dab7d1dc,scripts,karbon_kontacts.fmp12,770,Button: Create Email Message From Party,orchestration,server-domain,tier2,"Creates an email message activity from a party: ""to"" is the person (or, for a company, the related party's email), the current user and party are set in the selector globals to resolve the signature, then ""Create EmailMessage { data }"" in karbon_kontroller is called and the created activity is opened.","Party::PersonInd#130
+Party::EmailAddressIdCached#145
+Party::EmailAddressCached#127
+Party::Id#1
+Party_PartyRelation_Party::EmailAddressIdCached#145
+Party_PartyRelation_Party::EmailAddressCached#127
+Party_PartyRelation_Party::Id#1
+meta#dataFile::CurrentUserId#3
+session::CurrentUserPartyId#63
+Selected_User::EmailSignature#120
+System::DefaultEmailSignatureTemplate#63
+Selected_Party::NameCached#19
+Selected_Party_Person::EmployerName#131
+Selected_Party_Person::JobTitle#14
+Selected_Party::PhoneNumberCached#125
+Opportunity::Id#1","selector::UserId#24 (Set Field step 13, global)
+selector::PartyId#6 (Set Field step 14, global)","karbon_kontroller.fmp12/scripts/389 ""Create EmailMessage { data }"" (step 25) [other file: karbon_kontroller]
+karbon_kontacts.fmp12/scripts/291 ""Open Activity { Id }"" (step 36)","objects/karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+objects/karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt
+objects/karbon_kontacts.fmp12/layouts/50-Party_Detail.txt",none,"Step 23 sends ""EntityId"" = Opportunity::Id although this button runs from a party layout: the opportunity is not related here, so EntityId is likely empty or wrong (copy of script 691); EntityTypeId 13 (opportunity) is also hard-coded. ActivityPartyRoleId 55 (to recipient) is hard-coded. Script is in the Scripts menu."
+karbon_kontacts.fmp12/scripts/775-Button_Send_Email_Message.txt,e2bc00ad2b5b3000c035eead1b046cbf41c8753eded24c623ba4cab2b19f0a37,scripts,karbon_kontacts.fmp12,775,Button: Send Email Message,integration,external-adapter,tier1,"Sends the current email message: asks once per session for the user's SMTP password (unless the system settings are used), commits, calls ""Send Email Message Activity { json }"" in karbon_kontroller with the message id and user id, handles an authentication failure (error 1507) by clearing the stored password and offering a retry (calls itself), shows an error dialog on other failures, and closes the window on success.","Selected_User::SmtpPassword#118
+EmailMessage::UseSystemSettingsInd#26
+EmailMessage::Id#1
+session::CurrentUserId#58","User::SmtpPassword#118 (Show Custom Dialog input step 5, global: password typed by the user)
+User::SmtpPassword#118 (Set Field step 21, global: cleared on authentication error 1507)","karbon_kontroller.fmp12/scripts/521 ""Send Email Message Activity { json }"" (step 15) [other file: karbon_kontroller]
+karbon_kontacts.fmp12/scripts/775 ""Button: Send Email Message"" (step 24)","objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/scripts/775-Button_Send_Email_Message.txt","Perform Script Send Email Message Activity { json } (karbon_kontroller scripts/521, step 15): sends the mail through SMTP using the user's password or system settings","secret: step 5 collects the user's SMTP password into User::SmtpPassword#118 (a global field, held in memory for the session; the file-close trigger karbon_data script 3 also clears it) and script 521 uses it to authenticate; the target must keep it in a managed secret store, not in a normal field. The script calls itself on retry (step 24), unbounded as long as the user chooses Try Again. $ActivityId and $Sent (steps 32-33) are set but not used. The actual SMTP send is in karbon_kontroller script 521."

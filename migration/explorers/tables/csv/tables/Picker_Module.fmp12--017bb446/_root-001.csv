@@ -1,0 +1,50 @@
+source_id,source_hash,kind,file,id,name,role,fields,regular,calculated,summary,global,container,repeating,keys,logic,logic_count,target,open_question
+Picker_Module.fmp12/tables/136-Picker.txt,94d3ad9ec9ceeeac61a9de8b1640be721a3ac90fd575faf40892f8401599b8a9,tables,Picker Module.fmp12,136,Picker,settings-globals,34,4,6,0,30,0,0,none,"6 Settings_AllowMultipleSelectionsInd | calc-unstored | reads JSON key selectMultiple from Settings and returns it as a boolean (allow selecting several contacts); global calc
+11 Settings_OrganizationsOnly | calc-unstored | reads JSON key organizationsOnly from Settings as a boolean (restrict results to organizations); global calc
+12 Settings_AllowCreate | calc-unstored | reads JSON key allowCreate from Settings as a boolean (allow creating a party when nothing matches); global calc
+13 Settings_PlaceholderText | calc-unstored | reads JSON key placeholderText from Settings (text shown in the empty search field); global calc
+14 Settings_FooterMessage | calc-unstored | reads JSON key footerMessage from Settings (footer text before a search is made); global calc
+16 Settings_PeopleOnly | calc-unstored | reads JSON key peopleOnly from Settings as a boolean (restrict results to people); global calc
+26 Results_EmailAddressList | auto-calc | when Results is empty returns empty; otherwise lists the EmailAddressId values found in the Results JSON using custom function JSON.GetValuesAtPath; overwrites any existing value, so it follows Results; global",7,session-state,"secret: SmartyStreets_AuthId, SmartyStreets_AuthToken and GooglePlaces_ApiKey are non-global fields that hold address-API credentials; AddressServiceProvider (SmartyStreets or Google Places) is a plain field, not a global. Results_PhoneList has its auto-enter switched off: is the phone result list still used?"
+Picker_Module.fmp12/tables/139-VIRTUALLISTS.txt,0c87aeddda637433c83652f976b1acb2a7399112eafe7e56e148683d4c3e78b0,tables,Picker Module.fmp12,139,VIRTUALLISTS,utility,2,0,0,0,2,0,0,none,none,0,drop-candidate,none
+Picker_Module.fmp12/tables/140-VIRTUALLISTS_Rows.txt,704e270449cc057a3da0020c177df5854a297eb9d6acd3b57a743cb11fe5b86e,tables,Picker Module.fmp12,140,VIRTUALLISTS_Rows,utility,38,1,36,0,1,0,0,"n | serial (next value 201, on creation); right side of the inequality relationship foundCount >= n
+Email.PartyId | FK -> Party::Id (Equal relationship to karbon_data Party)","12 Address.RowData | calc-unstored | returns line n of Picker::AddressRows (one address suggestion line)
+30 Email.ContactMethodId | calc-unstored | returns the JSON element ""ContactMethodId"" of the Email.Result row object
+31 Email.EmailAddress | calc-unstored | returns the JSON element ""EmailAddress"" of the Email.Result row object
+32 Email.Label | calc-unstored | returns the JSON element ""Label"" of the Email.Result row object
+33 Email.PartyId | calc-unstored | returns the JSON element ""PartyId"" of the Email.Result row object
+34 Email.PartyName | calc-unstored | returns the JSON element ""PartyName"" of the Email.Result row object
+28 Email.Keys | calc-unstored | lists the JSON keys of the first value in Picker::Email.Found (comment says: keys from first array index)
+29 Email.Result | calc-unstored | returns value n of Picker::Email.Found, one JSON object per row (ContactMethodId, EmailAddress, Label, PartyId, PartyName); the formula holds a long header comment and a sample object
+19 json_SchemaPicker_Field | calc-unstored | returns element n-1 of Picker::Schema_FieldArray (one field object of the schema picker)
+24 json_SchemaPicker_Field_FieldName | calc-unstored | reads FieldName from the schema-picker field object
+15 json_SchemaPicker_File | calc-unstored | reads FileName from element n-1 of Picker::Schema_FileArray
+26 json_SchemaPicker_Script | calc-unstored | returns element n-1 of Picker::Schema_ScriptsArray
+27 json_SchemaPicker_Script_ScriptName | calc-unstored | reads ScriptName from the schema-picker script object
+17 json_SchemaPicker_Table | calc-unstored | returns element n-1 of Picker::Schema_TableArray
+20 json_SchemaPicker_Table_TableName | calc-unstored | reads TableName from the schema-picker table object
+18 json_SchemaPicker_TableOccurence | calc-unstored | returns element n-1 of Picker::Schema_TableOccurenceArray
+23 json_SchemaPicker_TableOccurence_TableOccurenceName | calc-unstored | reads TableOccurenceName from the schema-picker table-occurrence object
+14 json_SchemaPickerKeys | calc-unstored | lists the keys of the first object in Picker::Results at path Result.SchemaArray[0]
+16 json_SchemaPickerResult | calc-unstored | returns value n of the list of values found at Result.SchemaArray in Picker::Results
+1 n | auto-serial | serial number, next value 201, increment 1, generated OnCreation
+9 Party.PickerField1 | calc-unstored | Let that sets RowData from Party.PickerKeys value 1 and returns Party.PickerResult unless it starts with ""?"" (a JSON error), then empty; the RowData variable is declared but the result uses Party.PickerResult
+8 Party.PickerField2 | calc-unstored | same as PickerField1 for key position 2
+7 Party.PickerField3 | calc-unstored | same as PickerField1 for key position 3
+6 Party.PickerField4 | calc-unstored | same as PickerField1 for key position 4
+5 Party.PickerField5 | calc-unstored | same as PickerField1 for key position 5
+11 Party.PickerKeys | calc-unstored | lists the keys of the first object in Picker::Results at path Result.PartyArray[0] (column names of the party result)
+10 Party.PickerResult | calc-unstored | returns value n of the values at Result.PartyArray in Picker::Results (one party result per row)
+36 Email.EmailOrganizationName | calc-unstored | returns the JSON element ""OrganizationName"" of the Email.Result row object
+37 Phone.ClientInd | calc-unstored | returns the JSON element ""IsClient"" of the Phone.Result row object (true if the phone belongs to a client)
+38 Phone.Id | calc-unstored | returns the JSON element ""PhoneId"" of the Phone.Result row object
+39 Phone.Keys | calc-unstored | lists the JSON keys of the first value in Picker::Phone.Found
+40 Phone.Number | calc-unstored | returns the JSON element ""Phone"" of the Phone.Result row object
+41 Phone.OrganizationName | calc-unstored | returns the JSON element ""OrganizationName"" of the Phone.Result row object
+42 Phone.PartyId | calc-unstored | returns the JSON element ""PartyId"" of the Phone.Result row object
+43 Phone.PartyName | calc-unstored | returns the JSON element ""PartyName"" of the Phone.Result row object
+44 Phone.Result | calc-unstored | returns value n of Picker::Phone.Found, one JSON object per row (ContactMethodId, Phone, Label, PartyId, PartyName); the formula holds a header comment and a sample object
+45 Phone.Type | calc-unstored | returns the JSON element ""Type"" of the Phone.Result row object",37,drop-candidate,Virtual-list scaffold (200 rows) that slices JSON held in Picker globals into display rows; confirm the picker UI is rebuilt as a client-side list so no table is needed.
+Picker_Module.fmp12/tables/141-connector.txt,76efa6d129a33f7f96262739df05158c6dff672441f4cff185646ebc0bebc9e0,tables,Picker Module.fmp12,141,connector,utility,2,1,0,0,1,0,0,none,"12 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user cannot edit)",1,drop-candidate,none
+Picker_Module.fmp12/tables/142-meta.txt,3d0e4bbb86fd92a9bb0914a0d0bf331997c2d2e4b18be95b3f9f1e63be0882ca,tables,Picker Module.fmp12,142,meta,settings-globals,2,0,1,0,1,0,0,none,"9 FileVersion | calc-unstored | constant text ""0.9.5"" (file version, semantic versioning described in the formula comment); unstored so it survives cloning",1,config,none
+Picker_Module.fmp12/tables/143-selector.txt,0c05d16160ea1003ed57eeb8898690a034cff00a27196314872c9079ab494641,tables,Picker Module.fmp12,143,selector,utility,3,0,1,0,2,0,0,none,5 zc_TRUE | calc-stored | constant 1 stored calculation (always-true helper used as a join key),1,drop-candidate,PartyId is a global that joins to Party::Id; confirm it only carries the picker selection.

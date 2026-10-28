@@ -1,0 +1,187 @@
+# script 725: Button: Add Activity Attachment v1
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity
+# source: ScriptCatalog/Script[@id=725]
+# steps: 39 (8 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=252 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #SELECT FILE
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Insert File [ UtilityEmailMessage::AttachmentContainer ]
+        [ Custom title: "Select file to attach" ]
+        [ Storage method: Insert ]
+        [ Display icon ]
+        [ Compression: Never compress ]
+        DisableStepCollapsed state=False
+        UniversalPathList type=Embedded
+        Field table=UtilityEmailMessage id=28 name=AttachmentContainer
+        DialogOptions asFile=True enable=True
+          Storage type=InsertOnly
+          Compress type=Never
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $error; Value:Error.Last ( "selecting file" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+   9    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  10    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $FileName; Value:Substitute ( GetValue ( UtilityEmailMessage::AttachmentContainer ; 1 ) ; 
+        	"file:" ; "" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:GetValue, UtilityEmailMessage::AttachmentContainer#28
+        Name: $FileName
+  14    Set Variable [ $FilePath; Value:GetValue ( UtilityEmailMessage::AttachmentContainer ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue, UtilityEmailMessage::AttachmentContainer#28
+        Repetition
+          Calculation:
+            | 1
+        Name: $FilePath
+  15 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  16 // Set Variable [ $fileObject; Value:JSONSetElement ( "{}" ; 
+        	[ "FileName" ; $fileName ; JSONString ] ; 
+        	[ "FilePath" ; $filePath ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $fileObject
+  17 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  18 // Set Field [ UtilityEmailMessage::Attachments; JSONFormatElements ( JSON.Push ( UtilityEmailMessage::Attachments ; $fileObject ; JSONObject ) ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONFormatElements, cf:JSON.Push, UtilityEmailMessage::Attachments#8, fn:JSONObject
+        Field table=UtilityEmailMessage id=8 name=Attachments
+  19 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  20 // Perform Script [ “Update Attachments Virtual List” ]
+        DisableStepCollapsed state=False
+        Script id=375 name="Update Attachments Virtual List"
+  21 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  22 // Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #CREATE/ATTACH FILE
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $FileAttachment; Value:"[" & JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Activity::Id ; JSONString ]  ;
+        	[ "EntityTypeId" ; 11 ; JSONNumber ] ;
+        	[ "FileName" ; $FileName ; JSONString ]  
+        ) & "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Activity::Id#1, fn:JSONString, fn:JSONNumber
+        Name: $FileAttachment
+  28    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        //	[ "Category" ; $Category ; JSONString ]  ;
+        	[ "Container" ; Base64Encode ( UtilityEmailMessage::AttachmentContainer ) ; JSONString ]  ;
+        	[ "FileName" ; $FileName ; JSONString ] ; 
+        	[ "FileAttachment" ; $FileAttachment ; JSONArray ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Base64Encode, UtilityEmailMessage::AttachmentContainer#28, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Perform Script [ “Create File { data } v2” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=617 name="Create File { data } v2" in=karbon_kontroller.fmp12
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  33    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  34    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  35    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  36    End If
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $Id; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False

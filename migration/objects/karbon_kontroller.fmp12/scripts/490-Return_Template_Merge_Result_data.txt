@@ -1,0 +1,711 @@
+# script 490: Return Template Merge Result { data }
+# file: karbon_kontroller.fmp12
+# folder: API / Templates / Private
+# source: ScriptCatalog/Script[@id=490]
+# steps: 191 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=488 groupCollapsed=True includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Performs a template merge and returns text
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} Merge
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} Merge.TemplateId
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {string} Merge.Message - The text being substituted
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {string} [Merge.PartyId]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {string} [Merge.ProjectId]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@param {array} [Merge.ActivityPartyArray]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnSuccess {object} result.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@history 2018-07-15 admin - Created by Generator
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  30    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  31    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  38    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $Merge; Value:JSON.Format( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Merge
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    If [ Error.IsError ( $Merge ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  49    Set Variable [ $error; Value:$Merge ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  50    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  51    End If
+        DisableStepCollapsed state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $error; Value:JSON.Validate.This ( $Merge ) & JSON.Validate.ApplyRules ( 
+               List ( 
+                       JSON.Validate.Rule.IsRequired ( "TemplateId" ) ; 
+                       JSON.Validate.Rule.IsRequired ( "Message" ) ; 
+                       "" ; // additional tests  
+               )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  56    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Set Variable [ $TemplateId; Value:JSONGetElement ( $Merge ;  "TemplateId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TemplateId
+  64    Set Variable [ $Message; Value:JSONGetElement ( $Merge ;  "Message" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Message
+  65    Set Variable [ $ActivityPartyArray; Value:JSONGetElement ( $Merge ;  "ActivityPartyArray" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyArray
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #Constant values can be passed to substitute a value in these related records
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    Set Variable [ $PartyId; Value:JSONGetElement ( $Merge ;  "PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+  69    Set Variable [ $ProjectId; Value:JSONGetElement ( $Merge ;  "ProjectId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ProjectId
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #Connect to the template and get the list of Merge Fields
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Field [ DBTransactions::TemplateId; $TemplateId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=94 name=TemplateId
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Set Variable [ $MergeFieldList; Value:List ( MergeField#ByTemplateId::Name ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, MergeField#ByTemplateId::Name#58
+        Repetition
+          Calculation:
+            | 1
+        Name: $MergeFieldList
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Set Variable [ $MergeFieldListCount; Value:ValueCount( $MergeFieldList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $MergeFieldListCount
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    If [ $MergeFieldListCount = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    Set Variable [ $error; Value:Custom.Error ( "This Template has no merge fields defined" ; $Merge ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Custom.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  90    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  91    End If
+        DisableStepCollapsed state=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #Loop through each merge field
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  96    Exit Loop If [ $i > $MergeFieldListCount ]
+        DisableStepCollapsed state=False
+  97    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    Set Variable [ $ThisMergeField; Value:GetValue ( $MergeFieldList ; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisMergeField
+  99    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 100    Set Field [ DBTransactions::MergeFieldName; $ThisMergeField ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=92 name=MergeFieldName
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    #RESOLVE BY SCRIPT
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    If [ MergeFieldConfig#name::Resolve_ScriptInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: MergeFieldConfig#name::Resolve_ScriptInd#65
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    Set Variable [ $ScriptName; Value:MergeFieldConfig#name::ScriptName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: MergeFieldConfig#name::ScriptName#63
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptName
+ 106    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    Perform Script [ By name; $ScriptName ]
+        DisableStepCollapsed state=False
+ 108    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    Set Variable [ $SubstituteValue; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $SubstituteValue
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    #RESOLVE BY ACTIVITYPARTY
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    Else If [ MergeFieldConfig#name::Resolve_ActivityPartyInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: MergeFieldConfig#name::Resolve_ActivityPartyInd#67
+ 114    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    Set Variable [ $ActivityRoleTypeId; Value:MergeFieldConfig#name::AcitivityRoleTypeId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: MergeFieldConfig#name::AcitivityRoleTypeId#22
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityRoleTypeId
+ 116    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    #We need to get the ActivityPartyRole info first if ActivityPartyRole is set
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    If [ not IsEmpty ( $ActivityRoleTypeId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+ 119    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 120    Set Field [ DBTransactions::ActivityPartyRoleId; $ActivityRoleTypeId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=77 name=ActivityPartyRoleId
+ 121    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 122    #Loop through the ActivityPartyArray to find the PartyId
+        DisableStepCollapsed state=False
+        Restore state=False
+ 123    Set Variable [ $ActivityPartyArrayCount; Value:JSON.ArrayLength ( $ActivityPartyArray ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyArrayCount
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    Set Variable [ $ArrayIndex; Value:$ArrayIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $ArrayIndex
+ 127    Exit Loop If [ $ArrayIndex > $ActivityPartyArrayCount ]
+        DisableStepCollapsed state=False
+ 128    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    Set Variable [ $ThisActivityPartyObject; Value:JSONGetElement ( $ActivityPartyArray ; $ArrayIndex - 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $ThisActivityPartyObject
+ 130    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    Set Variable [ $ThisActivityPartyRoleId; Value:JSONGetElement ( $ThisActivityPartyObject ; "ActivityPartyRoleId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisActivityPartyRoleId
+ 132    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 133    If [ $ThisActivityPartyRoleId = $ActivityRoleTypeId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 134    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 135    Set Variable [ $SubstituteValue; Value:JSONGetElement ( $ThisActivityPartyObject ; MergeFieldConfig#name::ActivityPartyPluck ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, MergeFieldConfig#name::ActivityPartyPluck#68
+        Repetition
+          Calculation:
+            | 1
+        Name: $SubstituteValue
+ 136    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 138    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 139    End If
+        DisableStepCollapsed state=False
+ 140    End Loop
+        DisableStepCollapsed state=False
+ 141    End If
+        DisableStepCollapsed state=False
+ 142    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 143    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 144    #RESOLVE BY FIELD REFERENCE
+        DisableStepCollapsed state=False
+        Restore state=False
+ 145    Else If [ MergeFieldConfig#name::Resolve_FieldReferenceInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: MergeFieldConfig#name::Resolve_FieldReferenceInd#66
+ 146    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 147    #Set the field in DBTransactions
+        DisableStepCollapsed state=False
+        Restore state=False
+ 148    Set Variable [ $DBTransactionsFieldName; Value:MergeFieldConfig#name::DBTransactionsFieldName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: MergeFieldConfig#name::DBTransactionsFieldName#53
+        Repetition
+          Calculation:
+            | 1
+        Name: $DBTransactionsFieldName
+ 149    Set Variable [ $DBTransactionsFieldValue; Value:MergeFieldConfig#name::DBTransactionsFieldValue ]
+        DisableStepCollapsed state=False
+        Value
+          refs: MergeFieldConfig#name::DBTransactionsFieldValue#64
+        Repetition
+          Calculation:
+            | 1
+        Name: $DBTransactionsFieldValue
+ 150    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 151    Set Field By Name [ "DBTransactions" & "::" & $DBTransactionsFieldName; Evaluate ( MergeFieldConfig#name::DBTransactionsFieldValue ) ]
+        DisableStepCollapsed state=False
+        Result
+          refs: fn:Evaluate, MergeFieldConfig#name::DBTransactionsFieldValue#64
+ 152    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 153    #Set the substitute value to the field in the foreign table
+        DisableStepCollapsed state=False
+        Restore state=False
+ 154    Set Variable [ $ForeignTableOccurrenceName; Value:MergeFieldConfig#name::ForeignTableOccurrenceName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: MergeFieldConfig#name::ForeignTableOccurrenceName#52
+        Repetition
+          Calculation:
+            | 1
+        Name: $ForeignTableOccurrenceName
+ 155    Set Variable [ $ForeignFieldName; Value:MergeFieldConfig#name::ForeignFieldName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: MergeFieldConfig#name::ForeignFieldName#51
+        Repetition
+          Calculation:
+            | 1
+        Name: $ForeignFieldName
+ 156    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 157    Set Variable [ $SubstituteValue; Value:Evaluate ( $ForeignTableOccurrenceName & "::" & $ForeignFieldName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Evaluate
+        Repetition
+          Calculation:
+            | 1
+        Name: $SubstituteValue
+ 158    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 159    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 160    End If
+        DisableStepCollapsed state=False
+ 161    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 162    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 163    #Substitute the field
+        DisableStepCollapsed state=False
+        Restore state=False
+ 164    Set Variable [ $Message; Value:Substitute ( $Message ; $ThisMergeField ; $SubstituteValue ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $Message
+ 165    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 166    End Loop
+        DisableStepCollapsed state=False
+ 167    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 168    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 169    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 170    Set Variable [ $result; Value:JSONSetElement( "{}"; "Message" ; $Message ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 171    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 172    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 173    End Loop
+        DisableStepCollapsed state=False
+ 174    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 175    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 176    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 177    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 178    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 179    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 180    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 181    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 182    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 183    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 184    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 185    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 186    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 187    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 188    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 189    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 190    End If
+        DisableStepCollapsed state=False
+ 191    #
+        DisableStepCollapsed state=False
+        Restore state=False

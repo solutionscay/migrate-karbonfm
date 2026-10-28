@@ -1,0 +1,76 @@
+# script 76: Get Clip From Clipboard
+# file: karbon_Generator.fmp12
+# folder: App Modules / Generators / Private
+# source: ScriptCatalog/Script[@id=76]
+# steps: 17 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=127 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $currentClip; Value:Generators::clip ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Generators::clip#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $currentClip
+   5    If [ not IsEmpty ( $currentClip ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+   6    Show Custom Dialog [ Title: "Are you sure?"; Message: "There is already some XML stored here. The new XML will completely over right the old one if you continue."; Default Button: “Cancel”, Commit: “Yes”; Button 2: “Continue”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Cancel"
+          Button 2 CommitState=False: "Continue"
+          Button 3 CommitState=False
+   7    If [  Get(LastMessageChoice) = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+   8    Exit Script [  ]
+        DisableStepCollapsed state=False
+   9    End If
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $cliptype; Value:clip_GetFMObjectType ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_GetFMObjectType
+        Repetition
+          Calculation:
+            | 1
+        Name: $cliptype
+  13    Set Variable [ $clip; Value:clip_GetFMxml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_GetFMxml
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Field [ Generators::clipType; $cliptype ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=6 name=clipType
+  17    Set Field [ Generators::clip; $clip ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=3 name=clip

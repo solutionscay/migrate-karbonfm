@@ -1,0 +1,58 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/160-Show_Person_or_Org_Slide.txt,76cf6583b958365f1046d9213a4aa59230795db4fddfca55ad867a2e6610241f,scripts,karbon_kontacts.fmp12,160,Show Person or Org Slide,navigation,client-ui,tier3,"Focuses the organization name field if the party is an organization, otherwise the first name field.",Party::OrganizationInd#18,none,none,karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,none,Called from the Contact Card layout (as a trigger).
+karbon_kontacts.fmp12/scripts/163-Open_Party_Info_Card_Id.txt,646e3201e9ae6459265658cdb2446b39dda2691e9c88ea712d61142ffe7f95da,scripts,karbon_kontacts.fmp12,163,Open Party Info Card { Id },navigation,client-ui,tier3,Opens the 'Edit Contact' card window for a party id (JSON parameter 'Id') and finds the Party; closes the window with a 'could not be found' dialog on error. Does nothing when no Id is passed.,"Party::Id#1
+Party::Id#1 (find criterion step 16)",none,none,"karbon_kontacts.fmp12/layouts/134-Admin_User_Detail.txt
+karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt
+karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+karbon_kontacts.fmp12/layouts/50-Party_Detail.txt
+karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt
+karbon_kontacts.fmp12/layouts/69-Invoice.txt
+karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt",none,
+karbon_kontacts.fmp12/scripts/165-Create_Customer.txt,c189ee9fd69e4d8bee0867bac267e378154df5a2ad131270e69c6e0b78381e9a,scripts,karbon_kontacts.fmp12,165,Create Customer,orchestration,client-ui,tier2,"Creates a customer: forwards the script parameter to karbon_kontroller '_wip_Create Customer V3' (229), shows an error dialog on failure, otherwise finds the new Customer on layout 'Customer Detail' by id.",Party_PartyRole_Customer::Id#1 (find criterion step 16),none,"karbon_kontroller.fmp12/scripts/229 (step 4, other file karbon_kontroller)",none found (in Scripts menu),none,"The durable write is done by the called kontroller script (server-domain). Result code 0 on success, -2 on error. Script is in the Scripts menu (includeInMenu=True); callers: none found."
+karbon_kontacts.fmp12/scripts/166-Update_Party_Cached_Data.txt,10ae2aa943f5e3d305cfccd2d38a5e59995668f57407d16006be361df76818d1,scripts,karbon_kontacts.fmp12,166,Update Party Cached Data,data-change,server-domain,tier2,"Refreshes denormalised cache fields on a Party after its detail card closes: NameCached (organization name, or first + last name), customer DisplayName (only when empty), vendor and employee NameCached, and the cached primary email, phone and address (id, value, label) via the 'selector' ContactMethodId field.","Party::OrganizationInd#18
+Organization::OrganizationName#19
+Party::PersonInd#130
+Person::FirstName#7
+Person::LastName#9
+Party_PartyRole_Customer::ONE#20
+Party_PartyRole_Customer::DisplayName#27
+Party::NameCached#19
+Party_PartyRole_Vendor::ONE#28
+Party_PartyRole_Employee::ONE#37
+Party_ContactMethod_NetworkAddress#Email::Id#1
+Selected_NetworkAddress::Address#7
+Selected_NetworkAddress::Id#1
+Selected_NetworkAddress_ContactMethod::Label#47
+Party_ContactMethod_Phone::Id#1
+Selected_Phone::Number#8
+Selected_Phone::Id#1
+Selected_Phone_ContactMethod::Label#47
+Party_ContactMethod_Address::Id#1
+Selected_Address::AddressDisplay#22
+Selected_Address::Id#1
+Selected_Address_ContactMethod::Label#47","Party::NameCached#19 (Set Field step 7, current record)
+Party::NameCached#19 (Set Field step 9, current record)
+Party_PartyRole_Customer::DisplayName#27 (Set Field step 16, related via Party_PartyRole_Customer)
+Party_PartyRole_Vendor::NameCached#30 (Set Field step 21, related via Party_PartyRole_Vendor)
+Party_PartyRole_Employee::NameCached#20 (Set Field step 26, related via Party_PartyRole_Employee)
+selector::ContactMethodId#10 (Set Field step 30, global)
+Party::EmailAddressCached#127 (Set Field step 31, current record)
+Party::EmailAddressIdCached#145 (Set Field step 32, current record)
+Party::EmailAddressLabelCached#133 (Set Field step 33, current record)
+selector::ContactMethodId#10 (Set Field step 37, global)
+Party::PhoneNumberCached#125 (Set Field step 38, current record)
+Party::PhoneIdCached#147 (Set Field step 39, current record)
+Party::PhoneLabelCached#132 (Set Field step 40, current record)
+selector::ContactMethodId#10 (Set Field step 43, global)
+Party::AddressDisplayCached#128 (Set Field step 44, current record)
+Party::AddressIdCached#146 (Set Field step 45, current record)
+Party::AddressLabelCached#131 (Set Field step 46, current record)",none,karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,none,"Writes through the global-style 'selector::ContactMethodId' (step 30, 37, 43) to switch the Selected_* relationships; this selector-then-read pattern must become explicit queries. Customer DisplayName is updated only when empty (comment: 'We don't want to update this automatically'). Triggered from the Contact Card layout."
+karbon_kontacts.fmp12/scripts/173-Create_Employee.txt,119d5c8b1bdc06900c929d92ae65024047ae8c32e85866830add04b03c48f4aa,scripts,karbon_kontacts.fmp12,173,Create Employee,orchestration,client-ui,tier2,"Creates an employee: calls karbon_kontroller '_wip_Create Employee' (164) with PartySubtype Person, DisplayName 'New Employee' and SkipValidations true, shows an error dialog on failure, then finds the new Employee on a layout.",Party_PartyRole_Employee::Id#6 (find criterion step 18),none,"karbon_kontroller.fmp12/scripts/164 (step 5, other file karbon_kontroller)",none found (in Scripts menu),none,"Step 17 goes to a layout that no longer exists (<unknown>, id 57), so the find lands on the current layout or fails. Script is in the Scripts menu; callers: none found."
+karbon_kontacts.fmp12/scripts/290-Open_Party_Detail_Id.txt,83263959a7774b81741f7cd0ace337bb6d758c8625dbd7d5ec237015d396b4c0,scripts,karbon_kontacts.fmp12,290,Open Party Detail { Id },navigation,client-ui,tier3,"Goes to layout 'Party Detail', resizes to fit and, if an Id was passed in JSON, finds that Party (dialog 'contact could not be found' on failure). Does nothing further when Id is empty.","Party::Id#1
+Party::Id#1 (find criterion step 20)",none,none,none found (may be called by name),none,Comment step 9: open in new window / card window is still a Todo (step 12 disabled). Callers: none found.
+karbon_kontacts.fmp12/scripts/417-Party_Detail_-_On_Record_Load.txt,883f76eff588620026c902070be49adeab19c1f3ee0d2a2033ec32cfd8ed58a4,scripts,karbon_kontacts.fmp12,417,Party Detail - On Record Load,session-setup,client-ui,tier3,On-record-load trigger of Party Detail: clears selector::ActivityId.,none,"selector::ActivityId#7 (Set Field step 2, global)",none,karbon_kontacts.fmp12/layouts/50-Party_Detail.txt,none,selector::ActivityId#7 is a global field.
+karbon_kontacts.fmp12/scripts/619-btn_Open_Create_Party_Card_-_All_Contacts.txt,b09c606f8fdfffa7070e2e7e544fd08bae8cc8d220f00ff1643d3f475da71ab9,scripts,karbon_kontacts.fmp12,619,btn: Open Create Party Card - All Contacts,navigation,client-ui,tier3,"Clears selector::PartyId, installs a 1-second OnTimer that calls 'OnTimer: Handle Create Party From All Contacts' (620) and opens the 'Create Party' card (script 184).",none,"selector::PartyId#6 (Set Field step 2, global)","karbon_kontacts.fmp12/scripts/620  (OnTimer)(step 5)
+karbon_kontacts.fmp12/scripts/184 (step 7)","karbon_kontacts.fmp12/layouts/47-Parties.txt
+karbon_kontacts.fmp12/layouts/50-Party_Detail.txt",none,Combination of timer + card is the way the create result is handed back to the list.
+karbon_kontacts.fmp12/scripts/620-OnTimer_Handle_Create_Party_From_All_Contacts.txt,85a6677332cf162f8fe023c1008cc4f0d40939bbdee83afc8ebc307136a202c3,scripts,karbon_kontacts.fmp12,620,OnTimer: Handle Create Party From All Contacts,navigation,client-ui,tier3,"OnTimer handler: stops the timer, takes the new Organization or Person id from UtilityParty and opens the contact detail (script 502) with that Id.","UtilityParty::OrganizationId#20
+UtilityParty::PersonId#21",none,karbon_kontacts.fmp12/scripts/502 (step 15),karbon_kontacts.fmp12/scripts/619-btn_Open_Create_Party_Card_-_All_Contacts.txt,none,"If neither id exists the Else branch is empty (comment '#error'), so nothing happens. Script is in the Scripts menu."

@@ -1,0 +1,801 @@
+# layout 112: Estimate | Desktop
+# file: karbon_LedgerLink.fmp12
+# folder: Application / Desktop
+# source: LayoutCatalog/Layout[@id=112]
+# objects: 105
+# theme: LedgerLink PC
+# folder group: id=88 groupCollapsed=True includeInMenu=False
+
+Layout width=1024 quickFind=True includeInMenu=True id=112 name="Estimate | Desktop"
+  Table id=1065224 name=Estimate
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnRecordCommit id=104 triggerFlags=1(browse)
+      Script id=534 name="Estimate OnCommit Trigger"
+      TriggerText: "Estimate OnCommit Trigger"
+    Trigger event=OnModeExit id=107 triggerFlags=2(find)
+      Script id=491 name="Exit Find Mode Trigger"
+      TriggerText: "Exit Find Mode Trigger"
+  Object type=Button key=10 LabelKey=0 bounds=0,0,39,42
+    Text flags=2 style=button.nav
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Display Main Nav” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=463 name="Display Main Nav"
+      Image name=a3_list.svg
+  Object type=Text key=39 LabelKey=0 bounds=0,42,39,170
+    Text flags=2 style=text.header.title.left: Estimate
+  Object type=Field key=61 LabelKey=0 bounds=168,320,192,440
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::date#5
+  Object type=Text key=65 LabelKey=0 flags=260 bounds=41,24,81,640
+    Text flags=14 tableViewVisibility=0 style=text.header.title.left: "<<docNumber>>  <<Estimate_Customer::displayName>>"
+      FieldList quickFind=False
+        Field table=Estimate id=4 name=docNumber
+        Field table=Estimate_Customer id=9 name=displayName
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Text key=66 LabelKey=0 flags=1342177540 bounds=40,798,80,1022
+    Text flags=14 tableViewVisibility=0 style=text.header.title.right: <<totalAmt>>
+      Display: number flags=3598 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      FieldList quickFind=False
+        Field table=Estimate id=25 name=totalAmt
+    HideCondition findMode=True
+      Calculation:
+        | Estimate::totalAmt ≤ 0
+        | or
+        | IsEmpty ( Estimate::qbo_id )
+        | or
+        | Estimate::deleted
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: Estimate::totalAmt#25, fn:or, fn:IsEmpty, Estimate::qbo_id#2, Estimate::deleted#32, fn:Get, fn:WindowMode
+  Object type=Text key=67 LabelKey=0 flags=1342177540 bounds=40,1050,80,1274
+    Text flags=6 style=text.header.title.right: PAID
+    HideCondition findMode=True
+      Calculation:
+        | IsEmpty ( Estimate::qbo_id )
+        | or
+        | Estimate::deleted
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:IsEmpty, Estimate::qbo_id#2, fn:or, Estimate::deleted#32, fn:Get, fn:WindowMode
+  Object type=Field key=69 LabelKey=0 bounds=104,320,128,576
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::billEmailAddress#29
+  Object type=Text key=73 LabelKey=0 bounds=144,320,168,440
+    Text flags=6 style=text.form.field.label: "Estimate date"
+  Object type=Field key=76 LabelKey=0 flags=4 bounds=48,24,72,280
+    FieldObj numOfReps=1 flags=1179680 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=edit.view.left
+      Field: Estimate::docNumber#4
+      PlaceholderText findMode=True
+        Calculation:
+          | "Invoice No."
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+  Object type=Text key=83 LabelKey=0 flags=1342177540 bounds=40,776,80,1000
+    Text flags=6 style=text.header.title.right: DELETED
+    HideCondition findMode=True
+      Calculation:
+        | not Estimate::deleted
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:not, Estimate::deleted#32, fn:or, fn:Get, fn:WindowMode
+  Object type=Rect key=85 LabelKey=0 flags=1073741824 style=shape.form.portalHeader bounds=383,24,407,1000
+  Object type=Field key=88 LabelKey=89 flags=-536870912 bounds=585,24,657,424
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::customerMemo#27
+  Object type=Text key=89 LabelKey=0 flags=-1610612736 bounds=561,24,585,208
+    Text flags=6 style=text.form.field.label: "Message displayed on Estimate"
+  Object type=Field key=90 LabelKey=91 flags=-536870912 bounds=681,24,737,424
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::privateNote#6
+  Object type=Text key=91 LabelKey=0 flags=-1610612736 bounds=657,24,681,193
+    Text flags=6 style=text.form.field.label: Memo
+  Object type=Portal key=94 LabelKey=0 flags=-1073741824 bounds=407,24,526,1000
+    PortalObj portalFlags=277 numOfRows=3 initialRow=1
+      TableAliasKey: EstimateItem
+      FieldList
+        Field table=EstimateItem id=5 name=description
+        Field table=EstimateItem id=8 name=qty
+        Field table=EstimateItem id=7 name=unitPrice
+        Field table=EstimateItem id=6 name=amount
+        Field table=EstimateItem id=9 name=id_Item
+        Field table=EstimateItem id=9 name=id_Item
+      Object type=Field key=96 LabelKey=0 flags=1073741824 bounds=415,304,439,680
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: EstimateItem::description#5
+      Object type=Field key=97 LabelKey=0 flags=1342177284 bounds=415,688,439,752
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: EstimateItem::qty#8
+          Display: number flags=16384 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( EstimateItem::id_Item )
+            | 
+            | /* if an item is not selected, assume this is a description-only line */
+            refs: fn:IsEmpty, EstimateItem::id_Item#9
+      Object type=Field key=98 LabelKey=0 flags=1342177284 bounds=415,760,439,824
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: EstimateItem::unitPrice#7
+          Display: number flags=16384 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( EstimateItem::id_Item )
+            | 
+            | /* if an item is not selected, assume this is a description-only line */
+            refs: fn:IsEmpty, EstimateItem::id_Item#9
+      Object type=Field key=99 LabelKey=0 flags=1342177284 bounds=415,832,439,912
+        ScriptTriggers
+          Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+            Script id=532 name="EstimateItem Amount OnObjectExit Trigger"
+            TriggerText: "EstimateItem Amount OnObjectExit Trigger"
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: EstimateItem::amount#6
+          Display: number flags=16392 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty (EstimateItem::id_Item )
+            | 
+            | /* if an item is not selected, assume this is a description-only line */
+            refs: fn:IsEmpty, EstimateItem::id_Item#9
+      Object type=Button key=101 LabelKey=0 flags=1342177284 bounds=408,960,446,999
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=104 name="Delete Portal Row"
+            StepText: Delete Portal Row
+            NoInteract state=False
+            DisableStepCollapsed state=False
+          Image name=a25_trash.svg
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( EstimateItem::id )
+            refs: fn:IsEmpty, EstimateItem::id#1
+      Object type=Button key=102 LabelKey=0 flags=1342177540 bounds=408,920,446,960
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ EstimateItem::taxable; not EstimateItem::taxable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not EstimateItem::taxable
+              refs: fn:not, EstimateItem::taxable#11
+            Field table=EstimateItem id=11 name=taxable
+          Image name=checkbox.svg
+        HideCondition findMode=True
+          Calculation:
+            | EstimateItem::taxable
+            | or
+            | (
+            | 	IsEmpty ( EstimateItem::id_Item )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: EstimateItem::taxable#11, fn:or, fn:IsEmpty, EstimateItem::id_Item#9, fn:and, fn:Get, fn:WindowMode
+      Object type=Button key=104 LabelKey=0 flags=1342177540 bounds=408,920,446,960
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ EstimateItem::taxable; not EstimateItem::taxable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not EstimateItem::taxable
+              refs: fn:not, EstimateItem::taxable#11
+            Field table=EstimateItem id=11 name=taxable
+          Image name=checked.svg
+        HideCondition findMode=True
+          Calculation:
+            | not EstimateItem::taxable
+            | or
+            | (
+            | 	IsEmpty ( EstimateItem::id_Item )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: fn:not, EstimateItem::taxable#11, fn:or, fn:IsEmpty, EstimateItem::id_Item#9, fn:and, fn:Get, fn:WindowMode
+      Object type=Field key=201 LabelKey=0 bounds=415,68,439,276
+        FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: EstimateItem::id_Item#9
+          ValueList: Item Id Active#21
+      Object type=Button key=202 LabelKey=0 flags=16385 bounds=415,276,439,300
+        ConditionalFormatting
+          Item id=0 flags=129
+            Condition op=0
+              Calculation:
+                | IsEmpty ( EstimateItem::id_Item )
+                refs: fn:IsEmpty, EstimateItem::id_Item#9
+            Format: -fm-icon-color: rgba(0%,0%,0%,0);
+        ToolTip
+          Calculation:
+            | "remove value"
+        Text flags=6 style=button.field
+        ButtonObj buttonFlags=0 iconSize=14 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ EstimateItem::id_Item; "" ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | ""
+            Field table=EstimateItem id=9 name=id_Item
+          Image name=a32_smallXOutline.svg
+      Object type=Text key=200 LabelKey=0 bounds=415,28,439,68
+        Text flags=14 tableViewVisibility=0 style=text.list.field.center: {{RecordNumber}}
+          FieldList quickFind=False
+      Object type=Field key=203 LabelKey=0 bounds=415,68,439,276
+        FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: EstimateItem::id_Item#9
+          ValueList: Item Id#20
+  Object type=Text key=106 LabelKey=0 bounds=383,64,407,272
+    Text flags=6 style=text.form.portal.label.left: PRODUCT/SERVICE
+  Object type=Text key=107 LabelKey=0 flags=1073741824 bounds=383,304,407,680
+    Text flags=6 style=text.form.portal.label.left: DESCRIPTION
+  Object type=Text key=108 LabelKey=0 flags=1342177280 bounds=383,688,407,752
+    Text flags=6 style=text.form.portal.label.right: QTY
+  Object type=Text key=109 LabelKey=0 flags=1342177280 bounds=383,760,407,824
+    Text flags=6 style=text.form.portal.label.right: RATE
+  Object type=Text key=110 LabelKey=0 flags=1342177280 bounds=383,832,407,912
+    Text flags=6 style=text.form.portal.label.right: AMOUNT
+  Object type=Text key=114 LabelKey=0 flags=1342177280 bounds=383,920,407,960
+    Text flags=6 style=text.form.portal.label.center: TAX
+  Object type=Field key=121 LabelKey=122 flags=1073741828 bounds=168,768,264,1000
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Estimate::qbo_error#35
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Estimate::qbo_error )
+        refs: fn:IsEmpty, Estimate::qbo_error#35
+  Object type=Text key=122 LabelKey=0 flags=1073741828 bounds=144,768,168,856
+    Text flags=6 style=text.form.field.label: "sync error"
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Estimate::qbo_error )
+        refs: fn:IsEmpty, Estimate::qbo_error#35
+  Object type=Field key=163 LabelKey=0 bounds=104,24,128,280
+    FieldObj numOfReps=1 flags=658468 inputMode=0 keyboardType=1 displayType=1(drop-down-list) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Estimate_Customer::displayName#9
+      ValueList: Customer displayName#23
+      PlaceholderText findMode=True
+        Calculation:
+          | "Customer"
+  Object type=PopoverButton key=164 LabelKey=0 flags=260 bounds=104,24,128,280
+    Text flags=6
+    PopoverButtonObj buttonFlags=0 key=165 iconSize=14 displayType=0
+      Object type=Popover key=165 LabelKey=0 bounds=139,5,524,365
+        ScriptTriggers
+          Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+            Script id=527 name="Select Customer for Estimate On Popover Open"
+            TriggerText: "Select Customer for Estimate On Popover Open"
+          Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+            Script id=528 name="Select Customer for Estimate On Popover Close"
+            TriggerText: "Select Customer for Estimate On Popover Close"
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=1 key=164
+          Object type=SlideControl key=166 LabelKey=0 bounds=152,8,520,360
+            SlideControlObj visPanelKey=167 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+              Object type=SlidePanel key=167 LabelKey=0 bounds=152,8,520,360
+                SlidePanelObj slidePanelFlagSet=0
+                  Object type=Portal key=168 LabelKey=0 name=portal.customer_all bounds=210,16,512,352
+                    PortalObj portalFlags=409 numOfRows=10 initialRow=1
+                      TableAliasKey: Estimate_Customer~all
+                      FieldList
+                        FieldReference id=9 name=displayName repetition=1 UUID=""
+                          TableOccurrenceReference id=1065231 name=Estimate_Customer~all UUID=""
+                      SortList BlanksLast=False Maintain=True value=True
+                        Sort type=Ascending
+                          PrimaryField
+                            Field table=Estimate_Customer~all id=9 name=displayName
+                      FilterCalc enable=True
+                        Calculation:
+                          | IsEmpty ( GLOBAL::FILTER )
+                          | or
+                          | PatternCount ( Estimate_Customer~all::displayName ; GLOBAL::FILTER )
+                          refs: fn:IsEmpty, GLOBAL::FILTER#1, fn:or, fn:PatternCount, Estimate_Customer~all::displayName#9
+                      Object type=Text key=169 LabelKey=0 bounds=214,21,238,273
+                        Text flags=10 tableViewVisibility=0 style=text.list.field.left: <<Estimate_Customer~all::displayName>>
+                          FieldList quickFind=True
+                            Field table=Estimate_Customer~all id=9 name=displayName
+                      Object type=Button key=170 LabelKey=0 bounds=211,17,241,351
+                        Text flags=2 style=button.row
+                        ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                          Step enable=True id=1 name="Perform Script"
+                            StepText: Perform Script [ “Select Customer for Estimate” ]
+                            DisableStepCollapsed state=False
+                            CurrentScript value=Pause
+                            Script id=530 name="Select Customer for Estimate"
+                  Object type=Field key=171 LabelKey=0 name=field.customer_filter bounds=160,16,184,270
+                    ScriptTriggers
+                      Trigger event=OnObjectModify id=3 triggerFlags=1(browse)
+                        Script id=529 name="Select Customer for Estimate: Filter"
+                        TriggerText: "Select Customer for Estimate: Filter"
+                    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+                      Field: GLOBAL::FILTER#1
+                  Object type=Button key=172 LabelKey=0 bounds=160,280,184,352
+                    Text flags=2: Add
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=4
+                      Step enable=True id=145 name="Go to Object"
+                        StepText: Go to Object [ Object Name: "field.newCustomerName"; Repetition: 1 ]
+                        DisableStepCollapsed state=False
+                        ObjectName
+                          Calculation:
+                            | "field.newCustomerName"
+                        Repetition
+                          Calculation:
+                            | 1
+                      Image name=a15_smallAdd.svg
+              Object type=SlidePanel key=173 LabelKey=0 bounds=152,8,520,360
+                SlidePanelObj slidePanelFlagSet=0
+                  Object type=Field key=174 LabelKey=0 name=field.newCustomerName bounds=224,24,248,344
+                    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+                      Field: GLOBAL::FILTER#1
+                  Object type=Button key=175 LabelKey=0 bounds=280,264,312,344
+                    Text flags=2 style=button.raised.primary: Save
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                      Step enable=True id=1 name="Perform Script"
+                        StepText: Perform Script [ “Add Customer From Estimate” ]
+                        DisableStepCollapsed state=False
+                        CurrentScript value=Pause
+                        Script id=531 name="Add Customer From Estimate"
+                  Object type=Button key=176 LabelKey=0 bounds=280,160,312,248
+                    Text flags=2 style=button.flat.secondary: Cancel
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                      Step enable=True id=169 name="Close Popover"
+                        StepText: Close Popover
+                        DisableStepCollapsed state=False
+                  Object type=Text key=177 LabelKey=0 bounds=200,25,224,149
+                    Text flags=2 style=text.form.field.label: Name
+                  Object type=Text key=178 LabelKey=0 bounds=158,24,183,276
+                    Text flags=2 style=text.form.section: "New Customer"
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Button key=179 LabelKey=0 flags=16388 bounds=104,280,128,312
+    ToolTip
+      Calculation:
+        | "go to Customer"
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=74 name="Go to Related Record"
+        StepText: Go to Related Record [ From table: “Estimate_Customer”; Using layout: “Customer | Desktop” (Customer) ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065232 name=Estimate_Customer
+        Layout id=100 name="Customer | Desktop"
+      Image name=a121_revert.svg
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Invoice::id_Customer )
+        refs: fn:IsEmpty, Invoice::id_Customer#7
+  Object type=SlideControl key=180 LabelKey=0 flags=1342177540 bounds=88,839,168,999
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+    SlideControlObj visPanelKey=181 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=181 LabelKey=0 flags=1342177280 bounds=88,839,168,999
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Text key=184 LabelKey=0 flags=4 bounds=136,839,160,999
+            Text flags=2 style=text.form.info.center: "Will be deleted on next sync."
+            HideCondition findMode=False
+              Calculation:
+                | not Estimate::deleted
+                refs: fn:not, Estimate::deleted#32
+          Object type=Button key=182 LabelKey=0 flags=16388 bounds=96,855,136,983
+            ToolTip
+              Calculation:
+                | "Flag this record as deleted to have it delete from QuickBooks on the next sync."
+            Text flags=2 style=button.raised.secondary: Delete
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Estimate::deleted; True ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | True
+                  refs: fn:True
+                Field table=Estimate id=32 name=deleted
+            HideCondition findMode=False
+              Calculation:
+                | Estimate::deleted
+                refs: Estimate::deleted#32
+          Object type=Button key=183 LabelKey=0 flags=4 bounds=96,855,136,983
+            Text flags=2 style=button.raised.primary: Restore
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Estimate::deleted; "" ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | ""
+                Field table=Estimate id=32 name=deleted
+            HideCondition findMode=False
+              Calculation:
+                | not Estimate::deleted
+                refs: fn:not, Estimate::deleted#32
+  Object type=SlideControl key=185 LabelKey=0 flags=1342177284 bounds=80,855,128,999
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+    SlideControlObj visPanelKey=186 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=186 LabelKey=0 flags=1342177280 bounds=80,855,128,999
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=187 LabelKey=0 bounds=96,876,120,948
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Estimate::deleted; True ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | True
+                  refs: fn:True
+                Field table=Estimate id=32 name=deleted
+              Image name=checkbox.svg
+          Object type=Button key=188 LabelKey=0 flags=260 bounds=96,876,120,948
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Estimate::deleted; "" ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | ""
+                Field table=Estimate id=32 name=deleted
+              Image name=checked.svg
+            HideCondition findMode=True
+              Calculation:
+                | Estimate::deleted ≠ 1
+                refs: Estimate::deleted#32
+          Object type=Text key=189 LabelKey=0 bounds=96,896,120,968
+            Text flags=6 style=text.form.info.left: Deleted
+  Object type=Field key=194 LabelKey=0 flags=-268435456 bounds=440,1050,464,1194
+    FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::id_TaxCode#31
+      ValueList: TaxCode Id Active#14
+  Object type=Button key=195 LabelKey=0 flags=-268419071 bounds=440,1218,464,1242
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Estimate::id_TaxCode )
+            refs: fn:IsEmpty, Estimate::id_TaxCode#31
+        Format: -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | "remove value"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Estimate::id_TaxCode; "" ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | ""
+        Field table=Estimate id=31 name=id_TaxCode
+      Image name=a32_smallXOutline.svg
+  Object type=Button key=196 LabelKey=0 flags=-268419072 bounds=440,1194,464,1218
+    ToolTip
+      Calculation:
+        | "edit list in QBO"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: "TaxCode" ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | "TaxCode"
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a72_editOutline.svg
+  Object type=Field key=197 LabelKey=0 flags=-268435456 bounds=440,1050,464,1194
+    FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::id_TaxCode#31
+      ValueList: TaxCode Id#13
+  Object type=Button key=205 LabelKey=0 flags=1342193925 bounds=0,928,40,1024
+    ConditionalFormatting
+      Item id=0 flags=1
+        Condition op=0
+          Calculation:
+            | Estimate::qbo_send
+            refs: Estimate::qbo_send#3
+        Format: -fm-underline: underline; -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | Case (
+        | 	IsEmpty (Estimate::qbo_id) ;
+        | 	"New record hasn't been sent to QBO yet." ;
+        | 
+        | 	Estimate::qbo_send ;
+        | 	"Record has been changed and needs to be sent to QBO."
+        | )
+        refs: fn:Case, fn:IsEmpty, Estimate::qbo_id#2, Estimate::qbo_send#3
+    Text flags=6 style=button.nav: Sync
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Sync QBO with FM, Show Progress Card” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=242 name="Sync QBO with FM, Show Progress Card"
+      Image name=a125_sync.svg
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+  Object type=Button key=206 LabelKey=0 flags=1342177540 bounds=0,784,40,928
+    Text flags=6 style=button.nav: "Open in QBO"
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "Estimate" ; JSONString];
+          | 	[ "QBOId" ;  Estimate::qbo_id; JSONString ]
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "Estimate" ; JSONString];
+          | 	[ "QBOId" ;  Estimate::qbo_id; JSONString ]
+          | )
+          refs: fn:JSONSetElement, fn:JSONString, Estimate::qbo_id#2
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a11_share.svg
+    HideCondition findMode=True
+      Calculation:
+        | IsEmpty ( Estimate::qbo_id )
+        | or
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:IsEmpty, Estimate::qbo_id#2, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=207 LabelKey=0 bounds=228,320,252,440
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::TxnStatus#52
+      ValueList: Estimate Status#24
+  Object type=Text key=208 LabelKey=0 bounds=204,320,228,440
+    Text flags=6 style=text.form.field.label: "Estimate status"
+  Object type=Field key=209 LabelKey=0 bounds=168,452,192,572
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::expirationDate#54
+  Object type=Text key=210 LabelKey=0 bounds=144,452,168,572
+    Text flags=6 style=text.form.field.label: "Expiration date"
+  Object type=Text key=212 LabelKey=0 flags=4 bounds=204,452,228,572
+    Text flags=6 style=text.form.field.label: "Accepted By"
+    HideCondition findMode=False
+      Calculation:
+        | not  ( Estimate::TxnStatus = "Accepted" ) 
+        | or 
+        | IsEmpty ( Estimate::TxnStatus )
+        refs: fn:not, Estimate::TxnStatus#52, fn:or, fn:IsEmpty
+  Object type=Field key=213 LabelKey=0 flags=4 bounds=228,632,252,752
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::acceptedDate#55
+    HideCondition findMode=False
+      Calculation:
+        | not  ( Estimate::TxnStatus = "Accepted" ) 
+        | or 
+        | IsEmpty ( Estimate::TxnStatus )
+        refs: fn:not, Estimate::TxnStatus#52, fn:or, fn:IsEmpty
+  Object type=Text key=214 LabelKey=0 flags=4 bounds=204,632,228,752
+    Text flags=6 style=text.form.field.label: "Accepted date"
+    HideCondition findMode=False
+      Calculation:
+        | not  ( Estimate::TxnStatus = "Accepted" ) 
+        | or 
+        | IsEmpty ( Estimate::TxnStatus )
+        refs: fn:not, Estimate::TxnStatus#52, fn:or, fn:IsEmpty
+  Object type=Field key=231 LabelKey=0 flags=4 bounds=228,452,252,622
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Estimate::AcceptedBy#57
+    HideCondition findMode=False
+      Calculation:
+        | not  ( Estimate::TxnStatus = "Accepted" ) 
+        | or 
+        | IsEmpty ( Estimate::TxnStatus )
+        refs: fn:not, Estimate::TxnStatus#52, fn:or, fn:IsEmpty
+  Object type=Text key=243 LabelKey=0 bounds=405,1063,422,1218
+    Text flags=2: "If not using AST"
+  Object type=GroupButton key=260 LabelKey=0 bounds=128,24,368,280
+    GroupButtonObj numOfObjs=16
+      Object type=Field key=244 LabelKey=0 bounds=200,24,224,152
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::billAddressCity#10
+          PlaceholderText findMode=True
+            Calculation:
+              | "City"
+      Object type=Field key=245 LabelKey=0 bounds=224,152,248,280
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::billAddressCountry#11
+          PlaceholderText findMode=True
+            Calculation:
+              | "Country"
+      Object type=Field key=246 LabelKey=0 bounds=152,24,176,256
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::billAddressLine1#8
+          PlaceholderText findMode=True
+            Calculation:
+              | "Street"
+      Object type=Field key=247 LabelKey=0 bounds=224,24,248,152
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::billAddressPostalCode#14
+          PlaceholderText findMode=True
+            Calculation:
+              | "ZIP"
+      Object type=Field key=248 LabelKey=0 bounds=200,152,224,280
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::billAddressState#15
+          PlaceholderText findMode=True
+            Calculation:
+              | "State"
+      Object type=Field key=249 LabelKey=0 bounds=176,24,200,280
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::billAddressLine2#9
+          PlaceholderText findMode=True
+            Calculation:
+              | "Street"
+      Object type=Text key=250 LabelKey=0 bounds=128,24,152,280
+        Text flags=6: "Billing address"
+      Object type=Button key=251 LabelKey=0 flags=1 bounds=152,256,176,280
+        ConditionalFormatting
+          Item id=0 flags=129
+            Condition op=0
+              Calculation:
+                | IsEmpty ( Estimate::billAddressLine1 )
+                | and IsEmpty ( Estimate::billAddressCity )
+                | and IsEmpty ( Estimate::billAddressState )
+                | and IsEmpty ( Estimate::billAddressPostalCode )
+                refs: fn:IsEmpty, Estimate::billAddressLine1#8, fn:and, Estimate::billAddressCity#10, Estimate::billAddressState#15, Estimate::billAddressPostalCode#14
+            Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=12 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText
+              | Perform Script [ “Open Map ( address )”; Parameter: List (
+              | 	Estimate::billAddressLine1 ;
+              | 	Estimate::billAddressLine2 ;
+              | 	Estimate::billAddressCity ;
+              | 	Estimate::billAddressState ;
+              | 	Estimate::billAddressPostalCode ;
+              | 	Estimate::billAddressCountry
+              | ) ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | List (
+              | 	Estimate::billAddressLine1 ;
+              | 	Estimate::billAddressLine2 ;
+              | 	Estimate::billAddressCity ;
+              | 	Estimate::billAddressState ;
+              | 	Estimate::billAddressPostalCode ;
+              | 	Estimate::billAddressCountry
+              | )
+              refs: fn:List, Estimate::billAddressLine1#8, Estimate::billAddressLine2#9, Estimate::billAddressCity#10, Estimate::billAddressState#15, Estimate::billAddressPostalCode#14, Estimate::billAddressCountry#11
+            Script id=500 name="Open Map ( address )"
+          Image name=a99_locationTriangle.svg
+      Object type=Field key=252 LabelKey=0 bounds=320,24,344,152
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::shipAddressCity#42
+          PlaceholderText findMode=True
+            Calculation:
+              | "City"
+      Object type=Field key=253 LabelKey=0 bounds=344,152,368,280
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::shipAddressCountry#43
+          PlaceholderText findMode=True
+            Calculation:
+              | "Country"
+      Object type=Field key=254 LabelKey=0 bounds=272,24,296,256
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::shipAddressLine1#44
+          PlaceholderText findMode=True
+            Calculation:
+              | "Street"
+      Object type=Field key=255 LabelKey=0 bounds=344,24,368,152
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::shipAddressPostalCode#46
+          PlaceholderText findMode=True
+            Calculation:
+              | "ZIP"
+      Object type=Field key=256 LabelKey=0 bounds=320,152,344,280
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::shipAddressState#47
+          PlaceholderText findMode=True
+            Calculation:
+              | "State"
+      Object type=Field key=257 LabelKey=0 bounds=296,24,320,280
+        FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: Estimate::shipAddressLine2#45
+          PlaceholderText findMode=True
+            Calculation:
+              | "Street"
+      Object type=Text key=258 LabelKey=0 bounds=248,24,272,280
+        Text flags=6: "Shipping address"
+      Object type=Button key=259 LabelKey=0 flags=1 bounds=272,256,296,280
+        ConditionalFormatting
+          Item id=0 flags=129
+            Condition op=0
+              Calculation:
+                | IsEmpty ( Estimate::billAddressLine1 )
+                | and IsEmpty ( Estimate::billAddressCity )
+                | and IsEmpty ( Estimate::billAddressState )
+                | and IsEmpty ( Estimate::billAddressPostalCode )
+                refs: fn:IsEmpty, Estimate::billAddressLine1#8, fn:and, Estimate::billAddressCity#10, Estimate::billAddressState#15, Estimate::billAddressPostalCode#14
+            Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=12 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText
+              | Perform Script [ “Open Map ( address )”; Parameter: List (
+              | 	Estimate::shipAddressLine1 ;
+              | 	Estimate::shipAddressLine2 ;
+              | 	Estimate::shipAddressCity ;
+              | 	Estimate::shipAddressState ;
+              | 	Estimate::shipAddressPostalCode ;
+              | 	Estimate::shipAddressCountry
+              | ) ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | List (
+              | 	Estimate::shipAddressLine1 ;
+              | 	Estimate::shipAddressLine2 ;
+              | 	Estimate::shipAddressCity ;
+              | 	Estimate::shipAddressState ;
+              | 	Estimate::shipAddressPostalCode ;
+              | 	Estimate::shipAddressCountry
+              | )
+              refs: fn:List, Estimate::shipAddressLine1#44, Estimate::shipAddressLine2#45, Estimate::shipAddressCity#42, Estimate::shipAddressState#47, Estimate::shipAddressPostalCode#46, Estimate::shipAddressCountry#43
+            Script id=500 name="Open Map ( address )"
+          Image name=a99_locationTriangle.svg
+  Object type=Field key=262 LabelKey=0 flags=-268435456 bounds=587,856,611,976
+    FieldObj numOfReps=1 flags=1081396 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.right
+      Field: Estimate::totalTax#30
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Field key=265 LabelKey=266 flags=-268435456 bounds=659,856,683,976
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=edit.view.right
+      Field: Estimate::totalAmt#25
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=266 LabelKey=0 flags=-268435456 bounds=659,744,683,848
+    Text flags=6 style=text.form.field.label.right: Total
+  Object type=Field key=267 LabelKey=268 flags=-268435452 bounds=587,856,611,976
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.right
+      Field: Estimate::totalTax#30
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+    HideCondition findMode=False
+      Calculation:
+        | EstimateItem::summaryTotalAmountTaxable = 0
+        refs: EstimateItem::summaryTotalAmountTaxable#13
+  Object type=Text key=268 LabelKey=0 flags=-268435456 bounds=562,624,586,848
+    Text flags=14 tableViewVisibility=0 style=text.form.field.label.right: "Taxable subtotal <<taxableSubtotal>>"
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      FieldList quickFind=False
+        Field table=Estimate id=34 name=taxableSubtotal
+  Object type=Field key=269 LabelKey=270 flags=-268435456 bounds=538,856,562,976
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.right
+      Field: Estimate::subtotal#33
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=270 LabelKey=0 flags=-268435456 bounds=538,712,562,848
+    Text flags=6 style=text.form.field.label.right: Subtotal
+  Object type=Text key=276 LabelKey=0 flags=-268435456 bounds=587,744,611,848
+    Text flags=6 style=text.form.field.label.right: "Total Tax"
+  Object type=Field key=277 LabelKey=0 flags=-268435456 bounds=622,856,646,976
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=edit.default.right
+      Field: Estimate::shipAmt#41
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=278 LabelKey=0 flags=-268435456 bounds=622,744,646,848
+    Text flags=6 style=text.form.field.label.right: Shipping
+  Object type=Field key=78 LabelKey=0 flags=-268435328 bounds=20,3270,37,3345
+    FieldObj numOfReps=1 flags=32768 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=2 quickFind=0 pictFormat=0 style=text.form.field.label.right
+      Field: Estimate::taxableSubtotal#34
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No

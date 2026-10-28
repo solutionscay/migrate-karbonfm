@@ -1,0 +1,199 @@
+# script 353: Delete Email Recipient
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=353]
+# steps: 49 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "Id" ; Activity_ActivityParty::Id ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Activity_ActivityParty::Id#23, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Delete ActivityParty { Id }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=638 name="Delete ActivityParty { Id }" in=karbon_kontroller.fmp12
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  11    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  12    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  13    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Exit Script [  ]
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $EmailAddress; Value:VirtualListRows::ActivityParty_EmailAddress ]
+        DisableStepCollapsed state=False
+        Value
+          refs: VirtualListRows::ActivityParty_EmailAddress#30
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailAddress
+  20    Set Variable [ $ActivityPartyRoleName; Value:VirtualListRows::ActivityParty_ActivityPartyRoleName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: VirtualListRows::ActivityParty_ActivityPartyRoleName#27
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyRoleName
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  23    Set Variable [ $end; Value:JSON.ArrayLength ( UtilityEmailMessage::ActivityPartyArray ; "" ) - 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength, UtilityEmailMessage::ActivityPartyArray#10
+        Name: $end
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $thisValue; Value:JSONGetElement ( UtilityEmailMessage::ActivityPartyArray ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, UtilityEmailMessage::ActivityPartyArray#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisValue
+  30    Set Variable [ $thisEmailAddress; Value:JSONGetElement ( $thisValue ; "EmailAddress" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisEmailAddress
+  31    Set Variable [ $thisActivityPartyRoleName; Value:JSONGetElement ( $thisValue ; "ActivityPartyRoleName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisActivityPartyRoleName
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    If [ $thisEmailAddress = $EmailAddress and $thisActivityPartyRoleName = $ActivityPartyRoleName ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and
+  34    Set Field [ UtilityEmailMessage::ActivityPartyArray; JSONDeleteElement ( UtilityEmailMessage::ActivityPartyArray ; $n ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONDeleteElement, UtilityEmailMessage::ActivityPartyArray#10
+        Field table=UtilityEmailMessage id=10 name=ActivityPartyArray
+  35    Set Variable [ $end; Value:$end - 1 ]
+        DisableStepCollapsed state=False
+        Name: $end
+  36    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  38    End If
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    End Loop
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Perform Script [ “Go to Remove Recipients Popover” ]
+        DisableStepCollapsed state=False
+        Script id=352 name="Go to Remove Recipients Popover"
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ UtilityEmailMessage::ActivityPartyArray = "[]" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: UtilityEmailMessage::ActivityPartyArray#10
+  45    Close Popover
+        DisableStepCollapsed state=False
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

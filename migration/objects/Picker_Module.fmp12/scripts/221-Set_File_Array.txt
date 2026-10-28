@@ -1,0 +1,104 @@
+# script 221: Set File Array
+# file: Picker Module.fmp12
+# folder: Modules / Schema
+# source: ScriptCatalog/Script[@id=221]
+# steps: 25 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=219 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $FileList; Value:DatabaseNames ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:DatabaseNames
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileList
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Turn into an array
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $FileListCount; Value:ValueCount ( $FileList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileListCount
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $FileArray; Value:"[]" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileArray
+   9    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  11    Exit Loop If [ $i > $FileListCount ]
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $FileObject; Value:JSONSetElement ( "" ; "FileName" ; GetValue ( $FileList ; $i ) ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:GetValue, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileObject
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $FileArray; Value:JSONSetElement ( $FileArray ; $i - 1 ; $FileObject ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Name: $FileArray
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    End Loop
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Field [ Picker::Schema_FileArray; $FileArray ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=31 name=Schema_FileArray
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Field [ VIRTUALLISTS::foundCount; JSON.ArrayLength ( $FileArray ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.ArrayLength
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Refresh Window
+        [ Flush cached join results ]
+        Option state=True
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False

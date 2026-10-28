@@ -1,0 +1,70 @@
+# table 146: GeneratorTokens
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=146]
+# fields: 9
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=GeneratorTokens:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=idGenerator
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=name
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=helpText
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Calculated name=displayToken
+  Calculation table=GeneratorTokens:
+    | "[[" & name & "]]"
+    refs: GeneratorTokens::name#3
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=example
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Calculated name=asJSON
+  Calculation table=GeneratorTokens:
+    | jsonO(
+    |   jsonOp("name" ; name  ) &
+    |   jsonOp("helpText" ; helpText  ) &
+    |   jsonOp("value" ; values  ) &
+    |   jsonOp("example" ; example )
+    | )
+    refs: cf:jsonO, cf:jsonOp, GeneratorTokens::name#3, GeneratorTokens::helpText#4, GeneratorTokens::values#9, GeneratorTokens::example#6
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=updateBatch
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=values
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

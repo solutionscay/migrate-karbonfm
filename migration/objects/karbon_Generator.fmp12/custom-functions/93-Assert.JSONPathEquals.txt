@@ -1,0 +1,37 @@
+# custom function 93: Assert.JSONPathEquals
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=93]
+
+CustomFunction id=93 functionArity=3 visible=True parameters=TEST_Result;path;expected name=Assert.JSONPathEquals
+  Calculation:
+    | Let(
+    | [
+    | 
+    | actual = JSONGetElement ( TEST_Result ;  path  )  ;
+    | 
+    | passed = (actual = expected) ;
+    | 
+    | 
+    | 
+    | $TEST_Assert =  If( IsEmpty($TEST_Assert) ; "should have a path "& Quote(path) &" that returns " & Quote(expected); $TEST_Assert );
+    | 
+    | testInfo = JSONSetElement("{}";
+    | 	["Type" ; "JSONPathEquals" ; JSONString];
+    | 	["Expected" ; expected ; JSONString ];
+    | 	["Actual" ; actual ; JSONString ];
+    | 	["Result" ; $TEST_Result ; ""]
+    | 
+    | )
+    | 
+    | 
+    | 
+    | 
+    | ];
+    | 
+    | 
+    | Assert._helper ( passed ; testinfo )
+    | 
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:If, fn:IsEmpty, fn:Quote, fn:JSONSetElement, fn:JSONString, cf:Assert._helper

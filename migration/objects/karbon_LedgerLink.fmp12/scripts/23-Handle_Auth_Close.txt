@@ -1,0 +1,151 @@
+# script 23: _Handle Auth Close
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO GI OAuth2  / Private
+# source: ScriptCatalog/Script[@id=23]
+# steps: 43 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=27 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Install OnTimer Script [ Interval: "" ]
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “_Get Auth Result” ]
+        DisableStepCollapsed state=False
+        Script id=69 name="_Get Auth Result"
+   9    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ PatternCount ( $result ; "Error:" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:PatternCount
+  12    Show Custom Dialog [ Title: "Unable to Connect"; Message: $result; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  13    Exit Script [  ]
+        DisableStepCollapsed state=False
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    If [ IsEmpty ( $result ) or $result = Quote("access_denied") ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:or, fn:Quote
+  22    Exit Script [  ]
+        DisableStepCollapsed state=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ not JSONGetElement ( $result ; "success" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:JSONGetElement
+  26    Show Custom Dialog [ Title: "Unable to Authenticate"; Message: JSONFormatElements( $result ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  27    Exit Script [  ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $companyID; Value:JSONGetElement ( $$jwt ; "companyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $companyID
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    If [ $companyID <> QBOConfig::CompanyID and not IsEmpty ( QBOConfig::CompanyID ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: QBOConfig::CompanyID#17, fn:and, fn:not, fn:IsEmpty
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    End If
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Perform Script [ “ApiKey Recieved”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=68 name="ApiKey Recieved"
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout

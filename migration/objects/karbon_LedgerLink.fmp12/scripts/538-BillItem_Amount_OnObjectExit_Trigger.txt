@@ -1,0 +1,149 @@
+# script 538: BillItem Amount OnObjectExit Trigger
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Bill Interface
+# source: ScriptCatalog/Script[@id=538]
+# steps: 37 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=511 groupCollapsed=True includeInMenu=False
+
+   1    #PURPOSE: provide the same auto-calculations as QBO interface
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #NOTE: attach to BillItem::amount field on the Bill Detail layout
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #PARAMETER : Line DetailType
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $detailType; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $detailType
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ $detailType = "ItemBasedExpenseType" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Field [ BillLine_ItemBasedExpenseType::amount; Round ( BillLine_ItemBasedExpenseType::amount ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, BillLine_ItemBasedExpenseType::amount#21
+        Field table=BillLine_ItemBasedExpenseType id=21 name=amount
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ not IsEmpty ( BillLine_ItemBasedExpenseType::unitPrice ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, BillLine_ItemBasedExpenseType::unitPrice#23
+  12    #unitPrice can have more precision (7 decimal places) than the amount field (2 decimal places)
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #adjust the unitPrice based on current amount ONLY if the amount would be different after rounding
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $qty; Value:If ( IsEmpty ( BillLine_ItemBasedExpenseType::qty ) ; 1 ; BillLine_ItemBasedExpenseType::qty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, BillLine_ItemBasedExpenseType::qty#22
+        Name: $qty
+  15    Set Variable [ $amount; Value:Round ( BillLine_ItemBasedExpenseType::unitPrice * $qty ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, BillLine_ItemBasedExpenseType::unitPrice#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $amount
+  16    If [ $amount ≠ BillLine_ItemBasedExpenseType::amount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: BillLine_ItemBasedExpenseType::amount#21
+  17    Set Variable [ $unitPrice; Value:Round ( BillLine_ItemBasedExpenseType::amount / $qty ; 7 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, BillLine_ItemBasedExpenseType::amount#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $unitPrice
+  18    Set Field [ BillLine_ItemBasedExpenseType::unitPrice; $unitPrice ]
+        DisableStepCollapsed state=False
+        Field table=BillLine_ItemBasedExpenseType id=23 name=unitPrice
+  19    End If
+        DisableStepCollapsed state=False
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Field [ BillLine_AccountBasedExpenseLineDetail::amount; Round ( BillLine_AccountBasedExpenseLineDetail::amount ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, BillLine_AccountBasedExpenseLineDetail::amount#21
+        Field table=BillLine_AccountBasedExpenseLineDetail id=21 name=amount
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ not IsEmpty ( BillLine_AccountBasedExpenseLineDetail::unitPrice ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::unitPrice#23
+  26    #unitPrice can have more precision (7 decimal places) than the amount field (2 decimal places)
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #adjust the unitPrice based on current amount ONLY if the amount would be different after rounding
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $qty; Value:If ( IsEmpty ( BillLine_AccountBasedExpenseLineDetail::qty ) ; 1 ; BillLine_AccountBasedExpenseLineDetail::qty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::qty#22
+        Name: $qty
+  29    Set Variable [ $amount; Value:Round ( BillLine_AccountBasedExpenseLineDetail::unitPrice * $qty ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, BillLine_AccountBasedExpenseLineDetail::unitPrice#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $amount
+  30    If [ $amount ≠ BillLine_AccountBasedExpenseLineDetail::amount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: BillLine_AccountBasedExpenseLineDetail::amount#21
+  31    Set Variable [ $unitPrice; Value:Round ( BillLine_AccountBasedExpenseLineDetail::amount / $qty ; 7 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, BillLine_AccountBasedExpenseLineDetail::amount#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $unitPrice
+  32    Set Field [ BillLine_ItemBasedExpenseType::unitPrice; $unitPrice ]
+        DisableStepCollapsed state=False
+        Field table=BillLine_ItemBasedExpenseType id=23 name=unitPrice
+  33    End If
+        DisableStepCollapsed state=False
+  34    End If
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    End If
+        DisableStepCollapsed state=False

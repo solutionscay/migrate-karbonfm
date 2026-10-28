@@ -1,0 +1,99 @@
+# script 505: ?Toggle Send on all Entities
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices
+# source: ScriptCatalog/Script[@id=505]
+# steps: 17 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=469 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ /* table occurrence name */
+        GetValue (
+        	Substitute (
+        		GetFieldName (QBO::z_xJoin ) ;
+        		[ "::" ; "¶" ] 
+        	) ;
+        	1
+        )
+        = Get ( LayoutTableName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:GetValue, fn:Substitute, fn:GetFieldName, QBO::z_xJoin#12, fn:Get, fn:LayoutTableName
+   5    Set Variable [ $sum; Value:Sum ( QBOEntity::send ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Sum, QBOEntity::send#11
+        Repetition
+          Calculation:
+            | 1
+        Name: $sum
+   6    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $sum; Value:/*ExecuteSQL (
+        	"SELECT SUM(" & SQLGetFieldName ( QBOEntity::send ) & ")"
+        		& " FROM " & SQLGetTableName ( QBOEntity::send )
+        	;
+        	"" ;
+        	""
+        )*/ ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $sum
+   8    End If
+        DisableStepCollapsed state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $newValue; Value:If ( $sum ;
+        	/* at lease one record is selected, deselect all */
+        	False ;
+        
+        	/* else: nothing selected, select all */
+        	True
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:False, fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $newValue
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Replace Field Contents [ QBOEntity::send; Replace with calculation: $newValue ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=False
+        With value=Calculation
+        SerialNumbers PerformAutoEnter=False UpdateEntryOptions=False UseEntryOptions=True
+        Field table=QBOEntity id=11 name=send
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Script [  ]
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False

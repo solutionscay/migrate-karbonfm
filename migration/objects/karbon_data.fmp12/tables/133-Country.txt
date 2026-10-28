@@ -1,0 +1,93 @@
+# table 133: Country
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=133]
+# fields: 11
+# records: 179
+
+Field id=7 dataType=Text fieldType=Normal name=Country
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=PhoneCode
+  Comment: For international phone dialing
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=Idd
+  Comment
+    | The IDD prefix is the international prefix needed to dial a call FROM the country listed TO another country. This is followed by the country code for the country you are calling (see above). The IDD situation in many countries has been changing regularly.  Some countries have multiple IDDs, with each one used by a different long-distance carrier.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=Ndd
+  Comment
+    | The NDD prefix is the access code used to make a call WITHIN that country from one city to another (when calling another city in the same vicinity, this may not be necessary).  The NDD is followed by the city/area code for the place you are calling (city/area codes, where applicable)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Country:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=Country:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Country (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=Country:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Country:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Normal name=Id
+  AutoEnter allowEditing=True
+    Serial increment=1 nextValue=1 generate=OnCreation
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Normal name=ISOCode
+  Comment: The officially assigned alpha-2 (i.e., two-character) ISO code elements. See https://en.wikipedia.org/wiki/ISO_3166-1
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

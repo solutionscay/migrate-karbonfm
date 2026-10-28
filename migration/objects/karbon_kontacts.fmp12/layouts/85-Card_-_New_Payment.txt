@@ -1,0 +1,252 @@
+# layout 85: Card - New Payment
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Invoices
+# source: LayoutCatalog/Layout[@id=85]
+# objects: 56
+# theme: Karbon-1.0
+# folder group: id=66 groupCollapsed=False includeInMenu=False
+
+Layout width=701 quickFind=True includeInMenu=False id=85 name="Card - New Payment"
+  Table id=1065182 name=Payment
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnRecordCommit id=104 triggerFlags=1(browse)
+      Script id=278 name="Block Payment Commit"
+      TriggerText: "Block Payment Commit"
+  Object type=Rect key=1 LabelKey=0 bounds=280,15,304,685
+  Object type=Button key=2 LabelKey=0 bounds=540,520,572,681
+    Text flags=2 style=Button-SuccessPill: OK
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn Save Payment” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=283 name="btn Save Payment"
+  Object type=Button key=3 LabelKey=0 bounds=542,15,574,110
+    Text flags=2 style=Button-Muted: Cancel
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn Cancel Payment” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=279 name="btn Cancel Payment"
+  Object type=Text key=4 LabelKey=0 flags=-1073741824 bounds=500,730,517,773
+    Text: expand
+  Object type=Text key=5 LabelKey=0 bounds=0,15,38,685
+    Text flags=10 tableViewVisibility=0: "Payment From <<Payment_Customer::DisplayName>>"
+      FieldList quickFind=True
+        Field table=Payment_Customer id=27 name=DisplayName
+  Object type=Field key=6 LabelKey=7 bounds=131,15,155,139
+    FieldObj numOfReps=1 flags=525344 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Calendar-Medium
+      Field: Payment::date#3
+  Object type=Text key=7 LabelKey=0 bounds=110,15,131,45
+    Text flags=2 style=Label-Small-Left: Date
+  Object type=Field key=8 LabelKey=9 bounds=131,236,154,360
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Payment::amount#4
+      Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=9 LabelKey=0 bounds=110,236,131,315
+    Text flags=2 style=Label-Small-Left: Amount
+  Object type=Field key=10 LabelKey=11 bounds=186,236,210,466
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Payment::PaymentRefNum#7
+  Object type=Text key=11 LabelKey=0 bounds=163,236,188,341
+    Text flags=2 style=Label-Small-Left: "Reference Number"
+  Object type=Text key=12 LabelKey=0 bounds=163,474,188,569
+    Text flags=2 style=Label-Small-Left: "Deposit Account"
+  Object type=Field key=13 LabelKey=0 bounds=186,15,210,226
+    FieldObj numOfReps=1 flags=40 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Pop-up Medium Vertical Center"
+      Field: Payment::id_PaymentMethod#14
+      ValueList: PaymentMethods Id#13
+  Object type=Text key=14 LabelKey=0 bounds=163,15,189,113
+    Text flags=2 style=Label-Small-Left: "Payment Method"
+  Object type=Text key=15 LabelKey=0 bounds=281,483,302,562
+    Text flags=2 style=Label-Small: Balance
+  Object type=ButtonBar key=16 LabelKey=0 bounds=240,437,278,685
+    ButtonBarObj segmentKey=0
+      Object type=PopoverButton key=17 LabelKey=0 bounds=240,437,278,685
+        Text flags=2
+        PopoverButtonObj buttonFlags=2 key=18 iconSize=14 displayType=4
+          Image name=a15_smallAdd.svg
+          Object type=Popover key=18 LabelKey=0 bounds=289,339,502,784
+            TitleCalc
+              Calculation:
+                | "Popover"
+            PopoverObj flags=2 position=1 key=17
+              Object type=Rect key=19 LabelKey=0 bounds=296,345,321,778
+              Object type=ButtonBar key=20 LabelKey=0 bounds=467,421,468,422
+                ButtonBarObj segmentKey=0
+                  Object type=Button key=21 LabelKey=0 bounds=467,421,468,422
+                    Text flags=2
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                  Object type=Button key=22 LabelKey=0 bounds=467,421,468,422
+                    Text flags=2
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                  Object type=Button key=23 LabelKey=0 bounds=467,422,468,423
+                    Text flags=2
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Object type=Portal key=24 LabelKey=0 bounds=321,345,497,778
+                PortalObj portalFlags=145 numOfRows=6 initialRow=1
+                  TableAliasKey: Payment_Customer_OpenInvoices
+                  FieldList
+                    Field table=Payment_Customer_OpenInvoices id=4 name=docNumber
+                    Field table=Payment_Customer_OpenInvoices id=5 name=date
+                    Field table=Payment_Customer_OpenInvoices id=26 name=balance
+                    Field table=Payment_Customer_OpenInvoices id=25 name=totalAmt
+                  FilterCalc enable=True
+                    Calculation:
+                      | // show if the open invoice hasn't already been added to the payment
+                      | ListIncludes ( 
+                      | 	List ( Payment_PaymentLine::id_Invoice ) ; 
+                      | 	Payment_Customer_OpenInvoices::id
+                      | ) = False
+                      | 
+                      | and 
+                      | 
+                      | IsEmpty( 
+                      | 
+                      |   FilterValues ( Payment_Customer_OpenInvoices::id ; Payment::IncludedInvoiceIDs )
+                      | 
+                      | )
+                      refs: cf:ListIncludes, fn:List, Payment_PaymentLine::id_Invoice#7, Payment_Customer_OpenInvoices::id#1, fn:False, fn:and, fn:IsEmpty, fn:FilterValues, Payment::IncludedInvoiceIDs#21
+                  Object type=Field key=25 LabelKey=0 bounds=326,378,347,473
+                    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                      Field: Payment_Customer_OpenInvoices::docNumber#4
+                  Object type=Field key=26 LabelKey=0 bounds=326,486,347,581
+                    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                      Field: Payment_Customer_OpenInvoices::date#5
+                  Object type=Field key=27 LabelKey=0 bounds=326,663,347,756
+                    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                      Field: Payment_Customer_OpenInvoices::balance#26
+                  Object type=Field key=28 LabelKey=0 bounds=326,581,347,663
+                    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                      Field: Payment_Customer_OpenInvoices::totalAmt#25
+                  Object type=Button key=29 LabelKey=0 bounds=323,345,349,759
+                    Text flags=2
+                    ButtonObj buttonFlags=0 iconSize=17 displayType=1
+                      Step enable=True id=1 name="Perform Script"
+                        StepText: Perform Script [ “btn: Choose Open Invoice” ]
+                        DisableStepCollapsed state=False
+                        CurrentScript value=Pause
+                        Script id=280 name="btn: Choose Open Invoice"
+                      Image name=a39_rightArrow.svg
+              Object type=Text key=30 LabelKey=0 bounds=299,378,319,471
+                Text flags=2 style=Label-Small-Left: "Invoice #"
+              Object type=Text key=31 LabelKey=0 bounds=299,486,319,557
+                Text flags=2 style=Label-Small-Left: Date
+              Object type=Text key=32 LabelKey=0 bounds=299,596,319,663
+                Text flags=2 style=Label-Small: Original
+              Object type=Text key=33 LabelKey=0 bounds=299,656,319,756
+                Text flags=2 style=Label-Small: "Balance Due"
+        LabelCalc
+          Calculation:
+            | "Add An Invoice To Payment"
+  Object type=Text key=34 LabelKey=0 bounds=280,15,297,22
+  Object type=Text key=35 LabelKey=0 bounds=281,398,302,474
+    Text flags=2 style=Label-Small: Original
+  Object type=Text key=36 LabelKey=0 bounds=281,24,302,90
+    Text flags=2 style=Label-Small-Left: Invoice
+  Object type=Text key=37 LabelKey=0 bounds=281,156,302,232
+    Text flags=2 style=Label-Small-Left: Date
+  Object type=Text key=38 LabelKey=0 bounds=460,420,480,531
+    Text flags=2 style=Label-Small: Total
+  Object type=Text key=39 LabelKey=0 bounds=481,350,501,531
+    Text flags=2 style=Label-Small: "Amount To Be Credited"
+  Object type=Portal key=40 LabelKey=0 name=PaymentLines bounds=304,15,451,685
+    PortalObj portalFlags=17 numOfRows=5 initialRow=1
+      TableAliasKey: Payment_PaymentLine
+      FieldList
+        Field table=Payment_PaymentLine_Invoice id=25 name=totalAmt
+        Field table=Payment_PaymentLine id=18 name=TransactionDocNumber
+        Field table=Payment_PaymentLine id=17 name=TransactionDate
+        Field table=Payment_PaymentLine id=4 name=amount
+        Field table=Payment_PaymentLine_Invoice id=26 name=balance
+      FilterCalc enable=False
+        Calculation:
+          | False
+          refs: fn:False
+      Object type=Field key=41 LabelKey=0 flags=4 bounds=309,395,330,474
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+          Field: Payment_PaymentLine_Invoice::totalAmt#25
+          Display: number flags=2564 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( Payment_PaymentLine::id )
+            refs: fn:IsEmpty, Payment_PaymentLine::id#1
+      Object type=Field key=42 LabelKey=0 flags=4 bounds=309,18,330,142
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+          Field: Payment_PaymentLine::TransactionDocNumber#18
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( Payment_PaymentLine::id )
+            refs: fn:IsEmpty, Payment_PaymentLine::id#1
+      Object type=Field key=43 LabelKey=0 flags=4 bounds=309,156,330,280
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+          Field: Payment_PaymentLine::TransactionDate#17
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( Payment_PaymentLine::id )
+            refs: fn:IsEmpty, Payment_PaymentLine::id#1
+      Object type=Field key=44 LabelKey=47 flags=4 bounds=308,579,331,661
+        FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small
+          Field: Payment_PaymentLine::amount#4
+          Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( Payment_PaymentLine::id )
+            refs: fn:IsEmpty, Payment_PaymentLine::id#1
+      Object type=Field key=45 LabelKey=15 flags=4 bounds=309,483,330,565
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+          Field: Payment_PaymentLine_Invoice::balance#26
+          Display: number flags=2564 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( Payment_PaymentLine::id )
+            refs: fn:IsEmpty, Payment_PaymentLine::id#1
+  Object type=Field key=46 LabelKey=0 bounds=186,474,210,685
+    FieldObj numOfReps=1 flags=40 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Pop-up Medium Vertical Center"
+      Field: Payment::id_DepositAccount#5
+      ValueList: LL Accounts Bank Id#18
+  Object type=Text key=47 LabelKey=0 bounds=280,593,301,661
+    Text flags=2 style=Label-Small: Amount
+  Object type=Text key=50 LabelKey=0 bounds=240,18,271,196
+    Text flags=2 style=Label-Large-Left: "Allocate Payment"
+  Object type=Text key=51 LabelKey=0 bounds=474,785,491,792
+    Text flags=2
+  Object type=Text key=52 LabelKey=0 bounds=80,15,110,200
+    Text flags=2 style=H2-Primary: Payment
+  Object type=Field key=53 LabelKey=54 bounds=50,840,71,919
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Payment::id_Customer#2
+  Object type=Text key=54 LabelKey=0 bounds=51,740,70,828
+    Text: id_Customer
+  Object type=ButtonBar key=70 LabelKey=0 style=BB-TextObject-Small bounds=460,540,480,660
+    ButtonBarObj segmentKey=0
+      Object type=Button key=71 LabelKey=0 bounds=460,540,480,660
+        Text flags=2 style=BB-TextObject-Small
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | Let ( [ 
+            | 	paymentAmountList = List ( Payment_PaymentLine::amount ) ; 
+            | 	paymentAmountExpression = Substitute ( paymentAmountList ; ¶ ; "+" ) ;
+            | 	paymentTotal = GetAsNumber ( Evaluate ( paymentAmountExpression ) )
+            | ]; 
+            | 	AddDollarFormat (  ( paymentTotal ) )
+            | )
+            refs: fn:Let, fn:List, Payment_PaymentLine::amount#4, fn:Substitute, fn:GetAsNumber, fn:Evaluate, cf:AddDollarFormat
+  Object type=ButtonBar key=72 LabelKey=0 style=BB-TextObject-Small bounds=481,540,501,660
+    ButtonBarObj segmentKey=0
+      Object type=Button key=73 LabelKey=0 bounds=481,540,501,660
+        Text flags=2 style=BB-TextObject-Small
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | Let ( [ 
+            | 	paymentAmountList = List ( Payment_PaymentLine::amount ) ; 
+            | 	paymentAmountExpression = Substitute ( paymentAmountList ; ¶ ; "+" ) 
+            | ]; 
+            | 	AddDollarFormat ( Evaluate ( paymentAmountExpression )  - Payment::amount )
+            | )
+            refs: fn:Let, fn:List, Payment_PaymentLine::amount#4, fn:Substitute, cf:AddDollarFormat, fn:Evaluate, Payment::amount#4

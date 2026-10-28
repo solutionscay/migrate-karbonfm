@@ -1,0 +1,48 @@
+# script 636: btn: Download and Open File from Opportunity
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Opportunity
+# source: ScriptCatalog/Script[@id=636]
+# steps: 8 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=601 groupCollapsed=True includeInMenu=False
+
+   1    Set Variable [ $filename; Value:Get ( ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $filename
+   2    Set Variable [ $dir; Value:Get ( TemporaryPath) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:TemporaryPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $dir
+   3    Set Variable [ $path; Value:$dir & $filename ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Export Field Contents [ Opportunity_FileAttachment_File::Container; “$path”; Automatically open; Create folders:No ]
+        CreateDirectories state=False
+        DisableStepCollapsed state=False
+        AutoOpen state=True
+        CreateEmail state=False
+        UniversalPathList: $path
+        Field table=Opportunity_FileAttachment_File id=17 name=Container
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Exit Script [  ]
+        DisableStepCollapsed state=False

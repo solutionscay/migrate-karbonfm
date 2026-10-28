@@ -1,0 +1,29 @@
+# custom function 1: Error
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=1]
+
+CustomFunction id=1 functionArity=3 visible=True parameters=errorCode;descriptor;data name=Error
+  Calculation:
+    | Let ( 
+    | [
+    | e = errorCode;
+    | e = If( IsEmpty ( e ) ; 0 ; GetAsNumber(e) );
+    | 
+    | base = JSONSetElement ( "" ; "errorCode" ; e ; JSONNumber ) ;
+    | 
+    | basePlusMessage = If ( e >= -1 ; JSONSetElement ( base ; "errorMessage"; Error.Description(e) ; JSONString) ; base )
+    | ] ;
+    | 
+    | Case(
+    |    not e ; base ;
+    |    JSONSetElement( basePlusMessage ; 
+    | 		["scriptName" ; Get(ScriptName) ; JSONString];
+    | 		["type" ; "FM" ; JSONString] ;
+    | 		["descriptor" ; descriptor ; JSONString] ;
+    | 		["data" ; data ; JSONObject] 
+    |     )
+    | 
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:If, fn:IsEmpty, fn:GetAsNumber, fn:JSONSetElement, fn:JSONNumber, cf:Error.Description, fn:JSONString, fn:Case, fn:not, fn:Get, fn:ScriptName, fn:JSONObject

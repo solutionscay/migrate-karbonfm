@@ -1,0 +1,48 @@
+# custom function 54: SQL.GetRecordsAsJSON
+# file: Picker Module.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=54]
+
+CustomFunction id=54 functionArity=2 visible=True parameters=whereField;whereValue name=SQL.GetRecordsAsJSON
+  Calculation:
+    | /**
+    |  *
+    |  * Searches the Table specified by the WhereField and retuns a JSON Array
+    |  * uses SQL for the search and a field called AsJSON as the json object for the record
+    |  *
+    |  * @param {fieldReferece} whereField the field to search using a SQL "="
+    |  * @param {fieldReferece} whereValue the value to searhc for
+    |  *
+    |  * @return {array}
+    |  *
+    |  * @module fm-sql-cfs
+    |  * @see https://github.com/karbonfm/fm-sql-cfs
+    |  * 
+    |  * @history  2017-11-17, todd@geistinteractive.com
+    |  *
+    |  */
+    | 
+    | 
+    | Let(
+    | [
+    | 
+    | sql = List(
+    | "SELECT ''|| " & SQL.GetTableName ( whereField ) & ".\"AsJSON\"" ;
+    | "FROM " & SQL.GetTableName ( whereField ) ;
+    | "WHERE " & SQL.GetFieldName ( whereField ) & "=?" 
+    | );
+    | result = ExecuteSQL (
+    | 
+    | sql ; 
+    | 
+    | "" ;"," ; whereValue
+    | 
+    | )
+    | 
+    | 
+    | ];
+    | 
+    | "[" & result & "]"
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:List, cf:SQL.GetTableName, cf:SQL.GetFieldName, fn:ExecuteSQL

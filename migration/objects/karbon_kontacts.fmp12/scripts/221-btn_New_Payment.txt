@@ -1,0 +1,85 @@
+# script 221: btn: New Payment
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Payments Interface / Private
+# source: ScriptCatalog/Script[@id=221]
+# steps: 16 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=568 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $customerID; Value:SalesTransaction::id_Customer ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::id_Customer#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $customerID
+   3    If [ IsEmpty ( $customerID ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   4    Show Custom Dialog [ Title: "Invoice Requires a Customer"; Message: "You can't add a Payment to a invoice that doesn't have a customer."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   5    Exit Script [  ]
+        DisableStepCollapsed state=False
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $invoiceId; Value:Invoice::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Invoice::Id#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $invoiceId
+  10    Set Variable [ $balance; Value:SalesTransaction::balance ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::balance#26
+        Repetition
+          Calculation:
+            | 1
+        Name: $balance
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "customerId" ; $customerId ; JSONString ];
+        	[ "invoiceId" ; $invoiceId ; JSONString ];
+        	[ "balance" ; $balance ; JSONNumber ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  14    Perform Script [ “New Payment API{ params}”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=276 name="New Payment API{ params}"
+  15    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False

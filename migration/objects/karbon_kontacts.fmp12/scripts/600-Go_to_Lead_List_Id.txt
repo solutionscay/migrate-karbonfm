@@ -1,0 +1,84 @@
+# script 600: Go to Lead List { Id }
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Navigation
+# source: ScriptCatalog/Script[@id=600]
+# steps: 21 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=498 groupCollapsed=True includeInMenu=False
+
+   1    #Parameters are optional
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   3    If [ JSON.IsValid ( $parameters ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.IsValid
+   4    Set Variable [ $Id; Value:JSONGetElement ( Get ( ScriptParameter ) ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Go to Layout [ “Opportunities” (Opportunity) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=153 name=Opportunities
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ not IsEmpty ( $Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  11    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  12    Set Field [ Party_PartyRole_Lead::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=Party_PartyRole_Lead id=1 name=Id
+  13    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  14    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  16    Show All Records
+        DisableStepCollapsed state=False
+  17    Show Custom Dialog [ Title: "Error"; Message: "The lead could not be found."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  18    End If
+        DisableStepCollapsed state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

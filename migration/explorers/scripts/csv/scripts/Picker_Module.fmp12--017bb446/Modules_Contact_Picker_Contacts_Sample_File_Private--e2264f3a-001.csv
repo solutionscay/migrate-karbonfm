@@ -1,0 +1,45 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+Picker_Module.fmp12/scripts/69-Find_Contacts.txt,dd701e1cdc8514c0db2b1e5d6d6f5edc59c7f6348a87bd01f906610f4738f710,scripts,Picker Module.fmp12,69,Find Contacts,find-query,server-query,tier2,"Contact picker search: guards against double execution with $$disableScriptTriggers, then on the Party table does a quick find on the search text (or shows all records when empty), narrows to organizations only or people only when the picker setting says so, narrows to the allowed party role subtypes (Vendor, Customer, Employee, OR-ed requests), then picks the result layout, sorts, sets a footer message in Picker::Settings, updates the ""Found N records (of M)"" status and selects the first record.","Picker::Search_Field#1 (Perform Quick Find step 37)
+Picker::Settings#4 (partySubtypes, partyRoleSubtypes)
+Picker::Settings_OrganizationsOnly#11
+Picker::Settings_PeopleOnly#16
+Party::OrganizationInd#18 (find criterion step 47)
+Party::OrganizationInd#18 (find criterion step 49)
+PartyRole::VendorInd#44 (find criterion step 67)
+PartyRole::CustomerInd#42 (find criterion step 70)
+PartyRole::EmployeeInd#43 (find criterion step 73)","Picker::Settings#4 (Set Field step 88, global: adds footerMessage to the JSON)","Picker_Module.fmp12/scripts/95 ""Init Field References"" (step 18)
+Picker_Module.fmp12/scripts/79 ""Go To Correct Layout"" (step 25)
+Picker_Module.fmp12/scripts/79 ""Go To Correct Layout"" (step 83)
+Picker_Module.fmp12/scripts/73 ""Sort Results"" (step 86)
+Picker_Module.fmp12/scripts/93 ""Go to Picker Button"" (step 98)","objects/Picker_Module.fmp12/layouts/1-Contact_Picker_-_No_Results_With_Selection.txt
+objects/Picker_Module.fmp12/layouts/13-Contact_Picker_-_No_Results_No_Selection.txt
+objects/Picker_Module.fmp12/layouts/15-Contact_Picker_-_Results_No_Selection.txt
+objects/Picker_Module.fmp12/layouts/14-Contact_Picker_-_Results_With_Selection.txt
+objects/Picker_Module.fmp12/scripts/67-Show_Contact_Picker_top_left_allowMultiple.txt",none,"Step 49 (the ""PeopleOnly"" branch) sets Party::OrganizationInd = 1, the same as the organizations-only branch, so people-only does not exclude organizations (likely a bug; the find criterion should differ). When neither OrganizationsOnly nor PeopleOnly is set, steps 45-51 enter find mode, set nothing and constrain, which may leave an empty request. The party-subtype test at step 44 runs only if partySubtypes is non-empty. Step 37 Perform Quick Find uses the quick-find fields of layout ""Contact Configuration"" (Party), set by the layout, not in this script. Set Error Capture is turned off at step 82 and not restored. $$ session variables (disableScriptTriggers, FirstFindHasBeenPerformed, PickerSearchStatus) carry state."
+Picker_Module.fmp12/scripts/71-Select_Party.txt,29c688758ce68db4a73488a6e4720872b79242aced8a5b79a5475c297ced00c3,scripts,Picker Module.fmp12,71,Select Party,data-change,client-ui,tier3,"Toggles the selected contact in the picker result: builds {Id, Name, CustomerId, VendorId, EmployeeId} for the current record (Id and Name come from the kContactID / kContactName custom functions, which point to the contacts table key), adds or removes it in the list kept in Picker::Results, updates the picked count, then for multi-select refreshes the layout and window title (""N Contacts Selected"") or for single select closes the picker window.","Customer::Id#1
+Vendor::Id#7
+Employee::Id#6
+Picker::Results#2
+Picker::Settings_AllowMultipleSelectionsInd#6
+by name: kContactID and kContactName custom functions (the primary key and display name of the contacts table)","Picker::Results#2 (Set Field step 20, global)
+VIRTUALLISTS::foundCount#1 (Set Field step 22, global)","Picker_Module.fmp12/scripts/79 ""Go To Correct Layout"" (step 27)
+Picker_Module.fmp12/scripts/93 ""Go to Picker Button"" (step 28)","objects/Picker_Module.fmp12/layouts/15-Contact_Picker_-_Results_No_Selection.txt
+objects/Picker_Module.fmp12/layouts/14-Contact_Picker_-_Results_With_Selection.txt
+objects/Picker_Module.fmp12/scripts/70-Handle_Keystroke_on_Picker_Row.txt
+objects/Picker_Module.fmp12/scripts/67-Show_Contact_Picker_top_left_allowMultiple.txt",none,"The sample result at step 6 is disabled. The result key ""CreateRecord"" (step 20) differs from the ""CreateParty"" key used by script 72 and in the sample, so a caller reading the result must handle both. Whether kContactID/kContactName are defined in the Picker file or by the host solution is in the custom-functions explorer."
+Picker_Module.fmp12/scripts/72-Create_Contact.txt,d8079167063274888421b6d97fdd1d4906862b4db6848a1fbfa4f163d14db262,scripts,Picker Module.fmp12,72,Create Contact,data-change,client-ui,tier3,"Picker button handler for ""create a new contact"": writes {Result: {CreateParty: true}} into Picker::Results and closes the picker window so the calling solution creates the party itself.",none,"Picker::Results#2 (Set Field step 11, global)",none,"objects/Picker_Module.fmp12/layouts/13-Contact_Picker_-_No_Results_No_Selection.txt
+objects/Picker_Module.fmp12/layouts/15-Contact_Picker_-_Results_No_Selection.txt",none,No create happens here; the caller reads Picker::Results.CreateParty and does the create.
+Picker_Module.fmp12/scripts/73-Sort_Results.txt,288f37aa043cd7265c553d3de6cc02f10f3dd4d24785db50df5fcb9f8adbf6cd,scripts,Picker Module.fmp12,73,Sort Results,utility,client-ui,tier3,Sorts the picker result found set ascending by Party::NameCached and returns to the first record.,"Party::NameCached#19 (sort key step 6, ascending)",none,none,objects/Picker_Module.fmp12/scripts/69-Find_Contacts.txt,none,"Sort is applied only when the found count is not zero; callers in this share: ""Find Contacts"" step 86."
+Picker_Module.fmp12/scripts/79-Go_To_Correct_Layout.txt,8ada978a2eec5740c93239a1758f01df2eabfdc6b3ea1ce1da8868ac7c11726b,scripts,Picker Module.fmp12,79,Go To Correct Layout,navigation,client-ui,tier3,"Chooses the picker layout from the state: with no records found goes to ""Contact Picker - No Results With/No Selection"" (by whether Result.CountPicked is set) and focuses the search field; with records goes to the related Party layout ""Results With Selection"" or ""Results No Selection"", resizes the window to height 565 and refreshes it.",Picker::Results#2 (Result.CountPicked),none,"Picker_Module.fmp12/scripts/98 ""Go to Search Field"" (step 16)","objects/Picker_Module.fmp12/scripts/69-Find_Contacts.txt
+objects/Picker_Module.fmp12/scripts/103-Select_Project.txt
+objects/Picker_Module.fmp12/scripts/71-Select_Party.txt
+objects/Picker_Module.fmp12/scripts/89-Deselect_Party_From_Popover.txt",none,Step 15 (Adjust Window Resize to Fit) is disabled.
+Picker_Module.fmp12/scripts/89-Deselect_Party_From_Popover.txt,1c7ad6353b6065809404078a80719a3e330487bd73b28b6a684065289c30a994,scripts,Picker Module.fmp12,89,Deselect Party From Popover,data-change,client-ui,tier3,"Removes the contact at the active portal row from the picked-contacts JSON in Picker::Results, decrements Result.CountPicked and the virtual list count, and goes back to the matching layout when no contact remains picked.",Picker::Results#2,"Picker::Results#2 (Set Field step 5, global)
+VIRTUALLISTS::foundCount#1 (Set Field step 9, global)
+Picker::Results#2 (Set Field step 10, global)","Picker_Module.fmp12/scripts/79 ""Go To Correct Layout"" (step 15)","objects/Picker_Module.fmp12/layouts/1-Contact_Picker_-_No_Results_With_Selection.txt
+objects/Picker_Module.fmp12/layouts/14-Contact_Picker_-_Results_With_Selection.txt",none,"Uses Get(ActivePortalRowNumber)-1 as the array index, so it depends on the portal order equal to the PartyArray order."
+Picker_Module.fmp12/scripts/95-Init_Field_References.txt,b5ec247bf44c160095783baf1b64738f7277e1ea01799bc8ddffd610626b331a,scripts,Picker Module.fmp12,95,Init Field References,session-setup,client-ui,tier3,"One-time picker setup: if not yet initialised, goes to the ""Contact Configuration"" layout (Party), shows all records, reads the field names behind the layout objects ""kContactID"" and ""kContactName"" with Evaluate(Get(ActiveFieldName)) into $$PickerContactIDReference and $$PickerContactNameReference, returns to the Splash layout and sets $$PickerConfigInitialized.","by name: the field placed on layout object ""kContactID"" (Evaluate(Get(ActiveFieldName)) step 13)
+by name: the field placed on layout object ""kContactName"" (Evaluate(Get(ActiveFieldName)) step 16)",none,none,"objects/Picker_Module.fmp12/scripts/69-Find_Contacts.txt
+objects/Picker_Module.fmp12/scripts/29-OnFirstWindowOpen.txt
+objects/Picker_Module.fmp12/scripts/67-Show_Contact_Picker_top_left_allowMultiple.txt
+objects/Picker_Module.fmp12/scripts/128-Show_Address_Picker_top_left_allowMultiple.txt (dead code, disabled step 45)",none,"The picker is wired to the host solution's contact primary key and display name through two layout objects on ""Contact Configuration""; the target needs an explicit configuration for these two fields. Script is in the Scripts menu (includeInMenu=True)."

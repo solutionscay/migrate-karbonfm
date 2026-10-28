@@ -1,0 +1,815 @@
+# layout 124: Card - UtilityParty
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Parties
+# source: LayoutCatalog/Layout[@id=124]
+# objects: 154
+# theme: Karbon-1.0
+# folder group: id=43 groupCollapsed=False includeInMenu=False
+
+Layout width=380 quickFind=True includeInMenu=False id=124 name="Card - UtilityParty"
+  Table id=1065141 name=UtilityParty
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  Object type=SlideControl key=1 LabelKey=0 bounds=0,0,560,380
+    SlideControlObj visPanelKey=2 visPanelIndex=0 dotSize=9 slideFlagSet=3
+      Object type=SlidePanel key=2 LabelKey=0 name="Enter Organization Name" bounds=0,0,560,380
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=RRect key=168 LabelKey=0 flags=4 style=Shape-ValidationError bounds=99,20,125,360
+            HideCondition findMode=False
+              Calculation:
+                | not $$showingRequiredFields or 
+                | 
+                | not IsEmpty ( UtilityParty::OrganizationName )
+                refs: fn:not, fn:or, fn:IsEmpty, UtilityParty::OrganizationName#4
+          Object type=Field key=3 LabelKey=0 bounds=100,20,124,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrganizationName#4
+          Object type=Text key=4 LabelKey=0 bounds=70,20,94,340
+            Text flags=2 style=Label-Medium-Left: "Organization Name"
+          Object type=Button key=5 LabelKey=0 flags=65536 bounds=220,240,260,360
+            Text flags=2 style=Button-SuccessPill: Continue
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Search for Duplicate Organizations” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=388 name="Search for Duplicate Organizations"
+          Object type=Text key=6 LabelKey=0 bounds=20,20,50,340
+            Text flags=2 style=H2-Primary: "Organization Info"
+          Object type=Button key=22 LabelKey=0 flags=65540 bounds=220,20,260,90
+            Text flags=2 style=Button-Medium-CommandLink: Skip
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Skip Org” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=398 name="Skip Org"
+            HideCondition findMode=False
+              Calculation:
+                | // We can't skip if we're only creating an org
+                | 
+                | UtilityParty::SkipPersonInd or UtilityParty::PersonPrescribedInd
+                refs: UtilityParty::SkipPersonInd#23, fn:or, UtilityParty::PersonPrescribedInd#42
+          Object type=Button key=160 LabelKey=0 name=Button.AddAddress flags=65536 bounds=220,110,260,220
+            Text flags=2 style=_DEPRECATED_Button-Medium: Lookup…
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Button: Launch Address Picker from New Contact Wizard” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=630 name="Button: Launch Address Picker from New Contact Wizard"
+          Object type=Text key=249 LabelKey=0 bounds=140,20,164,320
+            Text flags=2 style=Label-Medium-Left: Website
+          Object type=Field key=250 LabelKey=0 bounds=170,20,194,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrgWebsite#16
+      Object type=SlidePanel key=23 LabelKey=0 name="Duplicate Organizations Found" bounds=0,0,560,380
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Text key=24 LabelKey=0 bounds=20,20,51,360
+            Text flags=2 style=H2-Primary: "Potential Duplicates..."
+          Object type=Text key=25 LabelKey=0 bounds=70,20,130,360
+            Text flags=2 style=Label-Medium-Left: "We have some organizations that are close to the organization you are trying to add. Are any of the below matches?"
+          Object type=Portal key=26 LabelKey=0 bounds=130,20,480,360
+            PortalObj portalFlags=273 numOfRows=9 initialRow=1 style="Standard Portal"
+              TableAliasKey: Selected_Party#partyList
+              FieldList
+                FieldReference id=19 name=NameCached repetition=1 UUID=""
+                  TableOccurrenceReference id=1065142 name=Selected_Party#partyList UUID=""
+              Object type=PopoverButton key=131 LabelKey=0 name=SelectExistingOrgButton bounds=130,20,170,360
+                Text flags=2 style=Button-RowHighlight
+                PopoverButtonObj buttonFlags=0 key=132 iconSize=12 displayType=0
+                  Object type=Popover key=132 LabelKey=0 style="Popover-White No Title" bounds=181,28,290,353
+                    TitleCalc
+                      Calculation:
+                        | "Popover"
+                    PopoverObj flags=2 position=1 key=131
+                      Object type=Text key=133 LabelKey=0 bounds=200,60,251,320
+                        Text flags=10 tableViewVisibility=0: "OK to use <<Selected_Party#partyList::NameCached>> instead of creating a new organization?"
+                          FieldList quickFind=True
+                            Field table=Selected_Party#partyList id=19 name=NameCached
+                      Object type=Button key=69 LabelKey=0 flags=65536 bounds=250,269,278,340
+                        Text flags=2 style=_DEPRECATED_Button-Medium: Use
+                        ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                          Step enable=True id=1 name="Perform Script"
+                            StepText: Perform Script [ “Select Existing Organization” ]
+                            DisableStepCollapsed state=False
+                            CurrentScript value=Pause
+                            Script id=390 name="Select Existing Organization"
+              Object type=Text key=28 LabelKey=0 bounds=139,30,163,350
+                Text flags=10 tableViewVisibility=0 style=Label-Medium-Left: <<Selected_Party#partyList::NameCached>>
+                  FieldList quickFind=True
+                    Field table=Selected_Party#partyList id=19 name=NameCached
+          Object type=Button key=68 LabelKey=0 flags=65536 bounds=500,180,540,360
+            Text flags=2 style=Button-Warning: "None of the Above Match"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “No Org Matches” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=399 name="No Org Matches"
+          Object type=Button key=124 LabelKey=0 flags=65536 bounds=500,20,540,100
+            Text flags=2 style=Button-Medium-CommandLink: Back
+            ButtonObj buttonFlags=0 iconSize=14 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText
+                  | Perform Script [ “Go to Start”; Parameter: JSONSetElement( "{}"; 
+                  | [ "TargetSlideNumber"; 1; JSONNumber]
+                  | ) ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | JSONSetElement( "{}"; 
+                  | [ "TargetSlideNumber"; 1; JSONNumber]
+                  | )
+                  refs: fn:JSONSetElement, fn:JSONNumber
+                Script id=402 name="Go to Start"
+              Image name=a33_leftChevron.svg
+      Object type=SlidePanel key=248 LabelKey=0 name="Full Contact Org Match Found" bounds=0,0,560,380
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Text key=251 LabelKey=0 bounds=20,20,51,360
+            Text flags=2 style=H2-Primary: "FullContact Match Found"
+          Object type=Text key=252 LabelKey=0 bounds=70,20,110,360
+            Text flags=2 style=Label-Medium-Left: "We found a contact that matched the organization you are trying to add. Select any data that you wish to use."
+          Object type=Text key=253 LabelKey=0 bounds=220,60,240,120
+            Text flags=2 style=Label-Small-Left: Location
+          Object type=Field key=254 LabelKey=253 bounds=220,120,270,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactOrgAddressFull#69
+          Object type=Field key=255 LabelKey=0 flags=4 bounds=220,20,246,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactOrgKeepLocation#79
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactOrgAddressFull )
+                refs: fn:IsEmpty, UtilityParty::FullContactOrgAddressFull#69
+          Object type=Button key=256 LabelKey=0 flags=65536 bounds=500,240,540,360
+            Text flags=2 style=Button-SuccessPill: Continue
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Accept FullContact Org Match” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=871 name="Accept FullContact Org Match"
+          Object type=Text key=257 LabelKey=0 bounds=310,60,330,120
+            Text flags=2 style=Label-Small-Left: LinkedIn
+          Object type=Field key=258 LabelKey=257 bounds=310,120,330,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactOrgLinkedInURL#62
+          Object type=Text key=260 LabelKey=0 bounds=280,60,300,120
+            Text flags=2 style=Label-Small-Left: Phone
+          Object type=Text key=262 LabelKey=0 bounds=340,60,360,120
+            Text flags=2 style=Label-Small-Left: Twitter
+          Object type=Text key=263 LabelKey=0 bounds=370,60,390,120
+            Text flags=2 style=Label-Small-Left: Facebook
+          Object type=Field key=264 LabelKey=265 flags=16384 bounds=400,120,480,370
+            ToolTip
+              Calculation:
+                | Self
+                refs: fn:Self
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactOrgBio#61
+          Object type=Text key=265 LabelKey=0 bounds=400,60,420,120
+            Text flags=2 style=Label-Small-Left: Bio
+          Object type=Field key=266 LabelKey=260 bounds=280,200,300,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactOrgPhone#73
+          Object type=Field key=268 LabelKey=262 bounds=340,120,360,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactOrgTwitter#70
+          Object type=Field key=269 LabelKey=263 bounds=370,120,390,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactOrgFacebook#76
+          Object type=Field key=259 LabelKey=0 flags=4 bounds=310,20,336,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactOrgKeepLinkedIn#81
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactOrgLinkedInURL )
+                refs: fn:IsEmpty, UtilityParty::FullContactOrgLinkedInURL#62
+          Object type=Field key=270 LabelKey=0 flags=16388 bounds=190,20,216,50
+            ToolTip
+              Calculation:
+                | "Keep Logo"
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactOrgKeepLogo#77
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactOrgLogo )
+                refs: fn:IsEmpty, UtilityParty::FullContactOrgLogo#71
+          Object type=Field key=271 LabelKey=0 flags=4 bounds=280,20,306,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactOrgKeepPhone#80
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactOrgPhone)
+                refs: fn:IsEmpty, UtilityParty::FullContactOrgPhone#73
+          Object type=Field key=273 LabelKey=0 flags=4 bounds=340,20,366,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactOrgKeepTwitter#82
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactOrgTwitter )
+                refs: fn:IsEmpty, UtilityParty::FullContactOrgTwitter#70
+          Object type=Field key=274 LabelKey=0 flags=4 bounds=370,20,396,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactOrgKeepFacebook#83
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactOrgFacebook )
+                refs: fn:IsEmpty, UtilityParty::FullContactOrgFacebook#76
+          Object type=Field key=275 LabelKey=0 flags=4 bounds=400,20,426,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactOrgKeepBio#78
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactOrgBio )
+                refs: fn:IsEmpty, UtilityParty::FullContactOrgBio#61
+          Object type=Field key=276 LabelKey=0 bounds=130,20,154,260
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-ListViewPrimary
+              Field: UtilityParty::FullContactOrgName#75
+          Object type=Field key=277 LabelKey=0 bounds=120,280,200,360
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=4 style=Cont-Icon
+              Field: UtilityParty::FullContactOrgLogo#71
+          Object type=Button key=278 LabelKey=0 bounds=170,20,186,100
+            Text flags=2 style=Button-Small-CommandLink: "select all"
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “FullContact Org Select All” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=869 name="FullContact Org Select All"
+          Object type=Text key=279 LabelKey=0 bounds=191,60,211,170
+            Text flags=2 style=Label-Small-Left: "Use this Logo"
+          Object type=Field key=280 LabelKey=0 flags=4 bounds=220,20,246,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepGender#44
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactOrgAddressFull )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactOrgAddressFull#69
+          Object type=Field key=281 LabelKey=0 flags=4 bounds=310,20,336,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepLinkedIn#46
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactOrgLinkedInURL )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactOrgLinkedInURL#62
+          Object type=Field key=282 LabelKey=0 flags=4 bounds=190,20,216,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepAvatar#55
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactOrgLogo )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactOrgLogo#71
+          Object type=Field key=283 LabelKey=0 flags=4 bounds=280,20,306,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepPhone#60
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactOrgPhone)
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactOrgPhone#73
+          Object type=Field key=285 LabelKey=0 flags=4 bounds=340,20,366,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepTwitter#56
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactOrgTwitter )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactOrgTwitter#70
+          Object type=Field key=286 LabelKey=0 flags=4 bounds=370,20,396,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepFacebook#58
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactOrgFacebook )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactOrgFacebook#76
+          Object type=Field key=287 LabelKey=0 flags=4 bounds=400,20,426,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepBio#57
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactOrgBio )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactOrgBio#61
+          Object type=Button key=288 LabelKey=0 flags=65540 bounds=500,20,540,80
+            Text flags=2 style=Button-Medium-CommandLink: Back
+            ButtonObj buttonFlags=0 iconSize=14 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Go to Start” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=402 name="Go to Start"
+              Image name=a33_leftChevron.svg
+            HideCondition findMode=False
+              Calculation:
+                | UtilityParty::SkipPersonInd or UtilityParty::PersonPrescribedInd
+                refs: UtilityParty::SkipPersonInd#23, fn:or, UtilityParty::PersonPrescribedInd#42
+          Object type=Field key=290 LabelKey=0 bounds=280,120,300,190
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactOrgPhoneLabel#74
+          Object type=Button key=291 LabelKey=0 flags=65536 bounds=500,100,540,220
+            Text flags=2 style=Button-Warning: "Ignore this Match"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Ignore FullContact Org Match” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=870 name="Ignore FullContact Org Match"
+      Object type=SlidePanel key=63 LabelKey=0 name="Enter Organization Contact Info" bounds=0,0,560,380
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Text key=7 LabelKey=0 bounds=130,20,154,360
+            Text flags=2 style=Label-Medium-Left: Address
+          Object type=Field key=8 LabelKey=0 bounds=160,20,200,360
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrgAddressLine1#8
+          Object type=Field key=10 LabelKey=11 bounds=250,260,274,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrgStateProvince#14
+          Object type=Text key=11 LabelKey=0 bounds=220,260,244,360
+            Text flags=2 style=Label-Medium-Left: State/Province
+          Object type=Field key=12 LabelKey=13 bounds=250,20,274,240
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrgCity#10
+          Object type=Text key=13 LabelKey=0 bounds=220,20,244,153
+            Text flags=2 style=Label-Medium-Left: City
+          Object type=Field key=14 LabelKey=15 bounds=320,260,344,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrgCountry#11
+          Object type=Text key=15 LabelKey=0 bounds=290,260,313,360
+            Text flags=2 style=Label-Medium-Left: Country
+          Object type=Field key=16 LabelKey=17 bounds=320,20,344,241
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrgPostalCode#13
+          Object type=Text key=17 LabelKey=0 bounds=290,20,314,153
+            Text flags=2 style=Label-Medium-Left: "Postal Code"
+          Object type=Text key=18 LabelKey=0 bounds=360,20,384,320
+            Text flags=2 style=Label-Medium-Left: Website
+          Object type=Field key=19 LabelKey=0 bounds=390,20,414,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrgWebsite#16
+          Object type=Text key=20 LabelKey=0 bounds=430,20,454,320
+            Text flags=2 style=Label-Medium-Left: "Business Phone"
+          Object type=Field key=21 LabelKey=0 bounds=460,20,484,360
+            ScriptTriggers
+              Trigger event=OnObjectSave id=4 triggerFlags=1(browse)
+                Script id=520 name="Format Phone Number"
+                TriggerText: "Format Phone Number"
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::OrgPhone#15
+          Object type=Text key=64 LabelKey=0 bounds=20,20,51,320
+            Text flags=2 style=H2-Primary: "Organization Info"
+          Object type=Text key=65 LabelKey=0 bounds=70,20,130,360
+            Text flags=10 tableViewVisibility=0 style=Label-Medium-Left: "If you want to add an address, website, or phone below, keep in mind it should apply to <<UtilityParty::OrganizationName>>, not a person."
+              FieldList quickFind=False
+                Field table=UtilityParty id=4 name=OrganizationName
+          Object type=Button key=66 LabelKey=0 flags=65536 bounds=500,240,540,360
+            Text flags=2 style=Button-SuccessPill: Continue
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Go to Person Info Slide” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=400 name="Go to Person Info Slide"
+          Object type=Button key=67 LabelKey=0 flags=65536 bounds=500,20,540,100
+            Text flags=2 style=Button-Medium-CommandLink: Back
+            ButtonObj buttonFlags=0 iconSize=14 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText
+                  | Perform Script [ “Go to Start”; Parameter: JSONSetElement( "{}"; 
+                  | [ "TargetSlideNumber"; 1; JSONNumber]
+                  | ) ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | JSONSetElement( "{}"; 
+                  | [ "TargetSlideNumber"; 1; JSONNumber]
+                  | )
+                  refs: fn:JSONSetElement, fn:JSONNumber
+                Script id=402 name="Go to Start"
+              Image name=a33_leftChevron.svg
+      Object type=SlidePanel key=30 LabelKey=0 name="Enter Party Info" bounds=0,0,560,380
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=RRect key=169 LabelKey=0 flags=4 style=Shape-ValidationError bounds=170,20,194,360
+            HideCondition findMode=False
+              Calculation:
+                | not $$showingRequiredFields or 
+                | 
+                | not IsEmpty ( UtilityParty::PersonLastName )
+                refs: fn:not, fn:or, fn:IsEmpty, UtilityParty::PersonLastName#3
+          Object type=RRect key=170 LabelKey=0 flags=4 style=Shape-ValidationError bounds=100,20,124,360
+            HideCondition findMode=False
+              Calculation:
+                | not $$showingRequiredFields or 
+                | 
+                | not IsEmpty ( UtilityParty::PersonFirstName )
+                refs: fn:not, fn:or, fn:IsEmpty, UtilityParty::PersonFirstName#1
+          Object type=Text key=31 LabelKey=0 bounds=20,20,51,320
+            Text flags=2 style=H2-Primary: "Contact Info"
+          Object type=Field key=32 LabelKey=0 name=PersonFirstName bounds=100,20,124,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::PersonFirstName#1
+          Object type=Text key=33 LabelKey=0 bounds=70,20,94,170
+            Text flags=2 style=Label-Medium-Left: "First Name"
+          Object type=Field key=34 LabelKey=0 bounds=170,20,194,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::PersonLastName#3
+          Object type=Text key=35 LabelKey=0 bounds=140,20,164,190
+            Text flags=2 style=Label-Medium-Left: "Last Name"
+          Object type=Button key=70 LabelKey=0 flags=65536 bounds=420,240,460,360
+            Text flags=2 style=Button-SuccessPill: Continue
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Search for Duplicate People” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=389 name="Search for Duplicate People"
+          Object type=Field key=91 LabelKey=0 bounds=310,20,334,260
+            ScriptTriggers
+              Trigger event=OnObjectSave id=4 triggerFlags=1(browse)
+                Script id=520 name="Format Phone Number"
+                TriggerText: "Format Phone Number"
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::PersonPhone#17
+          Object type=Text key=92 LabelKey=0 bounds=280,20,304,260
+            Text flags=2 style=Label-Medium-Left: Phone
+          Object type=Field key=95 LabelKey=0 bounds=380,20,404,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::PersonEmail#18
+          Object type=Text key=96 LabelKey=0 bounds=350,20,374,360
+            Text flags=2 style=Label-Medium-Left: Email
+          Object type=Field key=97 LabelKey=0 bounds=240,20,264,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::PersonJobTitle#19
+          Object type=Text key=98 LabelKey=0 bounds=210,20,234,190
+            Text flags=2 style=Label-Medium-Left: Title
+          Object type=Button key=125 LabelKey=0 flags=65540 bounds=420,20,460,100
+            Text flags=2 style=Button-Medium-CommandLink: Back
+            ButtonObj buttonFlags=0 iconSize=14 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText
+                  | Perform Script [ “Back from Contact Info”; Parameter: JSONSetElement( "{}"; 
+                  | [ "TargetSlideNumber"; 1; JSONNumber]
+                  | ) ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | JSONSetElement( "{}"; 
+                  | [ "TargetSlideNumber"; 1; JSONNumber]
+                  | )
+                  refs: fn:JSONSetElement, fn:JSONNumber
+                Script id=621 name="Back from Contact Info"
+              Image name=a33_leftChevron.svg
+            HideCondition findMode=False
+              Calculation:
+                | UtilityParty::OrganizationPrescribedInd
+                refs: UtilityParty::OrganizationPrescribedInd#41
+          Object type=Text key=162 LabelKey=0 bounds=281,280,305,360
+            Text flags=2 style=Label-Medium-Left: Ext
+          Object type=Field key=166 LabelKey=0 bounds=310,280,334,360
+            FieldObj numOfReps=1 flags=224 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+              Field: UtilityParty::PersonPhoneExt#40
+          Object type=Button key=167 LabelKey=0 flags=65540 bounds=420,150,460,220
+            Text flags=2 style=Button-Medium-CommandLink: Skip
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Skip Contact Info” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=654 name="Skip Contact Info"
+            HideCondition findMode=False
+              Calculation:
+                | UtilityParty::OrganizationPrescribedInd
+                refs: UtilityParty::OrganizationPrescribedInd#41
+      Object type=SlidePanel key=72 LabelKey=0 name="Duplicate People Found" bounds=0,0,560,380
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Text key=73 LabelKey=0 bounds=20,20,51,360
+            Text flags=2 style=H2-Primary: "Potential Duplicates"
+          Object type=Text key=74 LabelKey=0 bounds=70,20,126,360
+            Text flags=2 style=Label-Medium-Left: "We found some contacts that are close to the person you are trying to add. Are any of these contacts the one you want?"
+          Object type=Portal key=75 LabelKey=0 bounds=130,20,474,360
+            PortalObj portalFlags=273 numOfRows=9 initialRow=1 style="Standard Portal"
+              TableAliasKey: Selected_Party#partyList
+              Object type=ButtonBar key=141 LabelKey=0 style=BB-TextObject-Medium bounds=130,20,170,360
+                ButtonBarObj segmentKey=0
+                  Object type=PopoverButton key=149 LabelKey=0 bounds=130,20,170,360
+                    Text flags=2 style=BB-TextObject-Medium
+                    PopoverButtonObj buttonFlags=3 key=150 iconSize=12 displayType=0
+                      Object type=Popover key=150 LabelKey=0 style="Popover-White No Title" bounds=181,33,305,348
+                        TitleCalc
+                          Calculation:
+                            | "Popover"
+                        PopoverObj flags=2 position=1 key=149
+                          Object type=Text key=151 LabelKey=0 bounds=205,60,256,320
+                            Text flags=10 tableViewVisibility=0: "OK to use <<Selected_Party#partyList::NameCached>> instead of creating a new person?"
+                              FieldList quickFind=True
+                                Field table=Selected_Party#partyList id=19 name=NameCached
+                          Object type=Button key=152 LabelKey=0 flags=65536 bounds=262,260,290,331
+                            Text flags=2 style=_DEPRECATED_Button-Medium: Use
+                            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                              Step enable=True id=1 name="Perform Script"
+                                StepText: Perform Script [ “Select Existing Person” ]
+                                DisableStepCollapsed state=False
+                                CurrentScript value=Pause
+                                Script id=392 name="Select Existing Person"
+                    LabelCalc
+                      Calculation:
+                        | List ( 
+                        | 	TextStyleAdd ( Selected_Party#partyList::NameCached ; Bold ) ; 
+                        | 	Selected_Party#partyList_Person::EmployerName
+                        | )
+                        refs: fn:List, fn:TextStyleAdd, Selected_Party#partyList::NameCached#19, fn:Bold, Selected_Party#partyList_Person::EmployerName#131
+          Object type=Button key=78 LabelKey=0 flags=65536 bounds=500,180,540,360
+            Text flags=2 style=Button-Warning: "None of the Above Match"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “No Person Matches” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=401 name="No Person Matches"
+          Object type=Button key=127 LabelKey=0 flags=65540 bounds=500,20,540,100
+            Text flags=2 style=Button-Medium-CommandLink: Back
+            ButtonObj buttonFlags=0 iconSize=14 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Go to Start” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=402 name="Go to Start"
+              Image name=a33_leftChevron.svg
+            HideCondition findMode=False
+              Calculation:
+                | UtilityParty::SkipOrganizationInd
+                refs: UtilityParty::SkipOrganizationInd#22
+      Object type=SlidePanel key=172 LabelKey=0 name="Full Contact Person Match Found" bounds=0,0,560,380
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Text key=173 LabelKey=0 bounds=20,20,51,360
+            Text flags=2 style=H2-Primary: "FullContact Match Found"
+          Object type=Text key=174 LabelKey=0 bounds=70,20,110,360
+            Text flags=2 style=Label-Medium-Left: "We found a contact that matched the person you are trying to add. Select any data that you wish to use."
+          Object type=Text key=178 LabelKey=0 bounds=220,60,240,120
+            Text flags=2 style=Label-Small-Left: Gender
+          Object type=Field key=177 LabelKey=178 bounds=220,120,240,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactPersonGender#43
+          Object type=Field key=179 LabelKey=0 flags=4 bounds=220,20,246,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepGender#44
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactPersonGender )
+                refs: fn:IsEmpty, UtilityParty::FullContactPersonGender#43
+          Object type=Button key=181 LabelKey=0 flags=65536 bounds=500,240,540,360
+            Text flags=2 style=Button-SuccessPill: Continue
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Go to Summary” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=409 name="Go to Summary"
+          Object type=Text key=182 LabelKey=0 bounds=250,60,270,120
+            Text flags=2 style=Label-Small-Left: LinkedIn
+          Object type=Field key=183 LabelKey=182 bounds=250,120,270,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactPersonLinkedInURL#45
+          Object type=Field key=184 LabelKey=0 flags=4 bounds=250,20,276,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepLinkedIn#46
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactPersonLinkedInURL )
+                refs: fn:IsEmpty, UtilityParty::FullContactPersonLinkedInURL#45
+          Object type=Text key=219 LabelKey=0 bounds=280,60,300,120
+            Text flags=2 style=Label-Small-Left: Phone
+          Object type=Text key=221 LabelKey=0 bounds=310,60,330,120
+            Text flags=2 style=Label-Small-Left: "Job Title"
+          Object type=Text key=223 LabelKey=0 bounds=340,60,360,120
+            Text flags=2 style=Label-Small-Left: Twitter
+          Object type=Text key=209 LabelKey=0 bounds=370,60,390,120
+            Text flags=2 style=Label-Small-Left: Facebook
+          Object type=Field key=206 LabelKey=207 bounds=400,120,460,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactPersonBio#52
+          Object type=Text key=207 LabelKey=0 bounds=400,60,420,120
+            Text flags=2 style=Label-Small-Left: Bio
+          Object type=Field key=218 LabelKey=219 bounds=280,120,300,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactPersonPhone#50
+          Object type=Field key=220 LabelKey=221 bounds=310,120,330,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactPersonJobTitle#54
+          Object type=Field key=222 LabelKey=223 bounds=340,120,360,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactPersonTwitter#51
+          Object type=Field key=208 LabelKey=209 bounds=370,120,390,370
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Small-NoChrome
+              Field: UtilityParty::FullContactPersonFacebookURL#48
+          Object type=Field key=224 LabelKey=0 flags=16388 bounds=190,20,216,50
+            ToolTip
+              Calculation:
+                | "Keep Avatar"
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepAvatar#55
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactPersonAvatar )
+                refs: fn:IsEmpty, UtilityParty::FullContactPersonAvatar#53
+          Object type=Field key=225 LabelKey=0 flags=4 bounds=280,20,306,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepPhone#60
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactPersonPhone )
+                refs: fn:IsEmpty, UtilityParty::FullContactPersonPhone#50
+          Object type=Field key=226 LabelKey=0 flags=4 bounds=310,20,336,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepJobTitle#59
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactPersonJobTitle )
+                refs: fn:IsEmpty, UtilityParty::FullContactPersonJobTitle#54
+          Object type=Field key=227 LabelKey=0 flags=4 bounds=340,20,366,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepTwitter#56
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactPersonTwitter )
+                refs: fn:IsEmpty, UtilityParty::FullContactPersonTwitter#51
+          Object type=Field key=228 LabelKey=0 flags=4 bounds=370,20,396,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepFacebook#58
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactPersonFacebookURL )
+                refs: fn:IsEmpty, UtilityParty::FullContactPersonFacebookURL#48
+          Object type=Field key=229 LabelKey=0 flags=4 bounds=400,20,426,50
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepBio#57
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | IsEmpty ( UtilityParty::FullContactPersonBio )
+                refs: fn:IsEmpty, UtilityParty::FullContactPersonBio#52
+          Object type=Field key=210 LabelKey=0 bounds=130,20,154,260
+            FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-ListViewPrimary
+              Field: UtilityParty::FullContactPersonFullName#47
+          Object type=Field key=186 LabelKey=0 bounds=120,280,200,360
+            FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=7 style=Cont-Icon
+              Field: UtilityParty::FullContactPersonAvatar#53
+          Object type=Button key=232 LabelKey=0 bounds=170,20,186,100
+            Text flags=2 style=Button-Small-CommandLink: "select all"
+            ButtonObj buttonFlags=0 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “FullContact Person Select All” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=866 name="FullContact Person Select All"
+          Object type=Text key=233 LabelKey=0 bounds=191,60,211,170
+            Text flags=2 style=Label-Small-Left: "Use this Avatar"
+          Object type=Field key=237 LabelKey=0 flags=4 bounds=220,20,246,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepGender#44
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactPersonGender )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactPersonGender#43
+          Object type=Field key=238 LabelKey=0 flags=4 bounds=250,20,276,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepLinkedIn#46
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactPersonLinkedInURL )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactPersonLinkedInURL#45
+          Object type=Field key=239 LabelKey=0 flags=16388 bounds=190,20,216,50
+            ToolTip
+              Calculation:
+                | "Keep Avatar"
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepAvatar#55
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactPersonAvatar )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactPersonAvatar#53
+          Object type=Field key=240 LabelKey=0 flags=4 bounds=280,20,306,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepPhone#60
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactPersonPhone )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactPersonPhone#50
+          Object type=Field key=241 LabelKey=0 flags=4 bounds=310,20,336,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepJobTitle#59
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactPersonJobTitle )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactPersonJobTitle#54
+          Object type=Field key=242 LabelKey=0 flags=4 bounds=340,20,366,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepTwitter#56
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactPersonTwitter )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactPersonTwitter#51
+          Object type=Field key=243 LabelKey=0 flags=4 bounds=370,20,396,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepFacebook#58
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactPersonFacebookURL )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactPersonFacebookURL#48
+          Object type=Field key=244 LabelKey=0 flags=4 bounds=400,20,426,50
+            FieldObj numOfReps=1 flags=20 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Checkbox-Small
+              Field: UtilityParty::FullContactPersonKeepBio#57
+              ValueList: Boolean#1
+            HideCondition findMode=False
+              Calculation:
+                | not IsEmpty ( UtilityParty::FullContactPersonBio )
+                refs: fn:not, fn:IsEmpty, UtilityParty::FullContactPersonBio#52
+          Object type=Button key=247 LabelKey=0 flags=65540 bounds=500,20,540,80
+            Text flags=2 style=Button-Medium-CommandLink: Back
+            ButtonObj buttonFlags=0 iconSize=14 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Go to Person Info Slide” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=400 name="Go to Person Info Slide"
+              Image name=a33_leftChevron.svg
+            HideCondition findMode=False
+              Calculation:
+                | UtilityParty::SkipPersonInd or UtilityParty::PersonPrescribedInd
+                refs: UtilityParty::SkipPersonInd#23, fn:or, UtilityParty::PersonPrescribedInd#42
+      Object type=SlidePanel key=51 LabelKey=0 name=Summary bounds=0,0,560,380
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Text key=52 LabelKey=0 bounds=19,20,49,360
+            Text flags=2 style=H2-Primary: Summary
+          Object type=Button key=81 LabelKey=0 flags=65536 bounds=500,220,540,360
+            Text flags=2 style=Button-SuccessPill: Submit
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Create Parties” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=393 name="Create Parties"
+          Object type=Field key=122 LabelKey=0 bounds=70,20,480,360
+            FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium-NoChrome
+              Field: UtilityParty::Summary#35
+          Object type=Button key=129 LabelKey=0 flags=65540 bounds=500,20,540,80
+            Text flags=2 style=Button-Medium-CommandLink: Back
+            ButtonObj buttonFlags=0 iconSize=14 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Go to Start” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=402 name="Go to Start"
+              Image name=a33_leftChevron.svg
+            HideCondition findMode=False
+              Calculation:
+                | not UtilityParty::SkipPersonInd
+                refs: fn:not, UtilityParty::SkipPersonInd#23
+          Object type=Button key=130 LabelKey=0 flags=65540 bounds=500,20,540,80
+            Text flags=2 style=Button-Medium-CommandLink: Back
+            ButtonObj buttonFlags=0 iconSize=14 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Go to Person Info Slide” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=400 name="Go to Person Info Slide"
+              Image name=a33_leftChevron.svg
+            HideCondition findMode=False
+              Calculation:
+                | UtilityParty::SkipPersonInd or UtilityParty::PersonPrescribedInd
+                refs: UtilityParty::SkipPersonInd#23, fn:or, UtilityParty::PersonPrescribedInd#42
+  Object type=Button key=117 LabelKey=0 flags=65536 bounds=20,340,42,390
+    Text flags=2 style=Button-CardClose
+    ButtonObj buttonFlags=0 iconSize=20 displayType=1
+      Step enable=True id=121 name="Close Window"
+        StepText: Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+      Image name=a29_x.svg

@@ -1,0 +1,126 @@
+# table 148: ActivityType
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=148]
+# fields: 12
+# records: 10
+
+Field id=12 dataType=Text fieldType=Normal name=Description
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Normal name=Id
+  Comment: Primary key (serial number). Activity types should never be created from distributed clients.
+  AutoEnter allowEditing=False
+    Serial increment=1 nextValue=8 generate=OnCreation
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    MaxDataLength value=3
+    StrictValidation value=True
+    ErrorMessage: A unique code of three characters or less is required (ex: EML).
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=ActivityType (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=ActivityType:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=ActivityType (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=ActivityType (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=ActivityType:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=ActivityType (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=ActivityType:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ActivityType:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=ActivityType:
+    | // Created by Generator - 10/31/2018 3:14:03 PM
+    | // DO NOT format this JSON object!
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "Description" ; ActivityType::Description ; JSONString ] ; 
+    | 	[ "CreationAccountName" ; ActivityType::CreationAccountName ; JSONString ] ; 
+    | 	[ "CreationTimestamp" ; ActivityType::CreationTimestamp ; JSONString ] ; 
+    | 	[ "Id" ; ActivityType::Id ; JSONNumber ] ; 
+    | 	[ "ModificationAccountName" ; ActivityType::ModificationAccountName ; JSONString ] ; 
+    | 	[ "ModificationTimestamp" ; ActivityType::ModificationTimestamp ; JSONString ] ; 
+    | 	[ "CreationUserId" ; ActivityType::CreationUserId ; JSONString ] ; 
+    | 	[ "ModificationUserId" ; ActivityType::ModificationUserId ; JSONString ] 
+    |  
+    | )
+    refs: fn:JSONSetElement, ActivityType::Description#12, fn:JSONString, ActivityType::CreationAccountName#16, ActivityType::CreationTimestamp#17, ActivityType::Id#18, fn:JSONNumber, ActivityType::ModificationAccountName#19, ActivityType::ModificationTimestamp#21, ActivityType::CreationUserId#25, ActivityType::ModificationUserId#26
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

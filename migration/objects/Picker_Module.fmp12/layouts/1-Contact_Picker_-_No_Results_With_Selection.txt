@@ -1,0 +1,130 @@
+# layout 1: Contact Picker - No Results With Selection
+# file: Picker Module.fmp12
+# folder: Contact Picker
+# source: LayoutCatalog/Layout[@id=1]
+# objects: 18
+# theme: Cool Gray
+# folder group: id=22 groupCollapsed=False includeInMenu=True
+
+Layout width=460 quickFind=True includeInMenu=True id=1 name="Contact Picker - No Results With Selection"
+  Table id=1065093 name=Party
+  CustomMenuSet id=2 name="Default Menu Set"
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=False showFieldFrames=False saveRecord=True
+  Object type=Rect key=136 LabelKey=0 flags=1073741824 bounds=120,0,170,461
+  Object type=ButtonBar key=172 LabelKey=0 name=executeButton flags=1342177280 style="Body Button Bar" bounds=130,290,160,440
+    ButtonBarObj segmentKey=0
+      Object type=Button key=173 LabelKey=0 flags=65540 bounds=131,291,159,439
+        Text flags=2 style="Body Button Bar"
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Close Picker” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=94 name="Close Picker"
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( Picker::Results )
+            refs: fn:IsEmpty, Picker::Results#2
+        LabelCalc
+          Calculation:
+            | Let( [ 
+            | 
+            | 	countOfSelectedContacts = JSONGetElement ( Picker::Results ; "Result.CountPicked" )
+            | 
+            | ] ;
+            | 
+            | 	"Add " & 
+            | 
+            | 	Case( 
+            | 		// singular form
+            | 		countOfSelectedContacts = 1 ; 
+            | 			"One Contact" ; 
+            | 
+            | 		// spell our numbers from two through nine
+            | 		countOfSelectedContacts > 1 and countOfSelectedContacts < 10 ; 
+            | 			Choose ( countOfSelectedContacts ; "" ; "" ; "Two" ; "Three" ; "Four" ; "Five" ; "Six" ; "Seven" ; "Eight" ; "Nine" ) & " Contacts" ; 
+            | 
+            | 		// 10 or more
+            | 			countOfSelectedContacts & " Contacts"
+            | 	)
+            | 
+            | )
+            refs: fn:Let, fn:JSONGetElement, Picker::Results#2, fn:Case, fn:and, fn:Choose
+  Object type=Rect key=180 LabelKey=0 flags=268435456 style="Search Field Old" bounds=10,40,40,360
+  Object type=Text key=181 LabelKey=0 flags=268435456 bounds=40,40,60,300
+    Text flags=10 tableViewVisibility=0: <<$$PickerSearchStatus>>
+      FieldList quickFind=False
+  Object type=Button key=182 LabelKey=0 name=findButton flags=268500992 bounds=10,370,40,440
+    Text flags=2 style="Header Button": Find
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Find Contacts” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=69 name="Find Contacts"
+  Object type=Button key=183 LabelKey=0 name=cancelButton flags=268435456 bounds=16,330,34,348
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=49 name=Clear
+        StepText
+          | Clear [ Picker::Search_Field ]
+          | [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+      Image name=a27_XCircle.svg
+  Object type=Button key=184 LabelKey=0 flags=268435456 bounds=17,50,33,66
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Image name=a89_find.svg
+  Object type=Field key=185 LabelKey=0 name=searchField flags=285212672 bounds=10,70,40,320
+    ScriptTriggers
+      Trigger event=OnObjectValidate id=6 triggerFlags=1(browse)
+        Script id=69 name="Find Contacts"
+        TriggerText: "Find Contacts"
+    FieldObj numOfReps=1 flags=114 inputMode=0 keyboardType=0 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Picker::Search_Field#1
+      PlaceholderText findMode=True
+        Calculation:
+          | Picker::Settings_PlaceholderText
+          refs: Picker::Settings_PlaceholderText#13
+  Object type=Rect key=186 LabelKey=0 name=headerBackground flags=1073741824 style="Title Bar Shape" bounds=0,0,70,461
+  Object type=ButtonBar key=187 LabelKey=0 style="Selected Contacts" bounds=130,40,160,90
+    ButtonBarObj segmentKey=0
+      Object type=PopoverButton key=188 LabelKey=0 bounds=130,40,160,90
+        Text flags=2 style="Selected Contacts"
+        PopoverButtonObj buttonFlags=3 key=189 iconSize=13 displayType=4
+          Image name=a43_contact.svg
+          Object type=Popover key=189 LabelKey=0 style="Simple Popover" bounds=6,101,185,410
+            TitleCalc
+              Calculation:
+                | "Selected Contacts…"
+            PopoverObj position=0 key=188
+              Object type=Portal key=190 LabelKey=0 bounds=42,104,183,407
+                PortalObj portalFlags=17 numOfRows=4 initialRow=1
+                  TableAliasKey: VIRTUALLISTS_Rows
+                  FieldList
+                    Field table=VIRTUALLISTS_Rows id=6 name=Party.PickerField4
+                  Object type=Field key=191 LabelKey=0 bounds=47,139,72,389
+                    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+                      Field: VIRTUALLISTS_Rows::Party.PickerField4#6
+                  Object type=Button key=192 LabelKey=0 bounds=48,114,70,134
+                    Text flags=2 style="Portal Delete Icon"
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+                      Step enable=True id=1 name="Perform Script"
+                        StepText: Perform Script [ “Deselect Party From Popover” ]
+                        DisableStepCollapsed state=False
+                        CurrentScript value=Pause
+                        Script id=89 name="Deselect Party From Popover"
+                      Image name=a29_x.svg
+                  Object type=Line key=193 LabelKey=0 flags=4096 bounds=77,139,77,394
+        LabelCalc
+          Calculation:
+            | Let ( 
+            | 	getCount = JSONGetElement ( Picker::Results ; "Result.CountPicked" ) 
+            | ; 
+            | 	If ( Left ( getCount ; 1 ) = "?" ; 0 ; getCount )
+            | )
+            refs: fn:Let, fn:JSONGetElement, Picker::Results#2, fn:If, fn:Left
+  Object type=Text key=194 LabelKey=0 flags=-1073741824 bounds=80,480,100,670
+    Text flags=2: "expland >"

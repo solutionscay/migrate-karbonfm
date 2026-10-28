@@ -1,0 +1,119 @@
+# script 467: #DEPRECATED Clean fmDocs Prop { propName, paramName }
+# file: karbon_Generator.fmp12
+# folder: Miscellaneous Generators / Comment Generators
+# source: ScriptCatalog/Script[@id=467]
+# steps: 27 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=218 groupCollapsed=False includeInMenu=False
+
+   1    #@history 2018-09-28 dave@geistinteractive.com - now works with comments that don't have a hyphen to separate them
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-09-28 dave@geistinteractive.com - removes comments and cleans up an fmDocs property (e.g., param, returnSuccess)
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $propName; Value:JSONGetElement ( Get ( ScriptParameter ) ; "propName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+   5    Set Variable [ $paramName; Value:JSONGetElement ( Get ( ScriptParameter ) ; "paramName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $paramName
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #strip any square brackets, which indicate that it's an optional parameter
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $propName; Value:Substitute ( $propName ; [ "[" ; "" ] ; [ "]" ; "" ] ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #strip any default value, which follows the field name
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $positionDefaultSeparator; Value:Position ( $propName ; "=" ; 1 ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Position
+        Name: $positionDefaultSeparator
+  12    If [ $positionDefaultSeparator ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $propName; Value:Trim ( Left ( $propName ; $positionDefaultSeparator - 1 ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Trim, fn:Left
+        Name: $propName
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #strip the comments section, which follows the field name
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $positionCommentSeparator; Value:Position ( $propName ; "-" ; 1 ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Position
+        Name: $positionCommentSeparator
+  18    If [ $positionCommentSeparator ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $propName; Value:Left ( $propName ; $positionCommentSeparator - 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Left
+        Name: $propName
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #Strip out the parameter name
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $propName; Value:Substitute (  $propName ; $paramName & "." ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  24    Set Variable [ $propName; Value:Trim ( $propName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Trim
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Exit Script [ Result: $propName ]
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False

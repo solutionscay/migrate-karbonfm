@@ -1,0 +1,360 @@
+# script 578: _Summarize Line Items
+# file: karbon_kontroller.fmp12
+# folder: API / Sales Transaction / Private
+# source: ScriptCatalog/Script[@id=578]
+# steps: 80 (21 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=574 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # loop lines and gather all the changes that will need to be Posted or Unposted
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@private
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@history 2018-9-13 toddgeist
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $period; Value:SalesTransaction::period ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::period#36
+        Repetition
+          Calculation:
+            | 1
+        Name: $period
+  13    Set Variable [ $newCustomer; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $newCustomer
+  14    Set Variable [ $SalesTransactionId; Value:DBTransactions::SalesTransactionId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: DBTransactions::SalesTransactionId#93
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesTransactionId
+  15    Set Variable [ $sign; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $sign
+  16    Set Variable [ $wildcard; Value:"WC" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $wildcard
+  17    Set Variable [ $sum; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $sum
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #loop through lines
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $SalesLineIds; Value:SQL.GetColumn ( SalesTransaction_SalesLine::id ; SalesTransaction_SalesLine::SalesTransactionId ; $SalesTransactionId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, SalesTransaction_SalesLine::id#1, SalesTransaction_SalesLine::SalesTransactionId#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesLineIds
+  21    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  22    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $id; Value:GetValue($SalesLineIds; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $id
+  24    Exit Loop If [  IsEmpty ( $id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #connect to the line
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Field [ DBTransactions::SalesLineId; $id ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=26 name=SalesLineId
+  28    Set Variable [ $LineAmount; Value:SalesLine::amount ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesLine::amount#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $LineAmount
+  29    Set Variable [ $ItemId; Value:SalesLine::ItemId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesLine::ItemId#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemId
+  30    Set Variable [ $itemType; Value:SQL.GetColumn ( Item::itemType ; Item::id ; $ItemID ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, Item::itemType#21, Item::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $itemType
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32 // Set Field [ DBTransactions::SumPeriod; $period ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=111 name=SumPeriod
+  33 // Set Field [ DBTransactions::SumItemType; $wildcard ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=112 name=SumItemType
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36 // #connect to the summary record for period
+        DisableStepCollapsed state=False
+        Restore state=False
+  37 // Set Field [ SumaryByMonth::<File Missing>; 1 ]
+        DisableStepCollapsed state=False
+        Field table=SumaryByMonth id=10 name="" ref=external
+  38 // Set Variable [ $error; Value:Error.Last ( "Opening/Locking Summary Record By Period"; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  39 // Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #update summary fields
+        DisableStepCollapsed state=False
+        Restore state=False
+  42 // Set Field [ SumaryByMonth::<File Missing>; SumaryByMonth::<Field Missing> + 
+        
+        $sign * $LineAmount ]
+        DisableStepCollapsed state=False
+        Field table=SumaryByMonth id=7 name="" ref=external
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $baseKey; Value:$period & "_" & $wildcard ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $baseKey
+  45    Set Variable [ $totalRevenueKey; Value:$baseKey & ".TotalRevenue" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $totalRevenueKey
+  46    Set Variable [ $TotalRevenueChange; Value:JSONGetElement ( $sum ; $totalRevenueKey ) + $lineAmount * $sign ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TotalRevenueChange
+  47    Set Variable [ $sum; Value:JSONSetElement ( $sum ; $totalRevenueKey; $TotalRevenueChange; JSONNumber) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $sum
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50 // If [ $n = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  51 // Set Variable [ $newCustomerKey; Value:$baseKey & ".NewCustomerCount" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $newCustomerKey
+  52 // Set Variable [ $TotalNewCustomerCount; Value:JSONGetElement ( $sum ; $newCustomerKey ) + $newCustomer * $sign ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TotalNewCustomerCount
+  53 // Set Variable [ $sum; Value:JSONSetElement ( $sum ; $newCustomerKey; $TotalNewCustomerCount ; JSONNumber) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $sum
+  54 // End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #change the item Type
+        DisableStepCollapsed state=False
+        Restore state=False
+  58 // Set Field [ DBTransactions::SumItemType; $ItemType ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=112 name=SumItemType
+  59 // Set Field [ SumaryByMonth::<File Missing>; 1 ]
+        DisableStepCollapsed state=False
+        Field table=SumaryByMonth id=10 name="" ref=external
+  60 // Set Variable [ $error; Value:Error.Last ( "Opening/Locking Summary Record By Fake Period"; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  61 // Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #update totals
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Set Variable [ $baseKey; Value:$period & "_" & $ItemType ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $baseKey
+  66    Set Variable [ $totalRevenueKey; Value:$baseKey & ".TotalRevenue" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $totalRevenueKey
+  67    Set Variable [ $TotalRevenueChange; Value:JSONGetElement ( $sum ; $totalRevenueKey ) + $lineAmount * $sign ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TotalRevenueChange
+  68    Set Variable [ $sum; Value:JSONSetElement ( $sum ; $totalRevenueKey; $TotalRevenueChange; JSONNumber) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $sum
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70 // If [ $n = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  71 // Set Variable [ $newCustomerKey; Value:$baseKey & ".NewCustomerCount" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $newCustomerKey
+  72 // Set Variable [ $TotalNewCustomerCount; Value:JSONGetElement ( $sum ; $newCustomerKey ) + $newCustomer * $sign ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TotalNewCustomerCount
+  73 // Set Variable [ $sum; Value:JSONSetElement ( $sum ; $newCustomerKey; $TotalNewCustomerCount ; JSONNumber) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $sum
+  74 // End If
+        DisableStepCollapsed state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  77    End Loop
+        DisableStepCollapsed state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Exit Script [ Result: $sum ]
+        DisableStepCollapsed state=False

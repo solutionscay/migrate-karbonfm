@@ -1,0 +1,44 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/428-Open_Phone_Popover.txt,c17fec387f7f242376a77df06f74895a71596cfde3d706d08704ecf9dc616c58,scripts,karbon_kontacts.fmp12,428,Open Phone Popover,navigation,client-ui,tier3,"Opens the phone edit popover: commits, parses the JSON parameter, loads label, phone and extension into the UtilityContactMethod globals and focuses the ""PhoneLabel"" object.",none,"UtilityContactMethod::Label#7 (Set Field step 7, global)
+UtilityContactMethod::Phone#13 (Set Field step 8, global)
+UtilityContactMethod::Extension#14 (Set Field step 9, global)",none,objects/karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,none,Phone is loaded into UtilityContactMethod fields; the target-record id is not carried (new phone only). Script is in the Scripts menu (includeInMenu=True).
+karbon_kontacts.fmp12/scripts/431-Save_Contact_Method_-_Phone.txt,c71c0ad44c4ce6858e9256514ac6d208db4023d1c981c7d47c7a56e21cf6e992,scripts,karbon_kontacts.fmp12,431,Save Contact Method - Phone,data-change,server-domain,tier2,"Saves a new phone contact method from the popover: builds a Phone JSON ({Extension, Label, Number, PartyId} plus empty Comment, CountryCode, Primary, Type), closes the popover, commits, and calls ""Create Phone { data }"" in karbon_kontroller; shows ""This Phone was not created."" on error.","UtilityContactMethod::Extension#14
+UtilityContactMethod::Label#7
+UtilityContactMethod::Phone#13
+Party::Id#1",none,"karbon_kontroller.fmp12/scripts/206 ""Create Phone { data }"" (step 19) [other file: karbon_kontroller]",objects/karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,none,"$Comment, $CountryCode, $Primary and $Type are declared with no value (steps 3, 4, 9, 10), so Primary=false, Type empty and CountryCode empty are sent. CountryCode is typed as JSONNumber while empty. PartyId comes from Party::Id (the current related Party). The actual insert is in karbon_kontroller script 206."
+karbon_kontacts.fmp12/scripts/432-Open_Address_Popover.txt,39887a1daf5d22d6169a04baaac06519e74b16b566c901c145a1e9631012c073,scripts,karbon_kontacts.fmp12,432,Open Address Popover,navigation,client-ui,tier3,"Opens the address popover: commits, parses the JSON parameter (Id and Address object), loads id, label, address lines 1-3, city, state, postal code, county and country into the UtilityContactMethod globals and focuses ""AddressLabel"".",none,"UtilityContactMethod::Id#16 (Set Field step 9, global)
+UtilityContactMethod::Label#7 (Set Field step 11, global)
+UtilityContactMethod::AddressLine1#1 (Set Field step 12, global)
+UtilityContactMethod::AddressLine2#2 (Set Field step 13, global)
+UtilityContactMethod::AddressLine3#3 (Set Field step 14, global)
+UtilityContactMethod::City#4 (Set Field step 15, global)
+UtilityContactMethod::StateProvince#10 (Set Field step 16, global)
+UtilityContactMethod::PostalCode#8 (Set Field step 17, global)
+UtilityContactMethod::County#6 (Set Field step 18, global)
+UtilityContactMethod::Country#5 (Set Field step 19, global)",none,"objects/karbon_kontacts.fmp12/layouts/49-Contact_Card.txt
+objects/karbon_kontacts.fmp12/scripts/516-Edit_Address_Popover.txt",none,none
+karbon_kontacts.fmp12/scripts/433-Save_Contact_Method_-_Address.txt,836b8d9693f27c63a01393c7e859d55b2f6d5b8349ab462fa99c4b1f72be5b14,scripts,karbon_kontacts.fmp12,433,Save Contact Method - Address,data-change,server-domain,tier2,"Saves a contact address from the popover: builds an Address JSON from the UtilityContactMethod globals (lines 1-3, city, state, postal code, county, country, label, id, PartyId, Purpose array from the selected purpose type names), closes the popover, commits, and calls ""Create or Edit Address { data }"" in karbon_kontroller; shows ""This Address was not created."" on error.","UtilityContactMethod::AddressLine1#1
+UtilityContactMethod::AddressLine2#2
+UtilityContactMethod::AddressLine3#3
+UtilityContactMethod::City#4
+UtilityContactMethod::Country#5
+UtilityContactMethod::County#6
+UtilityContactMethod::Id#16
+UtilityContactMethod::Label#7
+Party::Id#1
+UtilityContactMethod::PostalCode#8
+UtilityContactMethod::StateProvince#10
+Selected_ContactMethod_ContactMethodPurpose_ContactMethodPurposeType::Name#47","selector::ContactMethodId#10 (Set Field step 18, global)","karbon_kontroller.fmp12/scripts/194 ""Create or Edit Address { data }"" (step 31) [other file: karbon_kontroller]",objects/karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,none,"$Comment and $Primary are declared with no value (steps 7, 15). Purpose is built from the Selected_ContactMethod purpose names via relationship from selector::ContactMethodId (step 18). Create vs edit is decided by the Id in karbon_kontroller script 194."
+karbon_kontacts.fmp12/scripts/434-Open_Network_Address_Popover_json.txt,2760ed1726ec936889c32e2352e0e4a2dfef69ef938eabe4862a8166eef04ed0,scripts,karbon_kontacts.fmp12,434,Open Network Address Popover { json },navigation,client-ui,tier3,"Opens the network address (email, web) popover: commits, parses the JSON parameter, focuses ""InternetAddressLabel"", and loads id, label and address into the UtilityContactMethod globals (supports editing an existing one, history 2019-07-17).",none,"UtilityContactMethod::Id#16 (Set Field step 10, global)
+UtilityContactMethod::Label#7 (Set Field step 11, global)
+UtilityContactMethod::NetworkAddress#15 (Set Field step 12, global)",none,objects/karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,none,none
+karbon_kontacts.fmp12/scripts/435-Save_Contact_Method_-_Network_Address.txt,47115b81c0bd68d05042b1c3d3d184253c4434a1d3d66c1f35db7c57040fa000,scripts,karbon_kontacts.fmp12,435,Save Contact Method - Network Address,data-change,server-domain,tier2,"Saves a network address (email, web, social) from the popover: closes the popover, commits, builds {Address, Id, Label, PartyId} from the UtilityContactMethod globals and the current Party, and calls ""Create or Update Network Address { data }"" in karbon_kontroller; shows ""This Network Address was not created."" on error.","UtilityContactMethod::NetworkAddress#15
+UtilityContactMethod::Id#16
+UtilityContactMethod::Label#7
+Party::Id#1",none,"karbon_kontroller.fmp12/scripts/207 ""Create or Update Network Address { data }"" (step 7) [other file: karbon_kontroller]",objects/karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,none,"The type of network address (email, web) is not sent: the type must be derived by karbon_kontroller script 207 from the value or from the Id. The actual create or update is in that script."
+karbon_kontacts.fmp12/scripts/516-Edit_Address_Popover.txt,7c31099d198a81ba0c8f1c345fef4cfe4764e8daa569a95831e20c034a64b2d9,scripts,karbon_kontacts.fmp12,516,Edit Address Popover,navigation,client-ui,tier3,"Edit address button: reads the current Party_ContactMethod record as JSON (Party_ContactMethod::AsJson) and calls ""Open Address Popover"" with it.",Party_ContactMethod::AsJson#41,none,"karbon_kontacts.fmp12/scripts/432 ""Open Address Popover"" (step 5)",objects/karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,none,none
+karbon_kontacts.fmp12/scripts/520-Format_Phone_Number.txt,0757571c02985d50f1b4c60268052a4d26ac4db8f38d162b544b30dec051eb44,scripts,karbon_kontacts.fmp12,520,Format Phone Number,utility,server-domain,tier2,"Validates and formats the phone number in the active field: sends the number and the Twilio format option to karbon_kontroller ""_wip_Format Phone"" when no Twilio account SID is configured, otherwise to ""Phone Lookup""; on an error shows ""The phone number appears to be invalid."", selects the field text and returns -2; on success writes the formatted PhoneNumber back to the active field and returns 1.","Get(ActiveFieldContents) (step 4)
+System::TwilioFormatOption#70
+System::TwilioAccountSid#68","by name: the active field Get(ActiveFieldTableName) & ""::"" & Get(ActiveFieldName) = formatted PhoneNumber from the result (Set Field By Name step 21, current record)","karbon_kontroller.fmp12/scripts/523 ""_wip_Format Phone { Data }"" (step 9) [other file: karbon_kontroller]
+karbon_kontroller.fmp12/scripts/533 ""Phone Lookup"" (step 11) [other file: karbon_kontroller]","objects/karbon_kontacts.fmp12/layouts/124-Card_-_UtilityParty.txt
+objects/karbon_kontacts.fmp12/layouts/49-Contact_Card.txt",none,"secret: step 8 only tests whether System::TwilioAccountSid#68 is empty (the Twilio credentials live in karbon_kontroller scripts 523/533, not set here). Step 22 (Set Field to UtilityContactMethod::Phone) is disabled. Which service ""Phone Lookup"" calls is in karbon_kontroller script 533; the international case is a #TODO (step 6). Script is in the Scripts menu (includeInMenu=True) and is meant to run as a field validate/save trigger."

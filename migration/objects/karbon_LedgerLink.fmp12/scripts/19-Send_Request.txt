@@ -1,0 +1,385 @@
+# script 19: _Send Request
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO / Private
+# source: ScriptCatalog/Script[@id=19]
+# steps: 79 (4 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=36 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Adds the defaults to the request, and sends it.
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} request
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @returns {object} response
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    ##proxy2 replace
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $params; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  13    Set Variable [ $data; Value:JSONGetElement ( $params ; "data" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  14    Set Variable [ $isDelete; Value:JSONGetElement ( $params ; "query.operation" ) = "delete" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $isDelete
+  15    Set Variable [ $query; Value:JSONGetElement ( $params ; "query" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $query
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $path; Value:Lower(JSONGetElement ( $params ;  "path"  )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Lower, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+  18    Set Variable [ $path; Value:If(Left($path;1) = "/" ; $path ; "/" & $path ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:Left
+        Name: $path
+  19    Set Variable [ $params; Value:JSONDeleteElement ( $params ; "path" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  20    Set Variable [ $method; Value:JSONGetElement ( $params ;  "method"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $method
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Perform Script [ “_OAuth BaseURL” ]
+        DisableStepCollapsed state=False
+        Script id=28 name="_OAuth BaseURL"
+  23    Set Variable [ $baseUrl; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $baseUrl
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ $path = "/attachable" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $path; Value:"/upload" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Perform Script [ “QBO Config” ]
+        DisableStepCollapsed state=False
+        Script id=63 name="QBO Config"
+  31    Set Variable [ $config; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $config
+  32    If [ Error.IsError ( $config ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  33    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  34    End If
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $sandbox; Value:JSONGetElement ( $config ;  "sandbox"  ) = 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $sandbox
+  37    Set Variable [ $apiKey; Value:JSONGetElement ( $config ;  "apiKey"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $apiKey
+  38    Set Variable [ $companyID; Value:JSONGetElement ( $config ;  "companyId"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $companyID
+  39    Set Variable [ $license; Value:JSONGetElement ( $config ;  "license"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $license
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $params; Value:JSONSetElement($params;
+          ["query.sandbox"; $sandbox; JSONNumber];
+          ["query.license"; $license; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    If [ IsEmpty ( $apiKey ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  44    Exit Script [ Result: QBO.Error.UnAuthorized ( "ApiKey is missing. You probably need to Connect to Quickbooks Online"; "") ]
+        DisableStepCollapsed state=False
+        refs: cf:QBO.Error.UnAuthorized
+  45    End If
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $path; Value:"/v3/company/"&   $companyId &  $path ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+  48    Set Variable [ $url; Value:$baseUrl & $path ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  49    Set Variable [ $request; Value:JSONSetElement ($params;
+        
+        	["url" ; $url ; JSONString];
+        	["headers.x-apikey" ; $apiKey ; JSONString];
+        	["headers.Accept" ; "application/json" ; JSONString]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    If [ $method = "Post" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $isUpdate; Value:not IsEmpty(  JSONGetElement (  $data ;  "Id"  )  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:IsEmpty, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $isUpdate
+  53    If [ Right ( $path; 4 )= "send" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Right
+  54    Set Variable [ $request; Value:JSONSetElement ($request;
+        
+        	[ "headers.Expect"; "" ; JSONString ] // turn off http 100-Continue
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $request
+  55    Else If [ $path = "/upload" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $request; Value:JSONSetElement ($request;
+        
+        	[ "data"; $data ; JSONObject ];
+        	[ "headers.Content-Type"; "multipart/form-data" ; JSONString ];
+        	[ "headers.Expect"; "" ; JSONString ] // turn off http 100-Continue
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject, fn:JSONString
+        Name: $request
+  57    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Variable [ $request; Value:JSONSetElement ($request;
+        
+        	[ "data"; $data ; JSONObject ];
+        	[ "headers.Content-Type"; "application/json" ; JSONString ];
+        	[ "headers.Expect"; "" ; JSONString ] // turn off http 100-Continue
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject, fn:JSONString
+        Name: $request
+  59    End If
+        DisableStepCollapsed state=False
+  60    End If
+        DisableStepCollapsed state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    If [ $isUpdate and not $isDelete ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and, fn:not
+  64    Set Variable [ $request; Value:JSONSetElement ($request;
+        
+        	["query.operation" ; "update" ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  65    End If
+        DisableStepCollapsed state=False
+  66 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    ##TODO do we need this?
+        DisableStepCollapsed state=False
+        Restore state=False
+  68 // If [ $isDelete ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  69 // Set Variable [ $request; Value:JSONSetElement ($request;
+        
+        	["query.operation" ; "delete" ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  70 // End If
+        DisableStepCollapsed state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #call the core Generator Script
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Perform Script [ “HTTP ( {request} )”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=78 name="HTTP ( {request} )"
+  76    Set Variable [ $response; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Exit Script [ Result: $response ]
+        DisableStepCollapsed state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False

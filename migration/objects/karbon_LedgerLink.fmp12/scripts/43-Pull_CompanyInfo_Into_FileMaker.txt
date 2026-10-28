@@ -1,0 +1,90 @@
+# script 43: Pull CompanyInfo Into FileMaker
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Public / Company Info
+# source: ScriptCatalog/Script[@id=43]
+# steps: 21 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=99 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Get the company info for this Account and save it to the DB
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @returns {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $Entity; Value:"CompanyInfo" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  11    Set Variable [ $QBOId; Value:SQL.GetColumn ( QBOConfig::CompanyID ; QBOConfig::One ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, QBOConfig::CompanyID#17, QBOConfig::One#20
+        Name: $QBOId
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "QBOId" ; $QBOId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  14    Perform Script [ “Pull QBO Entity Into FileMaker ( {Entity, QBOId })”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=145 name="Pull QBO Entity Into FileMaker ( {Entity, QBOId })"
+  15    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  19    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False

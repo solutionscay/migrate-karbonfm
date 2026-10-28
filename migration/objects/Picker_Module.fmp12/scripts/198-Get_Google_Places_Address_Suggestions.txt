@@ -1,0 +1,290 @@
+# script 198: Get Google Places Address Suggestions
+# file: Picker Module.fmp12
+# folder: Modules / Address Autocomplete / API / Private
+# source: ScriptCatalog/Script[@id=198]
+# steps: 76 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Gets address suggestions from Smarty Streets
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@todo:
+        	- document success object
+        	- support additional params
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {object} data
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {string} data.prefix - The part of the address that has already been typed. Maximum length is 128 bytes.
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@history 2018-05-11 dave@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  27    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #INIT
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $input; Value:Picker::Search_Field ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Picker::Search_Field#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $input
+  37    Set Variable [ $apiKey; Value:Picker::GooglePlaces_ApiKey ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Picker::GooglePlaces_ApiKey#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $apiKey
+  38    Set Variable [ $url; Value:"https://maps.googleapis.com/maps/api/place/autocomplete/json" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $activeSelectionStart; Value:Get( ActiveSelectionStart ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ActiveSelectionStart
+        Repetition
+          Calculation:
+            | 1
+        Name: $activeSelectionStart
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ IsEmpty ( $input ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  45    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #SEND API CALL
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $requestJSON; Value:Let(
+        [
+          json="{}";
+          json = JSONSetElement( json ; "method" ; "GET"; JSONString );
+          json = JSONSetElement( json ; "query.input" ; $input ; JSONString );
+          json = JSONSetElement( json ; "query.key" ; $apiKey ; JSONString );
+          json = JSONSetElement( json ; "url" ; $url ; JSONString );
+          null=""
+        ];
+        
+        json
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Perform Script [ “HTTP ( {request} )”; Parameter: $requestJSON ]
+        DisableStepCollapsed state=False
+        Script id=115 name="HTTP ( {request} )"
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $response; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  60    Set Variable [ $body; Value:JSONGetElement($response; "body") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Field [ Picker::AddressSuggestions; $body ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=21 name=AddressSuggestions
+  63    Set Field [ Picker::AddressRows; JSON.GetValuesAtPath ( JSONGetElement ( $body ; "predictions" ) ; "description" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.GetValuesAtPath, fn:JSONGetElement
+        Field table=Picker id=20 name=AddressRows
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Set Field [ VIRTUALLISTS::foundCount; ValueCount ( Picker::AddressRows ) ]
+        DisableStepCollapsed state=False
+        refs: fn:ValueCount, Picker::AddressRows#20
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    If [ VIRTUALLISTS::foundCount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: VIRTUALLISTS::foundCount#1
+  70    Perform Script [ “Constrain to Found” ]
+        DisableStepCollapsed state=False
+        Script id=204 name="Constrain to Found"
+  71    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Set Selection [ Picker::Search_Field; Start PositionCase( 
+        	IsEmpty( $activeSelectionStart ) 
+        		; Length( Picker::Search_Field ) + 1 
+        		; $activeSelectionStart 
+        ) ]
+        DisableStepCollapsed state=False
+        StartPosition
+          refs: fn:Case, fn:IsEmpty, fn:Length, Picker::Search_Field#1
+        Field table=Picker id=1 name=Search_Field
+  73    End If
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Exit Script [ Result: $body ]
+        DisableStepCollapsed state=False

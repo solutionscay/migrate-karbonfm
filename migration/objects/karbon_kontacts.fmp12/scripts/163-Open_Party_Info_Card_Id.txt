@@ -1,0 +1,101 @@
+# script 163: Open Party Info Card { Id }
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party
+# source: ScriptCatalog/Script[@id=163]
+# steps: 26 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=True includeInMenu=False
+
+   1    #2018-01-17 Dave Graham dave@geistinteractive.com: created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Parameters are optional
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $parameters; Value:JSON.Format ( Get ( ScriptParameter ); "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $Id; Value:JSONGetElement ( $parameters ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ IsEmpty ( $Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   9    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    New Window [ Style: Card; Name: "Edit Contact"; Using layout: “Contact Card” (Party); Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Layout id=49 name="Contact Card"
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ Party::Id <> $Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party::Id#1
+  15    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  16    Set Field [ Party::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=Party id=1 name=Id
+  17    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  18    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  21    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  22    Show Custom Dialog [ Title: "Error"; Message: "The contact could not be found"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

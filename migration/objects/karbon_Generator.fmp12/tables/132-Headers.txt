@@ -1,0 +1,74 @@
+# table 132: Headers
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=132]
+# fields: 9
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=idRequest
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=name
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=value
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Calculated name=pairs
+  Calculation table=Headers:
+    | name & ":" & value
+    refs: Headers::name#2, Headers::value#3
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Calculated name=pairJSON
+  Calculation table=Headers:
+    | <Function Missing> ( name ;  value  )
+    refs: Headers::name#2, Headers::value#3
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Calculated name=pairJSONModify
+  Calculation table=Headers:
+    | Case(
+    |    not IncludeAuth and name = "Authorization"  ; "";
+    |    jsonModifyStep ( "headers." & name ; value )
+    | )
+    refs: fn:Case, fn:not, Headers::IncludeAuth#8, fn:and, Headers::name#2, cf:jsonModifyStep, Headers::value#3
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Number fieldType=Calculated name=needsMimeType
+  Calculation table=Headers:
+    | name = "Content-Type"
+    | or
+    | name = "Accept"
+    refs: Headers::name#2, fn:or
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Number fieldType=Calculated name=IncludeAuth
+  Calculation table=Headers:
+    | Requests::includeAuth
+    refs: Requests::includeAuth#22
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Calculated name=pairJSONSetElement
+  Calculation table=Headers:
+    | Case(
+    |    not IncludeAuth and name = "Authorization"  ; "";
+    |    JSONSetElement_Step ( "headers." & name ; value )
+    | )
+    refs: fn:Case, fn:not, Headers::IncludeAuth#8, fn:and, Headers::name#2, cf:JSONSetElement_Step, Headers::value#3
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

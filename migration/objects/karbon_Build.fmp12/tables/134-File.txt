@@ -1,0 +1,144 @@
+# table 134: File
+# file: karbon_Build.fmp12
+# source: BaseTableCatalog/BaseTable[@id=134]
+# fields: 17
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  Comment: Unique identifier of each record in this table
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=File:
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=Minimal indexLanguage=Unicode_Raw maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  Comment: Date and time each record was created
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=Always
+    StrictDataType value=FourDigitYear
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=CreatedBy
+  Comment: Account name of the user who created each record
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=Always
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  Comment: Date and time each record was last modified
+  AutoEnter allowEditing=False value=ModificationTimeStamp
+  Validation type=Always
+    StrictDataType value=FourDigitYear
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=ModifiedBy
+  Comment: Account name of the user who last modified each record
+  AutoEnter allowEditing=False value=ModificationAccountName
+  Validation type=Always
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=FileName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=CurrentVersion
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=File (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=ActualVersion
+  Comment: The version of the file as reported by a GetVersion query to the Commander script. Useful to see if the current version is different from the actual.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=File:
+    | // Created by Generator - 8/13/2018 10:18:01 PM
+    | // DO NOT format this JSON object!
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "FileName" ; FileName ; JSONString ];
+    | //	[ "MigrationId" ; "" ; JSONString ];
+    | 	[ "SaveAsCopyInd" ; 0 ; JSONBoolean ]
+    |  
+    | )
+    refs: fn:JSONSetElement, File::FileName#6, fn:JSONString, fn:JSONBoolean
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=PublicInd
+  Comment: True if this file is being deployed to the public
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=Password_Development
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=Password_Build
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=Password_Production
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Number fieldType=Normal name=ApplicationId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=DynamicDataSourceName
+  Comment: The name of the global variable that refers to this external data source
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Summary name=IdListOf
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=1 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+

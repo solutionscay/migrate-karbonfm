@@ -1,0 +1,80 @@
+# script 139: btn: New Map
+# file: karbon_Generator.fmp12
+# folder: App Modules / Maps / Public / Buttons
+# source: ScriptCatalog/Script[@id=139]
+# steps: 15 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=146 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    New Record/Request
+        DisableStepCollapsed state=False
+   3    Go to Layout [ “FieldMap Details” (FieldMap) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=6 name="FieldMap Details"
+   4    Set Variable [ $clip; Value:<Function Missing>("public.utf8-plain-text" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $isJson; Value:Let(
+        [
+        
+        text = <Function Missing> ( $clip ; "$" )
+        
+        
+        ];
+        
+        text <> "?"
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let
+        Repetition
+          Calculation:
+            | 1
+        Name: $isJson
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ $isJson ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $json; Value:jsonPrettyPrint (  
+        
+        <Function Missing> ( $clip ; "$" ) ; "  "
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonPrettyPrint
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  10    Set Field [ FieldMap::JSONDocument; $json ]
+        DisableStepCollapsed state=False
+        Field table=FieldMap id=5 name=JSONDocument
+  11    Perform Script [ “Make the Map” ]
+        DisableStepCollapsed state=False
+        Script id=19 name="Make the Map"
+  12    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Go to Field [ FieldMap::JSONDocument ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=FieldMap id=5 name=JSONDocument
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False

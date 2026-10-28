@@ -1,0 +1,329 @@
+# script 248: Import Copied Tables to API Generator ( Id )
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Public
+# source: ScriptCatalog/Script[@id=248]
+# steps: 75 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=253 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $exclusionList; Value:List ( 
+        
+        	"CreationAccountName" ; 
+        	"CreationTimestamp" ; 
+        	"ModificationAccountName" ; 
+        	"ModificationCount" ; 
+        	"ModificationTimestamp" ; 
+        	"ONE" ; 
+        	"AsJSON" ; 
+        	"z_xJoin" 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $exclusionList
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $ApiGeneratorId; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $ApiGeneratorId
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $clip; Value:clip_GetFMxml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_GetFMxml
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+   8 // Set Variable [ $clip; Value:GLOBALS::ClipXml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: GLOBALS::ClipXml#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $tableIndex; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $tableIndex
+  11    Set Variable [ $tableCount; Value:GetAsNumber ( <Function Missing> ( $clip ; "count(//BaseTable/@name)"  ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $tableCount
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  14    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Freeze Window
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Go to Layout [ “ApiGeneratorLine” (ApiGeneratorLine) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=64 name=ApiGeneratorLine
+  19    #Loop through all copied tables
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Exit Loop If [ $tableIndex > $tableCount ]
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #Get field metadata as a list of JSON objects
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $thisTable; Value:List ( 
+        
+        	"<fmxmlsnippet type=\"FMObjectList\">" ; 
+        
+        	<Function Missing> ( $clip ; "//BaseTable[" & $tableIndex & "]" ; "" ; False ) ; 
+        
+        	"</fmxmlsnippet>" ; 
+        
+        	""
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisTable
+  25    Set Variable [ $baseTable; Value:<Function Missing> ( $thisTable ; "//BaseTable/@name" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $baseTable
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #Create table rule record
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Field [ SELECTOR::ApiGeneratorTableRuleId; "" ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=12 name=ApiGeneratorTableRuleId
+  30    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  31    Set Field [ <Table Missing>; $APiGeneratorId ]
+        DisableStepCollapsed state=False
+        Field table="" id=1 name="" ref=missing
+  32    Set Field [ <Table Missing>; $baseTable ]
+        DisableStepCollapsed state=False
+        Field table="" id=5 name="" ref=missing
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $param; Value:JSONSetElement ( "{}" ; 
+        
+        	[ "exclusionList" ; $exclusionList ; JSONString ] ; 
+        	[ "clip" ; $thisTable ; JSONString ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  36    Perform Script [ “Get Field Metadata as JSON”; Parameter: $param ]
+        DisableStepCollapsed state=False
+        Script id=230 name="Get Field Metadata as JSON"
+  37    Set Variable [ $fields; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $fields
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #Insert all fields into API Generator Lines
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $fieldIndex; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $fieldIndex
+  43    Set Variable [ $fieldCount; Value:ValueCount ( $fields ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldCount
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Exit Loop If [ $fieldIndex > $fieldCount ]
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #Get field metadata as a list of JSON objects
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $thisField; Value:GetValue ( $fields ; $fieldIndex ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisField
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    New Record/Request
+        DisableStepCollapsed state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Set Variable [ $dataType; Value:JSONGetElement ( $thisField ; "dataType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataType
+  54    Set Variable [ $readOnly; Value:JSONGetElement ( $thisField ; "readOnly" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $readOnly
+  55    Set Variable [ $name; Value:JSONGetElement ( $thisField ; "name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  56    Set Variable [ $comment; Value:JSONGetElement ( $thisField ; "comment" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $comment
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Field [ ApiGeneratorLine::ApiGeneratorId; $ApiGeneratorId ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=2 name=ApiGeneratorId
+  59    Set Field [ ApiGeneratorLine::FmpTableName; $baseTable ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=10 name=FmpTableName
+  60    Set Field [ ApiGeneratorLine::FmpFieldName; $name ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=4 name=FmpFieldName
+  61    Set Field [ ApiGeneratorLine::JsonPropertyName; $name ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=21 name=JsonPropertyName
+  62    Set Field [ ApiGeneratorLine::description; $comment ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=22 name=description
+  63    Set Field [ ApiGeneratorLine::type; $dataType ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=23 name=type
+  64    Set Field [ ApiGeneratorLine::readOnly; $readOnly ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=24 name=readOnly
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $fieldIndex; Value:$fieldIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $fieldIndex
+  67    End Loop
+        DisableStepCollapsed state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Set Variable [ $tableIndex; Value:$tableIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $tableIndex
+  71    End Loop
+        DisableStepCollapsed state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Exit Script [ Result: $new ]
+        DisableStepCollapsed state=False

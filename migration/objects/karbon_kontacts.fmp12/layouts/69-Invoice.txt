@@ -1,0 +1,788 @@
+# layout 69: Invoice
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Invoices
+# source: LayoutCatalog/Layout[@id=69]
+# objects: 124
+# theme: Karbon-1.0
+# folder group: id=66 groupCollapsed=False includeInMenu=False
+
+Layout width=1020 quickFind=True includeInMenu=False id=69 name=Invoice
+  Table id=1065147 name=Invoice
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnRecordCommit id=104 triggerFlags=1(browse)
+      Script id=376 name="On Commit - Sales Transactions"
+      TriggerText: "On Commit - Sales Transactions"
+  Object type=Rect key=356 LabelKey=0 bounds=170,20,268,280
+  Object type=ButtonBar key=47 LabelKey=0 flags=-1342177276 style=BB-InvisibleWhiteIcon bounds=740,481,770,538
+    HideCondition findMode=False
+      Calculation:
+        | not System::UsingQBOInd
+        refs: fn:not, System::UsingQBOInd#64
+    ButtonBarObj segmentKey=0
+      Object type=PopoverButton key=48 LabelKey=0 bounds=740,481,770,538
+        Text flags=2 style=BB-InvisibleWhiteIcon
+        PopoverButtonObj buttonFlags=0 key=49 iconSize=24 displayType=1
+          Image name="LedgerLink SVG.svg"
+          Object type=Popover key=49 LabelKey=0 bounds=510,423,729,596
+            TitleCalc
+              Calculation:
+                | "LedgerLink"
+            PopoverObj flags=2 position=3 key=48
+              Object type=Button key=50 LabelKey=0 flags=1342177540 bounds=580,434,620,578
+                Text flags=6 style=Button-SuccessPill: "Open in QBO"
+                ButtonObj buttonFlags=0 iconSize=20 displayType=4
+                  Step enable=True id=1 name="Perform Script"
+                    StepText
+                      | Perform Script [ “btn: Invoice Open In QBO”; Parameter: JSONSetElement ("" ; 
+                      | 
+                      | 	[ "Entity" ; "Invoice" ; JSONString];
+                      | 	[ "QBOId" ;  SalesTransaction::qbo_id ; JSONString ]
+                      | ) ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Calculation:
+                      | JSONSetElement ("" ; 
+                      | 
+                      | 	[ "Entity" ; "Invoice" ; JSONString];
+                      | 	[ "QBOId" ;  SalesTransaction::qbo_id ; JSONString ]
+                      | )
+                      refs: fn:JSONSetElement, fn:JSONString, SalesTransaction::qbo_id#2
+                    Script id=213 name="btn: Invoice Open In QBO"
+                  Image name=a121_revert.svg
+                HideCondition findMode=True
+                  Calculation:
+                    | IsEmpty (SalesTransaction::qbo_id)
+                    | or
+                    | Get ( WindowMode ) = 1 /* Find */
+                    refs: fn:IsEmpty, SalesTransaction::qbo_id#2, fn:or, fn:Get, fn:WindowMode
+              Object type=Field key=82 LabelKey=0 bounds=690,489,711,578
+                FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+                  Field: SalesTransaction::qbo_id#2
+              Object type=Text key=83 LabelKey=0 bounds=693,438,709,484
+                Text: "QBO ID"
+              Object type=Graphic key=185 LabelKey=0 bounds=530,432,570,578
+                GraphicObj pictFormat=3 mixColor=#0
+                  Image name=LedgerLink.png
+              Object type=Button key=251 LabelKey=0 flags=-1342177020 bounds=630,434,670,578
+                Text flags=6 style=Button-SuccessPill: "Remove From QBO"
+                ButtonObj buttonFlags=0 iconSize=12 displayType=4
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “btn: Remove Sales Transaction From QBO” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Script id=609 name="btn: Remove Sales Transaction From QBO"
+                  Image name=a25_trash.svg
+                HideCondition findMode=True
+                  Calculation:
+                    | IsEmpty ( SalesTransaction::qbo_id ) or 
+                    | 
+                    | //BookClosed, no edits allowed before this date
+                    | SalesTransaction::date  ≤  System::BookCloseDate
+                    refs: fn:IsEmpty, SalesTransaction::qbo_id#2, fn:or, SalesTransaction::date#5, System::BookCloseDate#62
+              Object type=Text key=380 LabelKey=0 flags=4 bounds=576,437,680,590
+                Text flags=2 style=Text-Primary-Muted
+                  | Transaction has not yet been sent to QBO
+                  | 
+                  | It will get sent when the transaction is locked.
+                HideCondition findMode=False
+                  Calculation:
+                    | not IsEmpty ( SalesTransaction::qbo_id )
+                    | and System::UsingQBOInd
+                    refs: fn:not, fn:IsEmpty, SalesTransaction::qbo_id#2, fn:and, System::UsingQBOInd#64
+  Object type=Button key=265 LabelKey=0 flags=-268435456 bounds=737,900,771,1010
+    Text flags=2 style=Button-SuccessPill: Lock
+    ButtonObj buttonFlags=0 iconSize=12 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Lock SalesTransaction” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Exit
+        Script id=377 name="btn: Lock SalesTransaction"
+      Image name=lock-solid.svg
+  Object type=Portal key=1 LabelKey=0 flags=-1073741824 bounds=340,20,440,1000
+    PortalObj portalFlags=21 numOfRows=2 initialRow=1 style=Portal-Edit
+      TableAliasKey: SalesLine
+      FieldList
+        Field table=SalesLine id=9 name=ItemId
+        Field table=SalesLine id=6 name=amount
+        Field table=SalesLine id=8 name=qty
+        Field table=SalesLine id=7 name=unitPrice
+        Field table=SalesLine id=5 name=description
+      Object type=Button key=211 LabelKey=0 flags=1342177540 bounds=340,958,368,988
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ SalesLine::taxable; not SalesLine::taxable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not SalesLine::taxable
+              refs: fn:not, SalesLine::taxable#11
+            Field table=SalesLine id=11 name=taxable
+          Image name=checked.svg
+        HideCondition findMode=True
+          Calculation:
+            | not SalesLine::taxable or 
+            | (
+            | 	IsEmpty (SalesLine::ItemId )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: fn:not, SalesLine::taxable#11, fn:or, fn:IsEmpty, SalesLine::ItemId#9, fn:and, fn:Get, fn:WindowMode
+      Object type=Button key=219 LabelKey=0 flags=16389 bounds=342,180,367,210
+        ConditionalFormatting
+          Item id=0 flags=129
+            Condition op=0
+              Calculation:
+                | IsEmpty ( SalesLine::ItemId )
+                refs: fn:IsEmpty, SalesLine::ItemId#9
+            Format: -fm-icon-color: rgba(0%,0%,0%,0);
+        ToolTip
+          Calculation:
+            | "remove value"
+        Text flags=6 style=Button-MutedIcon
+        ButtonObj buttonFlags=0 iconSize=14 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ SalesLine::ItemId; "" ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | ""
+            Field table=SalesLine id=9 name=ItemId
+          Image name=a32_smallXOutline.svg
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( SalesLine::ItemId )
+            refs: fn:IsEmpty, SalesLine::ItemId#9
+      Object type=Button key=210 LabelKey=0 flags=1342177540 bounds=340,958,368,988
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ SalesLine::taxable; not SalesLine::taxable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not SalesLine::taxable
+              refs: fn:not, SalesLine::taxable#11
+            Field table=SalesLine id=11 name=taxable
+          Image name=checkbox.svg
+        HideCondition findMode=True
+          Calculation:
+            | SalesLine::taxable
+            | or
+            | (
+            | 	IsEmpty ( SalesLine::ItemId )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: SalesLine::taxable#11, fn:or, fn:IsEmpty, SalesLine::ItemId#9, fn:and, fn:Get, fn:WindowMode
+      Object type=Field key=2 LabelKey=0 bounds=340,25,370,180
+        FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Pop-up Medium Vertical Center"
+          Field: SalesLine::ItemId#9
+          ValueList: Items Id#15
+      Object type=Field key=6 LabelKey=0 flags=1342177280 bounds=340,860,370,960
+        ScriptTriggers
+          Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+            Script id=270 name="SalesLine Amount OnObjectExit Trigger"
+            TriggerText: "SalesLine Amount OnObjectExit Trigger"
+        FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+          Field: SalesLine::amount#6
+          Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      Object type=Field key=4 LabelKey=0 flags=1342177280 bounds=340,700,370,750
+        FieldObj numOfReps=1 flags=34 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+          Field: SalesLine::qty#8
+      Object type=Field key=5 LabelKey=0 flags=1342177280 bounds=340,760,370,850
+        FieldObj numOfReps=1 flags=34 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+          Field: SalesLine::unitPrice#7
+          Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      Object type=Field key=3 LabelKey=0 flags=1073741824 bounds=340,220,380,690
+        FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+          Field: SalesLine::description#5
+  Object type=Field key=10 LabelKey=0 bounds=80,20,110,380
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Large
+      Field: SalesTransaction_Customer::DisplayName#27
+  Object type=Field key=14 LabelKey=0 flags=-1610612736 bounds=479,20,570,380
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::customerMemo#27
+  Object type=Text key=90 LabelKey=0 bounds=149,25,169,281
+    Text flags=6 style=Label-Small-Left: "Billing Address"
+  Object type=Field key=84 LabelKey=0 bounds=218,20,242,220
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: SalesTransaction::billAddressCity#10
+      PlaceholderText findMode=True
+        Calculation:
+          | "City"
+  Object type=Field key=85 LabelKey=0 bounds=241,150,265,280
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: SalesTransaction::billAddressCountry#11
+      PlaceholderText findMode=True
+        Calculation:
+          | "Country"
+  Object type=Field key=86 LabelKey=0 bounds=172,20,196,255
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: SalesTransaction::billAddressLine1#8
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Field key=87 LabelKey=0 bounds=241,20,265,150
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: SalesTransaction::billAddressPostalCode#14
+      PlaceholderText findMode=True
+        Calculation:
+          | "ZIP"
+  Object type=Field key=88 LabelKey=0 bounds=218,220,242,280
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: SalesTransaction::billAddressState#15
+      PlaceholderText findMode=True
+        Calculation:
+          | "State"
+  Object type=Field key=89 LabelKey=0 bounds=195,20,219,280
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: SalesTransaction::billAddressLine2#9
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Button key=91 LabelKey=0 flags=1 bounds=171,255,195,279
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( 	SalesTransaction::billAddressLine1 )  
+            | and 
+            | IsEmpty (	SalesTransaction::billAddressLine2 )
+            | and 
+            | IsEmpty (	SalesTransaction::billAddressCity )
+            | and 
+            | IsEmpty (	SalesTransaction::billAddressState )
+            | and 
+            | IsEmpty (	SalesTransaction::billAddressPostalCode )
+            | and 
+            | IsEmpty (	SalesTransaction::billAddressCountry )
+            refs: fn:IsEmpty, SalesTransaction::billAddressLine1#8, fn:and, SalesTransaction::billAddressLine2#9, SalesTransaction::billAddressCity#10, SalesTransaction::billAddressState#15, SalesTransaction::billAddressPostalCode#14, SalesTransaction::billAddressCountry#11
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open Map ( address )”; Parameter: List (
+          | 	SalesTransaction::billAddressLine1 ;
+          | 	SalesTransaction::billAddressLine2 ;	
+          | 	SalesTransaction::billAddressCity ;
+          | 	SalesTransaction::billAddressState ;
+          | 	SalesTransaction::billAddressPostalCode ;
+          | 	SalesTransaction::billAddressCountry
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | List (
+          | 	SalesTransaction::billAddressLine1 ;
+          | 	SalesTransaction::billAddressLine2 ;	
+          | 	SalesTransaction::billAddressCity ;
+          | 	SalesTransaction::billAddressState ;
+          | 	SalesTransaction::billAddressPostalCode ;
+          | 	SalesTransaction::billAddressCountry
+          | )
+          refs: fn:List, SalesTransaction::billAddressLine1#8, SalesTransaction::billAddressLine2#9, SalesTransaction::billAddressCity#10, SalesTransaction::billAddressState#15, SalesTransaction::billAddressPostalCode#14, SalesTransaction::billAddressCountry#11
+        Script id=268 name="Open Map ( address )"
+      Image name=a99_locationTriangle.svg
+  Object type=Text key=92 LabelKey=0 bounds=10,20,40,860
+    Text flags=10 tableViewVisibility=0 style=H2-Primary: "Invoice # <<SalesTransaction::docNumber>>"
+      FieldList quickFind=True
+        Field table=SalesTransaction id=4 name=docNumber
+  Object type=Field key=99 LabelKey=0 bounds=244,300,268,500
+    FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Pop-up Medium Vertical Center"
+      Field: SalesTransaction::id_Class#49
+      ValueList: LL Class Id#6
+  Object type=Text key=100 LabelKey=0 bounds=224,308,243,428
+    Text flags=6 style=Label-Small-Left: Class
+  Object type=Field key=103 LabelKey=0 bounds=170,300,194,459
+    FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Pop-up Medium Vertical Center"
+      Field: Invoice::id_Term#18
+      ValueList: LL Terms Id Active#9
+  Object type=Button key=104 LabelKey=0 flags=16385 bounds=170,485,194,509
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty (Invoice::id_Term )
+            refs: fn:IsEmpty, Invoice::id_Term#18
+        Format: -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | "remove value"
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Invoice::id_Term; "" ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | ""
+        Field table=Invoice id=18 name=id_Term
+      Image name=a32_smallXOutline.svg
+  Object type=Button key=105 LabelKey=0 flags=16384 bounds=170,461,194,485
+    ToolTip
+      Calculation:
+        | "edit list in QBO"
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open in QB ( {entity , qbo_id} )” from file: “karbon_LedgerLink”; Parameter: JSONSetElement (  ""; 
+          |  
+          | 	[ "Entity" ; "Term" ; JSONString ]
+          | 	 
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        FileReference id=6 name=karbon_LedgerLink
+          UniversalPathList: file:karbon_LedgerLink
+        Calculation:
+          | JSONSetElement (  ""; 
+          |  
+          | 	[ "Entity" ; "Term" ; JSONString ]
+          | 	 
+          | )
+          refs: fn:JSONSetElement, fn:JSONString
+        Script id=501 name="Open in QB ( {entity , qbo_id} )" in=karbon_LedgerLink.fmp12
+      Image name=a72_editOutline.svg
+  Object type=Field key=106 LabelKey=0 flags=4 bounds=170,300,194,459
+    FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Pop-up Medium Vertical Center"
+      Field: Invoice::id_Term#18
+      ValueList: LL Terms Id#8
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+  Object type=Field key=107 LabelKey=0 flags=-1610612736 bounds=479,400,570,740
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::privateNote#6
+  Object type=Text key=109 LabelKey=0 flags=-1610612736 bounds=459,30,478,240
+    Text flags=6 style=Label-Small-Left: "Message displayed on invoice"
+  Object type=Text key=110 LabelKey=0 flags=-1610612736 bounds=460,410,480,594
+    Text flags=6 style=Label-Small-Left: "On Statement"
+  Object type=Field key=111 LabelKey=0 bounds=80,440,110,780
+    FieldObj numOfReps=1 flags=1179680 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Large
+      Field: SalesTransaction::billEmailAddress#29
+      PlaceholderText findMode=True
+        Calculation:
+          | "Billing Email"
+  Object type=Field key=124 LabelKey=0 flags=1342177280 bounds=71,730,115,1000
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-XL-NoChrome-Right
+      Field: SalesTransaction::balanceView#69
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=126 LabelKey=0 flags=1342177280 bounds=56,880,80,1000
+    Text flags=6 style=Label-Small-Left: "Balance Due"
+  Object type=Text key=193 LabelKey=0 bounds=190,1040,214,1204
+    Text flags=6 style=Label-Small-Left: "Shipping/Service Address"
+  Object type=Field key=194 LabelKey=0 bounds=255,1040,279,1170
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::shipAddressCity#42
+      PlaceholderText findMode=True
+        Calculation:
+          | "City"
+  Object type=Field key=195 LabelKey=0 bounds=278,1170,302,1300
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::shipAddressCountry#43
+      PlaceholderText findMode=True
+        Calculation:
+          | "Country"
+  Object type=Field key=196 LabelKey=0 bounds=209,1040,233,1276
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::shipAddressLine1#44
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Field key=197 LabelKey=0 bounds=278,1040,302,1170
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::shipAddressPostalCode#46
+      PlaceholderText findMode=True
+        Calculation:
+          | "ZIP"
+  Object type=Field key=198 LabelKey=0 bounds=255,1170,279,1300
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::shipAddressState#47
+      PlaceholderText findMode=True
+        Calculation:
+          | "State"
+  Object type=Field key=199 LabelKey=0 bounds=232,1040,256,1300
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::shipAddressLine2#45
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Field key=201 LabelKey=0 bounds=170,520,194,640
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Calendar-Medium
+      Field: SalesTransaction::date#5
+  Object type=Text key=202 LabelKey=0 bounds=149,306,169,426
+    Text flags=6 style=Label-Small-Left: Terms
+  Object type=Text key=203 LabelKey=0 bounds=149,527,169,647
+    Text flags=6 style=Label-Small-Left: "Invoice date"
+  Object type=Field key=204 LabelKey=0 bounds=170,660,194,780
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Calendar-Medium
+      Field: SalesTransaction::dueDate#22
+  Object type=Text key=205 LabelKey=0 bounds=149,666,169,786
+    Text flags=6 style=Label-Small-Left: "Due date"
+  Object type=Text key=212 LabelKey=0 bounds=320,28,340,178
+    Text flags=6 style=Label-Small-Left: Product/Service
+  Object type=Text key=213 LabelKey=0 flags=1073741824 bounds=320,225,340,570
+    Text flags=6 style=Label-Small-Left: Description
+  Object type=Text key=214 LabelKey=0 flags=1342177280 bounds=320,770,340,840
+    Text flags=6 style=Label-Small-Left: Rate
+  Object type=Text key=215 LabelKey=0 flags=1342177280 bounds=320,860,340,960
+    Text flags=6 style=Label-Small: Amount
+  Object type=Text key=216 LabelKey=0 flags=1342177280 bounds=320,958,340,988
+    Text flags=6 style=Label-Small-Left: Tax
+  Object type=Text key=218 LabelKey=0 flags=1342177280 bounds=320,700,340,750
+    Text flags=6 style=Label-Small: Qty
+  Object type=GroupButton key=234 LabelKey=0 flags=1342177280 bounds=122,752,146,1000
+    GroupButtonObj numOfObjs=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Open Payments Portal Ob Invoice” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=285 name="btn: Open Payments Portal Ob Invoice"
+      Object type=Text key=235 LabelKey=0 flags=1342177284 bounds=122,752,146,1000
+        Text flags=14 tableViewVisibility=0: "Payments Received: <<countOfPayment>>"
+          FieldList quickFind=False
+            Field table=Invoice id=16 name=countOfPayment
+        HideCondition findMode=False
+          Calculation:
+            | Invoice::countOfPayment  ≤ 0
+            refs: Invoice::countOfPayment#16
+  Object type=PopoverButton key=236 LabelKey=0 flags=1342177284 bounds=113,890,137,914
+    Text flags=2
+    PopoverButtonObj buttonFlags=0 key=237 iconSize=14 displayType=0
+      Object type=Popover key=237 LabelKey=0 bounds=148,766,362,1039
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=3 key=236
+          Object type=Portal key=238 LabelKey=0 name=PaymentsPortal bounds=180,773,356,1032
+            PortalObj portalFlags=17 numOfRows=6 initialRow=1
+              TableAliasKey: Invoice_PaymentLine_Payment
+              FieldList
+                Field table=Invoice_PaymentLine_Payment id=4 name=amount
+                Field table=Invoice_PaymentLine_Payment id=3 name=date
+              Object type=Field key=239 LabelKey=0 bounds=186,916,207,1007
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+                  Field: Invoice_PaymentLine_Payment::amount#4
+                  Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+              Object type=Field key=240 LabelKey=0 bounds=186,806,207,910
+                FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+                  Field: Invoice_PaymentLine_Payment::date#3
+                  Display: date format=7 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"
+              Object type=Button key=241 LabelKey=0 bounds=182,773,208,1015
+                Text flags=2
+                ButtonObj buttonFlags=0 iconSize=17 displayType=1
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “btn: Go To Payment” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Script id=277 name="btn: Go To Payment"
+                  Image name=a39_rightArrow.svg
+          Object type=Rect key=242 LabelKey=0 bounds=154,773,180,1032
+          Object type=Text key=243 LabelKey=0 bounds=154,804,180,877
+            Text flags=2: Date
+          Object type=Text key=244 LabelKey=0 bounds=154,927,180,1000
+            Text flags=2: Amount
+    HideCondition findMode=False
+      Calculation:
+        | 1
+  Object type=Button key=247 LabelKey=0 flags=-1610547200 bounds=603,400,643,440
+    Text flags=2 style=Button-Discuss: Discuss
+    ButtonObj buttonFlags=0 iconSize=30 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open Discussion from SalesTransaction” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=851 name="Open Discussion from SalesTransaction"
+      Image name=chat-message_32.svg
+  Object type=Field key=262 LabelKey=0 bounds=689,1041,710,1120
+    FieldObj numOfReps=1 flags=1048614 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Invoice::Id#9
+  Object type=Text key=268 LabelKey=0 flags=-1610612736 bounds=591,30,611,140
+    Text flags=6 style=Label-Small-Left: Attachments
+  Object type=Portal key=271 LabelKey=0 name=portal.attachments flags=-1610612736 bounds=611,20,700,380
+    PortalObj portalFlags=17 numOfRows=3 initialRow=1 style=Portal-Edit
+      TableAliasKey: SalesTransaction_FileAttachment
+      FieldList
+        Field table=SalesTransaction_FileAttachment id=9 name=IncludeOnSend
+        Field table=SalesTransaction_FileAttachment_File id=6 name=FileName
+        Field table=SalesTransaction_FileAttachment_File id=27 name=FileSize
+      Object type=Field key=272 LabelKey=0 flags=16388 bounds=617,30,638,50
+        ToolTip
+          Calculation:
+            | "Attach to email"
+        FieldObj numOfReps=1 flags=48 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Checkbox-Small
+          Field: SalesTransaction_FileAttachment::IncludeOnSend#9
+          ValueList: Boolean#1
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( SalesTransaction_FileAttachment::Id )
+            refs: fn:IsEmpty, SalesTransaction_FileAttachment::Id#1
+      Object type=Field key=275 LabelKey=0 flags=1073741828 bounds=616,60,637,220
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+          Field: SalesTransaction_FileAttachment_File::FileName#6
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( SalesTransaction_FileAttachment::Id )
+            refs: fn:IsEmpty, SalesTransaction_FileAttachment::Id#1
+      Object type=Button key=381 LabelKey=0 flags=1342242820 bounds=616,340,636,360
+        Text flags=2 style=Button-RowDelete
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “btn: Delete FileAttachment from SalesTransaction” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=627 name="btn: Delete FileAttachment from SalesTransaction"
+          Image name=a27_XCircle.svg
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( SalesTransaction_FileAttachment::Id )
+            refs: fn:IsEmpty, SalesTransaction_FileAttachment::Id#1
+      Object type=Field key=383 LabelKey=0 flags=1073758209 bounds=616,223,637,313
+        ConditionalFormatting
+          Item id=0 flags=3
+            Condition op=0
+              Calculation:
+                | SalesTransaction_FileAttachment_File::FileSize > 20000
+                refs: SalesTransaction_FileAttachment_File::FileSize#27
+            Format: color: rgba(74.902%,10.1961%,18.4314%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+        ToolTip
+          Calculation:
+            | If ( SalesTransaction_FileAttachment_File::FileSize >  20000 ; "This file exceeds the QBO maximum" )
+            refs: fn:If, SalesTransaction_FileAttachment_File::FileSize#27
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome-Muted
+          Field: SalesTransaction_FileAttachment_File::FileSize#27
+      Object type=Text key=384 LabelKey=0 bounds=617,313,636,335
+        Text style=Label-Small-Left-Muted: KB
+  Object type=Text key=277 LabelKey=0 flags=-1610612736 bounds=594,190,610,380
+    Text flags=2 style=Text-Primary-Muted-Small: "Maximum size: 20MB"
+  Object type=SlideControl key=280 LabelKey=0 flags=-805306368 bounds=190,1220,730,1490
+    SlideControlObj visPanelKey=282 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=Slide-Hidden
+      Object type=SlidePanel key=282 LabelKey=0 name=panel.files.blank flags=-805306368 bounds=190,1220,730,1490
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=200 LabelKey=0 flags=1 bounds=209,1276,233,1300
+            ConditionalFormatting
+              Item id=0 flags=129
+                Condition op=0
+                  Calculation:
+                    | IsEmpty (SalesTransaction::shipAddressLine1 )
+                    | and 
+                    | IsEmpty (SalesTransaction::shipAddressLine2 )
+                    | and 
+                    | IsEmpty (SalesTransaction::shipAddressCity ) 
+                    | and 
+                    | IsEmpty (SalesTransaction::shipAddressState )
+                    | and 
+                    | IsEmpty (SalesTransaction::shipAddressPostalCode )
+                    | and 
+                    | IsEmpty (SalesTransaction::shipAddressCountry )
+                    refs: fn:IsEmpty, SalesTransaction::shipAddressLine1#44, fn:and, SalesTransaction::shipAddressLine2#45, SalesTransaction::shipAddressCity#42, SalesTransaction::shipAddressState#47, SalesTransaction::shipAddressPostalCode#46, SalesTransaction::shipAddressCountry#43
+                Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=12 displayType=1
+              Step enable=True id=1 name="Perform Script"
+                StepText
+                  | Perform Script [ “Open Map ( address )”; Parameter: List ( 
+                  | 
+                  | SalesTransaction::shipAddressLine1 ;
+                  | SalesTransaction::shipAddressLine2 ;
+                  | SalesTransaction::shipAddressCity ; 
+                  | SalesTransaction::shipAddressState ;
+                  | SalesTransaction::shipAddressPostalCode ;
+                  | SalesTransaction::shipAddressCountry
+                  | ) ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | List ( 
+                  | 
+                  | SalesTransaction::shipAddressLine1 ;
+                  | SalesTransaction::shipAddressLine2 ;
+                  | SalesTransaction::shipAddressCity ; 
+                  | SalesTransaction::shipAddressState ;
+                  | SalesTransaction::shipAddressPostalCode ;
+                  | SalesTransaction::shipAddressCountry
+                  | )
+                  refs: fn:List, SalesTransaction::shipAddressLine1#44, SalesTransaction::shipAddressLine2#45, SalesTransaction::shipAddressCity#42, SalesTransaction::shipAddressState#47, SalesTransaction::shipAddressPostalCode#46, SalesTransaction::shipAddressCountry#43
+                Script id=268 name="Open Map ( address )"
+              Image name=a99_locationTriangle.svg
+      Object type=SlidePanel key=283 LabelKey=0 name=panel.files.list flags=-805306368 bounds=190,1220,730,1490
+        SlidePanelObj slidePanelFlagSet=0
+  Object type=Button key=304 LabelKey=0 flags=-1610612736 bounds=670,1040,700,1140
+    Text flags=6 style=Button-Small-CommandLink-Center: "Show Existing"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open Card - File List_DEPRECATED” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Exit
+        Script id=533 name="Open Card - File List_DEPRECATED"
+  Object type=ButtonBar key=333 LabelKey=0 flags=1342177284 style=BB-Success bounds=260,890,300,1000
+    HideCondition findMode=False
+      Calculation:
+        | Sum(  SalesLine::retainerAmount) <> 0
+        | or 
+        | SalesTransaction::balance <=0
+        refs: fn:Sum, SalesLine::retainerAmount#17, fn:or, SalesTransaction::balance#26
+    ButtonBarObj segmentKey=0
+      Object type=PopoverButton key=334 LabelKey=0 bounds=261,891,299,999
+        Text flags=2 style=BB-Success
+        PopoverButtonObj buttonFlags=2 key=335 iconSize=12 displayType=0
+          Object type=Popover key=335 LabelKey=0 style="PopUp Dark" bounds=310,856,520,1034
+            TitleCalc
+              Calculation:
+                | "Popover"
+            PopoverObj flags=2 position=1 key=334
+              Object type=Field key=336 LabelKey=337 bounds=360,884,382,1014
+                FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+                  Field: SalesTransaction_Customer::RetainerBalanceCached#55
+                  Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+              Object type=Text key=337 LabelKey=0 bounds=340,884,359,995
+                Text: "Retainer Balance"
+              Object type=Field key=338 LabelKey=339 bounds=408,884,430,1014
+                FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+                  Field: SalesTransaction_Customer::Balance#42
+                  Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+              Object type=Text key=339 LabelKey=0 bounds=390,884,409,1018
+                Text: "Accounts Receivable"
+              Object type=Button key=340 LabelKey=0 flags=1342177280 bounds=450,880,490,1010
+                Text flags=2 style=Button-SuccessPill: OK
+                ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “btn: Apply Retainer” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Script id=223 name="btn: Apply Retainer"
+        LabelCalc
+          Calculation:
+            | "Apply Retainer"
+  Object type=Field key=342 LabelKey=0 flags=-268435456 bounds=460,870,484,990
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+      Field: SalesTransaction::subtotal#33
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Field key=343 LabelKey=0 flags=-268435456 bounds=505,870,530,990
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+      Field: SalesTransaction::totalTax#30
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Field key=344 LabelKey=0 flags=-268435456 bounds=559,870,584,990
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+      Field: SalesTransaction::totalAmt#25
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Field key=345 LabelKey=0 flags=-268435456 bounds=633,870,658,990
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+      Field: SalesTransaction::balanceView#69
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Field key=346 LabelKey=0 flags=-268435456 bounds=604,870,629,990
+    FieldObj numOfReps=1 flags=131108 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+      Field: SalesTransaction::totalPaid#58
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      PlaceholderText findMode=True
+        Calculation:
+          | "$0.00"
+  Object type=Field key=347 LabelKey=0 flags=-268435456 bounds=482,870,507,990
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Edit-Medium-NoChromeRight Copy"
+      Field: SalesTransaction::taxableSubtotal#34
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Line key=348 LabelKey=0 flags=-268431360 style=BlueLine bounds=556,756,556,1000
+  Object type=Line key=349 LabelKey=0 flags=-268431360 style=BlueLine bounds=631,756,631,1000
+  Object type=Button key=353 LabelKey=0 flags=256 bounds=80,380,110,420
+    Text flags=6 style=Button-Secondary: Choose…
+    ButtonObj buttonFlags=0 iconSize=17 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open Party Info Card { Id }”; Parameter: JSONSetElement ( "{}" ; "Id" ; SalesTransaction_Customer_PartyRole::PartyId ; JSONString ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ( "{}" ; "Id" ; SalesTransaction_Customer_PartyRole::PartyId ; JSONString )
+          refs: fn:JSONSetElement, SalesTransaction_Customer_PartyRole::PartyId#45, fn:JSONString
+        Script id=163 name="Open Party Info Card { Id }"
+      Image name=a89_find.svg
+  Object type=Text key=357 LabelKey=0 flags=-268435456 bounds=462,720,481,870
+    Text flags=2 style=Label-Small: Subtotal
+  Object type=Text key=358 LabelKey=0 flags=-268435456 bounds=508,720,527,870
+    Text flags=2 style=Label-Small: "Total Tax"
+  Object type=Text key=359 LabelKey=0 flags=-268435456 bounds=563,720,582,870
+    Text flags=2 style=Label-Small: Total
+  Object type=Text key=360 LabelKey=0 flags=-268435456 bounds=636,720,655,870
+    Text flags=2 style=Label-Small: "Balance Due"
+  Object type=Text key=361 LabelKey=0 flags=-268435456 bounds=609,720,628,870
+    Text flags=2 style=Label-Small: "Payments Received"
+  Object type=Text key=362 LabelKey=0 flags=-268435456 bounds=485,720,504,870
+    Text flags=2 style=Label-Small: "Taxable Subtotal"
+  Object type=Text key=370 LabelKey=0 bounds=384,1019,403,1026
+  Object type=ButtonBar key=373 LabelKey=0 flags=-1610612736 style=BB-InvisibleWhiteIcon bounds=729,13,779,80
+    ButtonBarObj segmentKey=0
+      Object type=PopoverButton key=374 LabelKey=0 flags=4 bounds=729,13,779,80
+        Text flags=2 style=BB-InvisibleWhiteIcon
+        PopoverButtonObj buttonFlags=0 key=375 iconSize=24 displayType=1
+          Image name=a25_trash.svg
+          Object type=Popover key=375 LabelKey=0 style=Popup-Danger bounds=790,5,839,260
+            TitleCalc
+              Calculation:
+                | "Popover"
+            PopoverObj flags=2 position=1 key=374
+              Object type=Button key=376 LabelKey=0 bounds=799,159,829,249
+                Text flags=2 style=Button-Danger: delete
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “btn: Delete SalesTransaction” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Script id=212 name="btn: Delete SalesTransaction"
+              Object type=Text key=377 LabelKey=0 bounds=806,20,824,159
+                Text flags=2 style=Text-Danger: "this can't be undone!"
+        HideCondition findMode=False
+          Calculation:
+            | not IsEmpty ( SalesTransaction::qbo_id )
+            refs: fn:not, fn:IsEmpty, SalesTransaction::qbo_id#2
+  Object type=ButtonBar key=378 LabelKey=0 flags=-1610612476 style=BB-Invisible bounds=739,18,769,75
+    HideCondition findMode=True
+      Calculation:
+        | IsEmpty ( SalesTransaction::qbo_id)
+        refs: fn:IsEmpty, SalesTransaction::qbo_id#2
+    ButtonBarObj segmentKey=0
+      Object type=Button key=379 LabelKey=0 bounds=739,18,769,75
+        Text flags=2 style=BB-Invisible
+        ButtonObj buttonFlags=0 iconSize=24 displayType=1
+          Image name=a25_trash.svg
+  Object type=Button key=382 LabelKey=0 flags=-1610612736 bounds=588,100,610,130
+    Text flags=2 style=Button-CardCloseCenter
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Add New File as FileAttachment to SalesTransaction” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=622 name="btn: Add New File as FileAttachment to SalesTransaction"
+      Image name=a15_smallAdd.svg
+  Object type=Field key=385 LabelKey=0 flags=-268435456 bounds=530,869,555,989
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: SalesTransaction::shipAmt#41
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=386 LabelKey=0 flags=-268435456 bounds=534,720,553,870
+    Text flags=2 style=Label-Small: Shipping
+  Object type=Button key=387 LabelKey=0 flags=-268435456 bounds=520,1050,554,1180
+    Text flags=2 style=Button-SuccessPill: "Refresh from QBO"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Refresh Invoice From QBO ( qbo_id )” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Exit
+        Script id=222 name="Refresh Invoice From QBO ( qbo_id )"
+      Image name=a125_sync.svg
+  Object type=Text key=388 LabelKey=0 flags=1342177540 bounds=0,960,30,1020
+    Text flags=2: DEV
+    HideCondition findMode=True
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=327 LabelKey=0 flags=1342177412 bounds=22,4065,67,4140
+    FieldObj numOfReps=1 flags=32768 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=2 quickFind=0 pictFormat=0
+      Field: Invoice::countOfPayment#16
+    HideCondition findMode=False
+      Calculation:
+        | Invoice::countOfPayment  ≤ 0
+        refs: Invoice::countOfPayment#16

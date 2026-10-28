@@ -1,0 +1,99 @@
+# script 377: btn: Lock SalesTransaction
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Buttons
+# source: ScriptCatalog/Script[@id=377]
+# steps: 22 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=557 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #if the record is open this will close it and run the On Commit Handler
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $id; Value:SalesTransaction::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $id
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Lock/Unlock Sales Transaction” from file: “karbon_kontroller”; Parameter: JSONSetElement ( "{}" ; 
+         
+        	[ "Id" ; $Id ; JSONString ];
+        	[ "Lock" ; True ; JSONBoolean ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: fn:JSONSetElement, fn:JSONString, fn:True, fn:JSONBoolean
+        Script id=599 name="Lock/Unlock Sales Transaction" in=karbon_kontroller.fmp12
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  13    Show Custom Dialog [ Title: "Error"; Message: "The  status wasn't changed"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  14    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ SalesTransaction::InvoiceInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: SalesTransaction::InvoiceInd#73
+  16    Go to Layout [ “Invoice - View Only” (Invoice) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=143 name="Invoice - View Only"
+  17    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Go to Layout [ “SalesReceipt - View Only” (SalesReceipt) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=145 name="SalesReceipt - View Only"
+  19    End If
+        DisableStepCollapsed state=False
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False

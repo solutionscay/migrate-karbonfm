@@ -1,0 +1,87 @@
+# script 857: Update Subscribed Employees
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / Subscriber Picker
+# source: ScriptCatalog/Script[@id=857]
+# steps: 18 (4 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=716 groupCollapsed=False includeInMenu=False
+
+   1    Set Variable [ $param; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+   2 // Show Custom Dialog [ Message: $param; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #check to see if it's an array
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $isArray; Value:Left ($param ; 1) = "[" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Left
+        Name: $isArray
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ $isArray ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $id; Value:JSONGetElement ($param ; ".[0].value[0]") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $id
+   9 // Show Custom Dialog [ Title: "Message"; Message: "REMOVE record with ID of: " & $id; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  10    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $id; Value:JSONGetElement ($param ; "value") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $id
+  12 // Show Custom Dialog [ Title: "Message"; Message: "ADD record with ID of : " & $id; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  13    End If
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #update subscriber global
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Field [ UtilityDiscussion::SubscriberPartyIds; AddRemoveListItems ( UtilityDiscussion::SubscriberPartyIds ; $id ) ]
+        DisableStepCollapsed state=False
+        refs: cf:AddRemoveListItems, UtilityDiscussion::SubscriberPartyIds#19
+        Field table=UtilityDiscussion id=19 name=SubscriberPartyIds
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18 // Exit Script [ Result: $id ]
+        DisableStepCollapsed state=False

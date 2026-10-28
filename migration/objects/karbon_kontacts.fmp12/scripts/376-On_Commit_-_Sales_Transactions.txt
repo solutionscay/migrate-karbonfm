@@ -1,0 +1,51 @@
+# script 376: On Commit - Sales Transactions
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Triggers
+# source: ScriptCatalog/Script[@id=376]
+# steps: 13 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=564 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #summarize related records
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Field [ SalesTransaction::subtotal; SalesLine::summaryTotalAmount ]
+        DisableStepCollapsed state=False
+        refs: SalesLine::summaryTotalAmount#14
+        Field table=SalesTransaction id=33 name=subtotal
+   4    Set Field [ SalesTransaction::taxableSubtotal; SalesLine::summaryTotalAmountTaxable ]
+        DisableStepCollapsed state=False
+        refs: SalesLine::summaryTotalAmountTaxable#13
+        Field table=SalesTransaction id=34 name=taxableSubtotal
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Field [ SalesTransaction::totalAmt; SalesTransaction::subtotal+ SalesTransaction::totalTax + SalesTransaction::shipAmt ]
+        DisableStepCollapsed state=False
+        refs: SalesTransaction::subtotal#33, SalesTransaction::totalTax#30, SalesTransaction::shipAmt#41
+        Field table=SalesTransaction id=25 name=totalAmt
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Field [ SalesTransaction::balance; SalesTransaction::totalAmt - SalesTransaction::totalPaid ]
+        DisableStepCollapsed state=False
+        refs: SalesTransaction::totalAmt#25, SalesTransaction::totalPaid#58
+        Field table=SalesTransaction id=26 name=balance
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Field [ SalesTransaction::qbo_send; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=SalesTransaction id=3 name=qbo_send
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Exit Script [ Result:  1 ]
+        DisableStepCollapsed state=False

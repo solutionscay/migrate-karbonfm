@@ -1,0 +1,63 @@
+# script 504: Send Email ( to )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices
+# source: ScriptCatalog/Script[@id=504]
+# steps: 14 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=469 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $to; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $to
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ not IsEmpty ( $to ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+   5    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   6    Send Mail [ Send via E-mail Client; To: $to ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        To UseFoundSet=False
+        MultipleEmails state=False
+        SendViaSMTP state=False
+        SendViaOAuthAuthentication state=False
+        SMTPEncryptionType type=SMTPEncryptionNone
+        SMTPAuthenticationType type=SMTPAuthenticationNone
+        OAuthProvider type=OAuthProviderGoogle
+   7    If [ Get ( LastError ) ≠ 0 and Get ( LastError ) ≠ 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError, fn:and
+   8    #try sending via mailto url
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Open URL [ "mailto:" & $to ]
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Exit Script [  ]
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False

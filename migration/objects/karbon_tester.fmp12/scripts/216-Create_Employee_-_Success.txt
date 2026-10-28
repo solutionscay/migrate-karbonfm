@@ -1,0 +1,282 @@
+# script 216: Create Employee - Success
+# file: karbon_tester.fmp12
+# folder: Application Module / Tests / Test Components / Party
+# source: ScriptCatalog/Script[@id=216]
+# steps: 70 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=171 groupCollapsed=True includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Script Tested: Create Employee
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Expected Result: Success
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Test Group: Party
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #Subject: Create an Employee Record
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #Case: Standard Employee
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@history 2018-07-30 Admin - Created by Generator
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #SET VARIABLES FOR TEST
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $TEST_Group; Value:"Party" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Group
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $TEST_Subject; Value:"Create" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Subject
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $TEST_Case; Value:"Create employee" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #INITIAL CONDITIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #TEST
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $employee; Value:JSONSetElement (  ""; 
+         
+        	[ "DateOfBirth" ; Date ( 1 ; 1 ; 1950 ) ; JSONString ];
+        	[ "Department" ; "Test department" ; JSONString ];
+        	[ "EmployerName" ; "Geist Interactive" ; JSONString ];
+        	[ "FirstName" ; "Lance" ; JSONString ];
+        	[ "JobTitle" ; "Doer of Deeds" ; JSONString ];
+        	[ "LastName" ; "Brandenberg" ; JSONString ];
+        	[ "Nickname" ; "He who shall not be named" ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Date, fn:JSONString
+        Name: $employee
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Perform Script [ “_wip_Create Employee { data }” from file: “Karbon_kontroller”; Parameter: $employee ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=164 name="_wip_Create Employee { data }" in=karbon_kontroller.fmp12
+  34    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    If [ not Error.IsError ( $TEST_result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  37    #Get the Id of the record we just created
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $PartyId; Value:JSONGetElement ( $TEST_result ; "PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+  39    Set Variable [ $Id; Value:JSONGetElement ( $TEST_result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #Get full JSON result
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $TEST_result; Value:SQL.GetColumn ( 
+        	Party::AsJson ; // columnField 
+        	Party::Id ; // whereField
+        	$PartyId // whereValue 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, Party::AsJson#137, Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  43    End If
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #ASSERTIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  50    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "Name" ; "Lance Brandenberg" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #CLEANUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    If [ not Error.IsError ( $TEST_result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #Delete the Party
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Field [ Deleter::IDsList; List ( Deleter::IDsList; $PartyId ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, Deleter::IDsList#1
+        Field table=Deleter id=1 name=IDsList
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #Delete the Employee
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Field [ Deleter::IDsList; List ( Deleter::IDsList; $Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, Deleter::IDsList#1
+        Field table=Deleter id=1 name=IDsList
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    End If
+        DisableStepCollapsed state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Exit Script [ Result: JSONGetElement ( $TEST_result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False

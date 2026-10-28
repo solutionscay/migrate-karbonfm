@@ -1,0 +1,253 @@
+# table 199: Opportunity
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=199]
+# fields: 31
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  Comment: Inherits from PartyRole Id
+  AutoEnter allowEditing=False overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=Opportunity:
+      | Get ( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=Opportunity (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=Opportunity:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=Opportunity (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=Opportunity (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Opportunity:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=Opportunity:
+    | JSONSetElement ( "{}" ; 
+    | 
+    | 	[ "CreationAccountName" ; CreationAccountName ; JSONString ] ;
+    | 	[ "CreationTimestamp" ; CreationTimestamp ; JSONString ] ;
+    | 	[ "Id" ; Id ; JSONString ] ;
+    | 	[ "Name" ; Name ; JSONString ] ;
+    | 	[ "Notes" ; Notes ; JSONString ] ;
+    | 	[ "Status" ; StatusCached ; JSONString ] 
+    | 
+    | )
+    refs: fn:JSONSetElement, Opportunity::CreationAccountName#15, fn:JSONString, Opportunity::CreationTimestamp#16, Opportunity::Id#1, Opportunity::Name#69, Opportunity::Notes#35, Opportunity::StatusCached#50
+  Comment: #WIP #TODO - add newly defined fields
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Normal name=Notes
+  Comment: Free form text describing the Customer. Added by Dave Graham 2017-07-09.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=48 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Opportunity (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Text fieldType=Normal name=StatusCached
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=Opportunity:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=52 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Opportunity:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=53 dataType=Number fieldType=Normal name=Value
+  Comment: The estimated value of this opportunity
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=54 dataType=Text fieldType=Normal name=Probability
+  Comment: One of: unlikely, likely, definite
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=55 dataType=Text fieldType=Normal name=PartyId
+  Comment: The party ID of the customer or lead associated with this sale
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=Text fieldType=Normal name=SalespersonId
+  Comment: The ID (i.e., PartyRoleId) of the employee associated with this opportunity
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=57 dataType=Date fieldType=Normal name=StartDate
+  Comment: The date the opportunity became effective
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=58 dataType=Date fieldType=Normal name=EndDate
+  Comment: The date the opportunity was closed
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=59 dataType=Number fieldType=Normal name=ActiveInd
+  Comment: True if this Opportunity has an active status (e.g., new, in process)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=60 dataType=Text fieldType=Normal name=LeadId
+  Comment: Foreign key of the Lead, if this opportunity relates to a lead.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=61 dataType=Number fieldType=Normal name=OpportunityStatusId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=62 dataType=Text fieldType=Calculated name=TypeDisplay
+  Calculation table=Opportunity:
+    | If ( 
+    | 	not IsEmpty ( LeadId ) ; 
+    | 		"Lead" ; 
+    | 		"Customer"
+    | )
+    refs: fn:If, fn:not, fn:IsEmpty, Opportunity::LeadId#60
+  Comment: Display a string of type enum: lead, customer
+  AutoEnter alwaysEvaluate=True
+  Storage storeCalculationResults=True autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=63 dataType=Number fieldType=Summary name=ValueTotal
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=Total
+    SummaryField
+      Field id=53 name=Value
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=64 dataType=Text fieldType=Normal name=PartyNameCached
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=65 dataType=Text fieldType=Normal name=ReferringPartyId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=66 dataType=Text fieldType=Normal name=ReferringPartyNameCached
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=67 dataType=Text fieldType=Summary name=IdList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=1 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=68 dataType=Number fieldType=Summary name=Count
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=Count
+    SummaryField
+      Field id=20 name=ONE
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=69 dataType=Text fieldType=Normal name=Name
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=70 dataType=Text fieldType=Normal name=PrimaryContactPartyId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

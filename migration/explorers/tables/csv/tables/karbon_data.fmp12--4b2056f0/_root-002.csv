@@ -1,0 +1,327 @@
+source_id,source_hash,kind,file,id,name,role,fields,regular,calculated,summary,global,container,repeating,keys,logic,logic_count,target,open_question
+karbon_data.fmp12/tables/171-Event.txt,d584ac2c8bfdd238e4080f39ec90242d3dce3fdc04f88ccaea321a1fa4d499ef,tables,karbon_data.fmp12,171,Event,entity,20,16,2,1,1,0,0,Id (id 1): UUID auto-enter; parent side of Equal predicates to Meeting,"6 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+129 IdList | summary | List summary of Id
+180 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+181 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+182 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+183 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+184 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+194 AsJSON | calc-stored | Stored (index none) JSON (address id, end/start date and time, id, location)
+195 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+196 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",11,table,Subtype of Activity by Id; MeetingInd flag plus a Meeting table
+karbon_data.fmp12/tables/172-ActivityPartyEvent.txt,a3d4b9d8b867fa1f46d2678ebfa6a2acf5b85a38b78be29e0b4e011ad3458dd3,tables,karbon_data.fmp12,172,ActivityPartyEvent,entity,9,6,0,2,1,0,0,FK Id -> ActivityParty::Id,"35 Comments | auto-calc | Cleans the entered comments with CleanText on every entry
+56 IdList | summary | List summary of Id
+62 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+74 CountRSVP | summary | Total summary of RsvpInd: number of expected attendees in the found set",4,table,none
+karbon_data.fmp12/tables/173-ActivityPartyEmail.txt,f19ba1658fe167b7e7ab413f47044fddd062a29f6e15b9d92cb5a93df1cb1c25,tables,karbon_data.fmp12,173,ActivityPartyEmail,entity,8,4,2,1,1,0,0,FK Id -> ActivityParty::Id,"23 Id | auto-calc | Auto-enter calculation switched on, but its formula is not in the DDR
+42 EmailAddressId | calc-unstored | Unstored, deprecated: ActivityParty::ContactMethodId
+56 IdList | summary | List summary of Id
+62 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+75 AsJson | calc-unstored | Unstored JSON (id, email address, email address id, party id and name, role id)",5,table,Id auto-enter is switched on but its formula is not in the DDR; EmailAddressId is deprecated in favor of ActivityParty::ContactMethodId
+karbon_data.fmp12/tables/174-ActivityComment.txt,f56b4264e82fc8562601ff42863878a2d8621e05f1d587bc0a9a59c43b163688,tables,karbon_data.fmp12,174,ActivityComment,entity,14,12,1,0,1,0,0,"Id (id 6): UUID auto-enter; parent side of Equal predicates to DBTransactions, Deleter
+FK ActivityId -> Activity::Id
+FK UserId_DEPRECATED -> User::Id
+FK CreatorId -> Party::Id","6 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+7 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+11 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+12 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+13 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+14 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+20 AsJSON | calc-stored | Stored (index none) JSON (comment, date, activity id, id, time, creator id)",7,table,UserId_DEPRECATED is replaced by CreatorId (a Party)
+karbon_data.fmp12/tables/175-Meeting.txt,e60f55d5f61a412821b6685ea0b39b8667bdd07b968bc6909ddcb368adfba3c9,tables,karbon_data.fmp12,175,Meeting,entity,3,2,0,0,1,0,0,"FK Id -> Event::Id
+FK Id -> Activity::Id",7 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts,1,merge,Subtype marker only; Event has MeetingInd; confirm it merges into Event
+karbon_data.fmp12/tables/176-HTTPRequestLog.txt,1beef0e21665c18df29d2472e577753d2cecf82b6d215ad6a85d3d44fcbe9816,tables,karbon_data.fmp12,176,HTTPRequestLog,log-audit,5,5,0,0,0,0,0,Id (id 1): UUID auto-enter,"1 Id | auto-calc | Generates a UUID string as the record key at creation (user may override)
+5 z_creationTimestamp | auto-calc | Auto-enters the current host timestamp on creation (recalculated if changed)",2,table,"Stores raw request, response and curl text; may contain credentials, check before migrating"
+karbon_data.fmp12/tables/177-SalesTransaction.txt,9ac6e7b1e2ccc0c7dee92b4ee337511f4264b6fa2169a97b80d95f60cbc5a038,tables,karbon_data.fmp12,177,SalesTransaction,entity,57,44,11,1,1,0,0,"id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to ActivityEntity, DBTransactions, FileAttachment, Invoice, PaymentLine, SalesLine, SalesReceipt, selector
+qbo_id (id 2): unique validation","1 id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user may override) and validates it: not empty, unique, strict (no override) (always) - message ""Invoice id must exist and be unique.""
+2 qbo_id | validate-rule | Validation (always, strict): unique (blank allowed)
+3 qbo_send | validate-rule | Validation (always, strict): range 0 to 1; its auto-enter calculation (GetField("""") with $LedgerLinkIsUpdatingThisRecord) is switched off
+4 docNumber | validate-rule | Validation during entry: at most 21 characters
+5 date | auto-calc, validate-rule | Auto-enters the current date; validation (always): four-digit year
+8 billAddressLine1 | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::billAddressLine1*/
+9 billAddressLine2 | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::billAddressLine2*/
+10 billAddressCity | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::billAddressCity*/
+11 billAddressCountry | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::billAddressCountry*/
+14 billAddressPostalCode | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::billAddressPostalCode*/
+15 billAddressState | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::billAddressState*/
+22 dueDate | validate-rule | Validation (always): four-digit year
+25 totalAmt | validate-rule | Validation (always): numeric
+26 balance | validate-rule | Validation (always): numeric
+29 billEmailAddress | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::primaryEmail*/
+30 totalTax | validate-rule | Validation (always): numeric
+31 id_TaxCode | auto-calc | Auto-enter calculation is only a comment (/*Customer::id_TaxCode*/), so it enters nothing
+32 deleted | validate-rule | Validation (always, strict): range 0 to 1 (soft-delete flag)
+35 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+36 period | calc-stored | Stored, not indexed: year and two-digit month of date (YYYYMM)
+37 totalAmtSummary | summary | Total summary of totalAmt
+42 shipAddressCity | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::shipAddressCity*/
+43 shipAddressCountry | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::shipAddressCountry*/
+44 shipAddressLine1 | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::shipAddressLine1*/
+45 shipAddressLine2 | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::shipAddressLine2*/
+46 shipAddressPostalCode | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::shipAddressPostalCode*/
+47 shipAddressState | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Invoice_Customer::shipAddressState*/
+57 paidInd | calc-stored | Stored, indexed boolean: balance = 0
+58 totalPaid | calc-unstored | Unstored: sum of the related PaymentLine amounts
+62 RETAINER | calc-stored | Stored calculated number whose formula is not in the DDR
+65 totalRetainerAmount | calc-unstored | Unstored: sum of the related SalesLine retainerAmount
+66 totalRevenue | calc-unstored | Unstored: totalAmt minus totalRetainerAmount
+67 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+68 status | auto-data | Constant default ""Draft"" (comment lists draft, posted, unposted, edit)
+69 balanceView | calc-unstored | Unstored: balance, or the computed total (totalAmtView) while balance is empty (works around posting to QBO)
+70 totalAmtView | calc-unstored | Unstored: totalAmt, or the sum of related SalesLine amounts while totalAmt is empty
+76 AsJSON | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (all invoice fields incl. bill and ship address, plus a SalesLine array from SalesLine::AsJSON)
+80 LockedInd | auto-calc, auto-data | Constant default 0 and a GetAsBoolean(Self) calculation that coerces any entered value to a boolean (comment: transaction is locked)
+81 BillingAddressDisplay | calc-stored | Stored (index none): billing address lines, city/state/postal on one line, then country
+82 ShippingAddressDisplay | calc-stored | Stored (index none): shipping address lines, city/state/postal on one line, then country",40,table,"Address-copy and tax-code auto-enters are commented out, so who copies customer address and email? RETAINER formula is not in the DDR; the qbo_send auto-enter is switched off; Invoice and SalesReceipt are subtypes by InvoiceInd/SalesReceiptInd"
+karbon_data.fmp12/tables/178-SalesLine.txt,6f587c77be64554ef837fe82635306e0c412c2f6e689e4364466646c2f879620,tables,karbon_data.fmp12,178,SalesLine,entity,19,13,3,2,1,0,0,"id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to DBTransactions
+FK SalesTransactionId -> SalesTransaction::id
+FK ItemId -> Item::id","1 id | auto-calc, validate-rule | Generates a UUID string at creation (user may override); validation (always, strict): not empty and unique, message ""InvoiceItem id must exist and be unique.""
+4 qbo_lineNum | auto-calc, validate-rule | Auto-enters the current UTC milliseconds so new lines sort after earlier ones (not for display); validated numeric
+5 description | auto-calc, validate-rule | Auto-enters the related Item description, replacing the old value; validation (always, strict): at most 4000 characters
+6 amount | auto-calc, validate-rule | Auto-enters qty (1 if empty) times unitPrice rounded to 2 decimals, empty when no ItemId (description-only line); recalculates always, mirrors QuickBooks Online; strict numeric validation
+7 unitPrice | auto-calc, validate-rule | Auto-enters the Item unitPrice when the user changed the item field (detected via Get(ActiveFieldName)); otherwise rounds the manual value to 7 decimals (QBO rule); the lookup is off; validation (always): numeric
+8 qty | auto-calc, validate-rule | Auto-enters Round(Self;7); validation (always): numeric
+9 ItemId | validate-rule | Strict validation with message ""A Product/Service must be selected.""
+10 SalesTransactionId | validate-rule | Validation (always, strict): not empty (a line needs a parent transaction)
+11 taxable | auto-calc, validate-rule | Auto-enters the related Item taxable flag; validation (always, strict): numeric, 0 to 1
+12 amountTaxable | calc-stored | Stored, not indexed: amount if taxable else 0 (feeds the taxable subtotal)
+13 summaryTotalAmountTaxable | summary | Total summary of amountTaxable
+14 summaryTotalAmount | summary | Total summary of amount
+17 retainerAmount | calc-unstored | Unstored: amount when the related Item is named ""Retainer"", else 0
+18 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+22 AsJSON | calc-stored | Stored (index none) JSON of the line (id, qbo ids, description, amount, unit price, qty, item and transaction ids, taxable, flags)",15,table,Stored amount/taxable rules mirror QuickBooks Online rounding; the item-change detection in unitPrice depends on Get(ActiveFieldName) so it needs an explicit rule in the target
+karbon_data.fmp12/tables/179-Payment.txt,465c2cb6b2d0b9b82e0fee172dc3517dcebcd7be010d645fb762a9e74fad7553,tables,karbon_data.fmp12,179,Payment,entity,18,14,3,0,1,0,0,"id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to DBTransactions, PaymentLine
+qbo_id (id 11): unique validation","1 id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user may override) and validates it: not empty, unique, strict (no override) (always)
+3 date | validate-rule | Validation (always): four-digit year
+10 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+11 qbo_id | auto-data, validate-rule | Constant default (empty); validation (always, strict): unique
+12 qbo_send | auto-calc, validate-rule | Auto-enters 1 (flag: needs sending to QuickBooks Online) on any edit unless the sync session variable is set, in which case it keeps its value; validated to 0 or 1 strictly. Formula uses GetField("""") to force re-evaluation on any change
+19 TotalAllocatedPayments | calc-unstored | Unstored: sum of related PaymentLine amounts
+20 TotalUnallocated | calc-unstored | Unstored: 0 if amount <= 0, else amount minus TotalAllocatedPayments
+21 IncludedInvoiceIDs | calc-unstored | Unstored: list of related PaymentLine id_Invoice values
+23 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts",9,table,qbo_send auto-enter references $fmQBOIsUpdatingThisRecord (QBO sync flag)
+karbon_data.fmp12/tables/180-PaymentLine.txt,f7de9ca14c38104cfa7d629ca9ca1ca83ea091f3219232e3f9c65e7bc927be4e,tables,karbon_data.fmp12,180,PaymentLine,join,13,9,2,1,1,0,0,"id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to DBTransactions
+FK id_Payment -> Payment::id
+FK id_Invoice -> SalesTransaction::id","1 id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user may override) and validates it: not empty, unique, strict (no override) (always)
+10 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+15 id_Customer | auto-calc | Auto-enter calculation refers to a deleted table and field (<Table Missing>::<Field Missing>), so it enters nothing usable
+17 TransactionDate | calc-unstored | Unstored: related SalesTransaction date
+18 TransactionDocNumber | calc-unstored | Unstored: related SalesTransaction docNumber
+19 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+21 totalOfAmount | summary | Total summary of amount",7,table,id_Customer auto-enter points to a deleted table; id_JournalEntry has no table in this share
+karbon_data.fmp12/tables/181-SalesReceipt.txt,e1c1d519e9a705a1e7874794b16295ea07d11332a6f685a9fce62e1cbcd53e8b,tables,karbon_data.fmp12,181,SalesReceipt,entity,5,4,0,0,1,0,0,FK id -> SalesTransaction::id,"1 id | validate-rule | StrictValidation with message ""Invoice id must exist and be unique."" (the message is copied from invoice; no uniqueness rule is set; UUID auto-enter is off)
+67 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+75 paymentRefNum | validate-rule | Validation during entry: at most 21 characters, message ""Exceeded max 21 characters""",3,table,Subtype of SalesTransaction by id; confirm whether it merges into SalesTransaction (it only adds id_AccountDeposit and paymentRefNum)
+karbon_data.fmp12/tables/183-Item.txt,4a41f224272176067dc16be7146c7d8ef1412f97412c786c55050232cf50c132,tables,karbon_data.fmp12,183,Item,entity,27,24,2,0,1,0,0,"id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to DBTransactions, SalesLine
+qbo_id (id 2): unique validation","1 id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user may override) and validates it: not empty, unique, strict (no override) (always)
+2 qbo_id | auto-data, validate-rule | Constant default (empty); validation (always, strict): unique
+4 active | auto-data, validate-rule | Constant default 1 (active); validation (always, strict): range 0 to 1
+5 description | validate-rule | Validation (always, strict): at most 4000 characters
+7 name | validate-rule | Validation (always, strict): at most 100 characters
+8 purchaseCost | validate-rule | Validation (always): numeric
+9 purchaseDesc | validate-rule | Validation during entry: at most 1000 characters
+13 qtyOnHand | validate-rule | Validation (always): numeric
+17 subItem | validate-rule | Validation (always): numeric
+19 taxable | auto-data, validate-rule | Constant default 1; validation (always): numeric, 0 to 1
+20 trackQtyOnHand | validate-rule | Validation (always): numeric
+21 itemType | validate-rule | Validation (always, strict): value must be in value list ItemType
+22 unitPrice | validate-rule | Validation (always): numeric
+24 level | validate-rule | Validation (always): numeric
+26 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+29 sku | validate-rule | Validation (always, strict): at most 100 characters
+34 qbo_send | auto-calc, validate-rule | Auto-enters 1 (flag: needs sending to QuickBooks Online) on any edit unless the sync session variable is set, in which case it keeps its value; validated to 0 or 1 strictly. Formula uses GetField("""") to force re-evaluation on any change
+35 nameForActiveValueList | calc-stored | Stored, indexed (minimal): name when active, else empty; feeds a value list of active items
+36 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+38 AsJSON | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (all item fields, QBO ids and account refs)",20,table,Value list ItemType defines allowed itemType values; account refs are QuickBooks account ids
+karbon_data.fmp12/tables/184-Discussion.txt,66a6d3123cf0937b33ec5848bc568afcc376537c2d9f2e5f71a99cf1ed525a0c,tables,karbon_data.fmp12,184,Discussion,entity,18,14,3,0,1,0,0,"FK Id -> Activity::Id
+FK EntityId_Deprecated -> Activity::Id","7 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+11 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+12 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+13 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+14 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+23 DisplayActiveUsers_Deprecated | calc-unstored | Deprecated unstored: display names of related users joined by "", "" (references DiscussionUser_User_Deprecated)
+26 AsJSON | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (ActiveInd, Date, Id, Time, Title; the entity elements are commented out)
+28 DisplaySubscribers | calc-unstored | Unstored: unique subscriber party names from related ActivityParty rows joined by "", "" with the trailing separator trimmed",8,table,EntityTypeId_Deprecated/EntityId_Deprecated are replaced by ActivityEntity; DiscussionUser_User_Deprecated relationship is still referenced
+karbon_data.fmp12/tables/186-Notification.txt,8294278c78215af76e9ecf5648aa08cb2ead2caff6b18247110f6cf9306101ee,tables,karbon_data.fmp12,186,Notification,entity,17,16,0,0,1,0,0,"Id (id 6): UUID auto-enter; parent side of Equal predicates to DBTransactions, Deleter","6 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+7 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+11 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+12 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+13 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+14 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+21 Date | auto-calc | Auto-enters the date part of CreationTimestamp",7,table,Several _Deprecated fields; Description summarizes discussions or tasks
+karbon_data.fmp12/tables/187-Template.txt,30e275f632bb1dd6d6efd8b21d0001493ecbf55d96cf28a99c2ff50fda0b2583,tables,karbon_data.fmp12,187,Template,entity,17,15,1,0,1,0,0,"Id (id 1): serial; parent side of Equal predicates to Activity, DBTransactions, MergeField, UtilityEmailMessage","1 Id | auto-serial | Serial number, increment 1, next value 3, generated OnCreation
+6 Subject | auto-calc | Trims leading and trailing spaces on entry
+10 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+26 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+27 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+28 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+29 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+30 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+31 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+32 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",10,table,Id is a serial; comment says to change it if templates are created in a synchronized system
+karbon_data.fmp12/tables/188-MergeField.txt,5a971c3b599c5599645469a05f160fbe22cb60b4adc796d0a87c9bad2b8176a6,tables,karbon_data.fmp12,188,MergeField,entity,17,15,1,0,1,0,0,"Id (id 19): serial
+FK Name -> MergeFieldConfig::Id
+FK TemplateId -> Template::Id","19 Id | auto-serial | Serial number, increment 1, next value 21, generated OnCreation
+44 RequiredInd | auto-data | Constant default 1 (a merge field requires a value)
+50 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+51 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+52 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+53 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+54 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+55 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+56 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+57 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+60 ActivityPartyRoleId | auto-calc | Auto-enter calculation is only a comment (SyncTest/Lookup), so it enters nothing",11,table,Name is related to MergeFieldConfig::Id by an Equal predicate although Name is text and the config Id is a serial; confirm intended join
+karbon_data.fmp12/tables/189-MergeFieldConfig.txt,453cb01040e25337fffd9d6fcc50aa570b2974132cc42b236a4a1eb9c5e37f45,tables,karbon_data.fmp12,189,MergeFieldConfig,lookup,23,20,2,0,1,0,0,"Id (id 19): serial; parent side of Equal predicates to DBTransactions, MergeField
+Name (id 31): unique validation; parent side of Equal predicates to DBTransactions","19 Id | auto-serial | Serial number, increment 1, next value 9, generated OnCreation
+31 Name | auto-data, validate-rule | Constant default ""<<Field Name>>""; validation (always, strict): unique
+42 ValidExpressionInd | calc-unstored | Unstored boolean: whether ""<ForeignTableOccurrenceName>::<DBTransactionsFieldName>"" is a valid FileMaker expression
+54 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+55 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+56 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+57 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+58 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+59 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+60 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+61 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)",11,table,"Rows name FileMaker scripts, table occurrences and DBTransactions fields (ScriptName, ForeignTableOccurrenceName, DBTransactionsFieldName), which are FileMaker implementation detail; confirm the target replaces them"
+karbon_data.fmp12/tables/190-Invoice.txt,b91ea56f52884613c8493edbb363d3ef2972e822885b6a9738777bbd69085300,tables,karbon_data.fmp12,190,Invoice,entity,16,11,3,0,2,0,0,FK Id -> SalesTransaction::id,"2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+6 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+8 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+10 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+11 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+13 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+14 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+16 countOfPayment | calc-unstored | Unstored: count of related PaymentLine ids
+20 totalPaid | calc-unstored | Unstored: sum of related PaymentLine amounts",12,unresolved,"Subtype of SalesTransaction by id with its own audit fields and aggregates (countOfPayment, totalPaid) duplicating SalesTransaction::totalPaid; confirm whether it is still used"
+karbon_data.fmp12/tables/193-EntityType.txt,0edb65d4f6f5fec8efd4d74a7ce1bf0051a6a6366675440bce6f87cd2c39e8fb,tables,karbon_data.fmp12,193,EntityType,lookup,8,7,0,0,1,0,0,"Id (id 6): serial; parent side of Equal predicates to ActivityEntity, DBTransactions","6 Id | auto-serial | Serial number (increment 1, next value 13); the UUID auto-enter calculation is switched off
+7 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+11 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+12 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+13 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+14 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)",6,table,none
+karbon_data.fmp12/tables/194-PartyImport.txt,5a8ce7451c762973da35ed03f339fecabe92c708401be079c7090710143e3188,tables,karbon_data.fmp12,194,PartyImport,staging,82,68,12,0,2,0,0,none,"136 Address Home Contact Method ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Address Home Street 1 ) ; uID_Create )*/
+151 Address Home Type Out | calc-unstored | Unstored calculation: Case( IsEmpty( Address Home Type Override ) ; ""Home"" ; Address Home Type Override )
+137 Address Work Contact Method ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Address Work Street 1 ) ; uID_Create )*/
+150 Address Work Type Out | calc-unstored | Unstored calculation: Case( IsEmpty( Address Work Type Override ) ; ""Work"" ; Address Work Type Override )
+31 Company Name | auto-calc | Cleans the entered text with CleanText on every entry
+144 Company Web Site ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Company Web Site ) ; uID_Create )*/
+74 Constant | calc-stored | Stored, indexed calculated number that is always 1
+75 Creation_Account | auto-created | Auto-enters the creating account name (not editable)
+100 Creation_Date | calc-unstored | Unstored: current date
+101 Creation_Time | calc-unstored | Unstored: current time
+76 Creation_Timestamp | auto-created | Auto-enters the creation timestamp (not editable)
+138 Email Home ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Email Home ) ; uID_Create )*/
+152 Email Home Type Out | calc-unstored | Unstored calculation: Case( IsEmpty( Email Home Type Override ) ; ""Email (h)"" ; Email Home Type Override )
+139 Email Work ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Email Work ) ; uID_Create )*/
+154 Email Work Type Out | calc-unstored | Unstored calculation: Case( IsEmpty( Email Work Type Override ) ; ""Email (w)"" ; Email Work Type Override )
+1 First Name | auto-calc | Auto-enters the first word of Full Name when empty, otherwise cleans the entry with CleanText
+2 Last Name | auto-calc | Auto-enters words 2 to end of Full Name when empty, otherwise cleans the entry with CleanText
+77 Modification_Account | auto-modified | Auto-enters the modifying account name
+78 Modification_Timestamp | auto-modified | Auto-enters the modification timestamp
+43 Party ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*uID_Create*/
+140 Phone Fax ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Phone Fax ) ; uID_Create )*/
+162 Phone Fax Type Out | calc-unstored | Unstored calculation: Case( IsEmpty( Phone Fax Type Override ) ; ""Fax"" ; Phone Fax Type Override )
+141 Phone Home ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Phone Home ) ; uID_Create )*/
+158 Phone Home Type Out | calc-unstored | Unstored calculation: Case( IsEmpty( Phone Home Type Override ) ; ""Home"" ; Phone Home Type Override )
+142 Phone Mobile ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Phone Mobile ) ; uID_Create )*/
+160 Phone Mobile Type Out | calc-unstored | Unstored calculation: Case( IsEmpty( Phone Mobile Type Override ) ; ""Mobile"" ; Phone Mobile Type Override )
+143 Phone Work ID | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*Case( not IsEmpty( Phone Work ) ; uID_Create )*/
+156 Phone Work Type Out | calc-unstored | Unstored calculation: Case( IsEmpty( Phone Work Type Override ) ; ""Work"" ; Phone Work Type Override )
+174 Modification_Count | calc-unstored | Unstored Get(RecordModificationCount)",29,drop-candidate,"Import staging table (0 records) for a contact import, with commented-out uID_Create ID formulas and source-specific columns (WordPress_Unique_ID, Youth Organization Program ID, SDWP_Profiles_UniqueID); confirm whether an import feature is needed in the target"
+karbon_data.fmp12/tables/195-File.txt,c78ce9268576d75b24738888698e3f46be6ca11eabe6625d85641671bd176ed6,tables,karbon_data.fmp12,195,File,entity,23,22,0,0,1,2,0,"Id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to DBTransactions, FileAttachment","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+20 qbo_send | auto-calc, validate-rule | Auto-enters 1 (flag: needs sending to QuickBooks Online) on any edit unless the sync session variable is set, in which case it keeps its value; validated to 0 or 1 strictly. Formula uses GetField("""") to force re-evaluation on any change
+22 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+25 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts",8,table,Container fields store files externally under Container/YYYY/MM/DD/ and Thumbnail/YYYY/MM/DD/ relative to karbon_data; files must be copied as part of data migration; FileSize auto-enter is switched off
+karbon_data.fmp12/tables/196-FileAttachment.txt,aa82627d561f6407917b852ba9e2dd248431ece7dd6670fc05332f26eadf8e94,tables,karbon_data.fmp12,196,FileAttachment,join,13,13,0,0,0,0,0,"Id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to DBTransactions
+FK AttachmentId -> File::Id
+FK EntityId -> SalesTransaction::id
+FK EntityId -> Opportunity::Id
+FK EntityId -> Party::Id
+FK EntityId -> ChatMessage::Id
+FK EntityId -> Activity::Id","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+9 IncludeOnSend | auto-calc, auto-data | Constant default 1 and GetAsBoolean(Self) coercion: attach the file when sending (comment: include on send)
+12 qbo_lineNum | auto-calc, validate-rule | Auto-enters the current UTC milliseconds so new lines sort after earlier lines; validated as numeric
+13 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts",8,table,EntityType (text) and EntityTypeId (number) both exist for the polymorphic link to entities
+karbon_data.fmp12/tables/197-ChartingLibrary.txt,dc330f539dcb8f42b128fccab2855f60b5f0138f4c32f967075f2ed88d8ffdc4,tables,karbon_data.fmp12,197,ChartingLibrary,utility,11,8,2,0,1,0,0,none,"6 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+7 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+8 AsJson | calc-unstored | Unstored calculation that is just the constant 1 (placeholder; field comment is copied from the Address table)
+10 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+11 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+12 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+13 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+14 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+15 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)",9,drop-candidate,0 records; AsJson is the constant 1 and its comment is copied from Address; confirm it is unused
+karbon_data.fmp12/tables/198-Globals.txt,3795dff1c95f445b56e14353b37f3a60366cd3aa023d875d7b6a844252e59922,tables,karbon_data.fmp12,198,Globals,settings-globals,0,0,0,0,0,0,0,none,none,0,drop-candidate,Table has 0 fields (1 record); confirm it is only a relationship anchor for global fields held elsewhere
+karbon_data.fmp12/tables/199-Opportunity.txt,5935470745cdd71e8e5ad130d0ebddcc8e124d641ef2f530ae305671a3bfcb36,tables,karbon_data.fmp12,199,Opportunity,entity,31,24,3,3,1,0,0,"Id (id 1): UUID auto-enter; parent side of Equal predicates to ActivityEntity, DBTransactions, FileAttachment
+FK SalespersonId -> Party::Id
+FK PartyId -> Party::Id
+FK OpportunityStatusId -> OpportunityStatus::Id
+FK PrimaryContactPartyId -> Party::Id","1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit); re-evaluated always
+15 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+16 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+17 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+18 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+19 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+20 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+23 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (audit, id, name, notes, status from StatusCached); comment says new fields still need adding (#WIP #TODO)
+51 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+52 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+62 TypeDisplay | calc-stored | Stored (minimal index), always evaluated: ""Lead"" if LeadId is set, else ""Customer""
+63 ValueTotal | summary | Total summary of Value
+67 IdList | summary | List summary of Id
+68 Count | summary | Count summary over ONE: number of opportunities in the found set",14,table,Subtype of PartyRole by Id; StatusCached and OpportunityStatusId both exist; AsJson is marked #WIP #TODO
+karbon_data.fmp12/tables/200-OpportunityStatus.txt,61e4a6ef22a76d5ff7133042030a4f9c15d0e9f36aa845b0daa8b1c9204fa49c,tables,karbon_data.fmp12,200,OpportunityStatus,lookup,9,7,1,0,1,0,0,"Id (id 1): serial, unique validation; parent side of Equal predicates to DBTransactions, Opportunity","1 Id | auto-serial, validate-rule | Serial number (increment 1, next value 8) with validation: numeric, not empty, unique
+15 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+16 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+20 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+51 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+61 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (Id, Name, ActiveInd); always evaluated
+62 ActiveInd | auto-calc, validate-rule | Coerces to a boolean with GetAsBoolean(Self), recalculated always; validation: numeric, not empty, range 0 to 1",7,table,"Id comment says ""Inherits from PartyRole Id"" (copy-paste from Opportunity)"
+karbon_data.fmp12/tables/201-ActivityEntity.txt,147c9da6606dfd9667a60201268825c84b3b2d8eeb3332c564150133c32beaae,tables,karbon_data.fmp12,201,ActivityEntity,join,10,9,0,0,1,0,0,"Id (id 6): UUID auto-enter; parent side of Equal predicates to DBTransactions
+FK ActivityId -> Activity::Id
+FK EntityId -> Activity::Id
+FK EntityId -> Opportunity::Id
+FK EntityId -> SalesTransaction::id
+FK EntityTypeId -> EntityType::Id","6 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+7 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+11 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+12 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+13 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+14 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)",6,table,EntityTypeId is Text here but Number in EntityType; polymorphic EntityId
+karbon_data.fmp12/tables/202-Call.txt,8bac3a75f478f284839f02ba90a4084da567fc91eeb0222b74cc22732928d0cf,tables,karbon_data.fmp12,202,Call,entity,6,5,0,0,1,0,0,FK Id -> Activity::Id,15 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts,1,table,none
+karbon_data.fmp12/tables/203-Chat.txt,f2cab7bbef91bc0bd6128bd8d5b80c6da9757380e5245385b9c24631f0e4518b,tables,karbon_data.fmp12,203,Chat,entity,15,9,1,1,4,0,0,FK Id -> Activity::Id,"15 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+21 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+22 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+23 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+24 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+25 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+26 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+27 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+29 IdList | summary | List summary of Id",9,table,"Three global fields (MessageInput, MessageTo, TestGlobal) are UI scratch state, not data"
+karbon_data.fmp12/tables/205-ChatMessage.txt,4f48b4e080779be29097d6fa1a7adf845b14f52714c561ac308c5a18c0fd6d0b,tables,karbon_data.fmp12,205,ChatMessage,entity,24,22,1,0,1,0,0,"Id (id 11): UUID auto-enter; parent side of Equal predicates to DBTransactions, FileAttachment","7 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+8 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+9 CreationUserId | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*meta::CurrentUserId*/
+11 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+13 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+14 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+15 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+16 ModificationUserId | auto-calc | Auto-enter calculation is only a comment, so it enters nothing: /*meta::CurrentUserId*/
+17 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts",9,table,CreationUserId/ModificationUserId calculations are commented out; Status*Ind flags are seven separate booleans for one status
+karbon_data.fmp12/tables/206-ChatConsent.txt,cbffa819fc67c4ed8578fbd256d77f48cec82cc7087aaaa88f6057f1c9aa12fc,tables,karbon_data.fmp12,206,ChatConsent,entity,8,7,0,0,1,0,0,"Id (id 1): UUID auto-enter, unique validation","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+7 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts",6,table,Phone field comment is copied from Id; consent has no date or channel field

@@ -1,0 +1,266 @@
+# table 135: FieldMap
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=135]
+# fields: 14
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=FieldMap:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=label
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=file
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=table
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=JSONDocument
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Calculated name=setFieldXML
+  Calculation table=FieldMap:
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "PARSE JSON INTO VARIABLES" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ) & ¶ &
+    | 
+    | 
+    | List(FieldMapItems::parseIntoVarsStep) & "¶" & 
+    | 
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "TRANSFORMATIONS" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "SET INTO FIELDS" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | )
+    |  & ¶ &
+    | 
+    | 
+    | List(FieldMapItems::SetIntoVarsStepXML) & "¶" & 
+    | 
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | )
+    refs: fn:List, cf:ScriptStep_Comment, FieldMapItems::parseIntoVarsStep#7, FieldMapItems::SetIntoVarsStepXML#8
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=FieldMap (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Calculated name=readFieldXML
+  Calculation table=FieldMap:
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "READ FIELD DATA INTO $VARS" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ) & ¶ &
+    | 
+    | 
+    | List(FieldMapItems::readIntoVarsStep) & "¶" & 
+    | 
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "TRANSFORMATIONS" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "BUILD INTO JSON" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_InsertCalculatedResult ( "$json" ; "If( IsEmpty($json); \"{}\" ; $json   )" ; 1 )
+    | )
+    |  & ¶ &
+    | 
+    | 
+    | List(FieldMapItems::buildIntoJSON) & "¶" & 
+    | 
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | )
+    refs: fn:List, cf:ScriptStep_Comment, FieldMapItems::readIntoVarsStep#12, cf:ScriptStep_InsertCalculatedResult, FieldMapItems::buildIntoJSON#13
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=idSource
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=source
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=idSourceParentRequest
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Calculated name=idSources
+  Calculation table=FieldMap:
+    | idSource & ¶ & idSourceParentRequest
+    refs: FieldMap::idSource#12, FieldMap::idSourceParentRequest#14
+  Storage storeCalculationResults=True autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Calculated name=setFieldXMLNative
+  Calculation table=FieldMap:
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "PARSE JSON INTO VARIABLES" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ) & ¶ &
+    | 
+    | 
+    | List(FieldMapItems::parseIntoVarsStepNative) & "¶" & 
+    | 
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "TRANSFORMATIONS" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "SET INTO FIELDS" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | )
+    |  & ¶ &
+    | 
+    | 
+    | List(FieldMapItems::SetIntoVarsStepXML) & "¶" & 
+    | 
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | )
+    refs: fn:List, cf:ScriptStep_Comment, FieldMapItems::parseIntoVarsStepNative#16, FieldMapItems::SetIntoVarsStepXML#8
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Calculated name=readFieldXMLNative
+  Calculation table=FieldMap:
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "READ FIELD DATA INTO $VARS" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ) & ¶ &
+    | 
+    | 
+    | List(FieldMapItems::readIntoVarsStep) & "¶" & 
+    | 
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "TRANSFORMATIONS" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "BUILD INTO JSON" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_InsertCalculatedResult ( "$json" ; "If( IsEmpty($json); \"{}\" ; $json   )" ; 1 )
+    | )
+    |  & ¶ &
+    | 
+    | 
+    | List(FieldMapItems::buildIntoJSONNative) & "¶" & 
+    | 
+    | List(
+    | ScriptStep_Comment ( "" );
+    | ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" );
+    | ScriptStep_Comment ( "" );
+    | )
+    refs: fn:List, cf:ScriptStep_Comment, FieldMapItems::readIntoVarsStep#12, cf:ScriptStep_InsertCalculatedResult, FieldMapItems::buildIntoJSONNative#18
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

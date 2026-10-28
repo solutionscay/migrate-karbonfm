@@ -1,0 +1,75 @@
+# custom function 18: clip_Set
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=18]
+
+CustomFunction id=18 functionArity=2 visible=True parameters=xml;FMObjectType name=clip_Set
+  Calculation:
+    | /**
+    |  * =====================================
+    |  * clip_Set ( xml, FMObjectType )
+    |  *
+    |  *   Sets the XML onto the Clipbaord as Pastable FileMaker Code
+    |  *
+    |  * RETURNS:
+    |  *		1 if successful
+    |  *
+    |  * PARAMETERS:
+    |  *		xml - valid fm clipboard xml
+    |  *
+    |  * DEPENDENCIES:
+    |  *		Base Elements
+    |  *
+    |  * HISTORY:
+    |  *		MODIFIED on 2015-JAN-19 Todd Geist, todd@geistinteractive.com
+    |  *			added windows formats
+    |  *		CREATED on 2014-SEPT-15 Todd Geist, todd@geistinteractive.com
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | 
+    | Let ( [
+    | 		line1 = "<fmxmlsnippet type=\"FMObjectList\">";
+    | 		platform =
+    | 		Case (
+    | 			Get ( SystemPlatform ) = 1 ; "Mac" ;
+    | 			Get ( SystemPlatform ) = -2 ; "Win" ;
+    | 			""
+    | 			);
+    | 			format =
+    | 			Case (
+    | 				platform = "Mac" ;
+    | 				Case (
+    | 					FMObjectType = "Layout Objects" ;  "dyn.ah62d4rv4gk8zuxnqgk" ;
+    | 					FMObjectType = "Scripts" or FMObjectType = "Script" ; "dyn.ah62d4rv4gk8zuxnxkq" ;
+    | 					FMObjectType = "Script Steps" ; "dyn.ah62d4rv4gk8zuxnxnq" ;
+    | 					FMObjectType = "ScriptSteps" ; "dyn.ah62d4rv4gk8zuxnxnq" ;
+    | 					FMObjectType = "Tables" ; "dyn.ah62d4rv4gk8zuxnykk" ;
+    | 					FMObjectType = "Fields" ; "dyn.ah62d4rv4gk8zuxngku" ;
+    | 					FMObjectType = "Custom Functions" ; "dyn.ah62d4rv4gk8zuxngm2" ;
+    | 					""
+    | 				) ; 
+    | 				platform = "Win" ;
+    | 				Case (
+    | 					FMObjectType = "Layout Objects" ; "Mac-XML2" ;
+    | 					FMObjectType = "Scripts" or FMObjectType = "Script" ; "Mac-XMSC" ;
+    | 					FMObjectType = "Script Steps" ; "Mac-XMSS" ;
+    | 					FMObjectType = "ScriptSteps" ; "Mac-XMSS" ;
+    | 					FMObjectType = "Tables" ; "Mac-XMTB" ;
+    | 					FMObjectType = "Fields" ; "Mac-XMFD" ;
+    | 					FMObjectType = "Custom Functions" ; "Mac-XMFN" ;
+    | 					""
+    | 				) ;
+    | 			);
+    | 		xml = If( Left (xml ; Length(line1)  ) = line1 ; xml ;
+    | 				List (
+    | 					"<fmxmlsnippet type=\"FMObjectList\">" ;
+    | 					xml ;
+    | 					"</fmxmlsnippet>"
+    | 				)
+    | 			)
+    | 		] ;
+    | 
+    | 		<Function Missing> ( xml ; format )
+    | 	)
+    refs: fn:Let, fn:Case, fn:Get, fn:SystemPlatform, fn:or, fn:If, fn:Left, fn:Length, fn:List

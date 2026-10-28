@@ -1,0 +1,134 @@
+# table 141: UtilityTask
+# file: karbon_kontacts.fmp12
+# source: BaseTableCatalog/BaseTable[@id=141]
+# fields: 16
+# records: 1
+
+Field id=6 dataType=Text fieldType=Normal name=PartyAssignedById
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=PartyAssignedToId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=Subject
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Date fieldType=Normal name=DueDate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=UtilityTask:
+    | JSONSetElement ( "{}" ; 
+    | 	[ "CreatorId" ; session::CurrentUserPartyId ; JSONString ];
+    | 	[ "Date" ; DueDate ; JSONString ];
+    | 	[ "Id" ; Id ; JSONString ];
+    | 	[ "PartyFromId" ; PartyAssignedById ; JSONString ];
+    | 	[ "PartyRegardingId" ; PartyRegardingId ; JSONString ];
+    | 	[ "PartyToId" ; PartyAssignedToId ; JSONString ];
+    | 	[ "Subject" ; Subject ; JSONString ]
+    | )
+    refs: fn:JSONSetElement, session::CurrentUserPartyId#63, fn:JSONString, UtilityTask::DueDate#9, UtilityTask::Id#10, UtilityTask::PartyAssignedById#6, UtilityTask::PartyRegardingId#12, UtilityTask::PartyAssignedToId#7, UtilityTask::Subject#8
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=PartyRegardingId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=UtilityTask (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=z_Search_PartyId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=z_Search_ActivityPartyRoleId
+  Comment: Assigned by or Assigned to
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=z_Search_Status
+  Comment: Complete, Incomplete, OverDue
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=TimeStamp fieldType=Normal name=z_Search_LastUpdate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=TimeStamp fieldType=Normal name=z_Search_LastTouch
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=UtilityTask:
+      | Let([
+      | 
+      | Triger1 = z_Search_ActivityPartyRoleId;
+      | Trigger2 = z_Search_PartyId;
+      | Trigger3 = z_Search_Status
+      | 
+      | ];
+      | 
+      | Get( CurrentHostTimestamp )
+      | 
+      | )
+      refs: fn:Let, UtilityTask::z_Search_ActivityPartyRoleId#16, UtilityTask::z_Search_PartyId#14, UtilityTask::z_Search_Status#17, fn:Get, fn:CurrentHostTimestamp
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Calculated name=z_Search_AsJSON
+  Calculation table=UtilityTask:
+    | JSONSetElement ( "" ; 
+    | 	[ "ActivityPartyRoleId" ; z_Search_ActivityPartyRoleId ; JSONString ];
+    | 	[ "PartyId" ; z_Search_PartyId ; JSONString ];
+    | 	[ "Status" ; z_Search_Status ; JSONString ]
+    | 
+    | )
+    refs: fn:JSONSetElement, UtilityTask::z_Search_ActivityPartyRoleId#16, fn:JSONString, UtilityTask::z_Search_PartyId#14, UtilityTask::z_Search_Status#17
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Normal name=EntityId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Number fieldType=Normal name=EntityTypeId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+

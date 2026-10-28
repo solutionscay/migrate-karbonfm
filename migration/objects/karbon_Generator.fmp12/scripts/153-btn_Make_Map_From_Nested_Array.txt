@@ -1,0 +1,54 @@
+# script 153: btn: Make Map From Nested Array
+# file: karbon_Generator.fmp12
+# folder: App Modules / Maps / Public / Buttons
+# source: ScriptCatalog/Script[@id=153]
+# steps: 10 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=146 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $json; Value:FieldMapItems::value ]
+        DisableStepCollapsed state=False
+        Value
+          refs: FieldMapItems::value#5
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   3    Set Field [ GLOBALS::Maps_SourceID; GetField ( Get(LayoutTableName) & "::id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetField, fn:Get, fn:LayoutTableName
+        Field table=GLOBALS id=7 name=Maps_SourceID
+   4    Set Field [ GLOBALS::Maps_SourceParentRequestID; FieldMap::idSource ]
+        DisableStepCollapsed state=False
+        refs: FieldMap::idSource#12
+        Field table=GLOBALS id=13 name=Maps_SourceParentRequestID
+   5    Set Field [ GLOBALS::Maps_Source; Get(LayoutTableName) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:LayoutTableName
+        Field table=GLOBALS id=8 name=Maps_Source
+   6    Set Field [ GLOBALS::Back_Layout; Get(LayoutName)& " from nested field map" ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:LayoutName
+        Field table=GLOBALS id=11 name=Back_Layout
+   7    Set Field [ GLOBALS::Back_Object; "portal_fieldMapItems" ]
+        DisableStepCollapsed state=False
+        Field table=GLOBALS id=12 name=Back_Object
+   8    Set Field [ GLOBALS::Maps_Name; Let ([
+        
+        	n = FieldMap::label & ": " & FieldMapItems::path 
+        ];
+        
+        	n
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Let, FieldMap::label#2, FieldMapItems::path#3
+        Field table=GLOBALS id=9 name=Maps_Name
+   9    Close Popover
+        DisableStepCollapsed state=False
+  10    Perform Script [ “Create Map (JSON)”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=152 name="Create Map (JSON)"

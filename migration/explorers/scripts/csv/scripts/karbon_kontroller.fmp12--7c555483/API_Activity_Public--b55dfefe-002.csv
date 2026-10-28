@@ -1,0 +1,155 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/522-Edit_EmailMessage_data.txt,28b13bf7527c85c36a837a18e913b9bbe3384efa5ed28ca6ec9cd670acffc0ac,scripts,karbon_kontroller.fmp12,522,Edit EmailMessage { data },data-change,server-domain,tier1,"Edits an email-message activity inside a transaction. Requires an Id, refuses if the message was already sent, adds the current user as the From party (role 54) when no From party is given, copies attachments, HTML body, system-settings flag, message text, date and subject onto the records, and hands the shared activity fields and party list to _Edit Activity. After the transaction is committed it re-opens the transaction and calls Send Email Message Activity when Send is true.","DBTransactions::ActivityId#58
+EmailMessage::SentInd#9
+meta#data::CurrentUserId#3
+User::PartyId#12
+User::SmtpEmailAddress#111
+Activity::Id#1
+Activity::AsJSON#188","DBTransactions::ActivityId#58 (step 111, current record (transaction record))
+EmailMessage::ONE#11 (step 114, new record (get-or-create and lock by the DBTransactions key))
+DBTransactions::UserId#64 (step 139, current record (transaction record))
+DBTransactions::PartyId#25 (step 147, current record (transaction record))
+EmailMessage::Attachments#10 (step 161, related via EmailMessage)
+EmailMessage::MessageHtml#24 (step 164, related via EmailMessage)
+EmailMessage::UseSystemSettingsInd#26 (step 167, related via EmailMessage)
+ActivityMessage::Message#12 (step 170, related via ActivityMessage)
+Activity::DateDisplay#56 (step 173, related via Activity)
+Activity::Subject#22 (step 176, related via Activity)","karbon_kontroller.fmp12/scripts/28 (step 48)
+karbon_kontroller.fmp12/scripts/542 (step 188)
+karbon_kontroller.fmp12/scripts/29 (step 209)
+karbon_kontroller.fmp12/scripts/31 (step 210)
+karbon_kontroller.fmp12/scripts/35 (step 221)
+karbon_kontroller.fmp12/scripts/521 (step 223)","karbon_kontacts.fmp12/scripts/333-Send_Utility_Email_Message.txt (step 49)
+karbon_kontacts.fmp12/scripts/517-Save_Utility_Email_Message_as_Draft.txt (step 7)",none,"From-party default uses meta#data::CurrentUserId and User::PartyId (steps 139-145): the target needs the same session-user source. Steps 99-102 (EmailMessageId_DEPRECATED) and 118-120 (Activity lock) are disabled. Send is a second step after the commit (steps 217-223), not part of the same transaction."
+karbon_kontroller.fmp12/scripts/543-Edit_Note_data__deprecated.txt,df04cd545346c2267acb7928ffcf6ee0ec0531f060db87007b07c2e263719686,scripts,karbon_kontroller.fmp12,543,Edit Note { data } _deprecated,data-change,server-domain,tier2,Thin wrapper for editing a note activity: adds ActivityPartySkip=1 to the incoming JSON (notes do not change parties) and passes it to _Edit Activity. Returns the error if _Edit Activity fails.,none,none,karbon_kontroller.fmp12/scripts/542 (step 5),karbon_kontacts.fmp12/scripts/257-Save_Card_-_UtilityNote.txt (step 13),none,"Named _deprecated but a live caller exists (karbon_kontacts Save Card - UtilityNote); confirm what replaced it. No Exit Script on success (steps 8-11), so the result is empty on success. No transaction is started here (the called script may start its own)."
+karbon_kontroller.fmp12/scripts/544-Edit_Task_data__deprecated.txt,a07f870daa35a9acd3362687be532b353178fd9f257ea0e408e2ea2fcfa7fa75,scripts,karbon_kontroller.fmp12,544,Edit Task { data } _deprecated,data-change,server-domain,tier1,"Creates or edits a task activity. Locks or creates the Task record by the transaction's ActivityId (new UUID when none is given), builds the party list (creator 50, assigned-by 52, assigned-to 53, optional regarding 63), calls _Edit Activity, caches the assignee name on the task, and creates a notification for the assignee when the creator is not the assignee.","DBTransactions::ActivityId#58
+Party::NameCached#19
+Party::Id#1
+Task::FromCached#23
+Activity::Subject#22
+Activity::AsJSON#188","DBTransactions::ActivityId#58 (step 84, current record (transaction record))
+DBTransactions::ActivityId#58 (step 86, current record (transaction record))
+Task::ONE#20 (step 90, new record (get-or-create and lock by the DBTransactions key))
+DBTransactions::PartyId#25 (step 117, current record (transaction record))
+Task::ToCached#24 (step 119, related via Task)
+DBTransactions::PartyId#25 (step 125, current record (transaction record))","karbon_kontroller.fmp12/scripts/28 (step 41)
+karbon_kontroller.fmp12/scripts/542 (step 107)
+karbon_kontroller.fmp12/scripts/670 (step 134)
+karbon_kontroller.fmp12/scripts/29 (step 155)
+karbon_kontroller.fmp12/scripts/31 (step 156)",karbon_kontacts.fmp12/scripts/289-Save_Card_-_UtiityTask.txt (step 13),none,"Named _deprecated but a live caller exists (karbon_kontacts Save Card - UtiityTask). Validation requires 'Date' while the header documents DueDate (step 59). If _Edit Activity fails, Exit Script at step 112 skips Save Transaction Result and End Transaction. Notification text uses Task::FromCached and Activity::Subject (step 132)."
+karbon_kontroller.fmp12/scripts/545-Create_Meeting_data.txt,c4825a7caced0ad84306e05d4f44eddc170f449a1b969a65ea566bda6469d025,scripts,karbon_kontroller.fmp12,545,Create Meeting { data },data-change,server-domain,tier2,"Creates a meeting activity (the Meeting, Activity and Event records are created together). Takes the Id from the input or generates a UUID, sets event location, start and end date/time and address, marks the activity as event and alert, builds the party list (creator role 50, invited party role 60) and calls _Create Activity to finish.","DBTransactions::ActivityId#58
+Activity::Id#1","DBTransactions::ActivityId#58 (step 108, current record (transaction record))
+DBTransactions::ActivityId#58 (step 110, current record (transaction record))
+Meeting::ONE#7 (step 116, new record (get-or-create and lock by the DBTransactions key))
+Event::AddressId#193 (step 121, related via Event)
+Event::MeetingInd#197 (step 125, related via Event)
+Event::EndDate#189 (step 126, related via Event)
+Event::EndTime#77 (step 127, related via Event)
+Event::Location#192 (step 128, related via Event)
+Event::StartDate#56 (step 129, related via Event)
+Event::StartTime#76 (step 130, related via Event)
+Activity::EventInd#90 (step 132, related via Activity)
+Activity::AlertInd#107 (step 136, related via Activity)","karbon_kontroller.fmp12/scripts/28 (step 53)
+karbon_kontroller.fmp12/scripts/377 (step 156)
+karbon_kontroller.fmp12/scripts/29 (step 177)
+karbon_kontroller.fmp12/scripts/31 (step 178)","karbon_kontacts.fmp12/scripts/266-Save_Card_-_UtiityMeeting.txt (step 9)
+karbon_kontacts.fmp12/scripts/683-Button_Create_Meeting_From_Opportunity.txt (step 14)
+karbon_kontacts.fmp12/scripts/771-Button_Create_Meeting_From_Party.txt (step 13)",none,"Step 65 assigns $?Meeting (typo) to $error. Steps 81 and 83 (parse AddressId, EndDate) are disabled but Event::AddressId and Event::EndDate are still written from those variables (steps 121, 126), so they are blank. Step 154 builds the _Create Activity parameter from $Event, which is never set in this script. Validation rules (steps 71-72) are disabled."
+karbon_kontroller.fmp12/scripts/546-Edit_Meeting_data.txt,d3f362616805b2dab5c8d736ca0925177690375aa0b56d420dc2621682f96134,scripts,karbon_kontroller.fmp12,546,Edit Meeting { data },data-change,server-domain,tier2,"Edits a meeting activity: locks the Meeting record by Id, sets event address, dates, times, location and activity subject for each property present in the JSON, rebuilds the party list (creator 50, invited 60) and calls _Edit Activity with the plucked shared fields.","DBTransactions::ActivityId#58
+Activity::Id#1
+Meeting::Id#6","DBTransactions::ActivityId#58 (step 110, current record (transaction record))
+Meeting::ONE#7 (step 113, new record (get-or-create and lock by the DBTransactions key))
+Activity::ActivityTypeId#100 (step 123, related via Activity)
+Event::AddressId#193 (step 126, related via Event)
+Activity::CompletionAccountName_deprecated#118 (step 132, related via Activity)
+Activity::CompletionTimestamp_deprecated#117 (step 135, related via Activity)
+Activity::DateDisplay#56 (step 141, related via Activity)
+Event::EndDate#189 (step 144, related via Event)
+Event::EndTime#77 (step 147, related via Event)
+Event::Location#192 (step 159, related via Event)
+Event::StartDate#56 (step 165, related via Event)
+Event::StartTime#76 (step 168, related via Event)
+Activity::Subject#22 (step 171, related via Activity)
+Activity::TemplateId#195 (step 174, related via Activity)
+Activity::TimeDisplay#76 (step 177, related via Activity)","karbon_kontroller.fmp12/scripts/28 (step 48)
+karbon_kontroller.fmp12/scripts/542 (step 195)
+karbon_kontroller.fmp12/scripts/29 (step 216)
+karbon_kontroller.fmp12/scripts/31 (step 217)",karbon_kontacts.fmp12/scripts/266-Save_Card_-_UtiityMeeting.txt (step 11),none,"Steps 122-177 are guarded by JSON.ContainsProperty, but $ActivityTypeId, $Date, $Time, $TemplateId, $CompletionAccountName and $CompletionTimestamp are never parsed in this script, so a present property writes a blank. Step 198 tests $error instead of $result, so an error from _Edit Activity is not propagated. If validation fails the Exit Script at step 70 skips End Transaction."
+karbon_kontroller.fmp12/scripts/570-Find_Task_for_C3_Charts_data.txt,f36f29d3e71d5989a790d77c62224f8cb9c4f5e66a28c7022d7159e74714f637,scripts,karbon_kontroller.fmp12,570,Find Task for C3 Charts {data},find-query,server-query,tier1,"Finds tasks for the C3 charts: activities where the given party holds the assigned-to role (53), the activity is a task, and the completed flag and date match. Returns the found-set size and id list for chart data.","ActivityParty::ActivityPartyRoleId#24 (find criterion step 88)
+ActivityParty::PartyId#7 (find criterion step 91)
+Activity::AlertInd#107 (find criterion step 94)
+Activity::DateDisplay#56 (find criterion step 98)
+Activity::TaskInd#171 (find criterion step 107)",none,none,none found,none,"The result JSON (steps 126-127) is inside a /* */ comment, so on success the script returns an empty result. Step 78 goes to layout <unknown> (id 0, ref=none), so the find has no target layout. Of the 25 find criteria set (steps 86-110) only role 53, PartyId, CompletedInd->AlertInd, Date->DateDisplay and TaskInd=1 get values; the rest use variables never set. CompletedInd is written to Activity::AlertInd (step 94): confirm the meaning."
+karbon_kontroller.fmp12/scripts/631-Edit_ActivityParty_json.txt,65e271a4b770a3c5d439de25c984b34d45d63eedbe969288619bb14db841c2c9,scripts,karbon_kontroller.fmp12,631,Edit ActivityParty { json },data-change,server-domain,tier1,"Creates or updates one activity-party row (a person or organization taking a role on an activity). Validates the party, activity and that the role applies to the activity type, sets the party's role data, creates the email or event subtype record when the role needs one, caches the party name, initials (first letter for an organization, up to 3 capitals for a person) and the activity's parties list, and caches task from/to names, the creator and completion state for roles 52, 53, 50 and 51.","DBTransactions::ActivityPartyId#59
+DBTransactions::PartyId#25
+Party::Id#1
+DBTransactions::ActivityId#58
+Activity::Id#1
+Activity::ActivityTypeId#100
+ActivityPartyRole#ByActivityType::Id#18
+DBTransactions::ActivityTypeId#81
+ActivityPartyRole::Id#18
+Party::NameCached#19
+Party::OrganizationInd#18
+ActivityPartyRole::CreateActivityPartyEmailInd#22
+ActivityPartyRole::CreateActivityPartyEventInd#23
+Activity::PartiesCached#198
+ActivityParty::Id#23","DBTransactions::ActivityPartyId#59 (step 104, current record (transaction record))
+ActivityParty::ONE#62 (step 107, new record (get-or-create and lock by the DBTransactions key))
+DBTransactions::PartyId#25 (step 114, current record (transaction record))
+DBTransactions::ActivityId#58 (step 127, current record (transaction record))
+DBTransactions::ActivityTypeId#81 (step 139, current record (transaction record))
+DBTransactions::ActivityPartyRoleId#77 (step 153, current record (transaction record))
+ActivityParty::ActivityId#6 (step 165, related via ActivityParty)
+ActivityParty::ActivityPartyRoleId#24 (step 168, related via ActivityParty)
+ActivityPartyEvent::AttendedInd#33 (step 171, related via ActivityPartyEvent)
+ActivityPartyEvent::Comments#35 (step 174, related via ActivityPartyEvent)
+ActivityParty::ContactMethodId#28 (step 177, related via ActivityParty)
+ActivityPartyEmail::EmailAddress#15 (step 180, related via ActivityPartyEmail)
+ActivityPartyEmail::EmailAddressFormatted#16 (step 183, related via ActivityPartyEmail)
+ActivityPartyEmail::EmailAddressId#42 (step 186, related via ActivityPartyEmail)
+ActivityParty::Id#23 (step 189, related via ActivityParty)
+ActivityParty::NotificationSentInd#47 (step 192, related via ActivityParty)
+ActivityParty::PartyId#7 (step 195, related via ActivityParty)
+ActivityParty::PartyInitials#29 (step 198, related via ActivityParty)
+ActivityParty::PartyNameCached#13 (step 201, related via ActivityParty)
+ActivityPartyEvent::Rsvp#32 (step 204, related via ActivityPartyEvent)
+ActivityPartyEvent::RsvpInd#73 (step 207, related via ActivityPartyEvent)
+ActivityParty::PartyNameCached#13 (step 211, related via ActivityParty)
+ActivityParty::PartyInitials#29 (step 215, related via ActivityParty)
+ActivityParty::PartyInitials#29 (step 218, related via ActivityParty)
+ActivityPartyEmail::ONE#62 (step 225, new record (get-or-create and lock by the DBTransactions key))
+ActivityPartyEmail::EmailAddress#15 (step 231, related via ActivityPartyEmail)
+ActivityPartyEmail::EmailAddressFormatted#16 (step 232, related via ActivityPartyEmail)
+ActivityPartyEmail::EmailAddressId#42 (step 233, related via ActivityPartyEmail)
+ActivityPartyEvent::ONE#62 (step 242, new record (get-or-create and lock by the DBTransactions key))
+ActivityPartyEvent::AttendedInd#33 (step 246, related via ActivityPartyEvent)
+ActivityPartyEvent::Comments#35 (step 247, related via ActivityPartyEvent)
+ActivityPartyEvent::Rsvp#32 (step 248, related via ActivityPartyEvent)
+ActivityPartyEvent::RsvpInd#73 (step 249, related via ActivityPartyEvent)
+Activity::PartiesCached#198 (step 258, related via Activity)
+Task::FromCached#23 (step 269, related via Task)
+Task::ToCached#24 (step 274, related via Task)
+Activity::CreatorCached#197 (step 285, related via Activity)
+Activity::AlertInd#107 (step 297, related via Activity)
+Activity::CompletedByCached_deprecated#196 (step 301, related via Activity)","karbon_kontroller.fmp12/scripts/28 (step 46)
+karbon_kontroller.fmp12/scripts/29 (step 318)
+karbon_kontroller.fmp12/scripts/31 (step 319)",karbon_kontacts.fmp12/scripts/673-Add_Edit_Activity_Party_to_Activity_ActivityPartyRoleId.txt (step 88),none,Role 51 (Completed By) sets Activity::AlertInd to 1 (step 297): confirm that AlertInd means 'completed'. Role ids 50-63 are hard-coded and carry domain meaning. Appended names for Activity::PartiesCached exclude roles 50 and 51 (step 256).
+karbon_kontroller.fmp12/scripts/638-Delete_ActivityParty_Id.txt,faccf468655d505f9d0bd9538aaaa1bbb33e2dc35b3b245ecfbb6e955701c983,scripts,karbon_kontroller.fmp12,638,Delete ActivityParty { Id },data-change,server-domain,tier2,"Deletes one activity-party record: connects to it through the transaction, then calls Delete First Portal Row on the portal 'ActivityPartyPortal'.",DBTransactions::ActivityPartyId#59,"delete: ActivityParty (Delete Portal Row via karbon_kontroller.fmp12/scripts/33, step 92, portal row 'ActivityPartyPortal' for the record connected in step 81)","karbon_kontroller.fmp12/scripts/28 (step 32)
+karbon_kontroller.fmp12/scripts/33 (step 92)
+karbon_kontroller.fmp12/scripts/31 (step 107)","karbon_kontacts.fmp12/scripts/353-Delete_Email_Recipient.txt (step 8)
+karbon_kontroller.fmp12/scripts/691-Mark_Task_Incomplete_data.txt (step 109)",none,"Deletion depends on a portal row position (script 33, portal object name ActivityPartyPortal): the target needs a keyed delete. The cached party list on the activity is not updated here. Returns the End Transaction result."
+karbon_kontroller.fmp12/scripts/641-Create_Call_data.txt,d2422525a36e073dfc3b05312e353e86f94ffc9b36cc376f94c1f728ad5ba992,scripts,karbon_kontroller.fmp12,641,Create Call { data },data-change,server-domain,tier2,"Creates a call activity: creates the Call, Activity records with the call and alert flags, sets callback number, caller name and result, and calls _Create Activity with the call type (8), the entity link and the party list.","DBTransactions::ActivityId#58
+Call::Id#6","DBTransactions::ActivityId#58 (step 111, current record (transaction record))
+DBTransactions::ActivityId#58 (step 113, current record (transaction record))
+Call::ONE#15 (step 116, new record (get-or-create and lock by the DBTransactions key))
+Activity::CallInd#201 (step 121, related via Activity)
+Activity::AlertInd#107 (step 122, related via Activity)
+Call::CallbackNumber#18 (step 150, related via Call)
+Call::CallerName#17 (step 151, related via Call)
+Call::Result#19 (step 152, related via Call)","karbon_kontroller.fmp12/scripts/28 (step 44)
+karbon_kontroller.fmp12/scripts/377 (step 136)
+karbon_kontroller.fmp12/scripts/29 (step 168)
+karbon_kontroller.fmp12/scripts/31 (step 169)","karbon_kontacts.fmp12/scripts/704-Button_Create_Call_from_Opportunity.txt (step 4)
+karbon_kontacts.fmp12/scripts/706-Button_Create_Call_from_Party.txt (step 4)
+karbon_tester.fmp12/scripts/347-Create_Call_-_Success.txt (step 52)",none,"The _Create Activity parameter (step 134) is built on $Call, which is never set, so subject, date and message are not passed on. $ActivityParty is never set before step 125, so the creator party (role 50) is not added; the regarding party (role 63) is. Date and Time defaults (steps 95-101) are computed but not used."

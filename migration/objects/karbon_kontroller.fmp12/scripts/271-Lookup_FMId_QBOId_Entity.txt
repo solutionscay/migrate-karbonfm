@@ -1,0 +1,268 @@
+# script 271: Lookup FMId { QBOId, Entity }
+# file: karbon_kontroller.fmp12
+# folder: Modules / QuickBooks Online / Sales Transactions / Private
+# source: ScriptCatalog/Script[@id=271]
+# steps: 72 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=563 groupCollapsed=False includeInMenu=True
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Swaps the qboId for the FileMaker Id
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} params.QBOId the id of the Quickbooks Record you want the FileMaker record for
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {string} params.Entity the QuickBooks Entity you are looking for
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {string} params.ParentId the FmId of the parent for line items, since their QBOId is not unique
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@return {string} FMId
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $params; Value:JSON.Format ( Get (ScriptParameter) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  18    If [ Error.IsError ( $params ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  19    Exit Script [ Result: $params ]
+        DisableStepCollapsed state=False
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $QBOId; Value:JSONGetElement ( $params ;  "QBOId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOId
+  23    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ $Entity = "Account" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $FMId; Value:SQL.GetColumn ( Account::id ;Account::qbo_id ; $QBOId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, Account::id#1, Account::qbo_id#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMId
+  27    Exit Script [ Result: $FMId ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ $Entity = "Customer" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $ExternalLinkTypeId; Value:5 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $ExternalLinkTypeId
+  32    Set Variable [ $FMId; Value:SQL.GetColumn2Fields ( 
+           ExternalLink::InternalId ;
+           ExternalLink::ExternalId ; $QBOId ; 
+           ExternalLink::ExternalLinkTypeId ; $ExternalLinkTypeId 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn2Fields, ExternalLink::InternalId#2, ExternalLink::ExternalId#10, ExternalLink::ExternalLinkTypeId#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMId
+  33    Exit Script [ Result: $FMId ]
+        DisableStepCollapsed state=False
+  34    End If
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    If [ $Entity = "Item" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $FMId; Value:SQL.GetColumn (Item::id; Item::qbo_id ; $QBOId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, Item::id#1, Item::qbo_id#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMId
+  39    Exit Script [ Result: $FMId ]
+        DisableStepCollapsed state=False
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    If [ $Entity = "Payment" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Variable [ $FMId; Value:SQL.GetColumn ( Payment::id ;  Payment::qbo_id; $QBOId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, Payment::id#1, Payment::qbo_id#11
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMId
+  44    Exit Script [ Result: $FMId ]
+        DisableStepCollapsed state=False
+  45    End If
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ $Entity = "PaymentLine" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Variable [ $FMId; Value:SQL.GetColumn ( PaymentLine::id ;  PaymentLine::qbo_id; $QBOId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, PaymentLine::id#1, PaymentLine::qbo_id#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMId
+  49    Exit Script [ Result: $FMId ]
+        DisableStepCollapsed state=False
+  50    End If
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    If [ $Entity = "PaymentMethod" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Set Variable [ $FMId; Value:SQL.GetColumn ( PaymentMethod::id ;  PaymentMethod::qbo_id ; $QBOId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, PaymentMethod::id#3, PaymentMethod::qbo_id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMId
+  54    Exit Script [ Result: $FMId ]
+        DisableStepCollapsed state=False
+  55    End If
+        DisableStepCollapsed state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    If [ $Entity = "Term" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Variable [ $FMId; Value:SQL.GetColumn ( Term::id ; Term::qbo_id; $QBOId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, Term::id#1, Term::qbo_id#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMId
+  59    Exit Script [ Result: $FMId ]
+        DisableStepCollapsed state=False
+  60    End If
+        DisableStepCollapsed state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    If [ $Entity = "SalesTransaction" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Set Variable [ $FMId; Value:SQL.GetColumn ( SalesTransaction::id ; SalesTransaction::qbo_id ; $QBOId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, SalesTransaction::id#1, SalesTransaction::qbo_id#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMId
+  64    Exit Script [ Result: $FMId ]
+        DisableStepCollapsed state=False
+  65    End If
+        DisableStepCollapsed state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Exit Script [  ]
+        DisableStepCollapsed state=False

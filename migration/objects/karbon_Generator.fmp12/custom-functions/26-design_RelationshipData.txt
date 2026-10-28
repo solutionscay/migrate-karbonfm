@@ -1,0 +1,32 @@
+# custom function 26: design_RelationshipData
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=26]
+
+CustomFunction id=26 functionArity=3 visible=True parameters=parentTable;childTable;databaseName name=design_RelationshipData
+  Calculation:
+    | Let(
+    | [
+    | 
+    | info = RelationInfo ( databaseName ; parentTable );
+    | p = Position(info ; "Table:" & childTable ; 1;1 );
+    | startingLineNumber = PatternCount( Left( info ; p ) ;  "¶"   ) ;
+    | p2 = Position( info ; "¶¶" ; p; 1 ); 
+    | endingLineNumber = PatternCount( Left( info ; p2 ) ;  "¶"   ) ;
+    | info = MiddleValues(info; startingLineNumber ; endingLineNumber - startingLineNumber + 1 );
+    | options = Substitute( GetValue(info ; 3); ["Options:" ; ""]; [" "; "¶"]) ;
+    | sourceFile = Substitute( GetValue(info ; 1); ["Source:" ; ""]; [" "; "¶"]) ;
+    | let = "$sourceFileName=" & Quote(sourceFile) & ";¶" & 
+    |           "$options=" & Quote(options) & ";¶" & 
+    |          "$predicates=" & Quote( MiddleValues(Info ; 4;30000000) )
+    | 
+    | 
+    | ];
+    | 
+    | Case(
+    |    p = 0; "" ;
+    |    let
+    | )
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:RelationInfo, fn:Position, fn:PatternCount, fn:Left, fn:MiddleValues, fn:Substitute, fn:GetValue, fn:Quote, fn:Case

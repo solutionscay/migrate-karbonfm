@@ -1,0 +1,448 @@
+# script 423: Create UserNotification_deprecated
+# file: karbon_kontroller.fmp12
+# folder: API / Notification
+# source: ScriptCatalog/Script[@id=423]
+# steps: 128 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=668 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #UserNotification - Create
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} UserNotification
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} UserNotification.CommentId
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {string} UserNotification.DiscussionId
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {string} UserNotification.Display
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {string} UserNotification.TaskId
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@param {string} UserNotification.UserId
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnSuccess {object} result.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@history  admin - Created by Generator
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  29    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  39    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $data; Value:JSON.Format( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  49    Set Variable [ $error; Value:$data ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  50    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  51    End If
+        DisableStepCollapsed state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $error; Value:JSON.Validate.This ( $data ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "UserId" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  56    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Set Variable [ $CommentId; Value:JSONGetElement( $data ; "CommentId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CommentId
+  64    Set Variable [ $DiscussionId; Value:JSONGetElement( $data ; "DiscussionId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DiscussionId
+  65    Set Variable [ $Display; Value:JSONGetElement( $data ; "Display" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Display
+  66    Set Variable [ $TaskId; Value:JSONGetElement( $data ; "TaskId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TaskId
+  67    Set Variable [ $UserId; Value:JSONGetElement( $data ; "UserId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $UserId
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #Create/connect to the DiscussionNotification record
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    If [ DBTransactions::NotificationId <> $Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::NotificationId#90
+  85    Set Field [ DBTransactions::NotificationId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=90 name=NotificationId
+  86    End If
+        DisableStepCollapsed state=False
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    Set Field [ Notification::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Notification id=7 name=ONE
+  89    Set Variable [ $error; Value:Error.Last ( "Creating/locking the DiscussionNotification record. " ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  90    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    Set Field [ Notification::CommentId_Deprecated; $CommentId ]
+        DisableStepCollapsed state=False
+        Field table=Notification id=10 name=CommentId_Deprecated
+  98    Set Field [ Notification::EntityId; $DiscussionId ]
+        DisableStepCollapsed state=False
+        Field table=Notification id=20 name=EntityId
+  99    Set Field [ Notification::Description; $Display ]
+        DisableStepCollapsed state=False
+        Field table=Notification id=23 name=Description
+ 100    Set Field [ Notification::TaskId_Deprecated; $TaskId ]
+        DisableStepCollapsed state=False
+        Field table=Notification id=22 name=TaskId_Deprecated
+ 101    Set Field [ Notification::UserId_Deprecated; $UserId ]
+        DisableStepCollapsed state=False
+        Field table=Notification id=9 name=UserId_Deprecated
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #SEND NOTIFICATION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    Set Variable [ $result; Value:JSONSetElement( "{}"; "Id" ; Notification::Id ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Notification::Id#6, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 112    End Loop
+        DisableStepCollapsed state=False
+ 113    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 119    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 120    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 121    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 122    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 123    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 125    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 126    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 128    End If
+        DisableStepCollapsed state=False

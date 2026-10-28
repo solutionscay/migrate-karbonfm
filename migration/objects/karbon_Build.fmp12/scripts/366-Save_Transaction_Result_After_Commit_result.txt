@@ -1,0 +1,40 @@
+# script 366: Save Transaction Result After Commit ( {result} )
+# file: karbon_Build.fmp12
+# folder: Modules / Transactions
+# source: ScriptCatalog/Script[@id=366]
+# steps: 8 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=363 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $error; Value:DBTransactions::Result ]
+        DisableStepCollapsed state=False
+        Value
+          refs: DBTransactions::Result#17
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+   4    If [ not Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+   5    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptParameter
+        Script id=365 name="Save Transaction Result ( {result} )"
+   6    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    Exit Script [ Result: DBTransactions::Result ]
+        DisableStepCollapsed state=False
+        refs: DBTransactions::Result#17

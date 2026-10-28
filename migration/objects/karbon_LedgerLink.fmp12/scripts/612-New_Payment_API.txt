@@ -1,0 +1,128 @@
+# script 612: New Payment API
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Payments Interface
+# source: ScriptCatalog/Script[@id=612]
+# steps: 32 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=580 groupCollapsed=True includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # opens a new window to accept a payment for the invoice
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} params.customerId
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {string} params.invoiceId
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {number} params.balance
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # /#
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $params; Value:JSON.Format ( Get (ScriptParameter) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  14    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  15    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $customerId; Value:JSONGetElement ( $params ;  "customerId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $customerId
+  19    Set Variable [ $invoiceId; Value:JSONGetElement ( $params ;  "invoiceId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $invoiceId
+  20    Set Variable [ $balance; Value:JSONGetElement ( $params ;  "balance" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $balance
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    New Window [ Style: Card; Name: "Payments"; Using layout: “New Payment Card” (Payment); Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=118 name="New Payment Card"
+  24    New Record/Request
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Field [ Payment::amount; $balance ]
+        DisableStepCollapsed state=False
+        Field table=Payment id=4 name=amount
+  27    Set Field [ Payment::date; 
+        Get(CurrentDate) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:CurrentDate
+        Field table=Payment id=3 name=date
+  28    Go to Field [ Payment::id_PaymentMethod ]
+        [ Select/perform ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=Payment id=14 name=id_PaymentMethod
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Field [ Payment::id_Customer; $CustomerId ]
+        DisableStepCollapsed state=False
+        Field table=Payment id=2 name=id_Customer
+  31    Set Field [ Payment_PaymentLine::id_Invoice; $invoiceId ]
+        DisableStepCollapsed state=False
+        Field table=Payment_PaymentLine id=7 name=id_Invoice
+  32    Set Field [ Payment_PaymentLine::amount; $balance ]
+        DisableStepCollapsed state=False
+        Field table=Payment_PaymentLine id=4 name=amount

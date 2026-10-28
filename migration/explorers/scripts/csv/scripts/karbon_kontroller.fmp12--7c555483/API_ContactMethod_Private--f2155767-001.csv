@@ -1,0 +1,18 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/197-Create_Contact_Method_data.txt,8eefccb7e57898f35233a5c877e73877ac8bf317f81315bb9371a2e29fd6b37e,scripts,karbon_kontroller.fmp12,197,Create Contact Method { data },data-change,server-domain,tier1,"Shared contact-method writer used by the phone, address and network address API scripts: inside the open transaction it sets PartyId, Label and Comment on the contact method, removes all existing contact-method purposes (billing, shipping, mailing) and clears the cached indicators, then creates one ContactMethodPurpose per entry of the Purpose array (billing=1, shipping=2, mailing=3) and sets the matching cached indicator to true. Returns the last error object.","DBTransactions::ContactMethodId#33 (step 74)
+ContactMethodPurpose#contactMethodId::Id#1 (step 53)","ContactMethod::PartyId#33 (Set Field step 38, current record: the contact method opened by the caller through the transaction record)
+ContactMethod::Label#47 (Set Field step 39, current record)
+ContactMethod::Comment#51 (Set Field step 40, current record)
+ContactMethod::_BillingIndCached#48 (Set Field step 50, current record: cleared)
+ContactMethod::_ShippingIndCached#50 (Set Field step 51, current record: cleared)
+ContactMethod::_MailingIndCached#49 (Set Field step 52, current record: cleared)
+delete: ContactMethodPurpose (Delete Portal Row via script 33 with portal ""ContactMethodPurposePortalByContactMethod"", step 54, portal row: first row, repeated until none left)
+DBTransactions::ContactMethodPurposeId#69 (Set Field step 68, current record: open transaction record, cleared so a new purpose is created)
+ContactMethodPurpose::ONE#40 (Set Field step 69, related via ContactMethodPurpose: new record)
+ContactMethodPurpose::ContactMethodId#33 (Set Field step 74, new record from step 69)
+ContactMethodPurpose::ContactMethodPurposeTypeId#47 (Set Field step 75, new record from step 69)
+ContactMethod::_BillingIndCached#48 (Set Field step 80, current record: true when purpose is billing)
+ContactMethod::_ShippingIndCached#50 (Set Field step 82, current record: true when purpose is shipping)
+ContactMethod::_MailingIndCached#49 (Set Field step 84, current record: true when purpose is mailing)","karbon_kontroller.fmp12/scripts/33 ""Delete First Portal Row (portalLayoutObjectName)"" (step 54)","objects/karbon_kontroller.fmp12/scripts/194-Create_or_Edit_Address_data.txt
+objects/karbon_kontroller.fmp12/scripts/206-Create_Phone_data.txt
+objects/karbon_kontroller.fmp12/scripts/207-Create_or_Update_Network_Address_data.txt",none,"Purposes are replaced, not merged: every existing purpose is deleted before the new ones are created, so editing a contact method without a Purpose array removes all its purposes. An unknown purpose name (not billing, shipping or mailing) gives an empty ContactMethodPurposeTypeId (step 65 Case has no default) and still creates a purpose row. The cached indicators are cleared inside the delete loop (steps 50-52), so they are cleared even when there is nothing to delete. The If [False] at step 78 is a placeholder. The contact method record itself is opened by the caller (karbon_kontroller scripts 194, 206, 207) via the transaction."

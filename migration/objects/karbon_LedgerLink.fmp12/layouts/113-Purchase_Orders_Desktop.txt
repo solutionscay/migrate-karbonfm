@@ -1,0 +1,85 @@
+# layout 113: Purchase Orders | Desktop
+# file: karbon_LedgerLink.fmp12
+# folder: Application / Desktop
+# source: LayoutCatalog/Layout[@id=113]
+# objects: 14
+# theme: LedgerLink PC
+# folder group: id=88 groupCollapsed=True includeInMenu=False
+
+Layout width=1024 quickFind=True includeInMenu=True id=113 name="Purchase Orders | Desktop"
+  Table id=1065135 name=PurchaseOrder
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnModeEnter id=106 triggerFlags=2(find)
+      Script id=490 name="Enter Find Mode Trigger"
+      TriggerText: "Enter Find Mode Trigger"
+  Object type=Button key=7 LabelKey=0 bounds=8,1044,48,1172
+    Text flags=2 style=button.logo
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Button key=8 LabelKey=0 bounds=48,16,72,264
+    Text flags=2 style=button.list.label.left: Vendor
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Text key=9 LabelKey=0 bounds=80,16,104,264
+    Text flags=10 tableViewVisibility=0 style=text.list.field.left: <<PurchaseOrder_Vendor::displayName>>
+      FieldList quickFind=True
+        Field table=PurchaseOrder_Vendor id=15 name=displayName
+  Object type=Button key=10 LabelKey=0 bounds=0,0,39,42
+    Text flags=2 style=button.nav
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Display Main Nav” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=463 name="Display Main Nav"
+      Image name=a3_list.svg
+  Object type=Button key=25 LabelKey=0 flags=1073741824 bounds=74,0,112,1024
+    Text flags=2 style=button.row
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=6 name="Go to Layout"
+        StepText: Go to Layout [ “Purchase Order | Desktop” (PurchaseOrder) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=114 name="Purchase Order | Desktop"
+  Object type=Button key=26 LabelKey=0 flags=1342177280 bounds=0,928,40,1024
+    Text flags=2 style=button.nav: Sync
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Sync QBO with FM, Show Progress Card” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=242 name="Sync QBO with FM, Show Progress Card"
+      Image name=a125_sync.svg
+  Object type=Button key=27 LabelKey=0 bounds=48,264,72,360
+    Text flags=2 style=button.list.label.left: Date
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Button key=28 LabelKey=0 bounds=48,360,72,456
+    Text flags=2 style=button.list.label.left: No.
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Button key=31 LabelKey=0 bounds=48,648,72,744
+    Text flags=2 style=button.list.label.right: Total
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+  Object type=Text key=32 LabelKey=0 bounds=80,264,104,360
+    Text flags=10 tableViewVisibility=0 style=text.list.field.left: <<date>>
+      Display: date format=8 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"
+      FieldList quickFind=True
+        Field table=PurchaseOrder id=5 name=date
+  Object type=Text key=33 LabelKey=0 bounds=80,360,104,470
+    Text flags=10 tableViewVisibility=0 style=text.list.field.left: <<docNumber>>
+      FieldList quickFind=True
+        Field table=PurchaseOrder id=4 name=docNumber
+  Object type=Text key=36 LabelKey=0 bounds=80,648,104,744
+    Text flags=10 tableViewVisibility=0 style=text.list.field.right: <<totalAmt>>
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      FieldList quickFind=True
+        Field table=PurchaseOrder id=25 name=totalAmt
+  Object type=Text key=37 LabelKey=0 flags=260 bounds=80,800,104,872
+    Text flags=6 style=text.list.field.right: Deleted
+    HideCondition findMode=True
+      Calculation:
+        | not PurchaseOrder::deleted
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:not, PurchaseOrder::deleted#32, fn:or, fn:Get, fn:WindowMode
+  Object type=Text key=39 LabelKey=0 bounds=0,42,39,495
+    Text flags=2 style=text.header.title.left: "Purchase Orders"

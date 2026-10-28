@@ -1,0 +1,69 @@
+# script 474: InvoiceItem Amount OnObjectExit Trigger
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Invoice Interface
+# source: ScriptCatalog/Script[@id=474]
+# steps: 16 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=470 groupCollapsed=False includeInMenu=False
+
+   1    #PURPOSE: provide the same auto-calculations as QBO interface
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #NOTE: attach to InvoiceItem::amount field on the Invoice Detail layout
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Field [ InvoiceItem::amount; Round ( InvoiceItem::amount ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, InvoiceItem::amount#6
+        Field table=InvoiceItem id=6 name=amount
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    If [ not IsEmpty ( InvoiceItem::unitPrice ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, InvoiceItem::unitPrice#7
+   7    #unitPrice can have more precision (7 decimal places) than the amount field (2 decimal places)
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #adjust the unitPrice based on current amount ONLY if the amount would be different after rounding
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $qty; Value:If ( IsEmpty ( InvoiceItem::qty ) ; 1 ; InvoiceItem::qty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, InvoiceItem::qty#8
+        Name: $qty
+  10    Set Variable [ $amount; Value:Round ( InvoiceItem::unitPrice * $qty ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, InvoiceItem::unitPrice#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $amount
+  11    If [ $amount ≠ InvoiceItem::amount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: InvoiceItem::amount#6
+  12    Set Variable [ $unitPrice; Value:Round ( InvoiceItem::amount / $qty ; 7 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, InvoiceItem::amount#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $unitPrice
+  13    Set Field [ InvoiceItem::unitPrice; $unitPrice ]
+        DisableStepCollapsed state=False
+        Field table=InvoiceItem id=7 name=unitPrice
+  14    End If
+        DisableStepCollapsed state=False
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False

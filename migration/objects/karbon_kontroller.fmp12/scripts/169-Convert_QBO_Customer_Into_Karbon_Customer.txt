@@ -1,0 +1,563 @@
+# script 169: Convert QBO Customer Into Karbon Customer
+# file: karbon_kontroller.fmp12
+# folder: Modules / QuickBooks Online / Customers / Private
+# source: ScriptCatalog/Script[@id=169]
+# steps: 95 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=273 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Converts a QBO Customer Into Party
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} data
+        DisableStepCollapsed state=False
+        Restore state=False
+   6 // Insert Text [ $EXAMPLE ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "Taxable": true,
+          |   "BillAddr": {
+          |     "Id": "95",
+          |     "Line1": "1603 N. State Road #3B",
+          |     "City": "Lehi",
+          |     "Country": "USA",
+          |     "CountrySubDivisionCode": "UT",
+          |     "PostalCode": "84043"
+          |   },
+          |   "ShipAddr": {
+          |     "Id": "95",
+          |     "Line1": "1603 N. State Road #3B",
+          |     "City": "Lehi",
+          |     "Country": "USA",
+          |     "CountrySubDivisionCode": "UT",
+          |     "PostalCode": "84043"
+          |   },
+          |   "Job": false,
+          |   "BillWithParent": false,
+          |   "Balance": 0,
+          |   "BalanceWithJobs": 0,
+          |   "CurrencyRef": {
+          |     "value": "USD",
+          |     "name": "United States Dollar"
+          |   },
+          |   "PreferredDeliveryMethod": "Email",
+          |   "domain": "QBO",
+          |   "sparse": false,
+          |   "Id": "202",
+          |   "SyncToken": "1",
+          |   "MetaData": {
+          |     "CreateTime": "2015-12-17T09:07:47-08:00",
+          |     "LastUpdatedTime": "2018-02-03T09:33:13-08:00"
+          |   },
+          |   "GivenName": "John",
+          |   "FamilyName": "Nichols",
+          |   "FullyQualifiedName": "Five Inc",
+          |   "CompanyName": "Five Inc",
+          |   "DisplayName": "Five Inc",
+          |   "PrintOnCheckName": "Five Inc",
+          |   "Active": true,
+          |   "Mobile": {
+          |     "FreeFormNumber": "(801) 492-1137"
+          |   },
+          |   "PrimaryEmailAddr": {
+          |     "Address": "john.nichols@fiveinc.com"
+          |   },
+          |   "WebAddr": {
+          |     "URI": "http://www.fiveinc.com/"
+          |   }
+          | }
+        Field: $EXAMPLE
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@returnSuccess {object} party
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #See sample object above
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {object} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@history	Todd Geist - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $data; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $hasContact; Value:not IsEmpty ( 
+        
+        
+        JSONGetElement ( $data ; "GivenName" ) & 
+        JSONGetElement ( $data ; "FamilyName" ) & 
+        JSONGetElement ( $data ; "MiddleName" )
+        
+        
+        
+        
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:IsEmpty, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $hasContact
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #PLUCK PROP to pull the simple stuff
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $KarbonCustomer; Value:JSONFormatElements ( 
+        
+        JSON.Pluck.From ( $data ) & 
+        JSON.Pluck (
+        List(
+         
+        	JSON.Pluck.Prop ( "CurrencyRef.value" ; JSONString ; "CurrencyRef");
+        	JSON.Pluck.Prop ( "DefaultTaxCodeRef.value" ; JSONString ; "DefaultTaxCodeRef");
+        	JSON.Pluck.Prop ( "DisplayName" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "Balance" ; JSONNumber ; "");
+            JSON.Pluck.Prop ( "Id" ; JSONNumber ; "QBOId");
+        
+        	JSON.Pluck.Prop ( "FederalTaxIdNumber" ; JSONString ; "");
+        
+        
+        	JSON.Pluck.Prop ( "GivenName" ; JSONString ; "FirstName");
+        	JSON.Pluck.Prop ( "FamilyName" ; JSONString ; "LastName");
+        	JSON.Pluck.Prop ( "MiddleName" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "Suffix" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "Title" ; JSONString ; "Salutation");
+        	JSON.Pluck.Prop ( "Title" ; JSONString ; "Prefix");
+        
+        
+        	JSON.Pluck.Prop ( "Notes" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "OpenBalanceDate" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "CompanyName" ; JSONString ; "OrganizationName");
+        	JSON.Pluck.Prop ( "ParentRef.value" ; JSONString ; "ParentRef");
+        	JSON.Pluck.Prop ( "PaymentMethodRef.value" ; JSONString ; "PaymentMethodRef");
+        	JSON.Pluck.Prop ( "PreferredDeliveryMethod" ; JSONString ; "");
+        
+        
+        	JSON.Pluck.Prop ( "PrintOnCheckName" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "ResaleNum" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "SalesTermRef" ; JSONString ; "SalesTermRef.value");
+        
+        
+        	JSON.Pluck.Prop ( "Suffix" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "Taxable" ; JSONBoolean ; "");
+         
+        ))
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, cf:JSON.Pluck.From, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString, fn:JSONNumber, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ JSONGetElement ( $KarbonCustomer; "OrganizationName" ) = ""  and JSONGetElement ( $KarbonCustomer; "DisplayName" ) <> "" and not $hasContact ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement, fn:and, fn:not
+  31    Set Variable [ $KarbonCustomer; Value:JSONSetElement ( $KarbonCustomer ; "OrganizationName" ; 
+        
+           JSONGetElement ( $KarbonCustomer ; "DisplayName" );
+        
+        
+        JSONString
+        
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONGetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #Addresses
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $c; Value:-1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  36    Set Variable [ $address; Value:JSONGetElement ( $data ; "BillAddr" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+  37    If [ not IsEmpty ( $address ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  38    Set Variable [ $c; Value:$c+1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  39    Set Variable [ $convertedAddress; Value:JSON.Pluck.From ($address ) & 
+        JSON.Pluck (
+        List(
+         
+        	JSON.Pluck.Prop ( "Line1" ; JSONString ; "AddressLine1");
+        	JSON.Pluck.Prop ( "Line1" ; JSONString ; "AddressLine1");
+        	JSON.Pluck.Prop ( "Line3" ; JSONString ; "AddressLine3");
+        	JSON.Pluck.Prop ( "City" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "Country" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "PostalCode" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "CountrySubDivisionCode" ; JSONString ; "StateProvince");
+         
+        )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Name: $convertedAddress
+  40    Set Variable [ $convertedAddress; Value:JSONSetElement ( $convertedAddress ; "Purpose[0]" ; "billing" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $convertedAddress
+  41    Set Variable [ $convertedAddress; Value:JSONSetElement ( $convertedAddress ; "Primary" ; 1 ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONBoolean
+        Name: $convertedAddress
+  42    Set Variable [ $KarbonCustomer; Value:JSONSetElement ( $KarbonCustomer; "Address[" & $c & "]" ; $convertedAddress ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  43    End If
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $address; Value:JSONGetElement ( $data ; "ShipAddr" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+  48    If [ not IsEmpty ( $address ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  49    Set Variable [ $c; Value:$c+1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  50    Set Variable [ $convertedAddress; Value:JSON.Pluck.From ($address ) & 
+        JSON.Pluck (
+        List(
+         
+        	JSON.Pluck.Prop ( "Line1" ; JSONString ; "AddressLine1");
+        	JSON.Pluck.Prop ( "Line1" ; JSONString ; "AddressLine1");
+        	JSON.Pluck.Prop ( "Line3" ; JSONString ; "AddressLine3");
+        	JSON.Pluck.Prop ( "City" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "Country" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "PostalCode" ; JSONString ; "");
+        	JSON.Pluck.Prop ( "CountrySubDivisionCode" ; JSONString ; "StateProvince");
+         
+        )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Name: $convertedAddress
+  51    Set Variable [ $convertedAddress; Value:JSONSetElement ( $convertedAddress ; "Purpose[0]" ; "shipping" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $convertedAddress
+  52    Set Variable [ $KarbonCustomer; Value:JSONSetElement ( $KarbonCustomer; "Address[" & $c & "]" ; $convertedAddress ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  53    End If
+        DisableStepCollapsed state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #PHONES
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $c; Value:-1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  57    #mobile
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Variable [ $Phone; Value:JSONGetElement($data; "Mobile.FreeFormNumber" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+  59    If [ not IsEmpty ( $Phone ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  60    Set Variable [ $c; Value:$c+1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  61    Set Variable [ $Label; Value:"Mobile" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Label
+  62    Set Variable [ $KarbonCustomer; Value:JSONSetElement ( $KarbonCustomer; 
+        
+           ["Phone[" & $c & "].Number" ; $Phone ; JSONString] ;
+           ["Phone[" & $c & "].Label" ; $Label ; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  63    End If
+        DisableStepCollapsed state=False
+  64    #primary
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Set Variable [ $Phone; Value:JSONGetElement($data; "PrimaryPhone.FreeFormNumber" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+  66    If [ not IsEmpty ( $Phone ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  67    Set Variable [ $c; Value:$c+1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  68    Set Variable [ $KarbonCustomer; Value:JSONSetElement ( $KarbonCustomer; 
+        
+           ["Phone[" & $c & "].Number" ; $Phone ; JSONString] ;
+           ["Phone[" & $c & "].Primary" ; True; JSONBoolean]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  69    End If
+        DisableStepCollapsed state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #Network Addresses
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Set Variable [ $c; Value:-1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  74    Set Variable [ $WebSite; Value:JSONGetElement($data; "WebAddr.URI" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $WebSite
+  75    If [ not IsEmpty ( $WebSite ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  76    Set Variable [ $c; Value:$c+1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  77    Set Variable [ $KarbonCustomer; Value:JSONSetElement ( $KarbonCustomer; 
+        
+           ["NetworkAddress[" & $c & "].Address" ; $WebSite ; JSONString] ;
+           ["NetworkAddress[" & $c & "].Type" ; "web"; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  78    End If
+        DisableStepCollapsed state=False
+  79    Set Variable [ $Email; Value:JSONGetElement($data; "PrimaryEmailAddr.Address" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Email
+  80    If [ not IsEmpty ( $Email ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  81    #qbo allows multiple addressses seperated by ","  so we loop
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Variable [ $split; Value:Substitute ( $email ; "," ; "¶" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $split
+  83    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  84    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    Set Variable [ $emailAddress; Value:GetValue ( $split ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailAddress
+  86    Set Variable [ $emailAddress; Value:Trim($emailAddress) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Trim
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailAddress
+  87    Exit Loop If [ IsEmpty( $emailAddress ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  88    Set Variable [ $c; Value:$c+1 ]
+        DisableStepCollapsed state=False
+        Name: $c
+  89    Set Variable [ $KarbonCustomer; Value:JSONSetElement ( $KarbonCustomer; 
+        
+           ["NetworkAddress[" & $c & "].Address" ; $emailAddress ; JSONString] ;
+           ["NetworkAddress[" & $c & "].Type" ; "email" ; JSONString] ;
+           ["NetworkAddress[" & $c & "].Purpose[0]" ; "billing"; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  90    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  91    End Loop
+        DisableStepCollapsed state=False
+  92    End If
+        DisableStepCollapsed state=False
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    Exit Script [ Result: $KarbonCustomer ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,229 @@
+# script 281: API Pluck Props For Subscript - WIP
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=281]
+# steps: 53 (2 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-09-11 dave@geistinteractive.com - We're using the generic $ScriptParameter instead of the entity name. It helps when we copy/paste code snippets from one script to another to have common variable names.
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4 // Insert Text [ $SAMPLE EXPRESSION ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | JSON.Pluck.From ( $Customer ) & JSON.Pluck ( 
+          | 	List ( 
+          | 		JSON.Pluck.Prop ( "FirstName" ; JSONString ; "FirstName" ) ; 
+          | 	)
+          | )
+        Field: $SAMPLE EXPRESSION
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Insert Text [ $pluckTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | JSON.Pluck.From ( $<<pluckFrom>> ) & JSON.Pluck ( 
+          | 	List ( 
+          | <<pluckPropList>> 
+          | 	)
+          | )
+        Field: $pluckTemplate
+   7    Insert Text [ $pluckPropTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSON.Pluck.Prop ( "<<pluckFrom>>" ; <<dataType>> ; "<<pluckTo>>" ) ;
+        Field: $pluckPropTemplate
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #Create Set Field script steps
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $entity; Value:"ScriptParameter" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+  14 // Set Variable [ $entity; Value:ApiGenerator::Entity ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::Entity#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  17    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Exit Loop If [ IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ApiGeneratorLine::Id#1
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ ApiGeneratorLine::FmpIgnore ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::FmpIgnore#11
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Else If [ // this parameter is going to be passed on to a subscript; add it to a pluck list
+        not IsEmpty ( ApiGeneratorLine::JsonPathOut ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, ApiGeneratorLine::JsonPathOut#26
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #Build a list of Set Variable steps
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $pluckTo; Value:ApiGeneratorLine::JsonPathOut ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::JsonPathOut#26
+        Repetition
+          Calculation:
+            | 1
+        Name: $pluckTo
+  29    Set Variable [ $thisPluckProp; Value:Substitute ( $pluckPropTemplate ; 
+        	[ "<<pluckFrom>>" ; ApiGeneratorLine::JsonPropertyName ] ; 
+        	[ "<<dataType>>" ; "json" & ApiGeneratorLine::type ] ; 
+        	[ "<<pluckTo>>" ; $pluckTo ] 
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, ApiGeneratorLine::JsonPropertyName#21, ApiGeneratorLine::type#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPluckProp
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $pluckPropList; Value:List( $pluckPropList ; $thisPluckProp ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $pluckPropList
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    End If
+        DisableStepCollapsed state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  36    End Loop
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    If [ IsEmpty ( $pluckPropList ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  40    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  41    End If
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $pluckStatement; Value:Substitute ( $pluckTemplate ; 
+        	[ "<<pluckFrom>>" ; $Entity ] ; 
+        	[ "<<pluckPropList>>" ; $pluckPropList ] 
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $pluckStatement
+  45    Set Variable [ $pluckStep; Value:ScriptStep_InsertCalculatedResult ( "$parameters" ; $pluckStatement ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult
+        Name: $pluckStep
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Exit Script [ Result: $pluckStep ]
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False

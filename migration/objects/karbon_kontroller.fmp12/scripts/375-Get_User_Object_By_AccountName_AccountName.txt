@@ -1,0 +1,147 @@
+# script 375: Get User Object By AccountName ( AccountName )
+# file: karbon_kontroller.fmp12
+# folder: API / User
+# source: ScriptCatalog/Script[@id=375]
+# steps: 42 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=14 groupCollapsed=True includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Get the user Object By Account Name
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @parameter {string} AccountName
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @returnSuccess {object} user
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @returnSuccess {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnError {object} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnError {...} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@todo 2018-09-20 dave@geistinteractive.com - we're no longer returning results inside of an object (see line 41). We need to update the dependencies to look at the root level object instead.
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $accountName; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $accountName
+  19    If [ IsEmpty ( $accountName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  20    Exit Script [ Result: _wip_API.Error.BadRequest ( "Missing ScriptParameter. AccountName is required" ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:_wip_API.Error.BadRequest
+  21    End If
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Go to Layout [ “f_User” (f_User) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=23 name=f_User
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  26    Set Field [ f_User::AccountName; Quote ( $accountName ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Quote
+        Field table=f_User id=11 name=AccountName
+  27    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  28    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Error Capture [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $user; Value:f_User::AsJSON ]
+        DisableStepCollapsed state=False
+        Value
+          refs: f_User::AsJSON#105
+        Repetition
+          Calculation:
+            | 1
+        Name: $user
+  33    If [ IsEmpty ( $user ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  34    Exit Script [ Result: _wip_API.Error.Validation ( "There is no User with this account" ; JSONSetElement ( "" ; "AccountName" ; $AccountName ; JSONString ) ) ]
+        DisableStepCollapsed state=False
+        refs: cf:_wip_API.Error.Validation, fn:JSONSetElement, fn:JSONString
+  35    End If
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #if we get here we have our account
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #Wrap it in user and go
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  41    Exit Script [ Result: JSONSetElement ( "" ; "User" ; $user ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONObject
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False

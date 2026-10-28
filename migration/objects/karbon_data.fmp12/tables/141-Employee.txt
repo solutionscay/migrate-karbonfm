@@ -1,0 +1,224 @@
+# table 141: Employee
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=141]
+# fields: 26
+# records: 1
+
+Field id=6 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=SocialSecurityNumber
+  AutoEnter allowEditing=True
+  Validation maxLength=True type=OnlyDuringDataEntry
+    MaxDataLength value=11
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=PayPeriod
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=NameCached
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Normal name=Initials
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=Employee:
+      | Filter ( Party::NameCached ; "ABCDEFGHIJKLMNOPQRSTUVWXYZ" )
+      refs: fn:Filter, Party::NameCached#19
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Summary name=IdListOf
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=6 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Summary name=NameList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=20 name=NameCached
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=32 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=34 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=Employee (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=Employee:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=Employee (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=Employee (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Employee:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=38 dataType=Number fieldType=Normal name=EstimatedHourlyCost
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=Number fieldType=Normal name=DefaultHourlyRate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=Employee:
+    | // Created by Generator - 2/13/2018 11:29:22 PM
+    | // DO NOT format this JSON object!
+    | // @history 2018-05-10 dave@geistinteractive.com - added some related data
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "BillableTime" ; BillableTime ; JSONNumber ];
+    | 	[ "CreationAccountName" ; CreationAccountName ; JSONString ];
+    | 	[ "CreationTimestamp" ; CreationTimestamp ; JSONString ];
+    | 	[ "DefaultHourlyRate" ; DefaultHourlyRate ; JSONNumber ];
+    | 	[ "EmployeeNumber" ; EmployeeNumber ; JSONNumber ];
+    | 	[ "EstimatedHourlyCost" ; EstimatedHourlyCost ; JSONNumber ];
+    | 	[ "Id" ; Id ; JSONString ];
+    | 	[ "Initials" ; Initials ; JSONString ];
+    | 	[ "ModificationAccountName" ; ModificationAccountName ; JSONString ];
+    | 	[ "ModificationTimestamp" ; ModificationTimestamp ; JSONString ];
+    | 	[ "NameCached" ; NameCached ; JSONString ];
+    | 	[ "PayPeriod" ; PayPeriod ; JSONString ];
+    | 	[ "SocialSecurityNumber" ; SocialSecurityNumber ; JSONString ];
+    | 	[ "Type" ; Type ; JSONString ];
+    | 	[ "PartyId" ; PartyRole::PartyId ; JSONString ]
+    |  
+    | )
+    refs: fn:JSONSetElement, Employee::BillableTime#49, fn:JSONNumber, Employee::CreationAccountName#32, fn:JSONString, Employee::CreationTimestamp#33, Employee::DefaultHourlyRate#39, Employee::EmployeeNumber#48, Employee::EstimatedHourlyCost#38, Employee::Id#6, Employee::Initials#21, Employee::ModificationAccountName#34, Employee::ModificationTimestamp#36, Employee::NameCached#20, Employee::PayPeriod#18, Employee::SocialSecurityNumber#14, Employee::Type#45, PartyRole::PartyId#45
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=45 dataType=Text fieldType=Normal name=Type
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Binary fieldType=Calculated name=Avatar
+  Calculation table=Employee:
+    | 
+    | TextSize ( Initials ; 72 )
+    refs: fn:TextSize, Employee::Initials#21
+  Storage storeCalculationResults=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Employee (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=48 dataType=Number fieldType=Normal name=EmployeeNumber
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=49 dataType=Number fieldType=Normal name=BillableTime
+  Comment: If true, this entity is currently enabled for use by QuickBooks
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=52 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=Employee:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=53 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Employee:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=Text fieldType=Summary name=AsJSONListOf
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=40 name=AsJson
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=57 dataType=Text fieldType=Calculated name=FoundSetAsJSON
+  Calculation table=Employee:
+    | JSONFormatElements (
+    | "[" & Substitute(Employee::AsJSONListOf; "¶" ; ",") & "]"
+    | )
+    refs: fn:JSONFormatElements, fn:Substitute, Employee::AsJSONListOf#56
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=58 dataType=Text fieldType=Normal name="Field 58"
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

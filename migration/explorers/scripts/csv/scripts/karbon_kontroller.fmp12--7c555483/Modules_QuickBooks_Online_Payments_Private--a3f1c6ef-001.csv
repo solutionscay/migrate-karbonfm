@@ -1,0 +1,58 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/403-Convert_QBO_Payment_into_Karbon_Payment.txt,5deaae24e424272675c8cc40283fb67bcaebf06fca55772309e170f6e13f2d0b,scripts,karbon_kontroller.fmp12,403,Convert QBO Payment into Karbon Payment,integration,external-adapter,tier2,"Converts a QBO Payment JSON object into a Karbon Payment JSON: parses ids/amounts/dates, looks up Karbon ids of the payment, customer, deposit account and payment method (script 271), converts each QBO Line through script 406 and returns id, qbo_id, PaymentLine array, id_Customer, id_DepositAccount, id_PaymentMethod, date, amount, PrivateNote, PaymentRefNum.",none,none,"karbon_kontroller.fmp12/scripts/271 (step 57)
+karbon_kontroller.fmp12/scripts/271 (step 64)
+karbon_kontroller.fmp12/scripts/271 (step 73)
+karbon_kontroller.fmp12/scripts/271 (step 80)
+karbon_kontroller.fmp12/scripts/406 (step 97)","karbon_kontroller.fmp12/scripts/401-Handle_Changed_or_New_QBO_Payment_QBO_Payment.txt (step 30)
+karbon_tester.fmp12/scripts/261-Convert_QBO_Payment_to_Karbon_Payment.txt (step 13)",none,"Step 6 (disabled) holds a QBO sample payload; step 67 (disabled) a hard-coded test customer id. DepositToAccount lookup carries developer note 'REFACTOR - Bring over Accounts table to Karbon?'. QBO Id parsed as number for Customer/Account/PaymentMethod but string for Payment (steps 56, 63, 72, 79)."
+karbon_kontroller.fmp12/scripts/405-Create_or_Update_PaymentLine_PaymentLine.txt,4c65bc178d13a73b8f87a8a5c3868b0f21f64aab0623d7159149948585b994cc,scripts,karbon_kontroller.fmp12,405,Create or Update PaymentLine { PaymentLine },data-change,server-domain,tier2,"Transactional create-or-update of one PaymentLine: validates JSON (id_Payment required), selects/locks the PaymentLine through DBTransactions::PaymentLineId and sets amount, id_Customer, id_Invoice, id_Payment, qbo_id; returns the line Id. Wrapped in Start/Save/End Transaction.","DBTransactions::PaymentLineId#85
+PaymentLine::id#1","DBTransactions::PaymentLineId#85 (Set Field step 90, current record)
+PaymentLine::ONE#19 (Set Field step 93, related via PaymentLine; creates or locks the record)
+PaymentLine::amount#4 (Set Field step 103, related via PaymentLine)
+PaymentLine::id_Customer#15 (Set Field step 104, related via PaymentLine)
+PaymentLine::id_Invoice#7 (Set Field step 105, related via PaymentLine)
+PaymentLine::id_Payment#2 (Set Field step 107, related via PaymentLine)
+PaymentLine::qbo_id#6 (Set Field step 109, related via PaymentLine)","karbon_kontroller.fmp12/scripts/28 (step 40)
+karbon_kontroller.fmp12/scripts/29 (step 125)
+karbon_kontroller.fmp12/scripts/31 (step 126)",karbon_kontroller.fmp12/scripts/404-Create_or_Update_Payment_Payment.txt (step 157),none,"Step 109 sets PaymentLine::qbo_id from $qbo_id, but the step that reads it (74) is disabled, so the value is always empty. qbo_error and qbo_lineNum are also disabled (73, 75, 108). id_Invoice is no longer required (comment step 59 line). Callers show it is only called from 'Create or Update Payment' (404)."
+karbon_kontroller.fmp12/scripts/406-Convert_QBO_PaymentLine_into_Karbon_PaymentLine.txt,2a68ed2765cdfd0e5de40b6db0ac08ce0c0bd2b7453168fe3794eba715d7a5c3,scripts,karbon_kontroller.fmp12,406,Convert QBO PaymentLine into Karbon PaymentLine,integration,external-adapter,tier2,"Converts one QBO Payment line into a Karbon PaymentLine JSON: amount and, when the linked transaction type is Invoice, the Karbon SalesTransaction id (lookup script 271, entity SalesTransaction) as id_Invoice.",none,none,karbon_kontroller.fmp12/scripts/271 (step 61),"karbon_kontroller.fmp12/scripts/403-Convert_QBO_Payment_into_Karbon_Payment.txt (step 97)
+karbon_tester.fmp12/scripts/262-Convert_QBO_Payment_Line_to_Karbon_Payment_Line.txt (step 13)",none,"Only 'Invoice' LinkedTxn is handled (step 58); other linked types (e.g. CreditMemo) yield an empty id_Invoice. Comment step 49: PaymentLine has no Karbon FMId, the loop counter is used on write."
+karbon_kontroller.fmp12/scripts/492-Convert_Karbon_Payment_into_QBO_Payment.txt,db2f92909589080d55f84f329d01a0d2a4872953ba805daba9b0fb1d545a157e,scripts,karbon_kontroller.fmp12,492,Convert Karbon Payment into QBO Payment,integration,external-adapter,tier1,"Builds the QBO Payment JSON from a Karbon Payment: selects the Payment through DBTransactions, reads the current QBO copy (karbon_LedgerLink Read script) when a qbo_id exists and keeps its unmodified fields, converts customer, payment method and deposit account to QBO ids (script 327), date to ISO, converts every PaymentLine (script 494) into QBO Line entries, and returns the JSON. Wrapped in Start/Save/End Transaction.","DBTransactions::PaymentId#84
+Payment::qbo_id#11
+Payment::id_Customer#2
+Payment::id_DepositAccount#5
+Payment::id_PaymentMethod#14
+Payment::date#3
+Payment::amount#4
+Payment::PrivateNote#6
+Payment::PaymentRefNum#7
+Payment_PaymentLine::id#1","DBTransactions::PaymentId#84 (Set Field step 45, current record)
+Payment::ONE#23 (Set Field step 48, related via Payment; creates or locks the record)","karbon_kontroller.fmp12/scripts/28 (step 32)
+karbon_LedgerLink.fmp12/scripts/1 (step 60, other file karbon_LedgerLink)
+karbon_kontroller.fmp12/scripts/327 (step 107)
+karbon_kontroller.fmp12/scripts/327 (step 113)
+karbon_kontroller.fmp12/scripts/327 (step 122)
+karbon_kontroller.fmp12/scripts/494 (step 144)
+karbon_kontroller.fmp12/scripts/29 (step 187)
+karbon_kontroller.fmp12/scripts/31 (step 188)","karbon_kontroller.fmp12/scripts/498-Handle_Payment_Push_to_QBO.txt (step 75)
+karbon_tester.fmp12/scripts/263-Convert_Karbon_Payment_to_QBO_Payment.txt (step 13)",none,ProcessPayment is set to True in $ProcessPayment (step 90) but the JSON step is disabled (168). Step 110 assigns $PaymentMethodRef.value to itself. The CustomerRef.name step is disabled (167). Line array index and QBO Line Id handling: see 494.
+karbon_kontroller.fmp12/scripts/494-Convert_Karbon_PaymentLine_into_QBO_PaymentLine.txt,5e4d872be46fce97cce7a6a794d45722c96f44489acefb77c1250382b3ce7550,scripts,karbon_kontroller.fmp12,494,Convert Karbon PaymentLine into QBO PaymentLine,integration,external-adapter,tier2,"Converts one Karbon PaymentLine into a QBO Line: selects the line via DBTransactions::PaymentLineId, reads amount and id_Invoice, resolves the QBO id of the SalesTransaction (script 327) and returns Amount plus LinkedTxn[0].TxnId and TxnType 'Invoice'.","PaymentLine::amount#4
+PaymentLine::id_Invoice#7","DBTransactions::PaymentLineId#85 (Set Field step 25, current record)
+PaymentLine::ONE#19 (Set Field step 26, related via PaymentLine; creates or locks the record)","karbon_kontroller.fmp12/scripts/28 (step 20)
+karbon_kontroller.fmp12/scripts/327 (step 47)
+karbon_kontroller.fmp12/scripts/29 (step 69)
+karbon_kontroller.fmp12/scripts/31 (step 70)","karbon_kontroller.fmp12/scripts/492-Convert_Karbon_Payment_into_QBO_Payment.txt (step 144)
+karbon_tester.fmp12/scripts/264-Convert_Karbon_PaymentLine_to_QBO_PaymentLine.txt (step 13)",none,LinkedTxnType is hard-coded to 'Invoice' (step 34).  $json is passed to 'Save Transaction Result' (29) and the exit result is Get(ScriptResult) after 'End Transaction' (31); the result contract of those scripts is outside this batch.
+karbon_kontroller.fmp12/scripts/498-Handle_Payment_Push_to_QBO.txt,0afb1ca3632db3016630c4d44161599954892632bc5e159be10019ee859d0c96,scripts,karbon_kontroller.fmp12,498,Handle Payment Push to QBO,integration,external-adapter,tier1,"Pushes a Karbon Payment to QuickBooks Online inside a transaction: validates FmId, selects the Payment, converts it (script 492), sends it with karbon_LedgerLink 'Send FMData To QBO', stores the returned QBO id in Payment::qbo_id, clears Payment::qbo_send, then pulls each linked invoice back from QBO so balances refresh. Returns the Payment Id or the error.","DBTransactions::PaymentId#84
+Payment::IncludedInvoiceIDs#21
+SalesTransaction::qbo_id#2
+SalesTransaction::id#1
+Payment::id#1","DBTransactions::PaymentId#84 (Set Field step 67, current record)
+Payment::ONE#23 (Set Field step 70, related via Payment; creates or locks the record)
+Payment::qbo_id#11 (Set Field step 98, related via Payment)
+Payment::qbo_send#12 (Set Field step 106, related via Payment)","karbon_kontroller.fmp12/scripts/28 (step 30)
+karbon_kontroller.fmp12/scripts/492 (step 75)
+karbon_LedgerLink.fmp12/scripts/292 (step 84, other file karbon_LedgerLink)
+karbon_LedgerLink.fmp12/scripts/145 (step 125, other file karbon_LedgerLink)
+karbon_kontroller.fmp12/scripts/29 (step 149)
+karbon_kontroller.fmp12/scripts/31 (step 150)",karbon_LedgerLink.fmp12/scripts/638-Handle_Payment_Push.txt,none,"Step 105 sets $fmQBOIsUpdatingThisRecord = True before clearing qbo_send (suppresses an on-commit trigger; trigger not in this batch). Step 125 pulls each linked invoice by QBO id; a failed pull sets $error and exits only the inner loop. Caller is the LedgerLink push handler (script 638), not a local script."

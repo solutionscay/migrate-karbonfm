@@ -1,0 +1,166 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/75-Create_External_Link_V1_data.txt,e656bf0da602d0bf87d7ac6d1a38f86e3070da34044e3551a43b2a02fa9a0498,scripts,karbon_kontroller.fmp12,75,Create External Link V1 { data },data-change,server-domain,tier2,"Links a party role (or any internal record) to an external reference id: validates the JSON, checks the link type exists and that the same external id and type are not already linked, then creates the ExternalLink record inside a transaction and returns it as JSON. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","ExternalLinkType::Id#1 (step 54,62)
+ExternalLinkType::ONE#8 (step 54)
+ExternalLinkType::InternalType#14 (step 62)
+ExternalLink::Id#1 (step 69)
+ExternalLink::ExternalId#10 (step 69)
+ExternalLink::ExternalLinkTypeId#9 (step 69)
+ExternalLink::AsJsonV1#12 (step 103)","DBTransactions::ExternalLinkId#46 (Set Field step 88, current record)
+ExternalLink::ONE#8 (Set Field step 89, related via ExternalLink)
+ExternalLink::InternalId#2 (Set Field step 94, related via ExternalLink)
+ExternalLink::ExternalLinkTypeId#9 (Set Field step 95, related via ExternalLink)
+ExternalLink::ExternalId#10 (Set Field step 96, related via ExternalLink)","karbon_kontroller.fmp12/scripts/28 step 84
+karbon_kontroller.fmp12/scripts/29 step 105
+karbon_kontroller.fmp12/scripts/31 step 106",none found (may be called by name),"ExecuteSQL (via cf:SQL.GetColumn) step 54
+ExecuteSQL (via cf:SQL.GetColumn) step 62
+ExecuteSQL (via cf:SQL.GetColumn2Fields) step 69","Developer note at step 25: '#TODO - should V1 exist?'. V2 (script 315) does the same job; no caller found for V1. Step 45 maps old PartyRoleId to InternalId for backward compatibility. Steps 39, 57, 64 and 71 exit before Start Transaction, so no End Transaction runs on those paths."
+karbon_kontroller.fmp12/scripts/83-wip_Delete_Party.txt,751e3b4a69a697fcca0dee6becd02bbbdf1b490bcd96f422113869b1585e1d8e,scripts,karbon_kontroller.fmp12,83,_wip_Delete Party,data-change,server-domain,tier1,"Work-in-progress delete of a party by Id. Soft delete (default true) marks the Party deleted with a reason, timestamp and account name; hard delete removes the party row through the portal-row delete helper. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","Party::Id#1 (step 62)
+DBTransactions::PartyId#25 (step 102)","DBTransactions::PartyId#25 (Set Field step 80, current record)
+Party::ONE#110 (Set Field step 83, related via Party)
+Party::DeletedInd#62 (Set Field step 90, related via Party)
+Party::DeletedReason#103 (Set Field step 91, related via Party)
+Party::DeletedTimestamp#112 (Set Field step 92, related via Party)
+Party::DeletedAccountName#113 (Set Field step 93, related via Party)
+delete: Party (Perform Script 'Delete First Portal Row' step 96 via script 33, portal row 'Party', only when soft=false)","karbon_kontroller.fmp12/scripts/28 step 32
+karbon_kontroller.fmp12/scripts/33 step 96
+karbon_kontroller.fmp12/scripts/29 step 111
+karbon_kontroller.fmp12/scripts/31 step 112",none found (may be called by name),ExecuteSQL (via cf:SQL.GetColumn) step 62,"Name starts with _wip_. Step 91 reads $json, which is never set in this script (the parsed variable is $data), so DeletedReason is probably written empty; the data.softReason param is not read by name either. No caller found. Hard-delete target (step 96 runs script 33 on portal object 'Party') is a layout object I cannot resolve from the DDR; no delete is recorded in writes because no Delete Record step exists here."
+karbon_kontroller.fmp12/scripts/182-Set_Primary_Phone_Id_PartyId.txt,aa858696a97e918be51e0a1a7645db8379873bdcb2b0d6f891d4dc5f4cdca520,scripts,karbon_kontroller.fmp12,182,"Set Primary Phone { Id, PartyId }",data-change,server-domain,tier1,"Marks one phone contact method as the primary phone of a party and clears the primary flag on the party's other phones. Also refreshes the cached primary phone number and label on the Party. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyId#25 (step 74)
+ContactMethod#byPartyId_Phone::Id#1 (step 80,81)
+DBTransactions::ContactMethodId#33 (step 91)
+Phone::NumberDisplay#21 (step 95)
+ContactMethod::Label#47 (step 96)","DBTransactions::PartyId#25 (Set Field step 76, current record)
+DBTransactions::ContactMethodId#33 (Set Field step 89, current record)
+Phone::PrimaryInd#20 (Set Field step 93, related via Phone)
+Party::PhoneNumberCached#125 (Set Field step 95, related via Party)
+Party::PhoneLabelCached#132 (Set Field step 96, related via Party)
+Phone::PrimaryInd#20 (Set Field step 98, related via Phone)","karbon_kontroller.fmp12/scripts/28 step 34
+karbon_kontroller.fmp12/scripts/31 step 113","objects/karbon_kontroller.fmp12/scripts/206-Create_Phone_data.txt
+objects/karbon_kontacts.fmp12/scripts/174-Button_Set_Primary_Phone.txt",none,"Loops over every phone of the party through DBTransactions::ContactMethodId, so the Phone and Party writes happen once per loop pass (records reached through the selector). The final End Transaction at step 113 runs inside the script, but there is no Save Transaction Result call."
+karbon_kontroller.fmp12/scripts/183-Set_Primary_Address_Id_PartyId.txt,fba039356c0c4e72890ba6c18132a5c10644eef93bce1ef222a6ce3d22bd227c,scripts,karbon_kontroller.fmp12,183,"Set Primary Address { Id, PartyId }",data-change,server-domain,tier1,"Marks one address contact method as the primary address of a party and clears the flag on the party's other addresses. Refreshes the cached address display and label on the Party. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyId#25 (step 78)
+ContactMethod#byPartyId_Address::Id#1 (step 84,85)
+DBTransactions::ContactMethodId#33 (step 95)
+Address::AddressDisplay#22 (step 99)
+ContactMethod::Label#47 (step 100)","DBTransactions::PartyId#25 (Set Field step 80, current record)
+DBTransactions::ContactMethodId#33 (Set Field step 93, current record)
+Address::PrimaryInd#19 (Set Field step 97, related via Address)
+Party::AddressDisplayCached#128 (Set Field step 99, related via Party)
+Party::AddressLabelCached#131 (Set Field step 100, related via Party)
+Address::PrimaryInd#19 (Set Field step 102, related via Address)","karbon_kontroller.fmp12/scripts/28 step 34
+karbon_kontroller.fmp12/scripts/31 step 117","objects/karbon_kontroller.fmp12/scripts/194-Create_or_Edit_Address_data.txt
+objects/karbon_kontacts.fmp12/scripts/181-Button_Set_Primary_Address.txt",none,Same loop as script 182 (phone). No Save Transaction Result call.
+karbon_kontroller.fmp12/scripts/184-Set_Primary_Network_Address_Id_PartyId.txt,84d883857061b45a5bc3ede76f72098bdc5972aee4d38f5671b4699ea8499ac2,scripts,karbon_kontroller.fmp12,184,"Set Primary Network Address { Id, PartyId }",data-change,server-domain,tier1,"Marks one network address (email or similar) as the primary one of a party and clears the flag on the others. Refreshes the cached primary email on the Party. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyId#25 (step 78)
+ContactMethod#byPartyId_NetworkAddress::Id#1 (step 85,86)
+DBTransactions::ContactMethodId#33 (step 96)
+NetworkAddress::Address#7 (step 100)
+ContactMethod::Label#47 (step 101)","DBTransactions::PartyId#25 (Set Field step 80, current record)
+DBTransactions::ContactMethodId#33 (Set Field step 94, current record)
+NetworkAddress::PrimaryInd#14 (Set Field step 98, related via NetworkAddress)
+Party::EmailAddressCached#127 (Set Field step 100, related via Party)
+Party::PhoneLabelCached#132 (Set Field step 101, related via Party)
+NetworkAddress::PrimaryInd#14 (Set Field step 103, related via NetworkAddress)","karbon_kontroller.fmp12/scripts/28 step 33
+karbon_kontroller.fmp12/scripts/31 step 118","objects/karbon_kontroller.fmp12/scripts/207-Create_or_Update_Network_Address_data.txt
+objects/karbon_kontacts.fmp12/scripts/180-Button_Set_Primary_Network_Address.txt",none,"Step 101 writes ContactMethod::Label into Party::PhoneLabelCached (the phone label field) instead of an email label; this looks like a copy-paste slip from script 182, recorded as written. No Save Transaction Result call."
+karbon_kontroller.fmp12/scripts/185-Toggle_Contact_Method_Purpose_ContactMethodId_ContactMethodP.txt,a2b50bf95f7b0b3094f597a4f46f05e0aa3afe7b9dc84724df8a33bce204e14a,scripts,karbon_kontroller.fmp12,185,"Toggle Contact Method Purpose { ContactMethodId, ContactMethodPurposeTypeId }",data-change,server-domain,tier1,"Toggles a purpose (billing, shipping, mailing) on a contact method: if the contact method does not have it, creates the ContactMethodPurpose row and sets the cached billing, shipping or mailing flag on the contact method; if it has it, clears the cached flag and deletes the purpose row from its portal. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","ContactMethodPurpose::Id#1 (step 72,79)
+ContactMethodPurpose::ContactMethodId#33 (step 72)
+ContactMethodPurpose::ContactMethodPurposeTypeId#47 (step 72)","DBTransactions::ContactMethodPurposeId#69 (Set Field step 75, current record)
+DBTransactions::ContactMethodId#33 (Set Field step 76, current record)
+ContactMethodPurpose::ONE#40 (Set Field step 82, related via ContactMethodPurpose)
+ContactMethodPurpose::ContactMethodId#33 (Set Field step 86, related via ContactMethodPurpose)
+ContactMethodPurpose::ContactMethodPurposeTypeId#47 (Set Field step 87, related via ContactMethodPurpose)
+ContactMethod::_BillingIndCached#48 (Set Field step 92, related via ContactMethod)
+ContactMethod::_ShippingIndCached#50 (Set Field step 94, related via ContactMethod)
+ContactMethod::_MailingIndCached#49 (Set Field step 96, related via ContactMethod)
+ContactMethod::_BillingIndCached#48 (Set Field step 104, related via ContactMethod)
+ContactMethod::_ShippingIndCached#50 (Set Field step 106, related via ContactMethod)
+ContactMethod::_MailingIndCached#49 (Set Field step 108, related via ContactMethod)
+delete: ContactMethodPurpose (Perform Script 'Delete First Portal Row' step 111 via script 33, portal row 'ContactMethodPurposePortal')","karbon_kontroller.fmp12/scripts/28 step 34
+karbon_kontroller.fmp12/scripts/33 step 111
+karbon_kontroller.fmp12/scripts/31 step 123",objects/karbon_kontacts.fmp12/scripts/183-Toggle_Contact_Method_Purpose_ContactMethodPurposeTypeId_Con.txt,ExecuteSQL (via cf:SQL.GetColumn2Fields) step 72,"Purpose type ids 1, 2, 3 are hard-coded to billing, shipping and mailing (steps 91-96, 103-108). The row is deleted through script 33 on portal object 'ContactMethodPurposePortal', a layout object I cannot resolve."
+karbon_kontroller.fmp12/scripts/186-Get_Party_data.txt,fd7a468017be725a476f7f584709a4edcdb6000d0c71408d38bbe46d4b5743ac,scripts,karbon_kontroller.fmp12,186,Get Party { data },find-query,server-query,tier1,"Searches parties by name for duplicates: shortens each word of the name to NumberOfDigitsPerWord letters (default 12) unless FullWordSearch is set, finds on cached name plus person and organization flags on layout f_Party, and returns the list of party ids and the count.","f_Party::NameCached#19 (find criterion step 77)
+f_Party::OrganizationInd#18 (find criterion step 78)
+f_Party::PersonInd#130 (find criterion step 79)
+f_Party::IdList#86 (step 89)",none,none,"objects/karbon_kontacts.fmp12/scripts/488-Utility_User_-_Search_for_Duplicate_People.txt
+objects/karbon_kontacts.fmp12/scripts/389-Search_for_Duplicate_People.txt
+objects/karbon_kontacts.fmp12/scripts/388-Search_for_Duplicate_Organizations.txt",none,"The script reads $SearchPerWord (step 40) but the header and the test (step 55) use $FullWordSearch, which is never set from the JSON, so the full-word option cannot be turned on; step 40 has a leftover name from before the 2018-10-29 change. Name is the only required param. Find criteria are written into fields of f_Party (a find-layout table occurrence)."
+karbon_kontroller.fmp12/scripts/246-wip_Create_Person_data.txt,862236db862c8f963295a38158ff8117ebd38643a5893c4fe5570cab10d320ed,scripts,karbon_kontroller.fmp12,246,_wip_Create Person { data },data-change,server-domain,tier1,"Work-in-progress create of a person party: validates the JSON, fails when the party already exists, creates the Person record, sets its name, birth, gender and other attributes, then calls Create Party V2 (script 249) with the comments, department, photo and the phone, address and network address arrays. Returns the new Id. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyId#25 (step 121,162)
+Party::ONE#110 (step 126)
+Person::Id#1 (step 172)","DBTransactions::PartyId#25 (Set Field step 122, current record)
+Person::ONE#110 (Set Field step 131, related via Person)
+Person::Bio#135 (Set Field step 141, related via Person)
+Person::DateOfBirth#54 (Set Field step 142, related via Person)
+Person::EmployerName#131 (Set Field step 143, related via Person)
+Person::Ethnicity#55 (Set Field step 144, related via Person)
+Person::FirstName#7 (Set Field step 145, related via Person)
+Person::Gender#56 (Set Field step 146, related via Person)
+Person::JobTitle#14 (Set Field step 147, related via Person)
+Person::LastName#9 (Set Field step 148, related via Person)
+Person::MaritalStatus#130 (Set Field step 149, related via Person)
+Person::MiddleName#8 (Set Field step 150, related via Person)
+Person::Nickname#12 (Set Field step 151, related via Person)
+Person::Prefix#10 (Set Field step 152, related via Person)
+Person::Salutation#43 (Set Field step 153, related via Person)
+Person::Suffix#11 (Set Field step 154, related via Person)","karbon_kontroller.fmp12/scripts/28 step 54
+karbon_kontroller.fmp12/scripts/249 step 163
+karbon_kontroller.fmp12/scripts/29 step 182
+karbon_kontroller.fmp12/scripts/31 step 183","objects/karbon_kontroller.fmp12/scripts/500-Create_User.txt
+objects/karbon_kontroller.fmp12/scripts/164-wip_Create_Employee_data.txt
+objects/karbon_kontroller.fmp12/scripts/229-wip_Create_Customer_V3_data.txt
+objects/karbon_kontroller.fmp12/scripts/595-wip_Create_Lead_json.txt
+objects/karbon_kontacts.fmp12/scripts/393-Create_Parties.txt
+objects/karbon_tester.fmp12/scripts/223-Create_Person_-_Success.txt",none,"Name starts with _wip_. Steps 74-75 (validation rules) are disabled, so no required-field check is made. Step 126 tests Party::ONE to detect an existing party. Bio, Photo, Comments, Department and PhotoAccessURL are read or passed on but Bio (step 141) is the only one written here; Photo and the rest go to script 249. Step 110 formats DateOfBirth with GetAsDate."
+karbon_kontroller.fmp12/scripts/253-wip_Create_Organization_data.txt,343c556787cc4dcaa947059c8b8e45711dc91b454b992f9eb1efdd0e9f4944c8,scripts,karbon_kontroller.fmp12,253,_wip_Create Organization { data },data-change,server-domain,tier1,"Work-in-progress create of an organization party: creates the Organization record (name, company type, federal tax id) and the party photo, then calls Create Party V2 (script 249) with comments, department and the contact method arrays. Returns the new Id. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyId#25 (step 93,118)
+Organization::Id#1 (step 128)","DBTransactions::PartyId#25 (Set Field step 94, current record)
+Organization::ONE#110 (Set Field step 97, related via Organization)
+Organization::CompanyType#131 (Set Field step 107, related via Organization)
+Organization::FederalTaxIdNumber#130 (Set Field step 108, related via Organization)
+Organization::OrganizationName#19 (Set Field step 109, related via Organization)
+Party::Photo#32 (Set Field step 110, related via Party)","karbon_kontroller.fmp12/scripts/28 step 42
+karbon_kontroller.fmp12/scripts/249 step 119
+karbon_kontroller.fmp12/scripts/29 step 138
+karbon_kontroller.fmp12/scripts/31 step 139","objects/karbon_kontroller.fmp12/scripts/229-wip_Create_Customer_V3_data.txt
+objects/karbon_kontroller.fmp12/scripts/595-wip_Create_Lead_json.txt
+objects/karbon_kontacts.fmp12/scripts/482-Create_Welcome_Initial_Parties.txt
+objects/karbon_kontacts.fmp12/scripts/393-Create_Parties.txt
+objects/karbon_tester.fmp12/scripts/225-Create_Organization_-_Success.txt",none,Name starts with _wip_. The validation rules (steps 60-62) are disabled. Unlike Create Person it does not stop when the party already exists. Step 110 writes Party::Photo through the Organization context.
+karbon_kontroller.fmp12/scripts/284-wip_Edit_Person_data.txt,042862044b149f158ad6b38b54a5cd6cdde3ca5aa64d5d63b407c4257cc53ef5,scripts,karbon_kontroller.fmp12,284,_wip_Edit Person { data },data-change,server-domain,tier1,"Work-in-progress edit of a person party: requires Person and Id, locks the Person record, updates only the fields whose property is present in the JSON, then passes comments, department, name, photo and the contact method arrays to Create Party V2 (script 249). Returns the Id. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyId#25 (step 115,177)
+Person::Id#1 (step 187)","DBTransactions::PartyId#25 (Set Field step 116, current record)
+Person::ONE#110 (Set Field step 119, related via Person)
+Person::DateOfBirth#54 (Set Field step 129, related via Person)
+Person::EmployerName#131 (Set Field step 132, related via Person)
+Person::Ethnicity#55 (Set Field step 135, related via Person)
+Person::FirstName#7 (Set Field step 138, related via Person)
+Person::Gender#56 (Set Field step 141, related via Person)
+Person::Id#1 (Set Field step 144, related via Person)
+Person::JobTitle#14 (Set Field step 147, related via Person)
+Person::LastName#9 (Set Field step 150, related via Person)
+Person::MaritalStatus#130 (Set Field step 153, related via Person)
+Person::MiddleName#8 (Set Field step 156, related via Person)
+Person::Nickname#12 (Set Field step 159, related via Person)
+Person::Prefix#10 (Set Field step 162, related via Person)
+Person::Salutation#43 (Set Field step 165, related via Person)
+Person::Suffix#11 (Set Field step 168, related via Person)","karbon_kontroller.fmp12/scripts/28 step 53
+karbon_kontroller.fmp12/scripts/249 step 178
+karbon_kontroller.fmp12/scripts/29 step 199
+karbon_kontroller.fmp12/scripts/31 step 200",objects/karbon_kontroller.fmp12/scripts/224-wip_Edit_Employee_data.txt,none,"Name starts with _wip_. Step 144 rewrites Person::Id with the same Id. Script 249 is named Create Party V2 but is also used for edits here; the Edit Party V2 script is 285 and is not called from this script. Bio, Department and Photo are only passed on."
+karbon_kontroller.fmp12/scripts/298-Create_Party_Role_Type_data.txt,31741faec1281de84aae8f939b5e337841d583536f4c67a2d974ec9a17efab84,scripts,karbon_kontroller.fmp12,298,Create Party Role Type { data },data-change,server-domain,tier2,"Creates a PartyRoleType (lookup of party role names) from an Id and a Name and returns the Id. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyRoleTypeId#75 (step 76)
+PartyRoleType::Id#16 (step 93)","DBTransactions::PartyRoleTypeId#75 (Set Field step 77, current record)
+PartyRoleType::ONE#36 (Set Field step 80, related via PartyRoleType)
+PartyRoleType::Id#16 (Set Field step 90, related via PartyRoleType)
+PartyRoleType::Name#47 (Set Field step 91, related via PartyRoleType)","karbon_kontroller.fmp12/scripts/28 step 34
+karbon_kontroller.fmp12/scripts/29 step 103
+karbon_kontroller.fmp12/scripts/31 step 104",none found (may be called by name),none,No caller found; probably used by a seed or setup routine outside the DDR.
+karbon_kontroller.fmp12/scripts/315-Create_External_Link_V2_data.txt,f383a9d24be9d2515a0969d7f9541a4f87003e92a9e57a586cc26bfcb0277977,scripts,karbon_kontroller.fmp12,315,Create External Link V2 { data },data-change,server-domain,tier2,"Creates an ExternalLink row that ties an internal record id to an external id and link type (used for QuickBooks Online ids). Validates that all three are present and returns the link as JSON. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::ExternalLinkId#46 (step 80)
+ExternalLink::AsJsonV2#18 (step 99)","DBTransactions::ExternalLinkId#46 (Set Field step 81, current record)
+ExternalLink::ONE#8 (Set Field step 84, related via ExternalLink)
+ExternalLink::ExternalId#10 (Set Field step 94, related via ExternalLink)
+ExternalLink::ExternalLinkTypeId#9 (Set Field step 95, related via ExternalLink)
+ExternalLink::InternalId#2 (Set Field step 96, related via ExternalLink)","karbon_kontroller.fmp12/scripts/28 step 35
+karbon_kontroller.fmp12/scripts/29 step 110
+karbon_kontroller.fmp12/scripts/31 step 111","objects/karbon_kontroller.fmp12/scripts/414-Handle_Invoice_Push_to_QBO.txt
+objects/karbon_kontroller.fmp12/scripts/447-Handle_Sales_Receipt_Push_to_QBO.txt
+objects/karbon_kontroller.fmp12/scripts/275-Create_Karbon_Customer_From_QBO_KabonCustomer.txt",none,"Step 80 compares DBTransactions::ExternalLinkId to $Id, but no $Id is ever set in this script, so the selector is set to empty. Called from the QBO push and customer scripts (callers listed)."
+karbon_kontroller.fmp12/scripts/364-Get_Person_Object_Id.txt,1382ec0b0278486a8902dab893669cbde47127e37f083adb3894b7bb6e82ba72,scripts,karbon_kontroller.fmp12,364,Get Person Object ( Id ),find-query,server-query,tier3,Returns the JSON object of one person by Id through an SQL lookup on f_Person::AsJson.,"f_Person::AsJson#132 (step 1)
+f_Person::Id#1 (step 1)",none,none,objects/karbon_tester.fmp12/scripts/223-Create_Person_-_Success.txt,ExecuteSQL (via cf:SQL.GetColumn) step 1,none
+karbon_kontroller.fmp12/scripts/365-Get_Organization_Object_Id.txt,498472b6ccb4f2d84e0a00176f9a7e61dba55fff3c71079b825d1b1f940ec2d6,scripts,karbon_kontroller.fmp12,365,Get Organization Object ( Id ),find-query,server-query,tier3,Returns the JSON object of one organization by Id through an SQL lookup on f_Organization::AsJson.,"f_Organization::AsJson#133 (step 1)
+f_Organization::Id#1 (step 1)",none,none,objects/karbon_tester.fmp12/scripts/225-Create_Organization_-_Success.txt,ExecuteSQL (via cf:SQL.GetColumn) step 1,none

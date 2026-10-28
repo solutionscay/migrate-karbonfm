@@ -1,0 +1,72 @@
+# script 577: Dev: After Abort, Revert, But Keep Log 
+# file: karbon_kontroller.fmp12
+# folder: Modules / Transactions
+# source: ScriptCatalog/Script[@id=577]
+# steps: 20 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=27 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # use this script after you have manually aborted a transaction during debugging,
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #  and want to revert the changes, but keep the DB Log
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ Get(RecordOpenState) =0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:RecordOpenState
+   9    Exit Script [  ]
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $NestedTransactions; Value:DBTransactions::TransactionCounter ]
+        DisableStepCollapsed state=False
+        Value
+          refs: DBTransactions::TransactionCounter#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $NestedTransactions
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $error; Value:Error(1; "Aborted Transaction" ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error
+        Name: $error
+  15    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  16    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+  18    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  19    Exit Loop If [ $n > $NestedTransactions ]
+        DisableStepCollapsed state=False
+  20    End Loop
+        DisableStepCollapsed state=False

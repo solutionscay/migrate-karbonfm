@@ -1,0 +1,190 @@
+# script 409: Go to Summary
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Create Party / Party Wizard
+# source: ScriptCatalog/Script[@id=409]
+# steps: 34 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=396 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-09-25 dave@geistinteractive.com - no longer closing party picker if we're not creating a record. We may still need to create party relationships and/or party roles
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Layout Object Animation [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $CreateOrganization; Value:// we don't have an org ID yet
+        IsEmpty( UtilityParty::OrganizationId ) and 
+        
+        // we aren't skipping org creation
+        not UtilityParty::SkipOrganizationInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:IsEmpty, UtilityParty::OrganizationId#20, fn:and, fn:not, UtilityParty::SkipOrganizationInd#22
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreateOrganization
+   6    Set Variable [ $CreatePerson; Value:// we don't have an person ID yet
+        IsEmpty( UtilityParty::PersonId ) and 
+        
+        // we aren't skipping person creation
+        not UtilityParty::SkipPersonInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:IsEmpty, UtilityParty::PersonId#21, fn:and, fn:not, UtilityParty::SkipPersonInd#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreatePerson
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #Set organization display
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Field [ UtilityParty::Summary; "" ]
+        DisableStepCollapsed state=False
+        Field table=UtilityParty id=35 name=Summary
+  11    Set Field [ UtilityParty::Summary; Let ( [ 
+        
+        	OrganizationHeading = Case ( 
+        
+        		not IsEmpty ( UtilityParty::OrganizationId ) ; 
+        			"Using existing organization:"  ; 
+        
+        		not UtilityParty::SkipOrganizationInd ; 
+        			"Creating new organization:" ; 
+        
+        			"Not creating an organization"
+        	)
+        
+        ] ; 
+        
+        
+        List ( UtilityParty::Summary ; 
+        
+        	TextStyleAdd ( OrganizationHeading ; 
+        		Italic 
+        	)
+        
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Let, fn:Case, fn:not, fn:IsEmpty, UtilityParty::OrganizationId#20, UtilityParty::SkipOrganizationInd#22, fn:List, UtilityParty::Summary#35, fn:TextStyleAdd, fn:Italic
+        Field table=UtilityParty id=35 name=Summary
+  12    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; 
+        
+        	// Company name in bold
+        	TextStyleAdd ( UtilityParty::OrganizationName ; Bold ) 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, fn:TextStyleAdd, UtilityParty::OrganizationName#4, fn:Bold
+        Field table=UtilityParty id=35 name=Summary
+  13    If [ not IsEmpty ( UtilityParty::OrgCity ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, UtilityParty::OrgCity#10
+  14    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; UtilityParty::OrgAddressLine1 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, UtilityParty::OrgAddressLine1#8
+        Field table=UtilityParty id=35 name=Summary
+  15    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; UtilityParty::OrgAddressLine2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, UtilityParty::OrgAddressLine2#9
+        Field table=UtilityParty id=35 name=Summary
+  16    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; UtilityParty::OrgCity & ", " & UtilityParty::OrgStateProvince & " " & UtilityParty::OrgPostalCode ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, UtilityParty::OrgCity#10, UtilityParty::OrgStateProvince#14, UtilityParty::OrgPostalCode#13
+        Field table=UtilityParty id=35 name=Summary
+  17    End If
+        DisableStepCollapsed state=False
+  18    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; UtilityParty::OrgPhone ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, UtilityParty::OrgPhone#15
+        Field table=UtilityParty id=35 name=Summary
+  19    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; UtilityParty::OrgWebsite ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, UtilityParty::OrgWebsite#16
+        Field table=UtilityParty id=35 name=Summary
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #Set person display
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Field [ UtilityParty::Summary; If ( not IsEmpty ( UtilityParty::Summary ) ; 
+        	UtilityParty::Summary & ¶ 
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:If, fn:not, fn:IsEmpty, UtilityParty::Summary#35
+        Field table=UtilityParty id=35 name=Summary
+  24    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; 
+        
+        	// New or existing 
+        	TextStyleAdd ( Case ( 
+        	not IsEmpty ( UtilityParty::PersonId ) ; 
+        		"Using existing person:"  ; 
+        	IsEmpty ( UtilityParty::SkipPersonInd ) ;
+        	"Creating new person:" ;
+        	""
+        	) ; 
+        		Italic 
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, fn:TextStyleAdd, fn:Case, fn:not, fn:IsEmpty, UtilityParty::PersonId#21, UtilityParty::SkipPersonInd#23, fn:Italic
+        Field table=UtilityParty id=35 name=Summary
+  25    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; 
+        
+        	// Company name in bold
+        	TextStyleAdd ( UtilityParty::PersonFirstLastDisplay ; Bold ) 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, fn:TextStyleAdd, UtilityParty::PersonFirstLastDisplay#30, fn:Bold
+        Field table=UtilityParty id=35 name=Summary
+  26    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; UtilityParty::PersonJobTitle ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, UtilityParty::PersonJobTitle#19
+        Field table=UtilityParty id=35 name=Summary
+  27    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; UtilityParty::PersonPhone ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, UtilityParty::PersonPhone#17
+        Field table=UtilityParty id=35 name=Summary
+  28    Set Field [ UtilityParty::Summary; List ( UtilityParty::Summary ; UtilityParty::PersonEmail ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityParty::Summary#35, UtilityParty::PersonEmail#18
+        Field table=UtilityParty id=35 name=Summary
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  32    Go to Object [ Object Name: "Summary"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

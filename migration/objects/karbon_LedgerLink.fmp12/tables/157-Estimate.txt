@@ -1,0 +1,360 @@
+# table 157: Estimate
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=157]
+# fields: 44
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation message=True type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+    ErrorMessage: Invoice id must exist and be unique.
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Number fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=Always
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Number fieldType=Normal name=qbo_send
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Let(
+      | [
+      | x = GetField("")
+      | 
+      | ];
+      | Case(
+      |    $LL_IsUpdatingThisRecord ; Self;
+      |    1
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:GetField, fn:Case, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=docNumber
+  Comment: Reference number for the transaction
+  AutoEnter allowEditing=True
+  Validation maxLength=True type=OnlyDuringDataEntry
+    MaxDataLength value=21
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Date fieldType=Normal name=date
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Get ( CurrentDate )
+      refs: fn:Get, fn:CurrentDate
+  Validation type=Always
+    StrictDataType value=FourDigitYear
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=privateNote
+  Comment: called "memo" in QuickBooks Online UI
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=id_Customer
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=billAddressLine1
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::billAddressLine1
+      refs: Estimate_Customer::billAddressLine1#13
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=billAddressLine2
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::billAddressLine2
+      refs: Estimate_Customer::billAddressLine2#29
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=billAddressCity
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::billAddressCity
+      refs: Estimate_Customer::billAddressCity#14
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Normal name=billAddressCountry
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::billAddressCountry
+      refs: Estimate_Customer::billAddressCountry#15
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=billAddressPostalCode
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::billAddressPostalCode
+      refs: Estimate_Customer::billAddressPostalCode#17
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=billAddressState
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::billAddressState
+      refs: Estimate_Customer::billAddressState#16
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Date fieldType=Normal name=dueDate
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=FourDigitYear
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Number fieldType=Normal name=totalAmt
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=Numeric
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Normal name=customerMemo
+  Comment: called "message displayed on estimate" in QB ui
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=28 dataType=Text fieldType=Normal name=id_Term
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Customer::id_Term
+      refs: Customer::id_Term#47
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Text fieldType=Normal name=billEmailAddress
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::primaryEmail
+      refs: Estimate_Customer::primaryEmail#12
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Number fieldType=Normal name=totalTax
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=Numeric
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=31 dataType=Text fieldType=Normal name=id_TaxCode
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Customer::id_TaxCode
+      refs: Customer::id_TaxCode#42
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=32 dataType=Number fieldType=Normal name=deleted
+  Comment: Boolean; If True, this record has been deleted in FileMaker and will be deleted in QBO and from FM on next sync
+  AutoEnter allowEditing=True
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Number fieldType=Normal name=subtotal
+  Comment: total of line items before tax; set by an On Commit script trigger, or when syncing with QBO
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=34 dataType=Number fieldType=Normal name=taxableSubtotal
+  Comment: total of taxable line items only; set by an On Commit script trigger, or when syncing with QBO
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Normal name=qbo_error
+  Comment: error message returned by QBO when attempting to sync this record
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Number fieldType=Calculated name=period
+  Calculation table=Estimate:
+    | Year(date) & Right( "0" & Month(date); 2 )
+    refs: fn:Year, Estimate::date#5, fn:Right, fn:Month
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Number fieldType=Summary name=totalAmtSummary
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=Total
+    SummaryField
+      Field id=25 name=totalAmt
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=38 dataType=Text fieldType=Normal name=trackingNum
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=Date fieldType=Normal name=shipDate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=Text fieldType=Normal name=shipMethod
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=41 dataType=Number fieldType=Normal name=shipAmt
+  Comment: cost of shipping
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=42 dataType=Text fieldType=Normal name=shipAddressCity
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::shipAddressCity
+      refs: Estimate_Customer::shipAddressCity#19
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=43 dataType=Text fieldType=Normal name=shipAddressCountry
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::shipAddressCountry
+      refs: Estimate_Customer::shipAddressCountry#20
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=44 dataType=Text fieldType=Normal name=shipAddressLine1
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::shipAddressLine1
+      refs: Estimate_Customer::shipAddressLine1#18
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=45 dataType=Text fieldType=Normal name=shipAddressLine2
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::shipAddressLine2
+      refs: Estimate_Customer::shipAddressLine2#30
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Text fieldType=Normal name=shipAddressPostalCode
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::shipAddressPostalCode
+      refs: Estimate_Customer::shipAddressPostalCode#22
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Text fieldType=Normal name=shipAddressState
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Estimate:
+      | Estimate_Customer::shipAddressState
+      refs: Estimate_Customer::shipAddressState#21
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=49 dataType=Text fieldType=Normal name=id_Class
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Text fieldType=Normal name=id_Department
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Normal name=deposit
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=52 dataType=Text fieldType=Normal name=TxnStatus
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: Pending
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=53 dataType=Number fieldType=Normal name=applyTaxAfterDiscount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=54 dataType=Date fieldType=Normal name=expirationDate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=55 dataType=Date fieldType=Normal name=acceptedDate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=57 dataType=Text fieldType=Normal name=AcceptedBy
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

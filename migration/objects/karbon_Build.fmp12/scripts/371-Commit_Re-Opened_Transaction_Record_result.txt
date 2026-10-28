@@ -1,0 +1,45 @@
+# script 371: Commit Re-Opened Transaction Record ( result )
+# file: karbon_Build.fmp12
+# folder: Modules / Transactions
+# source: ScriptCatalog/Script[@id=371]
+# steps: 9 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=363 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $result; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   3    If [ not IsEmpty ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+   4    Set Field [ DBTransactions::Result; $result ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=17 name=Result
+   5    End If
+        DisableStepCollapsed state=False
+   6    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   7    Go to Layout [ DBTransactions::LayoutNumber ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=LayoutNumberByCalc
+        Layout id=0 name="" ref=none
+          refs: DBTransactions::LayoutNumber#3
+   8    Exit Script [ Result: DBTransactions::Result ]
+        DisableStepCollapsed state=False
+        refs: DBTransactions::Result#17
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False

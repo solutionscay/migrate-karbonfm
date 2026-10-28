@@ -1,0 +1,35 @@
+# script 628: btn: Create Utility Note
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / Note
+# source: ScriptCatalog/Script[@id=628]
+# steps: 6 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=255 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $data; Value:JSONSetElement ( "" ; 
+        	[ "CreatorId" ; session::CurrentUserPartyId ; JSONString ];
+        	[ "RegardingId" ; Party::Id ; JSONString ];
+        	[ "Date" ; GetAsDate( Get( CurrentHostTimestamp ) ) ; JSONString ];
+        	[ "Time" ; Time( Hour( Get( CurrentHostTimestamp ) ); Minute( Get( CurrentHostTimestamp ) ); 0 ) ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, session::CurrentUserPartyId#63, fn:JSONString, Party::Id#1, fn:GetAsDate, fn:Get, fn:CurrentHostTimestamp, fn:Time, fn:Hour, fn:Minute
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “Open Card - UtilityNote”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        Script id=254 name="Open Card - UtilityNote"
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

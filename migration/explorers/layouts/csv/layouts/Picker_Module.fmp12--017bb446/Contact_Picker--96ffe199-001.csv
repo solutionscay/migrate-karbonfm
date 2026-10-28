@@ -1,0 +1,37 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+Picker_Module.fmp12/layouts/1-Contact_Picker_-_No_Results_With_Selection.txt,10652f481d7cc02586e7f62802f236e2247744cdd119e3734aaaa763fa16076f,layouts,Picker Module.fmp12,1,Contact Picker - No Results With Selection,dialog,"Party (base Party, karbon_data.fmp12)","key 173 button ""=Let( [  countOfSelectedContacts = JSONGetElement ( Picker::Results ; ""Result.CountPicked"" )  ] ;  ""Add "" &  Case( // singular form countOfSelectedContacts = 1 ; ""One Contact"" ;  // spell our numbers from two through nine countOfSelectedContacts > 1 and countOfSelectedContacts < 10 ; Choose ( countOfSelectedContacts ; """" ; """" ; ""Two"" ; ""Three"" ; ""Four"" ; ""Five"" ; ""Six"" ; ""Seven"" ; ""Eight"" ; ""Nine"" ) & "" Contacts"" ;  // 10 or more countOfSelectedContacts & "" Contacts"" )  )"" | hidden when the picker holds no picked contacts (Picker::Results is empty)",none,key 185 field Picker::Search_Field#1 | OnObjectValidate | script 69 Find Contacts | runs the contact search from the picker search text and shows the results,"key 173 (calc) ""Add N Contacts"" | script 94 Close Picker
+key 182 Find | script 69 Find Contacts
+key 183 cancelButton | Clear
+key 184 (icon) | no step
+key 188 (calc) count of picked contacts (0 when unreadable) | opens popover ""Selected Contacts…""
+key 192 (icon) | script 89 Deselect Party From Popover",none,key 190 VIRTUALLISTS_Rows | none | none,none,modal,"One of four contact-picker window states (results / selection variants); script 79 ""Go To Correct Layout"" picks the state, so the target may fold them into one dialog"
+Picker_Module.fmp12/layouts/9-Contact_Configuration.txt,93ae01c1e39bff18cff918c43a9f3001f2b3c823ce4ca6a0f42cf3ab3b0cea8a,layouts,Picker Module.fmp12,9,Contact Configuration,developer,"Party (base Party, karbon_data.fmp12)",none,none,none,none,none,none,none,script-context,"Field-reference layout for the picker configuration (name, address, email, phone, employer fields); used by scripts 69 and 95 to resolve field references"
+Picker_Module.fmp12/layouts/13-Contact_Picker_-_No_Results_No_Selection.txt,e57494b1985c9e39ee03776eda4619f1f72902a4f4cb5332d9795e4a2b0d8415,layouts,Picker Module.fmp12,13,Contact Picker - No Results No Selection,dialog,"Party (base Party, karbon_data.fmp12)","key 124 button ""Create new contact…"" | hidden when no find has been performed yet, or creating contacts is not allowed in this picker",none,key 122 field Picker::Search_Field#1 | OnObjectValidate | script 69 Find Contacts | runs the contact search from the picker search text and shows the results,"key 119 Find | script 69 Find Contacts
+key 120 cancelButton | Clear
+key 121 (icon) | no step
+key 130 (calc) Picker::Settings_FooterMessage | no step
+key 124 Create new contact… | script 72 Create Contact",none,none,none,modal,"One of four contact-picker window states (results / selection variants); script 79 ""Go To Correct Layout"" picks the state, so the target may fold them into one dialog"
+Picker_Module.fmp12/layouts/14-Contact_Picker_-_Results_With_Selection.txt,6259b079c6fa977c4df88c26e31eb3c59570d621117cf63fa9363a093c63e277,layouts,Picker Module.fmp12,14,Contact Picker - Results With Selection,dialog,"Party (base Party, karbon_data.fmp12)","key 154 button ""=Let( [  countOfSelectedContacts = JSONGetElement ( Picker::Results ; ""Result.CountPicked"" )  ] ;  ""Add "" &  Case( // singular form countOfSelectedContacts = 1 ; ""One Contact"" ;  // spell our numbers from two through nine countOfSelectedContacts > 1 and countOfSelectedContacts < 10 ; Choose ( countOfSelectedContacts ; """" ; """" ; ""Two"" ; ""Three"" ; ""Four"" ; ""Five"" ; ""Six"" ; ""Seven"" ; ""Eight"" ; ""Nine"" ) & "" Contacts"" ;  // 10 or more countOfSelectedContacts & "" Contacts"" )  )"" | hidden when the picker holds no picked contacts (Picker::Results is empty)
+key 258 button ""(icon)"" | hidden when the row contact is not in the list of picked contacts (the check mark shows only for picked rows)",none,"layout | OnRecordLoad | script 93 Go to Picker Button | moves focus to the object named pickerButton
+key 102 button ""pickerButton"" | OnObjectKeystroke | script 70 Handle Keystroke on Picker Row | handles Tab/arrow/Enter/space keystrokes on a picker row (moves the record or picks contacts)
+key 164 field Picker::Search_Field#1 | OnObjectValidate | script 69 Find Contacts | runs the contact search from the picker search text and shows the results","key 102 pickerButton | script 71 Select Party
+key 143 (calc) count of picked contacts (0 when unreadable) | opens popover ""Selected Contacts…""
+key 126 (icon) | script 89 Deselect Party From Popover
+key 154 (calc) ""Add N Contacts"" | script 94 Close Picker
+key 161 Find | script 69 Find Contacts
+key 162 cancelButton | Clear
+key 163 (icon) | no step
+key 258 (icon) | no step",none,key 123 VIRTUALLISTS_Rows | none | none,none,modal,"One of four contact-picker window states (results / selection variants); script 79 ""Go To Correct Layout"" picks the state, so the target may fold them into one dialog"
+Picker_Module.fmp12/layouts/15-Contact_Picker_-_Results_No_Selection.txt,69310381629588801588c901e2fdf6060138c96afaf95a43843eec4a1a16c5dc,layouts,Picker Module.fmp12,15,Contact Picker - Results No Selection,dialog,"Party (base Party, karbon_data.fmp12)","key 136 button ""(icon)"" | hidden when the row contact is not in the list of picked contacts (the check mark shows only for picked rows)
+key 143 buttonbar | hidden when creating contacts is not allowed in this picker
+key 145 button ""Create new contact…"" | hidden when no find has been performed yet, or creating contacts is not allowed in this picker",none,"layout | OnRecordLoad | script 93 Go to Picker Button | moves focus to the object named pickerButton
+key 132 button ""pickerButton"" | OnObjectKeystroke | script 70 Handle Keystroke on Picker Row | handles Tab/arrow/Enter/space keystrokes on a picker row (moves the record or picks contacts)
+key 151 field Picker::Search_Field#1 | OnObjectValidate | script 69 Find Contacts | runs the contact search from the picker search text and shows the results","key 132 pickerButton | script 71 Select Party
+key 136 (icon) | no step
+key 150 (icon) | no step
+key 144 (calc) Picker::Settings_FooterMessage | no step
+key 145 Create new contact… | script 72 Create Contact
+key 148 Find | script 69 Find Contacts
+key 149 cancelButton | Clear",none,none,none,modal,"One of four contact-picker window states (results / selection variants); script 79 ""Go To Correct Layout"" picks the state, so the target may fold them into one dialog"
+Picker_Module.fmp12/layouts/16-All_Fields_-_Picker.txt,c2de01c583f844b063a488d83a3ee3039ad82c08625f19be86db58e2a8b79be7,layouts,Picker Module.fmp12,16,All Fields - Picker,developer,"Picker (base Picker, Picker_Module.fmp12)",none,none,none,none,none,key 27 (no table occurrence shown in the layout file) | none | none,none,drop-candidate,"Raw field dump of the Picker table (Results, Settings, Search_Field); includes a deprecated field
+no reference found in Picker_Module.fmp12 (a script that goes to a layout by calculated name would not show)"

@@ -1,0 +1,221 @@
+# script 647: Attachable:: Field Map :: Get
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Supporting Resources
+# source: ScriptCatalog/Script[@id=647]
+# steps: 43 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=220 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #the JSON that comes back from QBO, is not in the same structure as what we need for a file upload.
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #so we have to just build out the parts we need, so the updates will work
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $dataFromQBO; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataFromQBO
+   6    Set Variable [ $syncToken; Value:JSONGetElement($dataFromQBO ; "SyncToken" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $syncToken
+   7    Set Variable [ $Id; Value:JSONGetElement($dataFromQBO ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   8    If [ not IsEmpty ( $dataFromQBO ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+   9    Set Variable [ $json; Value:JSONSetElement ( ""; 
+        
+          ["parts.[0].body.Id"; $Id ; JSONString];
+          ["parts.[0].body.SyncToken"; $syncToken; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #here is the map
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $FileName; Value:qbo_Attachable::FileName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: qbo_Attachable::FileName#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+  15    Set Variable [ $ContentType; Value:qbo_Attachable::ContentType ]
+        DisableStepCollapsed state=False
+        Value
+          refs: qbo_Attachable::ContentType#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $ContentType
+  16    Set Variable [ $Category; Value:qbo_Attachable::Category ]
+        DisableStepCollapsed state=False
+        Value
+          refs: qbo_Attachable::Category#11
+        Repetition
+          Calculation:
+            | 1
+        Name: $Category
+  17    Set Variable [ $Container; Value:qbo_Attachable::Container ]
+        DisableStepCollapsed state=False
+        Value
+          refs: qbo_Attachable::Container#17
+        Repetition
+          Calculation:
+            | 1
+        Name: $Container
+  18    Set Variable [ $qbo_id; Value:qbo_Attachable::qbo_id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: qbo_Attachable::qbo_id#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $qbo_id
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #Transforms
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $Container; Value:Base64EncodeRFC ( "" ; $Container ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Base64EncodeRFC
+        Repetition
+          Calculation:
+            | 1
+        Name: $Container
+  24    #-----
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #build json
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #we need to build the "Parts" of the multipart form that QBO requires here.
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #the first part is the meta data. it gets added to the 'body'
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[0].ContentType" ; "application/json"; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  31    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[0].name" ; "file_metadata_01"; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $json
+  32    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[0].body.FileName" ; $FileName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  33    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[0].body.ContentType" ; $ContentType ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  34    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[0].body.Category" ; $Category ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #the second part is the file. the base64 encoded version of the file is put into the 'body'
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[1].ContentType" ; $ContentType; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $json
+  38    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[1].name" ; "file_content_01"; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $json
+  39    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[1].filename" ; $FileName; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $json
+  40    Set Variable [ $json; Value:JSONSetElement($json ; "parts.[1].body" ; $Container; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $json
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Exit Script [ Result: $json ]
+        DisableStepCollapsed state=False

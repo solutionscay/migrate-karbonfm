@@ -1,0 +1,120 @@
+# script 365: User Detail - Update Task Portal
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / User
+# source: ScriptCatalog/Script[@id=365]
+# steps: 29 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=361 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #If this is run after a card window is called it will have the onTimer running
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Get ActivityList by ActivityParty” from file: “karbon_kontroller”; Parameter: UtilityTask::z_Search_AsJSON ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: UtilityTask::z_Search_AsJSON#20
+        Script id=497 name="Get ActivityList by ActivityParty" in=karbon_kontroller.fmp12
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  13    #Handle error
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Field [ selector::TaskIdList; "" ]
+        DisableStepCollapsed state=False
+        Field table=selector id=25 name=TaskIdList
+  15    Set Field [ UtilityTask::z_Search_LastUpdate; Get( CurrentHostTimestamp ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:CurrentHostTimestamp
+        Field table=UtilityTask id=18 name=z_Search_LastUpdate
+  16    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $ActivityList; Value:JSONGetElement ( $ScriptResult ; "IdList" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityList
+  18    Set Variable [ $FoundCount; Value:JSONGetElement ( $ScriptResult ; "Count" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FoundCount
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Field [ selector::TaskIdList; $ActivityList ]
+        DisableStepCollapsed state=False
+        Field table=selector id=25 name=TaskIdList
+  21    Set Field [ UtilityTask::z_Search_LastUpdate; Get( CurrentHostTimestamp ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:CurrentHostTimestamp
+        Field table=UtilityTask id=18 name=z_Search_LastUpdate
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False

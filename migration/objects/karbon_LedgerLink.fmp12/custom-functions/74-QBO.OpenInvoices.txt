@@ -1,0 +1,52 @@
+# custom function 74: QBO.OpenInvoices
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=74]
+
+CustomFunction id=74 functionArity=1 visible=True parameters=CustomerId name=QBO.OpenInvoices
+  Calculation:
+    | Let(
+    | [
+    | 
+    | totalField = Config ( "Invoice.fields.invoiceTotal");
+    | dateField = Config ( "Invoice.fields.invoiceDate");
+    | balanceField = Config ( "Invoice.fields.invoiceBalanceDue");
+    | fmIdField = Config ( "Invoice.fields.fmId");
+    | qboId = Config ( "Invoice.fields.qboId");
+    | customerIdField = Config ( "Invoice.fields.customerId");
+    | invoicePaidInd = Config ( "Invoice.fields.invoiceIsPaid");
+    | 
+    | sql = 
+    | 
+    | List(
+    | "SELECT ";
+    | "  " & SQL.GetFieldName ( totalField ) & ",";
+    | "   ''|| " & SQL.GetFieldName ( dateField )& ",";
+    | "  " & SQL.GetFieldName ( balanceField )& ",";
+    | "  " & SQL.GetFieldName ( fmIdField )& ",";
+    | "  " & SQL.GetFieldName ( qboId );
+    | 
+    | "FROM" ; 
+    | "  " & SQL.GetTableName(qboId);
+    | 
+    | 
+    | "WHERE";
+    | "  " & SQL.GetFieldName ( customerIdField ) & "=?" ;
+    | "  AND";
+    | "  " & SQL.GetFieldName ( balanceField) & ">0" ;
+    | 
+    | 
+    | );
+    | result = ExecuteSQL ( sql ; "\",\""; "\"],¶[\""; CustomerID )
+    | ];
+    | Case(
+    | result = "?" ; QBO.Error ( "SQL Error, trying to get open Invoices"; "" );
+    | result = "" ; "[]";
+    | 
+    | "[¶[\""  &
+    | result
+    | & "\"]¶]"
+    | )
+    | 
+    | 
+    | )
+    refs: fn:Let, cf:Config, fn:List, cf:SQL.GetFieldName, cf:SQL.GetTableName, fn:ExecuteSQL, fn:Case, cf:QBO.Error

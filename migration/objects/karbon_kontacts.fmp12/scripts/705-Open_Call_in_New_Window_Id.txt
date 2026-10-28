@@ -1,0 +1,95 @@
+# script 705: Open Call in New Window { Id }
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Call
+# source: ScriptCatalog/Script[@id=705]
+# steps: 17 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=702 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-10-23 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ IsEmpty ( Get ( ScriptParameter ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:Get, fn:ScriptParameter
+   4    Show Custom Dialog [ Title: "Error"; Message: "Missing required parameter: ID."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   5    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Field [ selector::ActivityId; JSONGetElement ( Get ( ScriptParameter ) ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Field table=selector id=7 name=ActivityId
+  10    Go to Related Record [ From table: “Selected_Activity_Call”; Using layout: “Call Detail” (Call) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        Name
+          Calculation:
+            | "Call"
+        Height
+          Calculation:
+            | 800
+        Width
+          Calculation:
+            | 1080
+        DistanceFromTop
+          Calculation:
+            | Get ( WindowTop ) + 22
+            refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          Calculation:
+            | Get ( WindowLeft ) + 22
+            refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=1074201090
+        Table id=1065363 name=Selected_Activity_Call
+        Layout id=171 name="Call Detail"
+  11 // Go to Related Record [ From table: “Selected_Activity_Call”; Using layout: “Call Detail” (Call) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Table id=1065363 name=Selected_Activity_Call
+        Layout id=171 name="Call Detail"
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Go to Field [ Call::CallerName ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=Call id=17 name=CallerName
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False

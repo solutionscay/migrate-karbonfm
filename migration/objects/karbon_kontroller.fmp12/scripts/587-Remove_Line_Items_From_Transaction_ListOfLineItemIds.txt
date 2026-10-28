@@ -1,0 +1,307 @@
+# script 587: Remove Line Items From Transaction(ListOfLineItemIds)
+# file: karbon_kontroller.fmp12
+# folder: API / Sales Transaction
+# source: ScriptCatalog/Script[@id=587]
+# steps: 88 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=572 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #remove line items from a sale transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {string} ListOfIds a list of 1 or more items to remove from a Sales Transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@returns {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@returns {number} result.errorCode will be 0 on success
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returns {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@history 2018-10-12 barbara@geistinteractive.com - updated to move single pass loop to top
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  22    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  29    Set Variable [ $result; Value:$error ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  30    Exit Loop If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $LineItemIds; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $LineItemIds
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #validate all the lines are on the same Transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Field [ DBTransactions::SalesLineId; $LineItemIds ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=26 name=SalesLineId
+  37    Set Variable [ $SaleTransactionId; Value:List(
+        DBTransactions::SalesTransactionId
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, DBTransactions::SalesTransactionId#93
+        Repetition
+          Calculation:
+            | 1
+        Name: $SaleTransactionId
+  38    If [ ValueCount ( $SaleTransactionId ) > 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:ValueCount
+  39    Set Variable [ $error; Value:_wip_API.Error.Validation ( "Line IDs came from more than 1 transaction" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:_wip_API.Error.Validation
+        Name: $error
+  40    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  41    End If
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #validate all the lines have a transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ ValueCount ( $SaleTransactionId ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:ValueCount
+  45    Set Variable [ $error; Value:_wip_API.Error.Validation ( "Line IDs do not belong to a Transaction" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:_wip_API.Error.Validation
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  46    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Field [ DBTransactions::SalesTransactionId; $SaleTransactionId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=93 name=SalesTransactionId
+  50    #validate that the transaction is NOT posted
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    If [ SalesTransaction::LockedInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: SalesTransaction::LockedInd#80
+  52    Set Variable [ $error; Value:
+        _wip_API.Error.BadRequest ( "You can't remove Lines from a Posted Transaction" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:_wip_API.Error.BadRequest
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  53    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  54    End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #loop lines that were passed in
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  59    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $LineItemId; Value:GetValue($LineItemIds; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $LineItemId
+  61    Exit Loop If [ IsEmpty ( $LineItemId ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Perform Script [ “_Remove Time Entries From The Invoice Line” ]
+        DisableStepCollapsed state=False
+        Script id=586 name="_Remove Time Entries From The Invoice Line"
+  64    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  65    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  68    End Loop
+        DisableStepCollapsed state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  72    End Loop
+        DisableStepCollapsed state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+  80    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  83    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  84    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  86    End If
+        DisableStepCollapsed state=False
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #
+        DisableStepCollapsed state=False
+        Restore state=False

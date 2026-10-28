@@ -1,0 +1,68 @@
+# script 809: _Handle Advanced Find Result
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Find / Advanced Find
+# source: ScriptCatalog/Script[@id=809]
+# steps: 15 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=802 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    If [ Get ( FoundCount ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+   3    Show Custom Dialog [ Title: "Error"; Message: "No matching records were found. Do you want to try again?"; Default Button: “Try Again”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Try Again"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+   4    If [ Get ( LastMessageChoice ) = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+   5    Set Variable [ $null; Value:Triggers.Disable ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Triggers.Disable
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+   6    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+   7    Set Variable [ $null; Value:Triggers.Enable ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Triggers.Enable
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+   8    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+   9    End If
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Go to Layout [ $$Find.ReturnToLayoutNumber ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=LayoutNumberByCalc
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Show/Hide Toolbars
+        [ Hide ]
+        IncludeEditRecordToolbar state=False
+        Lock state=False
+        DisableStepCollapsed state=False
+        ShowHide value=Hide
+  15    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

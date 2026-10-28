@@ -1,0 +1,186 @@
+# script 770: Button: Create Email Message From Party
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / EmailMessage
+# source: ScriptCatalog/Script[@id=770]
+# steps: 39 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=688 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #Set the "to" recipient
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ Party::PersonInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party::PersonInd#130
+   4    #This is a person
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $ActivityParty; Value:"[" & JSONSetElement ( "{}" ; 
+        	[ "ActivityPartyRoleId" ; 55 ; JSONNumber ]  ;
+        	[ "ContactMethodId" ; Party::EmailAddressIdCached ; JSONString ]  ;
+        	[ "EmailAddress" ; Party::EmailAddressCached ; JSONString ]  ;
+        	[ "PartyId" ; Party::Id ; JSONString ]  
+        ) & "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, Party::EmailAddressIdCached#145, fn:JSONString, Party::EmailAddressCached#127, Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityParty
+   6    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #This is a company; use the primary contact
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $ActivityParty; Value:"[" & JSONSetElement ( "{}" ; 
+        	[ "ActivityPartyRoleId" ; 55 ; JSONNumber ]  ;
+        	[ "ContactMethodId" ; Party_PartyRelation_Party::EmailAddressIdCached ; JSONString ]  ;
+        	[ "EmailAddress" ; Party_PartyRelation_Party::EmailAddressCached ; JSONString ]  ;
+        	[ "PartyId" ; Party_PartyRelation_Party::Id ; JSONString ]  
+        ) & "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, Party_PartyRelation_Party::EmailAddressIdCached#145, fn:JSONString, Party_PartyRelation_Party::EmailAddressCached#127, Party_PartyRelation_Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityParty
+   9    End If
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #Link to current user and party
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Field [ selector::UserId; meta#dataFile::CurrentUserId ]
+        DisableStepCollapsed state=False
+        refs: meta#dataFile::CurrentUserId#3
+        Field table=selector id=24 name=UserId
+  14    Set Field [ selector::PartyId; session::CurrentUserPartyId ]
+        DisableStepCollapsed state=False
+        refs: session::CurrentUserPartyId#63
+        Field table=selector id=6 name=PartyId
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #Set email signature
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ IsEmpty ( Selected_User::EmailSignature ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_User::EmailSignature#120
+  18    Set Variable [ $EmailSignature; Value:Substitute ( 
+        
+        System::DefaultEmailSignatureTemplate ; 
+        
+        	[ "{FullName}" ; Selected_Party::NameCached ] ; 
+        	[ "{EmployerName}" ; Selected_Party_Person::EmployerName ] ; 
+        	[ "{Title}" ; Selected_Party_Person::JobTitle ] ; 
+        	[ "{Phone}" ; Selected_Party::PhoneNumberCached ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, System::DefaultEmailSignatureTemplate#63, Selected_Party::NameCached#19, Selected_Party_Person::EmployerName#131, Selected_Party_Person::JobTitle#14, Selected_Party::PhoneNumberCached#125
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailSignature
+  19    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $EmailSignature; Value:Selected_User::EmailSignature ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_User::EmailSignature#120
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailSignature
+  21    End If
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "ActivityParty" ; $ActivityParty ; JSONArray ]  ;
+        	[ "EntityId" ; Opportunity::Id ; JSONString ]  ;
+        	[ "EntityTypeId" ; 13 ; JSONNumber ] ; 
+        	[ "Message" ; $EmailSignature ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONArray, Opportunity::Id#1, fn:JSONString, fn:JSONNumber
+        Name: $json
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Perform Script [ “Create EmailMessage { data }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=389 name="Create EmailMessage { data }" in=karbon_kontroller.fmp12
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  28    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  29    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  30    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $Id; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Perform Script [ “Open Activity { Id }”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=291 name="Open Activity { Id }"
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False

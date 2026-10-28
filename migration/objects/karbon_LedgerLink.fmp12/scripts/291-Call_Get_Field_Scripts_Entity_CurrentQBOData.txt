@@ -1,0 +1,635 @@
+# script 291: Call Get Field Scripts ({Entity, CurrentQBOData} )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Call Branches and Linkers
+# source: ScriptCatalog/Script[@id=291]
+# steps: 128 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=304 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Abstracts the Build JSON from Recordsfor an Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} params.Entity the target Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {array} params.CurrentQBOData the current entity data freshly read from QB0
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @returnSuccess {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnSuccess {number} error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @returnError {number} error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  21    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  22    Set Variable [ $CurrentQBOData; Value:JSONGetElement ( $params ;  "CurrentQBOData" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ not IsEmpty ( $CurrentQBOData ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  26    Set Variable [ $CurrentQBOData; Value:JSONDeleteElement ( $CurrentQBOData ; "MetaData" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  27    Set Variable [ $CurrentQBOData; Value:JSONDeleteElement ( $CurrentQBOData ; "sparse" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  28    Set Variable [ $CurrentQBOData; Value:JSONDeleteElement ( $CurrentQBOData ; "domain" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  29    ##FEATURE Line Merging
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $CurrentQBOData; Value:JSONDeleteElement ( $CurrentQBOData ; "Line" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    If [ 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Else If [ $Entity = "CompanyInfo" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  35 // Perform Script [ “CompanyInfo :: Field Map :: Set”; Parameter: $Record ]
+        DisableStepCollapsed state=False
+        Script id=55 name="CompanyInfo :: Field Map :: Set"
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Else If [ $Entity = "Item" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Perform Script [ “Item :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=166 name="Item :: Field Map :: Get"
+  39    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Else If [ $Entity = "Customer" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Perform Script [ “Customer :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=317 name="Customer :: Field Map :: Get"
+  43    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Else If [ $Entity = "Vendor" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Perform Script [ “Vendor :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=319 name="Vendor :: Field Map :: Get"
+  47    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Else If [ $Entity = "Deposit" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Perform Script [ “Deposit :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=840 name="Deposit :: Field Map :: Get"
+  51    Set Variable [ $CurrentQBOData; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  52    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  53    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+  54    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Else If [ $Entity = "JournalEntry" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Perform Script [ “JournalEntry :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=557 name="JournalEntry :: Field Map :: Get"
+  58    Set Variable [ $CurrentQBOData; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  59    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  60    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+  61    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Else If [ $Entity = "Invoice" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Perform Script [ “Invoice :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=347 name="Invoice :: Field Map :: Get"
+  65    Set Variable [ $CurrentQBOData; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  66    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  67    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+  68    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Else If [ $Entity = "Estimate" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Perform Script [ “Estimate :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=522 name="Estimate :: Field Map :: Get"
+  72    Set Variable [ $CurrentQBOData; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  73    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  74    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+  75    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Else If [ $Entity = "Payment" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Perform Script [ “Payment :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=372 name="Payment :: Field Map :: Get"
+  79    Set Variable [ $CurrentQBOData; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  80    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  81    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+  82    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Else If [ $Entity = "Bill" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    Perform Script [ “Bill :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=371 name="Bill :: Field Map :: Get"
+  86    Set Variable [ $CurrentQBOData; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  87    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  88    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+  89    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    Else If [ $Entity = "Purchase" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #Purchase
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    Perform Script [ “Purchase :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=847 name="Purchase :: Field Map :: Get"
+  94    Set Variable [ $CurrentQBOData; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  95    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  96    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+  97    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    Else If [ $Entity = "PurchaseOrder" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 100    #TODO - Finish Purchase Orders
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Perform Script [ “PurchaseOrder :: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=539 name="PurchaseOrder :: Field Map :: Get"
+ 102    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+ 103    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+ 104    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    Else If [ $Entity = "Attachable" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    Perform Script [ “Attachable:: Field Map :: Get”; Parameter: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+        Script id=647 name="Attachable:: Field Map :: Get"
+ 108    Set Variable [ $CurrentQBOData; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+ 109    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "CurrentQBOData" ; $CurrentQBOData ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+ 110    Perform Script [ “_Get Field Children ( { Entity, CurrentQBOData } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=295 name="_Get Field Children ( { Entity, CurrentQBOData } )"
+ 111    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 112    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    End If
+        DisableStepCollapsed state=False
+ 115    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    #if there is a qbo_id then add it to the object
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    Set Variable [ $qboIdFieldName; Value:Config($Entity & ".fields.qboId") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $qboIdFieldName
+ 118    Set Variable [ $qboId; Value:GetField($qboIdFieldName) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetField
+        Repetition
+          Calculation:
+            | 1
+        Name: $qboId
+ 119    If [ not IsEmpty ($qboId) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+ 120    Set Variable [ $result; Value:JSONSetElement ( $result;
+        
+        "Id"; $qboid; JSONString
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 121    End If
+        DisableStepCollapsed state=False
+ 122    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 123    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 128    #
+        DisableStepCollapsed state=False
+        Restore state=False

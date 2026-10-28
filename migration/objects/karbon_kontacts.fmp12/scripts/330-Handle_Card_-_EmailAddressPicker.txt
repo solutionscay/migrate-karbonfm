@@ -1,0 +1,176 @@
+# script 330: Handle Card - EmailAddressPicker
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=330]
+# steps: 44 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Get the result from the Picker Module
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “Get Results” from file: “Picker Module” ]
+        DisableStepCollapsed state=False
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Script id=99 name="Get Results" in=Picker_Module.fmp12
+   5    Set Variable [ $Result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ IsEmpty ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #No result; cancel picker
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Else If [ JSONGetElement ( $Result ; "Result.Canceled" ) = True ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement, fn:True
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #User canceled picker
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $ResultCount; Value:JSON.ArrayLength ( $Result ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Repetition
+          Calculation:
+            | 1
+        Name: $ResultCount
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  23    Exit Loop If [ $i > $ResultCount ]
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $ThisSelection; Value:JSONGetElement ( $Result ; $i - 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $ThisSelection
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #There may be more data in the result than we care about. This will extract what we need.
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $ThisSelection; Value:JSON.Pluck.From ( $ThisSelection ) & JSON.Pluck ( 
+        
+        List ( 
+        	JSON.Pluck.Prop ( "ActivityId" ; JSONString ; "ActivityId" ) ; 
+        	JSON.Pluck.Prop ( "ActivityPartyRoleId" ; JSONNumber ; "ActivityPartyRoleId" ) ; 
+        	JSON.Pluck.Prop ( "ActivityPartyRoleName" ; JSONString ; "ActivityPartyRoleName" ) ; 
+        	JSON.Pluck.Prop ( "ContactMethodId" ; JSONString ; "ContactMethodId" ) ; 
+        	JSON.Pluck.Prop ( "EmailAddress" ; JSONString ; "EmailAddress" ) ; 
+        	JSON.Pluck.Prop ( "EmailAddressFormatted" ; JSONString ; "EmailAddressFormatted" ) ; 
+        	JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        	JSON.Pluck.Prop ( "PartyName" ; JSONString ; "PartyName" ) ; 
+        
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisSelection
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #Add the prescribed ActivityId to this item
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $ThisSelection; Value:JSONSetElement ( $ThisSelection ; 
+        	[ "ActivityId" ; UtilityEmailMessage::Id ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityEmailMessage::Id#25, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisSelection
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #Push this object onto the end of the array
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Field [ UtilityEmailMessage::ActivityPartyArray; JSON.Push ( UtilityEmailMessage::ActivityPartyArray ; $ThisSelection ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.Push, UtilityEmailMessage::ActivityPartyArray#10, fn:JSONObject
+        Field table=UtilityEmailMessage id=10 name=ActivityPartyArray
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    End Loop
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #Process Results by adding them to the UtilityEmailMessage
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    End If
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

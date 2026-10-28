@@ -1,0 +1,243 @@
+# script 767: Set up Opportunity List View
+# file: karbon_kontacts.fmp12
+# folder: Modules
+# source: ScriptCatalog/Script[@id=767]
+# steps: 55 (3 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=23 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #@history 2019-02-26 dave@geistinteractive.com - this is now a multi-purpose script that performs an initial find/sort
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #Set up initial state
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ Get ( FoundCount ) = Get ( TotalRecordCount ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount, fn:TotalRecordCount
+  14    #Find active opportunities
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Find [ Specified Find Requests: Find Records; Criteria: Opportunity::ActiveInd: “1” ]
+        [ Restore ]
+        DisableStepCollapsed state=False
+        Restore state=True
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=Opportunity id=59 name=ActiveInd
+              Text: 1
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #Sort by status
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Sort Records [ Keep records in sorted order; Specified Sort Order: Opportunity::StatusCached; ascending
+        Opportunity::Name; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=Opportunity id=50 name=StatusCached
+          Sort type=Ascending
+            PrimaryField
+              Field table=Opportunity id=69 name=Name
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #Load the SalesOppChart widget
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #see the "Example Data" below for the data that needs to get sent into the
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #set the WebViewer name here
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $WebViewer; Value:"SalesOppChartWebViewer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $WebViewer
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $WidgetName; Value:"SalesOppChart" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $WidgetName
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32 // #Example Data
+        DisableStepCollapsed state=False
+        Restore state=False
+  33 // #comment this out when you get your real data
+        DisableStepCollapsed state=False
+        Restore state=False
+  34 // Insert Text [ $Data ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: {"json": [	{		"New" : 296500,		"Proposalsent" : 320000,		"Working" : 35000,		"name" : "Opportunities"	}]}
+        Field: $Data
+  35    Perform Script [ “Get Active Opportunities Status Value” from file: “karbon_kontroller” ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=682 name="Get Active Opportunities Status Value" in=karbon_kontroller.fmp12
+  36    Set Variable [ $Data; Value:JSONSetElement ( "" ; "json" ; Get(ScriptResult) ; JSONArray ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:ScriptResult, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $Data
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $params; Value:JSONSetElement ("{}";
+         
+          ["name" ;$WidgetName; JSONString ];
+          ["data" ; $Data; JSONObject ] 
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #compile the data into Widget
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Perform Script [ “Compile Widget { name; data }” from file: “karbon_charts”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        FileReference id=21 name=karbon_charts
+          UniversalPathList: file:karbon_charts
+        Script id=1252 name="Compile Widget { name; data }" in=karbon_charts.fmp12
+  42    Set Variable [ $html; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $html
+  43    If [ (
+          Error.IsError ( $html ) 
+           and 
+          Left(JSONGetElement ( $html ; "" );1 ) <> "?" 
+        ) 
+          or
+        IsEmpty ( $html ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError, fn:and, fn:Left, fn:JSONGetElement, fn:or, fn:IsEmpty
+  44    Show Custom Dialog [ Title: "Error"; Message: "Couldn't compile the Widget"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  45    Exit Script [  ]
+        DisableStepCollapsed state=False
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #load the widget into the webviewer
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Web Viewer [ Object Name: $WebViewer; URL: $html ]
+        DisableStepCollapsed state=False
+        Action value=GoToURL
+        URL custom=False
+  50    Set Variable [ $error; Value:Error.Last ( "trying to load webviewer named" & Quote( $WebViewer ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  51    If [ JSONGetElement ( $error; "errorCode" ) = 116 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  52    Show Custom Dialog [ Title: "WebViewer is missing"; Message: "Did you remember to set the webviewer name at the top of this script"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  53    Else If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  54    Show Custom Dialog [ Title: "WebViewer is missing"; Message: "Did you remember to set the webviewer name at the top of this script"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  55    End If
+        DisableStepCollapsed state=False

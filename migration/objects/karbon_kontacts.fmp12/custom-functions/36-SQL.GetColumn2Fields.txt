@@ -1,0 +1,53 @@
+# custom function 36: SQL.GetColumn2Fields
+# file: karbon_kontacts.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=36]
+
+CustomFunction id=36 functionArity=5 visible=True parameters=columnField;whereField;whereValue;whereField2;whereValue2 name=SQL.GetColumn2Fields
+  Calculation:
+    | /**
+    |  * 
+    |  * get the values in a field using two WHERE field searches
+    |  *
+    |  * @param {reference} columnField
+    |  * @param {reference} whereField
+    |  * @param {string} whereValue
+    |  * @param {reference} whereField2
+    |  * @param {string} whereValue2
+    |  *
+    |  * @returns {string} the list of values in the field targeted with 'columnField'
+    |  *
+    |  * @module fm-sql-cfs
+    |  * @see https://github.com/karbonfm/fm-sql-cfs
+    |  * 
+    |  * @history  2017-11-17, todd@geistinteractive.com
+    |  *
+    |  */
+    | 
+    | Let(
+    | [
+    | sql = SQL.GetColumnStatement (columnField; whereField ; "?" ) ;
+    | 
+    | sql = List(
+    | "SELECT ''|| " & SQL.GetFieldName ( columnField ) ;
+    | "FROM " & SQL.GetTableName ( whereField ) ;
+    | "WHERE " & SQL.GetFieldName ( whereField ) & "=?" ;
+    | "AND" ; 
+    | SQL.GetFieldName ( whereField2 ) & "=?" 
+    | )
+    | 
+    | 
+    | 
+    | 
+    | ];
+    | 
+    | 
+    | ExecuteSQL (
+    | 
+    | sql ; 
+    | 
+    | "" ;"" ; whereValue; whereValue2
+    | 
+    | ) 
+    | 
+    | )
+    refs: fn:Let, cf:SQL.GetColumnStatement, fn:List, cf:SQL.GetFieldName, cf:SQL.GetTableName, fn:ExecuteSQL

@@ -1,0 +1,102 @@
+# script 537: New Bill for ( id_Vendor )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Bill Interface
+# source: ScriptCatalog/Script[@id=537]
+# steps: 27 (18 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=511 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $id_Vendor; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $id_Vendor
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4 // If [ RightWords ( Get ( LayoutName ) ; 1 ) = "Desktop" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:RightWords, fn:Get, fn:LayoutName
+   5    Go to Layout [ “Bill | Desktop” (Bill) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=106 name="Bill | Desktop"
+   6    New Record/Request
+        DisableStepCollapsed state=False
+   7    Set Field [ Bill::id_Vendor; $id_Vendor ]
+        DisableStepCollapsed state=False
+        Field table=Bill id=6 name=id_Vendor
+   8 // Else If [ RightWords ( Get ( LayoutName ) ; 1 ) = "iPad" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:RightWords, fn:Get, fn:LayoutName
+   9 // Go to Layout [ <unknown> ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=0 name="" ref=none
+  10 // New Record/Request
+        DisableStepCollapsed state=False
+  11 // Set Field [ Invoice::id_Customer; $id_Customer ]
+        DisableStepCollapsed state=False
+        Field table=Invoice id=7 name=id_Customer
+  12 // Else If [ RightWords ( Get ( LayoutName ) ; 1 ) = "iPhone" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:RightWords, fn:Get, fn:LayoutName
+  13 // Go to Layout [ <unknown> ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=0 name="" ref=none
+  14 // New Record/Request
+        DisableStepCollapsed state=False
+  15 // Set Field [ Invoice::id_Customer; $id_Customer ]
+        DisableStepCollapsed state=False
+        Field table=Invoice id=7 name=id_Customer
+  16 // Set Variable [ $id_Invoice; Value:Invoice::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Invoice::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $id_Invoice
+  17 // Go to Layout [ <unknown> ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=0 name="" ref=none
+  18 // Show All Records
+        DisableStepCollapsed state=False
+  19 // Show Omitted Only
+        DisableStepCollapsed state=False
+  20 // New Record/Request
+        DisableStepCollapsed state=False
+  21 // Set Field [ InvoiceItem::id_Invoice; $id_Invoice ]
+        DisableStepCollapsed state=False
+        Field table=InvoiceItem id=10 name=id_Invoice
+  22 // Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  23 // Scroll Window
+        [ Home ]
+        DisableStepCollapsed state=False
+        ScrollOperation value=Home
+  24 // End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Exit Script [  ]
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False

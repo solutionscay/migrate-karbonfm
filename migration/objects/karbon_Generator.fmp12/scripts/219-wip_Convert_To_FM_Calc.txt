@@ -1,0 +1,274 @@
+# script 219: #wip Convert To FM Calc
+# file: karbon_Generator.fmp12
+# folder: Miscellaneous Generators / Comment Generators
+# source: ScriptCatalog/Script[@id=219]
+# steps: 54 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=218 groupCollapsed=False includeInMenu=False
+
+   1    Set Variable [ $testing; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $testing
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Close Popover
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $clip; Value:clip_GetFMxml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_GetFMxml
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+   6    Set Variable [ $comments; Value:<Function Missing> ( $clip ; "//Text"  ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $comments
+   7    Set Variable [ $errorMessage; Value:"An error occurred." ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $errorMessage
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Perform Script [ “params”; Parameter: $comments ]
+        DisableStepCollapsed state=False
+        Script id=221 name=params
+  11    Set Variable [ $params; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “#wip returnSuccess”; Parameter: $comments ]
+        DisableStepCollapsed state=False
+        Script id=466 name="#wip returnSuccess"
+  14    Set Variable [ $returnSuccess; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $returnSuccess
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Perform Script [ “Calc”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=223 name=Calc
+  17    Set Variable [ $calc; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $calc
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ $testing ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #@history 2018-09-27 dave@geistinteractive.com - testing…
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Perform Script [ “#wip Set Vars from Result - DG Testing”; Parameter: $returnSuccess ]
+        DisableStepCollapsed state=False
+        Script id=468 name="#wip Set Vars from Result - DG Testing"
+  24    Set Variable [ $stepsSuccess; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $stepsSuccess
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $xml; Value:List( $xml ; ScriptStep_Comment ( "" ) ; ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $xml
+  27    Set Variable [ $XML; Value:List( $XML ; ScriptStep_InsertCalculatedResult ( "$json" ; $calc ; 1 ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_InsertCalculatedResult
+        Name: $XML
+  28    Set Variable [ $xml; Value:List( $xml ; ScriptStep_Comment ( "" ) ; ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $xml
+  29    Set Variable [ $xml; Value:List( $xml ; ScriptStep_PerformScript ( "Select subscript" ; "$json" ; "" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_PerformScript
+        Repetition
+          Calculation:
+            | 1
+        Name: $xml
+  30    Set Variable [ $XML; Value:List( $XML ; ScriptStep_Comment ( "" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  31    Set Variable [ $XML; Value:List( $XML ; ScriptStep_InsertCalculatedResult ( "$result" ; "Get ( ScriptResult )" ; 1 ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_InsertCalculatedResult
+        Name: $XML
+  32    Set Variable [ $XML; Value:List( $XML ; ScriptStep_Comment ( "" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  33    Set Variable [ $XML; Value:List( $XML ; ScriptStep_If ( "Error.IsError( $result )" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_If
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  34    Set Variable [ $XML; Value:List( $XML ; ScriptStep_ShowCustomDialog ( "Error" ; $errorMessage ; "OK" ; "" ; "" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_ShowCustomDialog
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  35    Set Variable [ $XML; Value:List( $XML ; ScriptStep_ExitScript ( -2 ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_ExitScript
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  36    Set Variable [ $XML; Value:List( $XML ; ScriptStep_EndIf ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_EndIf
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  37    Set Variable [ $XML; Value:List( $XML ; ScriptStep_Comment ( "" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  38    Set Variable [ $xml; Value:List( $xml ; $stepsSuccess ; ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $xml
+  39    Set Variable [ $XML; Value:List( $XML ; ScriptStep_Comment ( "" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  40    Set Variable [ $result; Value:clip_Set ( $xml ; "ScriptSteps" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_Set
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $result; Value:<Function Missing> ( $calc ; "public.utf8-plain-text" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #2018-02-10 Dave Graham: provides feedback to the user
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Show Custom Dialog [ Title: "Done"; Message: "Your parameters have been converted to a FileMaker expression and copied to the clipboard."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  54    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False

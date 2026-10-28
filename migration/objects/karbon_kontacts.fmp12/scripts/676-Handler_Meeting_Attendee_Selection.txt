@@ -1,0 +1,268 @@
+# script 676: Handler: Meeting Attendee Selection
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Meeting
+# source: ScriptCatalog/Script[@id=676]
+# steps: 63 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=681 groupCollapsed=False includeInMenu=True
+
+   1    #This script is going to wait until the picker is done doing it's thing, and then proceed accordingly
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v1.01 2014-08-01: added test for user cancelation. Only go to contact if the user created a new contact. 
+        
+        v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #SAMPLE RESULT OBJECT: 
+        {
+        	"Result" : 
+        	{
+        		"CreateParty" : False
+        		"PartyCount" : 2,
+        		"PartyArray" : 
+        		[
+        			{
+        				"Id" : "123",
+        				"Name" : "Dave Graham"
+        			},
+        			{
+        				"Id" : "456",
+        				"Name" : "Lance Brandenberg"
+        			}
+        		]
+        	}
+        }
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Contact Handler Common Tests” ]
+        DisableStepCollapsed state=False
+        Script id=63 name="Contact Handler Common Tests"
+   9    Set Variable [ $results; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+  10    If [ Error.IsError ( $results ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  11    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #Init vars
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $createParty; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $createParty
+  17    Set Variable [ $partyCount; Value:JSONGetElement ( $results ; "Result.CountPicked" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyCount
+  18    Set Variable [ $partyArray; Value:JSONGetElement ( $results ; "Result.PartyArray" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyArray
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ Get( ScriptResult ) = -1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:ScriptResult
+  24    #user canceled; exit
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  26    Exit Script [ Result: -1 ]
+        DisableStepCollapsed state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    If [ $partyCount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #a pick was made; destroy timer
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  35    Set Variable [ $end; Value:$partyCount - 1 ]
+        DisableStepCollapsed state=False
+        Name: $end
+  36    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $thisParty; Value:JSONGetElement ( $partyArray ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisParty
+  40    Set Variable [ $thisPartyId; Value:JSONGetElement ( $thisParty ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPartyId
+  41    Set Variable [ $thisPartyName; Value:JSONGetElement ( $thisParty ; "Name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPartyName
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Field [ selector::PartyId; $thisPartyId ]
+        DisableStepCollapsed state=False
+        Field table=selector id=6 name=PartyId
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "ActivityId" ; Activity::Id ; JSONString ]  ;
+        	[ "ActivityPartyRoleId" ; 60 ; JSONNumber ]  ;
+        	[ "Comments" ; $Comments ; JSONString ]  ;
+        	[ "ContactMethodId" ; Selected_Party::EmailAddressIdCached ; JSONString ]  ;
+        	[ "EmailAddress" ; Selected_Party::EmailAddressCached ; JSONString ]  ;
+        	[ "PartyId" ; $thisPartyId ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Activity::Id#1, fn:JSONString, fn:JSONNumber, Selected_Party::EmailAddressIdCached#145, Selected_Party::EmailAddressCached#127
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Perform Script [ “Create ActivityParty { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=376 name="Create ActivityParty { json }" in=karbon_kontroller.fmp12
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  50    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  51    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  52    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  53    End If
+        DisableStepCollapsed state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  56    End Loop
+        DisableStepCollapsed state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    End If
+        DisableStepCollapsed state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False

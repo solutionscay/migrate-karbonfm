@@ -1,0 +1,465 @@
+# script 482: Create Welcome Initial Parties
+# file: karbon_kontacts.fmp12
+# folder: Modules / Welcome
+# source: ScriptCatalog/Script[@id=482]
+# steps: 86 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=479 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2019-02-06 dave@geistinteractive.com - no need to create employee/company relationships; it's handled by the Create Employee API
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “Validate Welcome Person” ]
+        DisableStepCollapsed state=False
+        Script id=495 name="Validate Welcome Person"
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #Create an Organization
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $OrganizationName; Value:UtilityParty::OrganizationName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::OrganizationName#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $OrganizationName
+  14    Set Variable [ $Address; Value:"[" & 
+        
+        JSONSetElement (  ""; 
+         
+        	[ "AddressLine1" ; UtilityParty::OrgAddressLine1 ; JSONString ];
+        	[ "AddressLine2" ; UtilityParty::OrgAddressLine2 ; JSONString ];
+        	[ "City" ; UtilityParty::OrgCity ; JSONString ];
+        	[ "Country" ; UtilityParty::OrgCountry ; JSONString ];
+        	[ "County" ; UtilityParty::OrgCounty ; JSONString ];
+        	[ "PostalCode" ; UtilityParty::OrgPostalCode ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ];
+        	[ "StateProvince" ; UtilityParty::OrgStateProvince ; JSONString ]
+         
+        )
+        
+        & "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::OrgAddressLine1#8, fn:JSONString, UtilityParty::OrgAddressLine2#9, UtilityParty::OrgCity#10, UtilityParty::OrgCountry#11, UtilityParty::OrgCounty#12, UtilityParty::OrgPostalCode#13, fn:True, fn:JSONBoolean, UtilityParty::OrgStateProvince#14
+        Name: $Address
+  15    Set Variable [ $Phone; Value:"[" & 
+        
+        JSONSetElement (  ""; 
+         
+        	[ "Label" ; "" ; JSONString ];
+        	[ "Number" ; UtilityParty::OrgPhone ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ]
+         
+        )
+        
+        & "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, UtilityParty::OrgPhone#15, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+  16    Set Variable [ $NetworkAddress; Value:"[" & 
+        
+        JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::OrgWebsite ; JSONString ];
+        	[ "Label" ; "Website" ; JSONString ];
+        	[ "Primary" ; False ; JSONBoolean ];
+        	[ "Type" ; "web" ; JSONString ]
+         
+        ) & 
+        
+        "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::OrgWebsite#16, fn:JSONString, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $Organization; Value:JSONFormatElements ( 
+        
+        
+        JSONSetElement (  ""; 
+         
+        	[ "OrganizationName" ; $OrganizationName ; JSONString ];
+        	[ "Phone" ; $Phone ; JSONArray ];
+        	[ "Address" ; $Address ; JSONArray ];
+        	[ "NetworkAddress" ; $NetworkAddress ; JSONArray ]
+         
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $Organization
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “_wip_Create Organization { data }” from file: “karbon_kontroller”; Parameter: $Organization ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=253 name="_wip_Create Organization { data }" in=karbon_kontroller.fmp12
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  25    Show Custom Dialog [ Title: "Error"; Message: $Result; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  26    Exit Script [  ]
+        DisableStepCollapsed state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $OrganizationId; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $OrganizationId
+  30    Set Field [ UtilityParty::OrganizationId; $OrganizationId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityParty id=20 name=OrganizationId
+  31    Set Field [ System::OwnerId; $OrganizationId ]
+        DisableStepCollapsed state=False
+        Field table=System id=39 name=OwnerId
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #Create the first employee
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $FirstName; Value:UtilityParty::PersonFirstName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::PersonFirstName#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $FirstName
+  41    Set Variable [ $JobTitle; Value:UtilityParty::PersonJobTitle ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::PersonJobTitle#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $JobTitle
+  42    Set Variable [ $LastName; Value:UtilityParty::PersonLastName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::PersonLastName#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $LastName
+  43    Set Variable [ $Address; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Address
+  44    Set Variable [ $Phone; Value:"[" & 
+        
+        JSONSetElement (  ""; 
+         
+        	[ "Label" ; "" ; JSONString ];
+        	[ "Number" ; UtilityParty::PersonPhone ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ]
+         
+        ) & 
+        
+        "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, UtilityParty::PersonPhone#17, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Phone
+  45    Set Variable [ $NetworkAddress; Value:"[" & 
+        
+        JSONSetElement (  "" ; 
+         
+        	[ "Address" ; UtilityParty::PersonEmail ; JSONString ];
+        	[ "Label" ; "Work" ; JSONString ];
+        	[ "Primary" ; True ; JSONBoolean ];
+        	[ "Type" ; "email" ; JSONString ]
+         
+        ) & 
+        
+        "]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::PersonEmail#18, fn:JSONString, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $NetworkAddress
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $Person; Value:JSONFormatElements ( JSONSetElement (  ""; 
+         
+        	[ "Comments" ; $Comments ; JSONString ];
+        	[ "DateOfBirth" ; $DateOfBirth ; JSONString ];
+        	[ "Department" ; $Department ; JSONString ];
+        	[ "EmployerName" ; $EmployerName ; JSONString ];
+        	[ "Ethnicity" ; $Ethnicity ; JSONString ];
+        	[ "FirstName" ; $FirstName ; JSONString ];
+        	[ "Gender" ; $Gender ; JSONString ];
+        	[ "Id" ; $Id ; JSONString ];
+        	[ "JobTitle" ; $JobTitle ; JSONString ];
+        	[ "LastName" ; $LastName ; JSONString ];
+        	[ "MaritalStatus" ; $MaritalStatus ; JSONString ];
+        	[ "MiddleName" ; $MiddleName ; JSONString ];
+        	[ "Nickname" ; $Nickname ; JSONString ];
+        	[ "Photo" ; $Photo ; JSONString ];
+        	[ "Prefix" ; $Prefix ; JSONString ];
+        	[ "Salutation" ; $Salutation ; JSONString ];
+        	[ "Suffix" ; $Suffix ; JSONString ];
+        	[ "Phone" ; $Phone ; JSONArray ];
+        	[ "Address" ; $Address ; JSONArray ];
+        	[ "NetworkAddress" ; $NetworkAddress ; JSONArray ]
+         
+        ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $Person
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Perform Script [ “_wip_Create Employee { data }” from file: “karbon_kontroller”; Parameter: $Person ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=164 name="_wip_Create Employee { data }" in=karbon_kontroller.fmp12
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  54    Show Custom Dialog [ Title: "Error"; Message: $Result; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  55    Exit Script [  ]
+        DisableStepCollapsed state=False
+  56    End If
+        DisableStepCollapsed state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Variable [ $CreatedPerson; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreatedPerson
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $PersonId; Value:JSONGetElement ( $result ; "PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PersonId
+  61    Set Field [ UtilityParty::PersonId; $PersonId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityParty id=21 name=PersonId
+  62    Set Field [ User::PartyId; $PersonId ]
+        DisableStepCollapsed state=False
+        Field table=User id=12 name=PartyId
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #Create a User record as well
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Set Variable [ $User; Value:JSONSetElement ( "";
+        	[ "AccountName" ; Get( AccountName ); JSONString ];
+        	[ "EmailAddress" ; UtilityParty::PersonEmail; JSONString ];
+        	[ "FirstName" ; UtilityParty::PersonFirstName; JSONString ];
+        	[ "LastName" ; UtilityParty::PersonLastName; JSONString ];
+        	[ "PartyId" ; $PersonId; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:AccountName, fn:JSONString, UtilityParty::PersonEmail#18, UtilityParty::PersonFirstName#1, UtilityParty::PersonLastName#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $User
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Perform Script [ “Create User” from file: “karbon_kontroller”; Parameter: $User ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=500 name="Create User" in=karbon_kontroller.fmp12
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  72    Show Custom Dialog [ Title: "Error"; Message: $Result; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  73    Exit Script [  ]
+        DisableStepCollapsed state=False
+  74    End If
+        DisableStepCollapsed state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Set Field [ System::InitialSetupDoneInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=System id=65 name=InitialSetupDoneInd
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Perform Script [ “Store UserID On Session” ]
+        DisableStepCollapsed state=False
+        Script id=54 name="Store UserID On Session"
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Perform Script [ “Go to Welcome System Settings” ]
+        DisableStepCollapsed state=False
+        Script id=515 name="Go to Welcome System Settings"
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

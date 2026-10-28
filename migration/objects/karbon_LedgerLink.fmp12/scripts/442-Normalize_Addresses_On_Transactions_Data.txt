@@ -1,0 +1,105 @@
+# script 442: Normalize Addresses On Transactions ( Data )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO / Public
+# source: ScriptCatalog/Script[@id=442]
+# steps: 27 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=58 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Normalizes the Shipping and Billing on Transactions
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} data the json containing addresses
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} data.BillAddr the billing addresses
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} data.ShipAddr the shipping address
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returns {object} data.
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $data; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ JSON.ContainsProperty ( $data ; "BillAddr" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.ContainsProperty
+  18    Perform Script [ “Normalize QBO Address (addressJSON)”; Parameter: JSONGetElement ( $data ; "BillAddr" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Script id=213 name="Normalize QBO Address (addressJSON)"
+  19    Set Variable [ $data; Value:JSONSetElement( $data ; "BillAddr" ; Get(ScriptResult) ; JSONObject) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:ScriptResult, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  20    End If
+        DisableStepCollapsed state=False
+  21    If [ JSON.ContainsProperty ( $data ; "ShipAddr" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.ContainsProperty
+  22    Perform Script [ “Normalize QBO Address (addressJSON)”; Parameter: JSONGetElement ( $data ; "ShipAddr" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Script id=213 name="Normalize QBO Address (addressJSON)"
+  23    Set Variable [ $data; Value:JSONSetElement( $data ; "ShipAddr" ; Get(ScriptResult) ; JSONObject) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:ScriptResult, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Exit Script [ Result:  $data ]
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,175 @@
+# script 312: _DisplayError
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices
+# source: ScriptCatalog/Script[@id=312]
+# steps: 30 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=469 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $error; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+   5    Set Variable [ $$_ll_error; Value:JSONFormatElements($error) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements
+        Repetition
+          Calculation:
+            | 1
+        Name: $$_ll_error
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $data; Value:JSONGetElement ( $error; "data" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $message; Value:   JSONGetElement($error ; "errorMessage" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $message
+  10    If [ not IsEmpty ( $data ) and Left($data;1) <> "?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:and, fn:Left
+  11    Set Variable [ $message; Value:Substitute (  
+        
+        List(
+        $message ;  
+        JSONGetElement ( $data; "message" )
+        )
+        ;
+        
+        "¶"; " "
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:List, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $message
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $QBOAPI_Error; Value:JSONGetElement ( $error ; "data.response.Fault" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOAPI_Error
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    If [ not IsEmpty ( $QBOAPI_Error ) and Left($QBOAPI_Error;1)<> "?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:and, fn:Left
+  19    Set Variable [ $QBOAPI_Error; Value:List(
+        
+        
+           "Error: " & JSONGetElement ( $error ; "data.response.Fault.Error[0].Detail" );
+           " ";
+           "Message: " & JSONGetElement ( $error ; "data.response.Fault.Error[0].Message" );
+           " ";
+           "code: " &  JSONGetElement ( $error ; "data.response.Fault.Error[0].code" )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOAPI_Error
+  20    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $QBOAPI_Error; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOAPI_Error
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  25    If [ JSONGetElement ( $error; "code" )=401 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  26    Show Custom Dialog [ Title: "Error"; Message: 
+        
+         $message; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  27    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Show Custom Dialog [ Title: "Error"; Message: List(
+        
+        
+          $message;
+           " ";
+           "Script: " & JSONGetElement($error ; "scriptName" );
+           JSONGetElement($error ; "descriptor" );
+           " ";
+           $QBOAPI_Error;
+        
+        ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:List, fn:JSONGetElement
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  29    End If
+        DisableStepCollapsed state=False
+  30    End If
+        DisableStepCollapsed state=False

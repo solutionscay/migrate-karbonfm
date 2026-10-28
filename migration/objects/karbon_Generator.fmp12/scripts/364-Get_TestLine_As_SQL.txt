@@ -1,0 +1,89 @@
+# script 364: Get TestLine As SQL
+# file: karbon_Generator.fmp12
+# folder: Test Engine (UI) / Private
+# source: ScriptCatalog/Script[@id=364]
+# steps: 17 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=367 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $FileName; Value:Selected_TestLine::FileName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::FileName#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   3    Set Variable [ $TableName; Value:Selected_TestLine::SQL_TableName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_TableName#14
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableName
+   4    Set Variable [ $FieldName; Value:Selected_TestLine::SQL_FieldReturn ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_FieldReturn#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldName
+   5    Set Variable [ $Id; Value:Selected_TestLine::SQL_FieldValue ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_FieldValue#13
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ Selected_TestLine::SQL_GetFromResultInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_TestLine::SQL_GetFromResultInd#24
+   8    Set Variable [ $Id; Value:JSONGetElement ( Test_TestLine#ActualTest::LastResult ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Test_TestLine#ActualTest::LastResult#20
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   9    End If
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $Statement; Value:"SELECT " & $FieldName & " FROM " & $TableName & " WHERE Id = '" & $Id & "'" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Statement
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $Result; Value:<Function Missing> ( $Statement; "," ; "¶" ; $FileName ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Check Test Result for Selected TestLine”; Parameter: $Result ]
+        DisableStepCollapsed state=False
+        Script id=363 name="Check Test Result for Selected TestLine"
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Exit Script [ Result: $Result ]
+        DisableStepCollapsed state=False

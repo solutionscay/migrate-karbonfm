@@ -1,0 +1,31 @@
+# custom function 19: design_BaseTableNames
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=19]
+
+CustomFunction id=19 functionArity=3 visible=True parameters=databaseName;noExternalTables;host name=design_BaseTableNames
+  Calculation:
+    | /**
+    | 
+    | 
+    | noExternalTables if set to true it will filter out BaseTables that aren't defined in this database
+    | "host" is required if noExternalTables is true AND the file is on a server.
+    | 
+    | **/
+    | 
+    | Let(
+    | [
+    | 
+    | databaseName = Upper(databaseName);
+    | baseFileName = databaseName & " (" & host & ")";
+    | 
+    | sql = Case(
+    |       noExternalTables ; "SELECT TableName FROM FILEMAKER_TABLES WHERE UPPER(BaseFileName)='" &  baseFileName   & "'" ;
+    |        "SELECT TableName FROM FILEMAKER_TABLES" 
+    | )
+    | 
+    | ];
+    | 
+    | design_x_sql ( sql ; databaseName )
+    | 
+    | )
+    refs: fn:Let, fn:Upper, fn:Case, cf:design_x_sql

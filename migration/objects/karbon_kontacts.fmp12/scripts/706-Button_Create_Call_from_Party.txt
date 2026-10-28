@@ -1,0 +1,111 @@
+# script 706: Button: Create Call from Party
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Call
+# source: ScriptCatalog/Script[@id=706]
+# steps: 21 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=702 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "CreatorId" ; session::CurrentUserPartyId ; JSONString ]  ;
+        	[ "RegardingId" ;Party::Id ; JSONString ]  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, session::CurrentUserPartyId#63, fn:JSONString, Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “Create Call { data }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=641 name="Create Call { data }" in=karbon_kontroller.fmp12
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   7    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   8    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   9    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $Id; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Field [ selector::PartyId; JSONGetElement ( $json ; "RegardingId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=selector id=6 name=PartyId
+  15    Set Field [ selector::PartyId; List ( Selected_Party_PartyRelation_Party::Id) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, Selected_Party_PartyRelation_Party::Id#1
+        Field table=selector id=6 name=PartyId
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $DisplayPartyIds; Value:Let ( [
+        	thisPersonId = Person::Id ;
+        	RelatedPersons = List ( Party_PartyRelation_Party_Person::Id ) ;
+        	ActivityPartyIds = Party_ActivityParty::PartyIdList ; 
+        	DisplayPartyIds = List ( thisPersonId ; RelatedPersons ; ActivityPartyIds )  
+        ];
+        	DisplayPartyIds
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, Person::Id#1, fn:List, Party_PartyRelation_Party_Person::Id#1, Party_ActivityParty::PartyIdList#59
+        Repetition
+          Calculation:
+            | 1
+        Name: $DisplayPartyIds
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Open Activity { Id }”; Parameter: JSONSetElement ( "{}" ; 
+        
+        [ "Id" ; $Id ; JSONString ] ;
+        [ "DisplayPartyIds" ; $DisplayPartyIds ; JSONString ] 
+        
+         ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Script id=291 name="Open Activity { Id }"
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

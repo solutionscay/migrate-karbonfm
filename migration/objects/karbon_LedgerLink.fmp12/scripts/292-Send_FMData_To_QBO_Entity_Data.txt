@@ -1,0 +1,113 @@
+# script 292: Send FMData To QBO ({Entity , Data})
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO / Public
+# source: ScriptCatalog/Script[@id=292]
+# steps: 24 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=58 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Send the Data to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} params.Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} params.Data
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  12    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  15    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  16    Set Variable [ $Data; Value:JSONGetElement ( $params ;  "Data" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Data
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $request; Value:JSONSetElement ( "" ;
+        
+        
+        	[ "path"; "/" & $Entity ; JSONString ];
+        	[ "method" ; "POST" ; JSONString ];
+        	[ "data" ; $Data ; JSONObject ]
+        
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Perform Script [ “Send QBO Request”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=18 name="Send QBO Request"
+  22    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False

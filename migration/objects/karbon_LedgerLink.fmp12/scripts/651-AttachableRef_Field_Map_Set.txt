@@ -1,0 +1,215 @@
+# script 651: AttachableRef:: Field Map :: Set
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Supporting Resources
+# source: ScriptCatalog/Script[@id=651]
+# steps: 58 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=220 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # This script is responsible for saving the data from QBO into a FileMaker Record
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # context QBO Layout, related to the target record
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} json the record just pulled from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  10    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  11    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $EntityRef.value; Value:JSONGetElement ( $json ; "EntityRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.value
+  18    Set Variable [ $EntityRef.type; Value:JSONGetElement ( $json ; "EntityRef.type" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.type
+  19    Set Variable [ $IncludeOnSend; Value:JSONGetElement ( $json ; "IncludeOnSend" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $IncludeOnSend
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #Link of other entities here by adding additional types ie "... or $EntityRef.type= "SalesReceipt"
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #caution, you'll need to be syncing the other entities for this to work!
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    If [ $EntityRef.type= "Invoice" or $EntityRef.type= "SalesReceipt" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  32    #karbon overide
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Perform Script [ “Lookup SalesTransaction fmID ( qboId )”; Parameter:  $EntityRef.value ]
+        DisableStepCollapsed state=False
+        Script id=653 name="Lookup SalesTransaction fmID ( qboId )"
+  34    Set Variable [ $EntityRef.value; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.value
+  35    Set Variable [ $EntityRef.typeId; Value:12  // SalesTransaction ]
+        DisableStepCollapsed state=False
+        Name: $EntityRef.typeId
+  36    Set Variable [ $EntityRef.type; Value:"SalesTransaction" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.type
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #non-Karbon default setting
+        DisableStepCollapsed state=False
+        Restore state=False
+  40 // Set Variable [ $EntityRef.value; Value:QBO.LookupFMId ( $EntityRef.type ; $EntityRef.value) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.value
+  41    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Field [ qbo_AttachableRef::EntityId; $EntityRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_AttachableRef id=7 name=EntityId ref=external
+  50    Set Field [ qbo_AttachableRef::EntityType; $EntityRef.type ]
+        DisableStepCollapsed state=False
+        Field table=qbo_AttachableRef id=6 name=EntityType ref=external
+  51    Set Field [ qbo_AttachableRef::IncludeOnSend; $IncludeOnSend ]
+        DisableStepCollapsed state=False
+        Field table=qbo_AttachableRef id=9 name=IncludeOnSend ref=external
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #Karbon-only
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Set Field [ qbo_AttachableRef::EntityTypeId; $EntityRef.typeId ]
+        DisableStepCollapsed state=False
+        Field table=qbo_AttachableRef id=14 name=EntityTypeId ref=external
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False

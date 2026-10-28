@@ -1,0 +1,36 @@
+# script 531: Add Customer From Estimate
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Estimate Interface
+# source: ScriptCatalog/Script[@id=531]
+# steps: 9 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=525 groupCollapsed=False includeInMenu=False
+
+   1    If [ IsEmpty ( Trim ( GLOBAL::FILTER ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:Trim, GLOBAL::FILTER#1
+   2    Go to Object [ Object Name: "field.newCustomerName"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+   3    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Field [ Estimate::id_Customer; "" ]
+        DisableStepCollapsed state=False
+        Field table=Estimate id=7 name=id_Customer
+   5    #commit the record to break the connection with the existing customer, if any
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   7    Set Field [ Estimate_Customer::displayName; GLOBAL::FILTER ]
+        DisableStepCollapsed state=False
+        refs: GLOBAL::FILTER#1
+        Field table=Estimate_Customer id=9 name=displayName
+   8    Close Popover
+        DisableStepCollapsed state=False
+   9    End If
+        DisableStepCollapsed state=False

@@ -1,0 +1,66 @@
+# script 609: btn: Remove Sales Transaction From QBO
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Buttons / QBO
+# source: ScriptCatalog/Script[@id=609]
+# steps: 13 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=605 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Close Popover
+        DisableStepCollapsed state=False
+   3    Go to Field [  ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+   4    Set Variable [ $data; Value:JSONSetElement (""; "Id"; SalesTransaction::id ; JSONString) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, SalesTransaction::id#1, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   5    Perform Script [ “Delete a SalesTransaction From QBO { data }” from file: “karbon_kontroller”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=461 name="Delete a SalesTransaction From QBO { data }" in=karbon_kontroller.fmp12
+   6    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  10    Show Custom Dialog [ Title: "Error"; Message: "The transaction couldn't be deleted from QBO¶¶" &
+        
+        JSONFormatElements ( $result ); Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False

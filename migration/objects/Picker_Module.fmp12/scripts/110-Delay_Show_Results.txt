@@ -1,0 +1,44 @@
+# script 110: Delay Show Results
+# file: Picker Module.fmp12
+# folder: Modules / Address Autocomplete / API / Private
+# source: ScriptCatalog/Script[@id=110]
+# steps: 11 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=False includeInMenu=False
+
+   1    #Whenever the user hits a key the timer gets reset. If no key is pressed within threshold the search script is run.
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $delayBeforeFind; Value:.75 /* number (or fraction) of seconds */ ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $delayBeforeFind
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ Picker::AddressServiceProviderThisSession = "SmartyStreets" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Picker::AddressServiceProviderThisSession#25
+   6    Install OnTimer Script [ “Get Smarty Street Address Suggestions”; Interval: $delayBeforeFind ]
+        DisableStepCollapsed state=False
+        Script id=117 name="Get Smarty Street Address Suggestions"
+   7    Else If [ Picker::AddressServiceProviderThisSession = "Google Places" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Picker::AddressServiceProviderThisSession#25
+   8    Install OnTimer Script [ “Get Google Places Address Suggestions”; Interval: $delayBeforeFind ]
+        DisableStepCollapsed state=False
+        Script id=198 name="Get Google Places Address Suggestions"
+   9    End If
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

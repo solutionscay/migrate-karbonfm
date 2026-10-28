@@ -1,0 +1,293 @@
+# script 266: API Validation
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=266]
+# steps: 55 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-09-11 dave@geistinteractive.com - We're using the generic $ScriptParameter instead of the entity name. It helps when we copy/paste code snippets from one script to another to have common variable names.
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-02-27 dave@geistinteractive.com - added additional validation rule support
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Insert Text [ $validationTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | JSON.Validate.This ( $<<entity>> ) & JSON.Validate.ApplyRules ( 
+          | 	List ( 
+          | <<validationList>> 
+          | 	)
+          | )
+        Field: $validationTemplate
+   6    Insert Text [ $validationRuleTemplateIsRequired ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSON.Validate.Rule.IsRequired ( "<<path>>" ) ;
+        Field: $validationRuleTemplateIsRequired
+   7    Insert Text [ $validationRuleTemplateIsNumeric ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSON.Validate.Rule.IsNumeric ( "<<path>>" ) ;
+        Field: $validationRuleTemplateIsNumeric
+   8    Insert Text [ $validationRuleTemplateIsOneOf ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSON.Validate.Rule.IsOneOf ( "<<path>>" /* path */ ; List ( <<theList>> ) /* enum */ ) ;
+        Field: $validationRuleTemplateIsOneOf
+   9    Insert Text [ $validationRuleTemplateIsOneOfIfPresent ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | If ( not IsEmpty ( $<<path>> ) ; 
+          | 			JSON.Validate.Rule.IsOneOf ( "<<path>>" /* path */  ; List ( <<theList>> ) /* enum */ ) 
+          | 		) ;
+        Field: $validationRuleTemplateIsOneOfIfPresent
+  10    Insert Text [ $validationRuleAddMore ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: "" ; // additional tests
+        Field: $validationRuleAddMore
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $entity; Value:"json" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+  13 // Set Variable [ $entity; Value:ApiGenerator::Entity ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::Entity#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  16    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Exit Loop If [ IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ApiGeneratorLine::Id#1
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $path; Value:ApiGeneratorLine::JsonPropertyName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ not ApiGeneratorLine::IsObject ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, ApiGeneratorLine::IsObject#41
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ ApiGeneratorLine::required ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::required#19
+  25    #Required
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $validationList; Value:List( $validationList ; 
+        	Substitute ( $validationRuleTemplateIsRequired ; 
+        		[ "<<path>>" ; $path ] 
+        	 )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $validationList
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    If [ ApiGeneratorLine::IsOneOf and ApiGeneratorLine::required ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::IsOneOf#37, fn:and, ApiGeneratorLine::required#19
+  30    #Is one of
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $validationList; Value:Let ( [ 
+        
+        	theList = If ( not IsEmpty ( ApiGeneratorLineValueOption::Number ) ; 
+        
+        		// use the index if present
+        		List ( ApiGeneratorLineValueOption::Number ) ; 
+        
+        		// otherwise use the value
+        		List ( ApiGeneratorLineValueOption::Value )
+        	) ; 
+        	theListOut = "\"" & ( Substitute ( theList ; "¶" ; "\" ; \"" ) ) & "\""
+        
+        ] ; 
+        
+        
+        List( $validationList ; 
+        	Substitute ( $validationRuleTemplateIsOneOf ; 
+        		[ "<<path>>" ; $path ] ; 
+        		[ "<<theList>>" ; theListOut ] 
+        	 )
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:If, fn:not, fn:IsEmpty, ApiGeneratorLineValueOption::Number#4, fn:List, ApiGeneratorLineValueOption::Value#3, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $validationList
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    If [ ApiGeneratorLine::IsOneOf and not ApiGeneratorLine::required ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::IsOneOf#37, fn:and, fn:not, ApiGeneratorLine::required#19
+  35    #Is one of, but not required
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $validationList; Value:Let ( [ 
+        
+        	theList = If ( not IsEmpty ( ApiGeneratorLineValueOption::Number ) ; 
+        
+        		// use the index if present
+        		List ( ApiGeneratorLineValueOption::Number ) ; 
+        
+        		// otherwise use the value
+        		List ( ApiGeneratorLineValueOption::Value )
+        	) ; 
+        	theListOut = "\"" & ( Substitute ( theList ; "¶" ; "\" ; \"" ) ) & "\""
+        
+        ] ; 
+        
+        
+        List( $validationList ; 
+        	Substitute ( $validationRuleTemplateIsOneOfIfPresent ; 
+        		[ "<<path>>" ; $path ] ; 
+        		[ "<<theList>>" ; theListOut ] 
+        	 )
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:If, fn:not, fn:IsEmpty, ApiGeneratorLineValueOption::Number#4, fn:List, ApiGeneratorLineValueOption::Value#3, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $validationList
+  37    End If
+        DisableStepCollapsed state=False
+  38    End If
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  42    End Loop
+        DisableStepCollapsed state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $validationList; Value:List( $validationList ; $validationRuleAddMore ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $validationList
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Variable [ $validationStatement; Value:Substitute ( $validationTemplate ; 
+        	[ "<<entity>>" ; $entity ] ; 
+        	[ "<<validationList>>" ; $validationList ]  
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $validationStatement
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Exit Script [ Result: $validationStatement ]
+        DisableStepCollapsed state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False

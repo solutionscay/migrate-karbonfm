@@ -1,0 +1,60 @@
+# script 374: Button: Create Markdown File
+# file: karbon_Build.fmp12
+# source: ScriptCatalog/Script[@id=374]
+# steps: 14 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Insert Calculated Result [ $json; JSONSetElement ( "{}" ; 
+        	[ "AppBuildId" ; AppBuild::Id ; JSONString ] 
+        ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, AppBuild::Id#1, fn:JSONString
+        Field: $json
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “Create Change Log { AppBuildId }”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=359 name="Create Change Log { AppBuildId }"
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Insert Calculated Result [ $result; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $result
+   7    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   8    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   9    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  10    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Show Custom Dialog [ Title: "Success"; Message: "The change log has been saved to your Desktop in Markdown format."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

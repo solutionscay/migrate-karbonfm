@@ -1,0 +1,126 @@
+# script 272: Create Invoice (Customer Id)
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Public
+# source: ScriptCatalog/Script[@id=272]
+# steps: 23 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=553 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # this is  PUBLIC becuase it doesn't matter where it so called from
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #It does not depend on a particular context
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $CustomerId; Value:Get ( ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerId
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9 // Set Variable [ $Invoice; Value:// Created by Generator - 6/27/2018 7:54:16 AM
+        // DO NOT format this JSON object!
+        JSONSetElement (  ""; 
+        
+        	[ "id_Customer" ; $CustomerId ; JSONString ]
+        	
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $Invoice
+  10    Set Variable [ $Invoice; Value:// Created by Generator - 6/27/2018 8:04:42 AM
+        // DO NOT format this JSON object!
+        JSONSetElement (  ""; 
+        
+        	[ "id_Customer" ; $CustomerId ; JSONString ] ;
+        	[ "date" ; Get (CurrentDate) ; JSONString ] ;	
+         
+        	[ "billAddressCity" ; Party_ContactMethod#Billing_Address::City ; JSONString ];
+        	[ "billAddressCountry" ; Party_ContactMethod#Billing_Address::Country ; JSONString ];
+        	[ "billAddressLine1" ; Party_ContactMethod#Billing_Address::AddressLine1 ; JSONString ];
+        	[ "billAddressLine2" ; Party_ContactMethod#Billing_Address::AddressLine2 ; JSONString ];
+        	[ "billAddressPostalCode" ; Party_ContactMethod#Billing_Address::PostalCode ; JSONString ];
+        	[ "billAddressState" ; Party_ContactMethod#Billing_Address::StateProvince ; JSONString ];
+        //	[ "billEmailAddress" ; Invoice::billEmailAddress ; JSONString ];
+        	
+        	[ "shipAddressCity" ; Party_ContactMethod#Shipping_Address::City ; JSONString ];
+        	[ "shipAddressCountry" ; Party_ContactMethod#Shipping_Address::Country; JSONString ];
+        	[ "shipAddressLine1" ; Party_ContactMethod#Shipping_Address::AddressLine1 ; JSONString ];
+        	[ "shipAddressLine2" ; Party_ContactMethod#Shipping_Address::AddressLine2 ; JSONString ];
+        	[ "shipAddressPostalCode" ; Party_ContactMethod#Shipping_Address::PostalCode ; JSONString ];
+        	[ "shipAddressState" ; Party_ContactMethod#Shipping_Address::StateProvince ; JSONString ]
+        	 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Get, fn:CurrentDate, Party_ContactMethod#Billing_Address::City#10, Party_ContactMethod#Billing_Address::Country#13, Party_ContactMethod#Billing_Address::AddressLine1#7, Party_ContactMethod#Billing_Address::AddressLine2#8, Party_ContactMethod#Billing_Address::PostalCode#12, Party_ContactMethod#Billing_Address::StateProvince#11, Party_ContactMethod#Shipping_Address::City#10, Party_ContactMethod#Shipping_Address::Country#13, Party_ContactMethod#Shipping_Address::AddressLine1#7, Party_ContactMethod#Shipping_Address::AddressLine2#8, Party_ContactMethod#Shipping_Address::PostalCode#12, Party_ContactMethod#Shipping_Address::StateProvince#11
+        Name: $Invoice
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Perform Script [ “Create or Update Invoice { invoice }” from file: “karbon_kontroller”; Parameter: $Invoice ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=395 name="Create or Update Invoice { invoice }" in=karbon_kontroller.fmp12
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $result; Value:Get ( ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  15    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  16    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $InvoiceId; Value:JSONGetElement (  $result; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $InvoiceId
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Perform Script [ “Display Sales Transaction in a New Window( Id )”; Parameter: $InvoiceId ]
+        DisableStepCollapsed state=False
+        Script id=224 name="Display Sales Transaction in a New Window( Id )"
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False

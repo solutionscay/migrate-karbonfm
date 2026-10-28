@@ -1,0 +1,101 @@
+# script 630: Handle SalesReceipt Update
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Karbon Overrides
+# source: ScriptCatalog/Script[@id=630]
+# steps: 23 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=605 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $data; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   7    Set Variable [ $SalesReceipt; Value:JSONGetElement ( $data ; "Record" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesReceipt
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #No SalesReceipts before 1/1/2015
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $Date; Value:JSON.Types.GetDateFromISO ( $SalesReceipt ; "TxnDate" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Types.GetDateFromISO
+        Repetition
+          Calculation:
+            | 1
+        Name: $Date
+  12    Set Variable [ $Limit; Value:Date(1;1;2015) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Date
+        Name: $Limit
+  13    If [ $Date<$Limit ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Exit Script [ Result: Error(0;"";"") ]
+        DisableStepCollapsed state=False
+        refs: cf:Error
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “Handle Changed or New QBO SalesReceipt ( {QBO SalesReceipt} )” from file: “DataSourceControllerFile”; Parameter: $SalesReceipt ]
+        DisableStepCollapsed state=False
+        FileReference id=7 name=DataSourceControllerFile
+          UniversalPathList
+            | file:karbon_kontroller
+            | $$DataSourceControllerFile
+        Script id=425 name="Handle Changed or New QBO SalesReceipt ( {QBO SalesReceipt} )" ref=external
+  19    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False

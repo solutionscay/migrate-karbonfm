@@ -1,0 +1,66 @@
+# script 856: btn: Delete PartyRelation
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Related Contacts
+# source: ScriptCatalog/Script[@id=856]
+# steps: 15 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=421 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #This script relies on the context of the party_Partyrelation portal
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Insert Calculated Result [ $json; JSONSetElement ( "{}" ; 
+        	[ "Id" ; Get (ScriptParameter) ; JSONString ] 
+        ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:Get, fn:ScriptParameter, fn:JSONString
+        Field: $json
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Delete Party Relation { Id }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=720 name="Delete Party Relation { Id }" in=karbon_kontroller.fmp12
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Insert Calculated Result [ $result; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $result
+   8    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   9    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  10    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False

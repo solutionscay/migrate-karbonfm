@@ -1,0 +1,125 @@
+# script 366: User Detail - Quick Add Task_deprecated
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / User
+# source: ScriptCatalog/Script[@id=366]
+# steps: 31 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=361 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ IsEmpty ( UtilityTask::z_Search_PartyId )
+        or 
+        IsEmpty ( UtilityTask::Subject ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, UtilityTask::z_Search_PartyId#14, fn:or, UtilityTask::Subject#8
+   4    Exit Script [  ]
+        DisableStepCollapsed state=False
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Field [ UtilityTask::DueDate; GetAsDate ( Get( CurrentHostTimestamp ) ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetAsDate, fn:Get, fn:CurrentHostTimestamp
+        Field table=UtilityTask id=9 name=DueDate
+   8    Set Field [ UtilityTask::PartyAssignedById; session::CurrentUserPartyId ]
+        DisableStepCollapsed state=False
+        refs: session::CurrentUserPartyId#63
+        Field table=UtilityTask id=6 name=PartyAssignedById
+   9    Set Field [ UtilityTask::PartyAssignedToId; UtilityTask::z_Search_PartyId ]
+        DisableStepCollapsed state=False
+        refs: UtilityTask::z_Search_PartyId#14
+        Field table=UtilityTask id=7 name=PartyAssignedToId
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “Create Task { data }” from file: “karbon_kontroller”; Parameter: UtilityTask::AsJSON ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: UtilityTask::AsJSON#11
+        Script id=391 name="Create Task { data }" in=karbon_kontroller.fmp12
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  18    #Handle error
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $TaskId; Value:JSONGetElement ( $ScriptResult ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TaskId
+  22    Set Field [ UtilityTask::Subject; "" ]
+        DisableStepCollapsed state=False
+        Field table=UtilityTask id=8 name=Subject
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Field [ selector::TaskIdList; List ( selector::TaskIdList; $TaskId ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, selector::TaskIdList#25
+        Field table=selector id=25 name=TaskIdList
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False

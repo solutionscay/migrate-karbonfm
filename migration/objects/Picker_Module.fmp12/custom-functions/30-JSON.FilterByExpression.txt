@@ -1,0 +1,82 @@
+# custom function 30: JSON.FilterByExpression
+# file: Picker Module.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=30]
+
+CustomFunction id=30 functionArity=2 visible=True parameters=array;expression name=JSON.FilterByExpression
+  Calculation:
+    | /**
+    |  *
+    |  * filters the array by a FileMaker expression
+    |  *
+    |  *@param {array} array a valid JSON Array
+    |  *@param {string} expression a valid FileMaker Expression. 
+    |  *				It can use 
+    |  *				"$item" to access the array item for use
+    |  *				in the filter calculation.
+    |  *
+    |  * @returns {array} 
+    |  *
+    |  * @module fm-json-additions
+    |  * @see https://github.com/geistinteractive/fm-json-additions
+    |  * 
+    |  * @history, 2017-06-20, michael.wallace@rcconsulting.com
+    |  * @history 2017-04-01, todd@geistinteractive.com
+    |  *
+    |  */
+    | 
+    | Let(
+    | [
+    | 
+    | // start a newArray if one is already in place
+    | $newArray = Case ( IsEmpty ($newArray) ; "[]" ; $newArray );
+    | 
+    | notValid = Left(JSONFormatElements(array);1) = "?" ;
+    | c = ValueCount( JSONListValues ( array ; "" ));
+    | 
+    | // store the current item in a var so it can be used in the expression
+    | $item = JSONGetElement ( array ;  0  );
+    | 
+    | //evaluate the expresion
+    | passed = GetAsBoolean(  Evaluate( expression )  );
+    | 
+    | // determine the type of the element to be added if it is time, timestamp, or date 
+    | // as these are not being handled correctly by FileMaker's default functionality
+    | isTimestamp = If ( passed ; GetAsTimestamp($item) ≠ "?" and
+    | 			PatternCount($item;":") and 
+    | 			( PatternCount($item;"/") or 	PatternCount($item;"-") ) and 
+    | 			Filter($item ; "0123456789 :/-AMP")=$item ) ;
+    | 
+    | isTime = If ( passed ; GetAsTime($item) ≠ "?" and
+    | 			PatternCount($item;":") and 
+    | 			Filter($item ; "0123456789 :AMP")=$item ) ;
+    | 
+    | isDate = If ( passed ; GetAsDate($item) ≠ "?" and
+    | 			( PatternCount($item;"/") or 	PatternCount($item;"-") ) and 
+    | 			Filter($item ; "0123456789 /-")=$item ) ;
+    | 
+    | // add thisItem to the new array if it passes
+    | n = ValueCount( JSONListValues ( $newArray ; "" ));
+    | $newArray  = Case (	passed and c >0 and ( isTimestamp or isTime or isDate ) ; 
+    | 					JSONSetElement ( $newArray; n ; Quote ( $item ) ; "JSONString" ) ; 
+    | 				passed and c >0 ;
+    | 					JSONSetElement ( $newArray; n ; $item ; "" ) ; 
+    | 				// default not (passed and c >0)
+    | 					$newArray ) ;
+    | 
+    | //update the array for use in the next round
+    | array  = JSONDeleteElement(array ;0 ) ;
+    | 
+    | //clear this for the next round
+    | $item = ""
+    | 
+    | ];
+    |     Case(
+    | 
+    | 	c < 1 or notValid    ; $newArray &  Let($newArray=""; "" ); // return the newArray and clear the var
+    |       	JSON.FilterByExpression (array ; expression )
+    |         
+    |         
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:Case, fn:IsEmpty, fn:Left, fn:JSONFormatElements, fn:ValueCount, fn:JSONListValues, fn:JSONGetElement, fn:GetAsBoolean, fn:Evaluate, fn:If, fn:GetAsTimestamp, fn:and, fn:PatternCount, fn:or, fn:Filter, fn:GetAsTime, fn:GetAsDate, fn:JSONSetElement, fn:Quote, fn:JSONDeleteElement, cf:JSON.FilterByExpression

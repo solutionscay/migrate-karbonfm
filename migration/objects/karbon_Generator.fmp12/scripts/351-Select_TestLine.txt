@@ -1,0 +1,65 @@
+# script 351: Select TestLine
+# file: karbon_Generator.fmp12
+# folder: Test
+# source: ScriptCatalog/Script[@id=351]
+# steps: 17 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=343 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $TestLineId; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineId
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Field [ SELECTOR::TestLineId; $TestLineId ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=18 name=TestLineId
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #If this is a test, go to the JSON Slide panel
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ Selected_TestLine::LineTypeId = 1001 //Test ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_TestLine::LineTypeId#11
+  10    Go to Object [ Object Name: "Script"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  11    Else If [ not IsEmpty( Selected_TestLine::SQL_TableName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, Selected_TestLine::SQL_TableName#14
+  12    Go to Object [ Object Name: "SQL"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  13    Else If [ not IsEmpty( Selected_TestLine::ScriptName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, Selected_TestLine::ScriptName#17
+  14    Go to Object [ Object Name: "Script"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  15    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Go to Object [ Object Name: "Choose"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  17    End If
+        DisableStepCollapsed state=False

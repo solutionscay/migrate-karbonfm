@@ -1,0 +1,56 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/395-Create_or_Update_Invoice_invoice.txt,036d95be42c74e1b083a8b512c3dc4ce4ca835d1cfd4389f781446a38aefb166,scripts,karbon_kontroller.fmp12,395,Create or Update Invoice { invoice },orchestration,server-domain,tier1,"Create or update an invoice from a JSON parameter (id_Customer is required). If the invoice already exists (Id given), it is unposted first (576, Post=false), then the invoice is created or updated (585) and finally posted again (576, Post=true). Returns the result of the create/update, or the first error.",none,none,"karbon_kontroller.fmp12/scripts/576 (""Post/Unpost Internal ( {Id, Post} )"", step 87)
+karbon_kontroller.fmp12/scripts/585 (""_Create or Update Invoice { invoice }"", step 97)
+karbon_kontroller.fmp12/scripts/576 (""Post/Unpost Internal ( {Id, Post} )"", step 112)","objects/karbon_kontacts.fmp12/scripts/272-Create_Invoice_Customer_Id.txt (step 12)
+objects/karbon_kontroller.fmp12/scripts/398-Handle_Changed_or_New_QBO_Invoice_QBO_Invoice.txt (step 30)",none,"Posting is skipped inside 576 when the function ""PostSalesTransactions"" is off (see script 576); step 39 there is an unresolved function. Step 23 is a disabled comment line."
+karbon_kontroller.fmp12/scripts/428-Create_or_Update_SalesReceipt_SalesReceipt.txt,b85b5027936a3c8a4f46a33bbd66f08a29e2235ba299a5524711fd61696f3ff5,scripts,karbon_kontroller.fmp12,428,Create or Update SalesReceipt ( { SalesReceipt } ),orchestration,server-domain,tier1,"Create or update a sales receipt from a JSON parameter: unposts an existing one first (576), creates or updates it (584), then posts it (576). Returns the create/update result or the first error.",none,none,"karbon_kontroller.fmp12/scripts/576 (""Post/Unpost Internal ( {Id, Post} )"", step 77)
+karbon_kontroller.fmp12/scripts/584 (""_Create or Update SalesReceipt ( { SalesReceipt } )"", step 85)
+karbon_kontroller.fmp12/scripts/576 (""Post/Unpost Internal ( {Id, Post} )"", step 94)","objects/karbon_kontacts.fmp12/scripts/514-Create_Sales_Receipt_Id.txt (step 6)
+objects/karbon_kontroller.fmp12/scripts/425-Handle_Changed_or_New_QBO_SalesReceipt_QBO_SalesReceipt.txt (step 30)",none,"The comment header lists id_Customer as required but this script never validates it (and does not check the JSON.Format result), unlike the invoice version 395; validation may be in 584."
+karbon_kontroller.fmp12/scripts/560-Delete_SalesTransaction_SalesTransactionId.txt,ae1e640b86e7a6d161e552d9f13a0b2a0f38f35dbba4540042b927bff23da750,scripts,karbon_kontroller.fmp12,560,Delete SalesTransaction ( SalesTransactionId ),data-change,server-domain,tier1,"Deletes a sales transaction (invoice or sales receipt) by id. Refuses when the transaction has a qbo_id (""posted to Accounting, un-post it first"") or is locked (LockedInd, ""posted""), removes the time entries linked to each of its lines (586), then deletes the first row of the SalesTransactionPortal portal. Wrapped in a Start/End Transaction.","SalesTransaction::qbo_id#2
+SalesTransaction::LockedInd#80
+SalesLine::id#1 (SQL.GetColumn step 65)
+SalesLine::SalesTransactionId#10 (SQL.GetColumn step 65)","DBTransactions::SalesTransactionId#93 (Set Field step 48, current record)
+SalesTransaction::ONE#67 (Set Field step 60, related via DBTransactions, locks the record)
+delete: SalesTransaction (Delete First Portal Row via script 33, step 80, first row of portal SalesTransactionPortal)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 32)
+karbon_kontroller.fmp12/scripts/586 (""_Remove Time Entries From The Invoice Line"", step 71)
+karbon_kontroller.fmp12/scripts/33 (""Delete First Portal Row (portalLayoutObjectName)"", step 80)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 98)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 99)","objects/karbon_kontacts.fmp12/scripts/211-btn_Delete_SalesTransaction_From_Customer.txt (step 7)
+objects/karbon_kontacts.fmp12/scripts/212-btn_Delete_SalesTransaction.txt (step 8)",none,"Step 71 runs script 586 without a parameter inside the line loop, so how it knows which line to use is not shown here ($lineID is script-local). The delete happens through script 33 (Delete First Portal Row on the layout object SalesTransactionPortal, step 80); what happens to the SalesLine records is not shown. Menu script (includeInMenu=True)."
+karbon_kontroller.fmp12/scripts/576-Post_Unpost_Internal_Id_Post.txt,4f22475e17cd021185e356b6346605a2682cbb5871d91b972993b9a64418fc6c,scripts,karbon_kontroller.fmp12,576,"Post/Unpost Internal ( {Id, Post} )",data-change,server-domain,tier1,"Posts or unposts a sales transaction (Id, Post). It locks the transaction and its customer, then adds or subtracts (sign = +1 on post, -1 on unpost) the transaction's total retainer amount on the customer's RetainerBalanceCached, and if the lock state changes sets SalesTransaction::LockedInd to Post, summarizes the line items by period and item type (578) and adds TotalRevenue and NewCustomerCount to the monthly summary records (file not resolved). A post is refused when QBO is in use and the transaction still has qbo_send set. Does nothing when the feature check ""PostSalesTransactions"" is false.","SalesTransaction::id_Customer#7
+SalesTransaction::totalRetainerAmount#65
+System::UsingQBOInd#64
+SalesTransaction::qbo_send#3
+SalesTransaction::LockedInd#80
+Customer::RetainerBalanceCached#55","DBTransactions::SalesTransactionId#93 (Set Field step 71, current record)
+SalesTransaction::ONE#67 (Set Field step 74, related via DBTransactions, locks the record)
+DBTransactions::PartyRoleId#68 (Set Field step 81, current record)
+Customer::ONE#20 (Set Field step 82, related via DBTransactions, locks the record)
+Customer::RetainerBalanceCached#55 (Set Field step 86, related via Customer)
+SalesTransaction::LockedInd#80 (Set Field step 97, related via SalesTransaction)
+DBTransactions::SumPeriod#111 (Set Field step 116, current record)
+DBTransactions::SumItemType#112 (Set Field step 117, current record)
+SumaryByMonth::<File Missing>#10 (Set Field step 119, related via DBTransactions, file not in set)
+SumaryByMonth::<File Missing>#7 (Set Field step 123, adds TotalRevenue, file not in set)
+SumaryByMonth::<File Missing>#9 (Set Field step 124, adds NewCustomerCount, file not in set)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 34)
+karbon_kontroller.fmp12/scripts/578 (""_Summarize Line Items"", step 100)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 144)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 145)","objects/karbon_kontroller.fmp12/scripts/395-Create_or_Update_Invoice_invoice.txt (step 112)
+objects/karbon_kontroller.fmp12/scripts/395-Create_or_Update_Invoice_invoice.txt (step 87)
+objects/karbon_kontroller.fmp12/scripts/428-Create_or_Update_SalesReceipt_SalesReceipt.txt (step 77)
+objects/karbon_kontroller.fmp12/scripts/428-Create_or_Update_SalesReceipt_SalesReceipt.txt (step 94)
+objects/karbon_kontroller.fmp12/scripts/583-Rebuild_Posted_Data.txt (step 11)
+objects/karbon_kontroller.fmp12/scripts/599-Lock_Unlock_Sales_Transaction.txt (step 50)",<Function Missing> plugin call (step 39),"Step 39 calls an unresolved function (<Function Missing>, ""PostSalesTransactions"") as a feature switch. The retainer balance update (step 86) runs before the qbo_send check (step 89) and regardless of $doIt, so posting twice changes the balance twice; confirm intent. Steps 119-124 write SumaryByMonth fields in a file that is not in the set (<File Missing>, ref=external; ids 10, 7, 9). Log.Entry (steps 64, 102) writes to a log by custom function. Menu script."
+karbon_kontroller.fmp12/scripts/587-Remove_Line_Items_From_Transaction_ListOfLineItemIds.txt,6ddac189a526f6acdaa442b65f625ccb665dc746c36963a7dfbacbcac5435657,scripts,karbon_kontroller.fmp12,587,Remove Line Items From Transaction(ListOfLineItemIds),data-change,server-domain,tier1,"Removes line items from a sales transaction: checks that all given line ids belong to one transaction and that the transaction is not posted, then removes the time entries from each line (586). The line records themselves are not deleted in this script.","DBTransactions::SalesTransactionId#93
+SalesTransaction::LockedInd#80","DBTransactions::SalesLineId#26 (Set Field step 36, current record, a list of line ids)
+DBTransactions::SalesTransactionId#93 (Set Field step 49, current record)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 28)
+karbon_kontroller.fmp12/scripts/586 (""_Remove Time Entries From The Invoice Line"", step 63)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 79)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 80)",none found (in Scripts menu),none,"Step 29 sets $result from $error before $error is set. The name says it removes lines, but only script 586 (""Remove Time Entries From The Invoice Line"") is called per line; whether 586 deletes the line is not shown. Step 71 passes no line id. Menu script with no caller found."
+karbon_kontroller.fmp12/scripts/599-Lock_Unlock_Sales_Transaction.txt,4d5866f08cdbd5ba8ac75c5d589fb71b31e87f18448e9006d0d8e4f7be29a662,scripts,karbon_kontroller.fmp12,599,Lock/Unlock Sales Transaction,orchestration,server-domain,tier1,"Locks or unlocks a sales transaction (Id, Lock). When locking while QuickBooks Online is in use and the transaction still needs sending (qbo_send), it first sends the transaction to QBO (596); then it posts or unposts it through 576 (Post = Lock). Returns the result of 576.","System::UsingQBOInd#64 (SQL.GetColumn step 33)
+System::ONE#1 (SQL.GetColumn step 33)
+SalesTransaction::qbo_send#3 (SQL.GetColumn step 37)
+SalesTransaction::id#1 (SQL.GetColumn step 37)",none,"karbon_kontroller.fmp12/scripts/596 (""Send a Sales Transaction To QBO (FMId)"", step 39)
+karbon_kontroller.fmp12/scripts/576 (""Post/Unpost Internal ( {Id, Post} )"", step 50)","objects/karbon_kontacts.fmp12/scripts/335-btn_Unlock_Sales_Transaction_Id.txt (step 15)
+objects/karbon_kontacts.fmp12/scripts/377-btn_Lock_SalesTransaction.txt (step 8)",none,"Steps 21-23 (the PostSalesTransactions feature check) are disabled here but active in 576. The send to QBO is by script 596, not read in this share. Menu script."

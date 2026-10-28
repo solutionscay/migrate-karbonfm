@@ -1,0 +1,43 @@
+# custom function 23: JSON.Format
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=23]
+
+CustomFunction id=23 functionArity=2 visible=True parameters=json;descriptor name=JSON.Format
+  Calculation:
+    | /*#######################################################
+    | 
+    | PURPOSE : 
+    | 	Formats and validates the JSON string that is passed in
+    | 
+    | PARMS:
+    | 	json -  the JSON String
+    | 
+    | RETURNS
+    | 	When valid: Formated JSON
+    | 	When invalid : Error JSON 
+    | 
+    | HISTORY
+    | 	2016-11-23, todd@geistinteractive.com
+    | 		created
+    | #######################################################*/
+    | 
+    | Let(
+    | [
+    | 
+    | 
+    | validated = JSONFormatElements ( json );
+    | valid = ( Left(validated;1) <> "?" )
+    | ];
+    | Case(
+    | 	valid ; validated ;
+    | 
+    | 	
+    | 	JSONSetElement (
+    | 		JSON.Error.Validation ( descriptor  ; json ) ;
+    | 	
+    | 		["jsonErrorMsg" ; Middle(validated; 2; 100000 ) ; JSONString ]
+    | 
+    | 	)
+    | )
+    | )
+    refs: fn:Let, fn:JSONFormatElements, fn:Left, fn:Case, fn:JSONSetElement, cf:JSON.Error.Validation, fn:Middle, fn:JSONString

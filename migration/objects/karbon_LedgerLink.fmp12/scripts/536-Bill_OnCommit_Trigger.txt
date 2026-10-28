@@ -1,0 +1,73 @@
+# script 536: Bill OnCommit Trigger
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Bill Interface
+# source: ScriptCatalog/Script[@id=536]
+# steps: 17 (6 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=511 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #flag a Bill as modified when its related line items are modified
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Field [ Bill::qbo_send; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=Bill id=10 name=qbo_send
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #summarize related records
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Field [ Bill::subtotal; BillLine::summaryTotalAmount ]
+        DisableStepCollapsed state=False
+        refs: BillLine::summaryTotalAmount#31
+        Field table=Bill id=43 name=subtotal
+   9    Set Field [ Bill::taxableSubtotal; BillLine::summaryTotalAmountTaxable ]
+        DisableStepCollapsed state=False
+        refs: BillLine::summaryTotalAmountTaxable#36
+        Field table=Bill id=41 name=taxableSubtotal
+  10 // If [ /* tax field was not modified */
+        
+        IsEmpty ( FilterValues (
+        	Get ( ModifiedFields ) ;
+        	FieldName ( Bill::totalTax )
+        ) )
+        
+        /* this allows the user manually enter the total tax */ ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:FilterValues, fn:Get, fn:ModifiedFields, cf:FieldName, Bill::totalTax#42
+  11 // Set Field [ Bill::totalTax; Round ( Bill::taxableSubtotal * ( Bill_TaxCode::percentage / 100 ) ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, Bill::taxableSubtotal#41, Bill_TaxCode::percentage#10
+        Field table=Bill id=42 name=totalTax
+  12 // Else If [ /* at least one item is taxable */
+        BillLine::summaryTotalAmountTaxable ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: BillLine::summaryTotalAmountTaxable#36
+  13 // #at least one line must be taxable for total tax to be sent to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+  14 // Set Field [ Bill::totalTax; "" ]
+        DisableStepCollapsed state=False
+        Field table=Bill id=42 name=totalTax
+  15 // End If
+        DisableStepCollapsed state=False
+  16    Set Field [ Bill::totalAmt; Bill::subtotal + Bill::totalTax + Bill::shipAmt ]
+        DisableStepCollapsed state=False
+        refs: Bill::subtotal#43, Bill::totalTax#42, Bill::shipAmt#44
+        Field table=Bill id=30 name=totalAmt
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,59 @@
+# script 506: Toggle Get on all Entities
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices
+# source: ScriptCatalog/Script[@id=506]
+# steps: 11 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=469 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $newValue; Value:If ( Sum ( QBOEntity::get ) ;
+        	/* at lease one record is selected, deselect all */
+        	False ;
+        
+        	/* else: nothing selected, select all */
+        	True
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:Sum, QBOEntity::get#12, fn:False, fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $newValue
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Replace Field Contents [ QBOEntity::get; Replace with calculation: $newValue ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=False
+        With value=Calculation
+        SerialNumbers PerformAutoEnter=False UpdateEntryOptions=False UseEntryOptions=True
+        Field table=QBOEntity id=12 name=get
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Exit Script [  ]
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False

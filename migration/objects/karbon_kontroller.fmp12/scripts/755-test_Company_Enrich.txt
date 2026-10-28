@@ -1,0 +1,61 @@
+# script 755: test Company Enrich
+# file: karbon_kontroller.fmp12
+# folder: Modules / Full Contact / Public
+# source: ScriptCatalog/Script[@id=755]
+# steps: 14 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=742 groupCollapsed=False includeInMenu=True
+
+   1    Set Variable [ $domain; Value:"fullcontact.com" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $domain
+   2    Insert Calculated Result [ $json; JSONSetElement ( "{}" ; 
+        	[ "domain" ; $domain ; JSONString ] 
+        ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “FullContact Company Enrich”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=754 name="FullContact Company Enrich"
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Insert Calculated Result [ $result; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $result
+   7    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   8    Insert Calculated Result [ $error; $result ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $error
+   9    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Exit Script [  ]
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False

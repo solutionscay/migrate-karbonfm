@@ -1,0 +1,221 @@
+# script 224: Display Sales Transaction in a New Window( Id )
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Public
+# source: ScriptCatalog/Script[@id=224]
+# steps: 45 (11 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=553 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $Id; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ IsEmpty ( $Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   5    Exit Script [  ]
+        DisableStepCollapsed state=False
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Field [ selector::SalesTransactionId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=selector id=13 name=SalesTransactionId
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #if qbo_id, we need to refresh from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+  18 // If [ not IsEmpty ( Selected_SalesTransaction::qbo_id ) and Selected_SalesTransaction::status<>"Needs to Send" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, Selected_SalesTransaction::qbo_id#2, fn:and, Selected_SalesTransaction::status#68
+  19 // If [ Selected_SalesTransaction::InvoiceInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_SalesTransaction::InvoiceInd#73
+  20 // Perform Script [ “Refresh Invoice From QBO ( qbo_id )” ]
+        DisableStepCollapsed state=False
+        Script id=222 name="Refresh Invoice From QBO ( qbo_id )"
+  21 // Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22 // Perform Script [ “Refresh SalesReceipt From QBO ( qbo_id )” ]
+        DisableStepCollapsed state=False
+        Script id=299 name="Refresh SalesReceipt From QBO ( qbo_id )"
+  23 // End If
+        DisableStepCollapsed state=False
+  24 // Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  25 // If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  26 // Exit Script [  ]
+        DisableStepCollapsed state=False
+  27 // End If
+        DisableStepCollapsed state=False
+  28 // End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #nav to proper Sales Transaction form
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    If [ Selected_SalesTransaction::InvoiceInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_SalesTransaction::InvoiceInd#73
+  32    If [ Selected_SalesTransaction::LockedInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_SalesTransaction::LockedInd#80
+  33    Go to Related Record [ From table: “Selected_SalesTransaction_Invoice”; Using layout: “Invoice - View Only” (Invoice) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        Name
+          Calculation:
+            | "Invoice"
+        DistanceFromTop
+          Calculation:
+            | Get(WindowTop)+20
+            refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          Calculation:
+            | Get(WindowLeft)+20
+            refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=1074201090
+        Table id=1065228 name=Selected_SalesTransaction_Invoice
+        Layout id=143 name="Invoice - View Only"
+  34    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Go to Related Record [ From table: “Selected_SalesTransaction_Invoice”; Using layout: “Invoice” (Invoice) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        DistanceFromTop
+          Calculation:
+            | Get(WindowTop)+20
+            refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          Calculation:
+            | Get(WindowLeft)+20
+            refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=1074201090
+        Table id=1065228 name=Selected_SalesTransaction_Invoice
+        Layout id=69 name=Invoice
+  36    End If
+        DisableStepCollapsed state=False
+  37    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ Selected_SalesTransaction::LockedInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_SalesTransaction::LockedInd#80
+  39    Go to Related Record [ From table: “Selected_SalesTransaction_SalesReceipt”; Using layout: “SalesReceipt - View Only” (SalesReceipt) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        Name
+          Calculation:
+            | "Sales Receipt"
+        DistanceFromTop
+          Calculation:
+            | Get(WindowTop)+20
+            refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          Calculation:
+            | Get(WindowLeft)+20
+            refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=1074201090
+        Table id=1065229 name=Selected_SalesTransaction_SalesReceipt
+        Layout id=145 name="SalesReceipt - View Only"
+  40    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Go to Related Record [ From table: “Selected_SalesTransaction_SalesReceipt”; Using layout: “SalesReceipt” (SalesReceipt) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        DistanceFromTop
+          Calculation:
+            | Get(WindowTop)+20
+            refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          Calculation:
+            | Get(WindowLeft)+20
+            refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=1074201090
+        Table id=1065229 name=Selected_SalesTransaction_SalesReceipt
+        Layout id=94 name=SalesReceipt
+  42    End If
+        DisableStepCollapsed state=False
+  43    End If
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False

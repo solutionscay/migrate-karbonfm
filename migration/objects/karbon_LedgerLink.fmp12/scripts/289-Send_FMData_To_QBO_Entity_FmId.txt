@@ -1,0 +1,318 @@
+# script 289: _Send FMData To QBO ( {Entity , FmId )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Private
+# source: ScriptCatalog/Script[@id=289]
+# steps: 81 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=108 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Send a record to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {String} params.Entity the QBO Enity to send to
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {String} params.FmId the the primary key of the FileMaker record to send
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  12    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  17    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #this will eventually open the record
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “Configure Sending Data From FM {Entity; FmId }”; Parameter: Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptParameter
+        Script id=449 name="Configure Sending Data From FM {Entity; FmId }"
+  21    Set Variable [ $data; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  22    If [ JSONGetElement ( $data ; "overridden" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  23    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  24    Set Variable [ $error; Value:$data ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  25    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  27    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    End If
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    If [ not JSONGetElement ( $data ; "overridden" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:JSONGetElement
+  32    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  33    #if the record is still open, we can just revert here
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Revert Record/Request
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  35    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  36    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $object; Value:JSONSetElement("" ; ["Entity" ; $Entity; JSONString ]; ["Data" ; $data ; JSONObject]) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $object
+  40    Perform Script [ “Send FMData To QBO ({Entity , Data})”; Parameter: $object ]
+        DisableStepCollapsed state=False
+        Script id=292 name="Send FMData To QBO ({Entity , Data})"
+  41    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  42    If [ $Entity="Attachable" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Variable [ $Fault; Value:JSONGetElement ( $result ; $Entity & "Response[0].Fault" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Fault
+  44    If [ not IsEmpty ( $Fault ) and Left($Fault;1) <> "?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:and, fn:Left
+  45    Set Variable [ $result; Value:QBO.Error ( "Sending to QBO" ; $Fault ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  46    End If
+        DisableStepCollapsed state=False
+  47    Set Variable [ $result; Value:JSONGetElement ( $result ; $Entity & "Response[0]" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  48    End If
+        DisableStepCollapsed state=False
+  49    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  50    #if the record is still open, we can just revert here
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Revert Record/Request
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  52    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  53    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  54    End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #get the record
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $result; Value:JSONGetElement ( $result ;  $Entity  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $params; Value:JSONSetElement ( "" ; 
+        
+        	[ "Entity"; $Entity ; JSONString ];
+        	[ "Record" ; $result ; JSONObject ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  62    Perform Script [ “_Update Line Records If Required”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=301 name="_Update Line Records If Required"
+  63    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    If [ not Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  68    Perform Script [ “_Commit Record ({Entity, Record} )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=179 name="_Commit Record ({Entity, Record} )"
+  69    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  70    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #if the record is still open, we can just revert here
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Revert Record/Request
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  73    End If
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    End If
+        DisableStepCollapsed state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False

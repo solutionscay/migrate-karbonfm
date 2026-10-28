@@ -1,0 +1,188 @@
+# script 362: Check Test Result - JSON
+# file: karbon_Generator.fmp12
+# folder: Test Engine (UI) / Private
+# source: ScriptCatalog/Script[@id=362]
+# steps: 44 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=367 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $Result; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #Check for success
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ Test::ExpectedResult = "Success" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Test::ExpectedResult#15
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $null; Value:Assert.ValidJSON ( $Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  11    Set Variable [ $null; Value:Assert.NotAnError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #Check for error
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $null; Value:Assert.ValidJSON ( $Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  17    Set Variable [ $null; Value:Assert.Error ( $Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $TestLineResultList; Value:List( Test_TestLine_TestLineResult::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Test_TestLine_TestLineResult::Id#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineResultList
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $TestLineResultListCount; Value:ValueCount( $TestLineResultList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineResultListCount
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #Loop through TestResultLines
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  29    Exit Loop If [ $i > $TestLineResultListCount ]
+        DisableStepCollapsed state=False
+  30    Set Variable [ $ThisTestLineResult; Value:GetValue ( $TestLineResultList ; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTestLineResult
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Field [ SELECTOR::TestLineResultId; $ThisTestLineResult ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=19 name=TestLineResultId
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    If [ Selected_TestLineResult::HasValueInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_TestLineResult::HasValueInd#11
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $null; Value:Assert.JSONPathEquals ( $Result ; Selected_TestLineResult::Key ; Selected_TestLineResult::Value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals, Selected_TestLineResult::Key#8, Selected_TestLineResult::Value#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $null; Value:Assert.HasProperty ( $Result ; Selected_TestLineResult::Key ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.HasProperty, Selected_TestLineResult::Key#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    End If
+        DisableStepCollapsed state=False
+  44    End Loop
+        DisableStepCollapsed state=False

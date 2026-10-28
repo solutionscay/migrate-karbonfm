@@ -1,0 +1,196 @@
+# script 1257: Preview in FM From FileMaker
+# file: karbon_charts.fmp12
+# folder: Application Modules / Widgets / Editor UI / in VS Code
+# source: ScriptCatalog/Script[@id=1257]
+# steps: 46 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=1261 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Install OnTimer Script [ Interval: "" ]
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ IsEmpty ( Widgets::EditingFilePath ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Widgets::EditingFilePath#10
+   5    Perform Script [ “btn:  Set File Location” ]
+        DisableStepCollapsed state=False
+        Script id=1246 name="btn:  Set File Location"
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ IsEmpty ( Widgets::EditingFilePath ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Widgets::EditingFilePath#10
+  10    Exit Script [  ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $path; Value:Widgets::EditingFilePath ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Widgets::EditingFilePath#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $data.json; Value:<Function Missing> ( $path & "/data.json" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $data.json
+  16    Set Variable [ $data.json; Value:Substitute($data.json; Char(13) ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:Char
+        Name: $data.json
+  17    Set Variable [ $index.html; Value:<Function Missing> ( $path & "/index.html" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $index.html
+  18    Set Variable [ $index.html; Value:Substitute( $index.html ; Char(13) ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:Char
+        Name: $index.html
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $json; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  21    Set Variable [ $json; Value:JSONSetElement ( $json ; "html"; $index.html ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  22    Set Variable [ $json; Value:JSONSetElement ( $json ; "data" ; $data.json ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  23    Set Variable [ $json; Value:JSONSetElement ( $json ; "useMerge" ; Widgets::UseMerge ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Widgets::UseMerge#15, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Perform Script [ “Compile HTML ( html, intialProps, useMerge ) ”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=1231 name="Compile HTML ( html, intialProps, useMerge ) "
+  28    Set Variable [ $html; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $html
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ $html <> $$LastHTML ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $json; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  32    Set Variable [ $json; Value:JSONSetElement ( $json ; "url" ; $html ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  33    Set Variable [ $json; Value:JSONSetElement ( $json ; "webViewer" ; "Preview" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  34    Perform Script [ “Load WebViewer App ( {webViewer; url  } )”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=1234 name="Load WebViewer App ( {webViewer; url  } )"
+  35    End If
+        DisableStepCollapsed state=False
+  36    Set Variable [ $$LastHTML; Value:$html ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$LastHTML
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38 // Set Field [ Widgets::Index.html; $index.html ]
+        DisableStepCollapsed state=False
+        Field table=Widgets id=6 name=Index.html
+  39 // Set Field [ Widgets::Data.json; $data.json ]
+        DisableStepCollapsed state=False
+        Field table=Widgets id=7 name=Data.json
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    If [ $$WatchingFS ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Install OnTimer Script [ “Preview in FM From FileMaker”; Interval: 1 ]
+        DisableStepCollapsed state=False
+        Script id=1257 name="Preview in FM From FileMaker"
+  43    End If
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False

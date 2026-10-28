@@ -1,0 +1,64 @@
+# script 346: New - Apply Template
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=346]
+# steps: 11 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $Param; Value:JSONSetElement ( "" ;
+        	[ "Message" ; UtilityEmailMessage::Message ; JSONString ];
+        	[ "TemplateId" ; UtilityEmailMessage::TemplateId ; JSONString ];
+        	[ "ActivityPartyArray" ; UtilityEmailMessage::ActivityPartyArray ; JSONArray ];
+        	[ "PartyId" ; Party::Id ; JSONString ]
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityEmailMessage::Message#7, fn:JSONString, UtilityEmailMessage::TemplateId#23, UtilityEmailMessage::ActivityPartyArray#10, fn:JSONArray, Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $Param
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Return Template Merge Result { data }” from file: “karbon_kontroller”; Parameter: $Param ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=490 name="Return Template Merge Result { data }" in=karbon_kontroller.fmp12
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9 // Show Custom Dialog [ Message: $Result; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Field [ UtilityEmailMessage::Message; JSONGetElement ( $Result; "Message" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityEmailMessage id=7 name=Message

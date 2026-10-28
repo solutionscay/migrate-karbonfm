@@ -1,0 +1,35 @@
+# script 838: Open Discussion from Customer
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion
+# source: ScriptCatalog/Script[@id=838]
+# steps: 3 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=305 groupCollapsed=True includeInMenu=False
+
+   1    Set Variable [ $params; Value:Let ([
+        
+        relatedContacts = List ( Party_PartyRelation_Party_Person::Id) ; 
+        
+        
+        displayPartyIds = List ( relatedContacts ; Person::Id )
+        
+        ];
+        
+        
+        JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Party::Id ; JSONString ];
+        	[ "EntityTypeId" ; 10 ; JSONNumber ]; //Party
+        	[ "Title" ; Party::NameCached ; JSONString ] ;
+        	[ "DisplayPartyIds" ; displayPartyIds ; JSONString ]
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:List, Party_PartyRelation_Party_Person::Id#1, Person::Id#1, fn:JSONSetElement, Party::Id#1, fn:JSONString, fn:JSONNumber, Party::NameCached#19
+        Name: $params
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Perform Script [ “Open Discussion in New Window { data } v2”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=313 name="Open Discussion in New Window { data } v2"

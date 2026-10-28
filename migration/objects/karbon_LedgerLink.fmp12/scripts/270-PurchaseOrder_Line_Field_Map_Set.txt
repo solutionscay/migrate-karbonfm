@@ -1,0 +1,345 @@
+# script 270: PurchaseOrder Line :: Field Map :: Set
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Transactions
+# source: ScriptCatalog/Script[@id=270]
+# steps: 83 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=246 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # This script is responsible for saving the data from QBO into a FileMaker Record
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # context QBO Layout, related to the target record
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} json the record just pulled from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  10    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  11    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $Description; Value:JSONGetElement( $json ; "Description" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Description
+  21    Set Variable [ $Amount; Value:JSONGetElement( $json ; "Amount" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Amount
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    # this can only be one of either "ItemBasedExpenseLineDetail" or "AccountBasedExpenseLineDetail"
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $DetailType; Value:JSONGetElement ( $json ; "DetailType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DetailType
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #we branch for each type
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    If [ $DetailType = "ItemBasedExpenseLineDetail" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $ItemBasedExpenseLineDetail.ItemRef.value; Value:JSONGetElement( $json ; "ItemBasedExpenseLineDetail.ItemRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemBasedExpenseLineDetail.ItemRef.value
+  29    Set Variable [ $ItemBasedExpenseLineDetail.ClassRef.value; Value:JSONGetElement( $json ; "ItemBasedExpenseLineDetail.ClassRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemBasedExpenseLineDetail.ClassRef.value
+  30    Set Variable [ $ItemBasedExpenseLineDetail.UnitPrice; Value:JSONGetElement( $json ; "ItemBasedExpenseLineDetail.UnitPrice" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemBasedExpenseLineDetail.UnitPrice
+  31    Set Variable [ $ItemBasedExpenseLineDetail.Qty; Value:JSONGetElement( $json ; "ItemBasedExpenseLineDetail.Qty" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemBasedExpenseLineDetail.Qty
+  32    Set Variable [ $ItemBasedExpenseLineDetail.CustomerRef.value; Value:JSONGetElement( $json ; "ItemBasedExpenseLineDetail.CustomerRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemBasedExpenseLineDetail.CustomerRef.value
+  33    Set Variable [ $ItemBasedExpenseLineDetail.BillableStatus; Value:JSONGetElement( $json ; "ItemBasedExpenseLineDetail.BillableStatus" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemBasedExpenseLineDetail.BillableStatus
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Else If [ $DetailType = "AccountBasedExpenseLineDetail" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $AccountBasedExpenseLineDetail.CustomerRef.value; Value:JSONGetElement( $json ; "AccountBasedExpenseLineDetail.CustomerRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AccountBasedExpenseLineDetail.CustomerRef.value
+  37    Set Variable [ $AccountBasedExpenseLineDetail.ClassRef.value; Value:JSONGetElement( $json ; "AccountBasedExpenseLineDetail.ClassRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AccountBasedExpenseLineDetail.ClassRef.value
+  38    Set Variable [ $AccountBasedExpenseLineDetail.AccountRef.value; Value:JSONGetElement( $json ; "AccountBasedExpenseLineDetail.AccountRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AccountBasedExpenseLineDetail.AccountRef.value
+  39    Set Variable [ $AccountBasedExpenseLineDetail.BillableStatus; Value:JSONGetElement( $json ; "AccountBasedExpenseLineDetail.BillableStatus" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AccountBasedExpenseLineDetail.BillableStatus
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    End If
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Variable [ $ItemBasedExpenseLineDetail.CustomerRef.value; Value:QBO.LookupFMId ( "Customer" ; $ItemBasedExpenseLineDetail.CustomerRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemBasedExpenseLineDetail.CustomerRef.value
+  51    Set Variable [ $ItemBasedExpenseLineDetail.ItemRef.value; Value:QBO.LookupFMId ( "Item" ; $ItemBasedExpenseLineDetail.ItemRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $ItemBasedExpenseLineDetail.ItemRef.value
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Set Variable [ $AccountBasedExpenseLineDetail.CustomerRef.value; Value:QBO.LookupFMId ( "Customer" ; $AccountBasedExpenseLineDetail.CustomerRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $AccountBasedExpenseLineDetail.CustomerRef.value
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $taxable; Value:If($taxable; "TAX" ; "NON") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If
+        Repetition
+          Calculation:
+            | 1
+        Name: $taxable
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Field [ qbo_PurchaseOrderLine::amount; $Amount ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=6 name=amount
+  65    Set Field [ qbo_PurchaseOrderLine::description; $Description ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=5 name=description
+  66    Set Field [ qbo_PurchaseOrderLine::taxable; $taxable ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=11 name=taxable
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    # this can only be one of either "ItemBasedExpenseLineDetail" or "AccountBasedExpenseLineDetail"
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Field [ qbo_PurchaseOrderLine::detailType; $DetailType ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=18 name=detailType
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    If [ $DetailType = "ItemBasedExpenseLineDetail" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Set Field [ qbo_PurchaseOrderLine::Id_BillableCustomer; $ItemBasedExpenseLineDetail.CustomerRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=16 name=Id_BillableCustomer
+  73    Set Field [ qbo_PurchaseOrderLine::id_Item; $ItemBasedExpenseLineDetail.ItemRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=9 name=id_Item
+  74    Set Field [ qbo_PurchaseOrderLine::unitPrice; $ItemBasedExpenseLineDetail.UnitPrice ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=7 name=unitPrice
+  75    Set Field [ qbo_PurchaseOrderLine::qty; $ItemBasedExpenseLineDetail.Qty ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=8 name=qty
+  76    Set Field [ qbo_PurchaseOrderLine::billableStatus; $ItemBasedExpenseLineDetail.BillableStatus ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=15 name=billableStatus
+  77    Else If [ $DetailType = "AccountBasedExpenseLineDetail" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Set Field [ qbo_PurchaseOrderLine::Id_BillableCustomer; $AccountBasedExpenseLineDetail.CustomerRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=16 name=Id_BillableCustomer
+  79    Set Field [ qbo_PurchaseOrderLine::billableStatus; $AccountBasedExpenseLineDetail.BillableStatus ]
+        DisableStepCollapsed state=False
+        Field table=qbo_PurchaseOrderLine id=15 name=billableStatus
+  80    End If
+        DisableStepCollapsed state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False

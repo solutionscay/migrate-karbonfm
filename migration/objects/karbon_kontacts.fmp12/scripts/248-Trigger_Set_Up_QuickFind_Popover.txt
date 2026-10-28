@@ -1,0 +1,57 @@
+# script 248: Trigger: Set Up QuickFind Popover
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Find
+# source: ScriptCatalog/Script[@id=248]
+# steps: 11 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=259 groupCollapsed=True includeInMenu=False
+
+   1    #clear QF global
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    If [ not IsEmpty ( Globals::QuickFind ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, Globals::QuickFind#1
+   3    Clear [ Globals::QuickFind ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=Globals id=1 name=QuickFind
+   4    Set Variable [ $null; Value:Triggers.Disable ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Triggers.Disable
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+   5    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   6    Set Variable [ $null; Value:Triggers.Enable ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Triggers.Enable
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Go to Field [ Globals::QuickFind ]
+        [ Select/perform ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=Globals id=1 name=QuickFind
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

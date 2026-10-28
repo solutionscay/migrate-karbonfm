@@ -1,0 +1,60 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/169-Convert_QBO_Customer_Into_Karbon_Customer.txt,e70c854e4a3ebccb73c7c377f5cfcecf9bd1c30535439431039921466eff3169,scripts,karbon_kontroller.fmp12,169,Convert QBO Customer Into Karbon Customer,integration,external-adapter,tier2,"Pure mapper from a QuickBooks Online Customer JSON to a Karbon customer/party JSON: plucks currency, tax code, display and contact names, company name, balance, QBO id, parent/payment/sales-term refs and notes; uses DisplayName as OrganizationName when no company name and no person name; converts BillAddr and ShipAddr to Address entries (purpose billing/shipping, bill is primary), Mobile and PrimaryPhone to Phone entries, WebAddr to a web network address, and a comma-separated PrimaryEmailAddr to billing email network addresses. Returns the Karbon customer JSON.",none,none,none,"objects/karbon_kontroller.fmp12/scripts/167-Handle_Changed_or_New_QBO_Customer_QBO_Customer.txt
+objects/karbon_tester.fmp12/scripts/186-Convert_QBO_Customer.txt",none,"Mapping oddities to carry over or fix: the address pluck maps ""Line1"" to AddressLine1 twice and never maps Line2 (AddressLine2) for either address (steps 39, 50); ""Title"" is mapped to both Salutation and Prefix; ""Suffix"" is mapped twice; the SalesTermRef pluck has its property name and target swapped (""SalesTermRef"" -> ""SalesTermRef.value"", step 26); PrimaryPhone gets no label while Mobile is labelled ""Mobile"". Step 6 (an example QBO customer, with sample names/addresses) is disabled. Success value returned to the caller is the JSON at step 95."
+karbon_kontroller.fmp12/scripts/275-Create_Karbon_Customer_From_QBO_KabonCustomer.txt,aabd1ba41464d63841981c858c73530ace04e4a185258db6af381501d4734249,scripts,karbon_kontroller.fmp12,275,Create Karbon Customer From QBO ( {KabonCustomer } ),orchestration,server-domain,tier2,"Creates a Karbon customer from the converted QBO customer JSON inside a database transaction: starts the transaction, runs ""_wip_Create Customer V3"", then creates an External Link (type 5) from the new party role id to the QBO id, stores the party role id as the transaction result and ends the transaction with the error state.",DBTransactions::PartyRoleId#68,"DBTransactions::Result#17 (Set Field step 53, current record: open transaction record)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 26)
+karbon_kontroller.fmp12/scripts/229 ""_wip_Create Customer V3 { data }"" (step 34)
+karbon_kontroller.fmp12/scripts/315 ""Create External Link V2 { data }"" (step 44)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 54)",objects/karbon_kontroller.fmp12/scripts/167-Handle_Changed_or_New_QBO_Customer_QBO_Customer.txt,none,"ExternalLinkTypeId 5 is hard-coded as the QBO link type (step 39). The ""_wip_Create Customer V3"" and ""Create External Link V2"" scripts do the actual inserts (karbon_kontroller scripts 229 and 315, outside this share). If the create fails the link is skipped but the Result is still set at step 53 from DBTransactions::PartyRoleId (may be empty)."
+karbon_kontroller.fmp12/scripts/276-Update_QBO_Data_for_Found_Customer_QBOCustomer.txt,d9fc56ed04ef7aee2d35ca7647d5dadd9d1493051fa7d457e9d1ce022e54f2e9,scripts,karbon_kontroller.fmp12,276,Update QBO Data for Found Customer ({QBOCustomer}),data-change,server-domain,tier2,"Updates an existing Karbon customer's QuickBooks-sourced data in a transaction: opens the customer through the transaction record by the party role id, then writes the QBO Balance and Notes to Customer, stores the party role id as result and ends the transaction.",DBTransactions::PartyRoleId#68,"DBTransactions::PartyRoleId#68 (Set Field step 33, current record: open transaction record)
+Customer::ONE#20 (Set Field step 34, related via Customer: sets key to 1 to open the related customer record)
+Customer::Balance#42 (Set Field step 38, related via Customer)
+Customer::Notes#35 (Set Field step 39, related via Customer)
+DBTransactions::Result#17 (Set Field step 47, current record: open transaction record)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 29)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 48)",objects/karbon_kontroller.fmp12/scripts/167-Handle_Changed_or_New_QBO_Customer_QBO_Customer.txt,none,"$Id here is the Karbon party role id (script parameter ""Id""), not the QBO Id. Whether Customer::ONE=1 creates or only opens the related customer is set by the relationship (cascadeCreate), not seen in this script."
+karbon_kontroller.fmp12/scripts/453-Handle_Customer_Push_to_QBO.txt,688007f249f3ee461d974af96c70ec44ef6245df3311a6ab6f09d076f764114e,scripts,karbon_kontroller.fmp12,453,Handle Customer Push to QBO,orchestration,server-domain,tier1,"Pushes a Karbon customer to QuickBooks Online inside a database transaction: validates that the JSON has FmId, opens the customer, party and (if present) the QBO external link (type 5) through the transaction record, reads the current QBO customer through LedgerLink ""Read"" when a QBO id exists, converts the customer with ""Convert Karbon Customer into QBO Customer"", sends it through LedgerLink ""Send FMData To QBO"", saves the result and ends the transaction. Missing customer, party or link record returns a validation error.","Customer::Id#1
+PartyRole::PartyId#45
+Party::Id#1
+ExternalLink::Id#1
+ExternalLink::ExternalId#10
+ExecuteSQL (ExternalLink::Id#1 where ExternalLink::InternalId#2 = $Id and ExternalLink::ExternalLinkTypeId#9 = 5) (ExecuteSQL step 81)","DBTransactions::PartyRoleId#68 (Set Field step 60, current record: open transaction record, only when different)
+DBTransactions::PartyId#25 (Set Field step 72, current record: open transaction record, only when different)
+DBTransactions::ExternalLinkId#46 (Set Field step 87, current record: open transaction record, only when different)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 54)
+karbon_LedgerLink.fmp12/scripts/1 ""Read({Entity, QBOId })"" (step 100) [other file: karbon_LedgerLink]
+karbon_kontroller.fmp12/scripts/454 ""Convert Karbon Customer into QBO Customer"" (step 112)
+karbon_LedgerLink.fmp12/scripts/292 ""Send FMData To QBO ({Entity , Data})"" (step 120) [other file: karbon_LedgerLink]
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 137)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 138)",objects/karbon_LedgerLink.fmp12/scripts/633-Handle_Customer_Push.txt,"ExecuteSQL via cf:SQL.GetColumn2Fields (step 81)
+Perform Script in karbon_LedgerLink: Read({Entity, QBOId}) (step 100, performs the QuickBooks HTTP read)
+Perform Script in karbon_LedgerLink: Send FMData To QBO (step 120, performs the QuickBooks HTTP send)","This script never writes the QBO id returned for a new customer to ExternalLink (no step creates or updates it); it only sends and saves the result via ""Save Transaction Result""; whether the LedgerLink send script (292) or the caller stores the id is not visible here. $result is only set at step 121, so Save Transaction Result gets an empty value when the loop exits early on an error. ExternalLinkTypeId 5 is hard-coded as the QBO customer link type (step 80). Called from karbon_LedgerLink script 633 as ""Handle Customer Push to QBO"" through a data-source reference ($$DataSourceControllerFile or file karbon_kontroller)."
+karbon_kontroller.fmp12/scripts/454-Convert_Karbon_Customer_into_QBO_Customer.txt,ae113056691bfb6bb3945c21fe618906c16ac4ad491c4dd87671de88e74ed9ff,scripts,karbon_kontroller.fmp12,454,Convert Karbon Customer into QBO Customer,integration,external-adapter,tier1,"Maps a Karbon customer (through the open transaction record's Customer, Person, Organization, Party, PartyRole and contact-method relationships) to a QuickBooks Online Customer JSON: name parts, display name, company, print-on-check name, active flag, primary phone and email cached on the party, website, tax flags, bill and ship addresses, notes, balances, resale number, QBO sales-term id (looked up with ""Lookup QBOId"") and the QBO customer id; starts from the freshly-read QBO data (minus MetaData, sparse, domain) so unchanged QBO fields are kept.","PartyRole::CurrentInd#22
+Person::Prefix#10
+Person::FirstName#7
+Person::MiddleName#8
+Person::LastName#9
+Person::Suffix#11
+Customer::DisplayName#27
+Organization::OrganizationName#19
+Customer::PrintOnCheckName#32
+Party::PhoneNumberCached#125
+Party::EmailAddressCached#127
+Customer_ContactMethod#URL_NetworkAddress::Address#7
+Customer::Taxable#31
+Customer::TaxExemptReasonId#61
+Customer_ContactMethod#BillTo_Address::AddressLine1#7
+Customer_ContactMethod#BillTo_Address::AddressLine2#8
+Customer_ContactMethod#BillTo_Address::City#10
+Customer_ContactMethod#BillTo_Address::StateProvince#11
+Customer_ContactMethod#BillTo_Address::Country#13
+Customer_ContactMethod#BillTo_Address::PostalCode#12
+Customer_ContactMethod#ShipTo_Address::AddressLine1#7
+Customer_ContactMethod#ShipTo_Address::AddressLine2#8
+Customer_ContactMethod#ShipTo_Address::City#10
+Customer_ContactMethod#ShipTo_Address::StateProvince#11
+Customer_ContactMethod#ShipTo_Address::Country#13
+Customer_ContactMethod#ShipTo_Address::PostalCode#12
+Customer::Notes#35
+Customer::Balance#42
+Customer::BalanceWithJobs#44
+Customer::ResaleNum#47
+Customer::SalesTermRef#40
+ExternalLink::ExternalId#10",none,"karbon_kontroller.fmp12/scripts/327 ""Lookup QBOId { FMId, Entity }"" (step 103)",objects/karbon_kontroller.fmp12/scripts/453-Handle_Customer_Push_to_QBO.txt,none,"$id_Term (step 100) is never set, so the sales-term lookup always runs with an empty id. $Id (step 113) is never set in this script (the caller's $Id is a different script variable), so ""Id"" is not set from $CustomerRef.value; the QBO Id comes only from $CurrentQBOData. Step 157 sends $$ResaleNum (global variable) instead of $ResaleNum, so the resale number sent is whatever the session global holds. Variables for AlternatePhone, Mobile and Fax are undefined (their sets are disabled steps 49-51) yet are written into the JSON as empty at steps 131-133. Steps 7 (example JSON), 42, 46, 49-51, 57, 65, 75 and 124 are disabled. Active (step 117 and again 128) is the PartyRole::CurrentInd."

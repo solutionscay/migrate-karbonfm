@@ -1,0 +1,149 @@
+# script 347: Edit Email Message
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=347]
+# steps: 27 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Field [ UtilityEmailMessage::Attachments; Selected_Activity_EmailMessage::Attachments ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_EmailMessage::Attachments#10
+        Field table=UtilityEmailMessage id=8 name=Attachments
+   5    Set Field [ UtilityEmailMessage::Date; Selected_Activity::DateDisplay ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::DateDisplay#56
+        Field table=UtilityEmailMessage id=14 name=Date
+   6    Set Field [ UtilityEmailMessage::EntityId; Selected_Activity_ActivityEntity::EntityId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityEntity::EntityId#17
+        Field table=UtilityEmailMessage id=31 name=EntityId
+   7    Set Field [ UtilityEmailMessage::EntityTypeId; Selected_Activity_ActivityEntity::EntityTypeId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityEntity::EntityTypeId#16
+        Field table=UtilityEmailMessage id=33 name=EntityTypeId
+   8    Set Field [ UtilityEmailMessage::Id; Selected_Activity::Id ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::Id#1
+        Field table=UtilityEmailMessage id=25 name=Id
+   9    Set Field [ UtilityEmailMessage::Message; Selected_Activity_ActivityMessage::Message ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityMessage::Message#12
+        Field table=UtilityEmailMessage id=7 name=Message
+  10    Set Field [ UtilityEmailMessage::Subject; Selected_Activity::Subject ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::Subject#22
+        Field table=UtilityEmailMessage id=6 name=Subject
+  11    Set Field [ UtilityEmailMessage::TemplateId; Selected_Activity::TemplateId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::TemplateId#195
+        Field table=UtilityEmailMessage id=23 name=TemplateId
+  12    Set Field [ UtilityEmailMessage::Time; Selected_Activity::TimeDisplay ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::TimeDisplay#76
+        Field table=UtilityEmailMessage id=15 name=Time
+  13    Set Field [ UtilityEmailMessage::UserId; Selected_Activity::CreationUserId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::CreationUserId#193
+        Field table=UtilityEmailMessage id=21 name=UserId
+  14    Set Field [ UtilityEmailMessage::UseSystemSettingsInd; Selected_Activity_EmailMessage::UseSystemSettingsInd ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_EmailMessage::UseSystemSettingsInd#26
+        Field table=UtilityEmailMessage id=9 name=UseSystemSettingsInd
+  15    Set Field [ UtilityEmailMessage::ActivityPartyArray; JSON.ArrayFromRelated ( Selected_Activity_ActivityPartyEmail::AsJson ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.ArrayFromRelated, Selected_Activity_ActivityPartyEmail::AsJson#75
+        Field table=UtilityEmailMessage id=10 name=ActivityPartyArray
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Field [ Globals::QuickFind; "" ]
+        DisableStepCollapsed state=False
+        Field table=Globals id=1 name=QuickFind
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ Selected_Activity_EmailMessage::SentInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_Activity_EmailMessage::SentInd#9
+  21    Set Variable [ $recipientDisplay; Value:Let ( [ 
+        
+        	~To = TextStyleAdd ( "To: " ; Bold ) & UtilityEmailMessage::ToDisplay ; 
+        
+        	~Cc = If ( not IsEmpty ( UtilityEmailMessage::CcArrayDisplay ) ; 
+        		TextStyleAdd ( "Cc: " ; Bold ) & UtilityEmailMessage::CcArrayDisplay 
+        	) ; 
+        
+        	~Bcc = If ( not IsEmpty ( UtilityEmailMessage::BccArrayDisplay ) ; 
+        		TextStyleAdd ( "Bcc: " ; Bold ) & UtilityEmailMessage::BccArrayDisplay 
+        	) ; 
+        
+        	RecipientList = 	List ( 
+        		~To ; 
+        		~Cc ; 
+        		~Bcc 		 
+        	)
+        
+        ] ; 
+        
+        	TextStyleAdd ( UtilityEmailMessage::From ; Bold ) & "¶¶" & 
+        
+        	UtilityEmailMessage::Subject & "¶¶" & 
+        
+        	Substitute ( RecipientList ; ¶ ; ", " ) & "¶¶¶" & 
+        
+        	UtilityEmailMessage::Message
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:TextStyleAdd, fn:Bold, UtilityEmailMessage::ToDisplay#17, fn:If, fn:not, fn:IsEmpty, UtilityEmailMessage::CcArrayDisplay#18, UtilityEmailMessage::BccArrayDisplay#19, fn:List, UtilityEmailMessage::From#16, UtilityEmailMessage::Subject#6, fn:Substitute, UtilityEmailMessage::Message#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $recipientDisplay
+  22    Set Field [ UtilityEmailMessage::SentMailDisplay; $recipientDisplay ]
+        DisableStepCollapsed state=False
+        Field table=UtilityEmailMessage id=24 name=SentMailDisplay
+  23    New Window [ Style: Document; Name: "Email"; Using layout: “Card - Utility_EmailMessage - Read Only” (UtilityEmailMessage); Height: 720; Width: 870; Top: Get ( WindowTop ) + 22; Left: Get ( WindowLeft ) + 22; Close: Yes; Minimize: No; Maximize: No; Resize: Yes; Menu Bar: No; Dim parent window: No; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        DistanceFromTop
+          refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=No Maximize=No Resize=Yes Styles=3221291522
+        Layout id=118 name="Card - Utility_EmailMessage - Read Only"
+  24    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    New Window [ Style: Document; Name: "Email"; Using layout: “Card - Utility_EmailMessage” (UtilityEmailMessage); Height: 720; Width: 870; Top: Get ( WindowTop ) + 22; Left: Get ( WindowLeft ) + 22; Close: Yes; Minimize: No; Maximize: No; Resize: Yes; Menu Bar: No; Dim parent window: No; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        DistanceFromTop
+          refs: fn:Get, fn:WindowTop
+        DistanceFromLeft
+          refs: fn:Get, fn:WindowLeft
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Document Close=Yes Minimize=No Maximize=No Resize=Yes Styles=3221291522
+        Layout id=105 name="Card - Utility_EmailMessage"
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False

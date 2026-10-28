@@ -1,0 +1,289 @@
+# script 668: Trigger: Close Activity Window
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity
+# source: ScriptCatalog/Script[@id=668]
+# steps: 75 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=252 groupCollapsed=True includeInMenu=False
+
+   1    #@history 2019-02-26 dave@geistinteractive.com - Update activity display date/time from task
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-10-23 dave@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ Get ( FoundCount ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+   5    #No found count
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #make sure subject has a value
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ IsEmpty ( Activity::Subject ) and
+        
+        
+         ( 
+        
+        // a message has been entered
+        
+        not IsEmpty ( Activity_ActivityMessage::Message ) 
+        
+        
+        or  
+        
+        // a related activity such as a discussion exists
+        
+        not IsEmpty ( Activity_ActivityEntity_Activity::Id )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Activity::Subject#22, fn:and, fn:not, Activity_ActivityMessage::Message#12, fn:or, Activity_ActivityEntity_Activity::Id#1
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Beep
+        DisableStepCollapsed state=False
+  13    Show Custom Dialog [ Title: "Error"; Message: "The subject is required."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  14    Go to Field [ Activity::Subject ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=Activity id=22 name=Subject
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #Don't allow window to close
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Else If [ IsEmpty ( Activity::Subject ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Activity::Subject#22
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Show Custom Dialog [ Title: "Discard activity?"; Message: "You didn't enter a subject. Would you like to discard this activity?"; Default Button: “Discard”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Discard"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #Discard empty note
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ Get ( LastMessageChoice ) = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  25    Delete Record/Request
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  26    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #Don't allow window to close
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    If [ Activity::TaskInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Activity::TaskInd#171
+  34    #update DateDisplay
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    If [ IsEmpty ( Task::DueDate ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Task::DueDate#25
+  36    Set Field [ Activity::DateDisplay; GetAsDate ( Activity::CreationTimestamp ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetAsDate, Activity::CreationTimestamp#181
+        Field table=Activity id=56 name=DateDisplay
+  37    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Field [ Activity::DateDisplay; Task::DueDate ]
+        DisableStepCollapsed state=False
+        refs: Task::DueDate#25
+        Field table=Activity id=56 name=DateDisplay
+  39    Set Field [ Activity::TimeDisplay; Task::DueTime ]
+        DisableStepCollapsed state=False
+        refs: Task::DueTime#28
+        Field table=Activity id=76 name=TimeDisplay
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    End If
+        DisableStepCollapsed state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ Activity::CallInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Activity::CallInd#201
+  45    #call is in the past, turn off alert ind
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $CallTimestamp; Value:Let ([
+        
+        theDate = Activity::DateDisplay ;
+        theTime = If( not IsEmpty ( Activity::TimeDisplay) ; Activity::TimeDisplay ; "12:01:00 AM" ) 
+        
+        
+        ];
+        
+        Timestamp ( theDate ; theTime )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, Activity::DateDisplay#56, fn:If, fn:not, fn:IsEmpty, Activity::TimeDisplay#76, fn:Timestamp
+        Name: $CallTimestamp
+  47    If [ $CallTimestamp < Get(CurrentHostTimestamp) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:CurrentHostTimestamp
+  48    Set Field [ Activity::AlertInd; False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+        Field table=Activity id=107 name=AlertInd
+  49    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Field [ Activity::AlertInd; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=Activity id=107 name=AlertInd
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    End If
+        DisableStepCollapsed state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    If [ Activity::EventInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Activity::EventInd#90
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #update DateDisplay
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    If [ IsEmpty ( Event::StartDate ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Event::StartDate#56
+  60    Set Field [ Activity::DateDisplay; GetAsDate ( Activity::CreationTimestamp ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetAsDate, Activity::CreationTimestamp#181
+        Field table=Activity id=56 name=DateDisplay
+  61    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Field [ Activity::DateDisplay; Event::StartDate ]
+        DisableStepCollapsed state=False
+        refs: Event::StartDate#56
+        Field table=Activity id=56 name=DateDisplay
+  63    Set Field [ Activity::TimeDisplay; Event::StartTime ]
+        DisableStepCollapsed state=False
+        refs: Event::StartTime#76
+        Field table=Activity id=76 name=TimeDisplay
+  64    End If
+        DisableStepCollapsed state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #event is in the past, turn off alert ind
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Set Variable [ $EventTimestamp; Value:Let ([
+        
+        theDate = Activity::DateDisplay ;
+        theTime = If( not IsEmpty ( Activity::TimeDisplay) ; Activity::TimeDisplay ; "12:01:00 AM" ) 
+        
+        
+        ];
+        
+        Timestamp ( theDate ; theTime )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, Activity::DateDisplay#56, fn:If, fn:not, fn:IsEmpty, Activity::TimeDisplay#76, fn:Timestamp
+        Name: $EventTimestamp
+  68    If [ $EventTimestamp < Get(CurrentHostTimestamp) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:CurrentHostTimestamp
+  69    Set Field [ Activity::AlertInd; False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+        Field table=Activity id=107 name=AlertInd
+  70    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Field [ Activity::AlertInd; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=Activity id=107 name=AlertInd
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    End If
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    End If
+        DisableStepCollapsed state=False

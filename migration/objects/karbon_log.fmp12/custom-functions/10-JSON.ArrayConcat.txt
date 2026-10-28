@@ -1,0 +1,51 @@
+# custom function 10: JSON.ArrayConcat
+# file: karbon_log.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=10]
+
+CustomFunction id=10 functionArity=2 visible=True parameters=firstArray;secondArray name=JSON.ArrayConcat
+  Calculation:
+    | /**
+    |  * 
+    |  * JSON.ArrayConcat ( firstArray ; secondArray )
+    |  *
+    |  * RETURNS:
+    |  *	a longer array of the first & second concatinated
+    |  *
+    |  * @param {array} firstArray
+    |  * @param {array} secondArray
+    |  *
+    |  * @returns {array}
+    |  *
+    |  * @module fm-json-additions
+    |  * @see https://github.com/geistinteractive/fm-json-additions
+    |  * 
+    |  * @history 2017-05-07, cdelfs@delfsengineering.ca
+    |  *
+    |  */
+    | 
+    | 
+    | Let(
+    | [
+    | 	// enable to test in data viewer
+    | 	//firstArray = " [\"some value\",2,3,4,5] ";
+    | 	//secondArray = "[6,7,8,9,10]";
+    | 	
+    | 	// remove spaces n squares
+    | 	firstArray = Trim(firstArray);
+    | 	firstArray = Right ( firstArray ; Length ( firstArray ) -1 );
+    | 	firstArray = Left ( firstArray ; Length ( firstArray )-1 );
+    | 
+    | 	secondArray = Trim(secondArray);
+    | 	secondArray = Right ( secondArray ; Length ( secondArray ) -1 );
+    | 	secondArray = Left ( secondArray ; Length ( secondArray )-1 );
+    | 
+    | 	separator = If( firstArray ="" or secondArray = ""  ; "" ; ", " );
+    | 	finalArray = "[" & firstArray & separator & secondArray & "]"
+    | 
+    | ];
+    | 
+    | //wrapping in JSONGetElement to remove any lingering white space
+    | JSONGetElement(finalArray; "" )
+    | 
+    |  )
+    refs: fn:Let, fn:Trim, fn:Right, fn:Length, fn:Left, fn:If, fn:or, fn:JSONGetElement

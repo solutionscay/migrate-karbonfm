@@ -1,0 +1,69 @@
+# script 696: #wip Button: Add User to Selected Discussion_Deprecated
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / DiscussionUtility
+# source: ScriptCatalog/Script[@id=696]
+# steps: 15 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=311 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $Param; Value:JSONSetElement( "";
+        	[ "DiscussionId" ; Selected_Discussion::Id ; JSONString ];
+        	[ "UserId" ; UtilityDiscussion::UserId_Deprecated; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Selected_Discussion::Id#6, fn:JSONString, UtilityDiscussion::UserId_Deprecated#14
+        Repetition
+          Calculation:
+            | 1
+        Name: $Param
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Perform Script [ “Create DiscussionUser_deprecated” from file: “karbon_kontroller”; Parameter: $Param ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=424 name="Create DiscussionUser_deprecated" in=karbon_kontroller.fmp12
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ Error.IsError ( Get( ScriptResult ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError, fn:Get, fn:ScriptResult
+   9    Show Custom Dialog [ Title: "Error"; Message: "There was an error adding this user to this discussion."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  10    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Field [ UtilityDiscussion::UserId_Deprecated; "" ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=14 name=UserId_Deprecated
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False

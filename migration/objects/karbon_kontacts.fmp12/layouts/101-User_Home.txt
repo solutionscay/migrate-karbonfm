@@ -1,0 +1,538 @@
+# layout 101: User Home
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / User
+# source: LayoutCatalog/Layout[@id=101]
+# objects: 83
+# theme: Karbon-1.0
+# folder group: id=115 groupCollapsed=False includeInMenu=False
+
+Layout width=1280 quickFind=True includeInMenu=False id=101 name="User Home"
+  Table id=1065095 name=User
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnLayoutEnter id=101 triggerFlags=1(browse)
+      Script id=363 name="User Detail - On Layout Enter"
+      TriggerText: "User Detail - On Layout Enter"
+    Trigger event=OnRecordLoad id=103 triggerFlags=1(browse)
+      Script id=418 name="User Detail - On Record Load"
+      TriggerText: "User Detail - On Record Load"
+  Object type=Rect key=170 LabelKey=0 flags=1073741824 style=Shape-Dark bounds=0,0,70,1280
+  Object type=Text key=171 LabelKey=0 bounds=15,120,55,460
+    Text flags=2 style=H1-Muted: "User Home"
+  Object type=ButtonBar key=172 LabelKey=0 style=BB-KarbonMenu bounds=15,10,55,50
+    ButtonBarObj segmentKey=0
+      Object type=Button key=173 LabelKey=0 flags=65536 bounds=15,10,55,50
+        Text flags=6 style=BB-KarbonMenu
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Display Main Nav” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=105 name="Display Main Nav"
+          Image name=a5_menu.svg
+  Object type=ButtonBar key=174 LabelKey=0 style=BB-NavHeader bounds=15,50,55,110
+    ButtonBarObj flags=2 segmentKey=0
+      ActiveSegmentCalc
+        Calculation:
+          | ""
+      Object type=Button key=175 LabelKey=0 flags=16385 bounds=15,50,55,80
+        ConditionalFormatting
+          Item id=0 flags=1
+            Condition op=0
+              Calculation:
+                | BrowserNav.SaveNavHistory
+                refs: cf:BrowserNav.SaveNavHistory
+        ToolTip
+          Calculation:
+            | BrowserNav.Tooltip ( "backward" )
+            refs: cf:BrowserNav.Tooltip
+        Text flags=6 style=BB-NavHeader
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Browser Nav (forward or backward)”; Parameter: "Backward" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Backward"
+            Script id=466 name="Browser Nav (forward or backward)"
+          Image name=a33_leftChevron.svg
+      Object type=Button key=176 LabelKey=0 flags=16384 bounds=15,80,55,110
+        ToolTip
+          Calculation:
+            | BrowserNav.Tooltip ( "forward" )
+            refs: cf:BrowserNav.Tooltip
+        Text flags=6 style=BB-NavHeader
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Browser Nav (forward or backward)”; Parameter: "Forward" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Forward"
+            Script id=466 name="Browser Nav (forward or backward)"
+          Image name=a35_rightChevron.svg
+  Object type=GroupButton key=177 LabelKey=0 flags=1342177280 bounds=20,1000,50,1120
+    GroupButtonObj numOfObjs=3
+      Object type=GroupButton key=178 LabelKey=0 flags=1342177280 bounds=20,1030,50,1090
+        GroupButtonObj numOfObjs=2
+          Object type=Field key=179 LabelKey=0 name=Nav.RecordNumberField flags=1 bounds=20,1030,50,1090
+            ConditionalFormatting
+              Item id=0 flags=3
+                Condition op=0
+                  Calculation:
+                    | Get(RecordNumber) <> Self
+                    refs: fn:Get, fn:RecordNumber, fn:Self
+                Format: color: rgba(32.9412%,36.8627%,45.4902%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+            ScriptTriggers
+              Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+                Script id=382 name="Record Nav"
+                  Calculation:
+                    | "Open"
+                TriggerText: "Record Nav"; Parameter: "Open"
+              Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+                Script id=382 name="Record Nav"
+                  Calculation:
+                    | "exit"
+                TriggerText: "Record Nav"; Parameter: "exit"
+            FieldObj numOfReps=1 flags=1048800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-StatusAreaRecordNumber
+              Field: Globals::RecordNav#31
+          Object type=Text key=180 LabelKey=0 name=Nav.RecordNumberMerge bounds=20,1030,50,1090
+            Text flags=10 tableViewVisibility=0 style=Text-StatusAreaRecordNavOverlay: {{RecordNumber}}
+              FieldList quickFind=False
+      Object type=Button key=181 LabelKey=0 flags=1342242816 bounds=20,1000,50,1030
+        Text flags=2 style=Button-NavPrev
+        ButtonObj buttonFlags=0 iconSize=12 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Record Nav”; Parameter: "prev" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "prev"
+            Script id=382 name="Record Nav"
+          Image name=a34_leftChevronOutline.svg
+      Object type=Button key=182 LabelKey=0 flags=1342242816 bounds=20,1090,50,1120
+        Text flags=2 style=Button-NavNext
+        ButtonObj buttonFlags=0 iconSize=12 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Record Nav”; Parameter: "next" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "next"
+            Script id=382 name="Record Nav"
+          Image name=a36_rightChevronOutline.svg
+  Object type=ButtonBar key=183 LabelKey=0 flags=1342177280 style=BB-NavHeaderRecords bounds=20,1130,50,1220
+    ButtonBarObj segmentKey=0
+      Object type=Button key=184 LabelKey=0 flags=65536 bounds=20,1130,50,1220
+        Text flags=2 style=BB-NavHeaderRecords
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Record Nav”; Parameter: "ToggleFoundSet" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "ToggleFoundSet"
+            Script id=382 name="Record Nav"
+        LabelCalc
+          Calculation:
+            | If ( 
+            | 
+            | 	// Find mode requests 
+            | 	Get ( WindowMode ) = 1 ; 
+            | 		Get ( TotalRecordCount ) & " Find Requests" ; 
+            | 
+            | 
+            | 		// Browse mode record counts
+            | 		If ( Get(TotalRecordCount) = Get(FoundCount) ; 
+            | 			Get ( TotalRecordCount ) & "¶Total" ; 
+            | 			Get ( FoundCount ) & " / " & Get ( TotalRecordCount ) & "¶Found" 
+            | 		) & 
+            | 
+            | 		// Sort status
+            | 		If ( Get( SortState ) = 0 ; " (Unsorted)" ; " (Sorted)" )
+            | 
+            | )
+            refs: fn:If, fn:Get, fn:WindowMode, fn:TotalRecordCount, fn:FoundCount, fn:SortState
+  Object type=Text key=185 LabelKey=0 flags=4 bounds=0,350,30,410
+    Text flags=6: DEV
+    HideCondition findMode=False
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=186 LabelKey=0 flags=268435456 bounds=16,620,56,660
+    FieldObj numOfReps=1 flags=1048628 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Cont-Icon
+      Field: System::Logo#67
+  Object type=SlideControl key=75 LabelKey=0 flags=-1073741822 bounds=170,0,920,1280
+    SlideControlObj visPanelKey=76 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=Slide-Hidden
+      Object type=SlidePanel key=76 LabelKey=0 name=Tasks flags=-1073741822 bounds=170,0,920,1280
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Portal key=109 LabelKey=0 flags=-1073741822 bounds=260,20,886,1260
+            PortalObj portalFlags=25 numOfRows=16 initialRow=1 style="Standard Portal"
+              TableAliasKey: Selected_Task
+              FieldList
+                Field table=Selected_Task_Activity id=56 name=DateDisplay
+                Field table=Selected_Task_Activity id=22 name=Subject
+                Field table=Selected_Task id=23 name=FromCached
+                Field table=Selected_Task id=24 name=ToCached
+                Field table=Selected_Task_Activity_ActivityEntity_EntityType id=15 name=Name
+              SortList BlanksLast=False Maintain=True value=True
+                Sort type=Ascending
+                  PrimaryField
+                    Field table=Selected_Task_Activity id=107 name=AlertInd
+                Sort type=Ascending
+                  PrimaryField
+                    Field table=Selected_Task_Activity id=56 name=DateDisplay
+              Object type=Field key=110 LabelKey=0 bounds=270,60,290,150
+                FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                  Field: Selected_Task_Activity::DateDisplay#56
+              Object type=Field key=119 LabelKey=0 flags=1073741824 bounds=270,160,290,740
+                FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                  Field: Selected_Task_Activity::Subject#22
+              Object type=Field key=129 LabelKey=0 flags=1342177280 bounds=270,881,290,1001
+                FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                  Field: Selected_Task::FromCached#23
+              Object type=Field key=130 LabelKey=0 flags=1342177280 bounds=270,751,290,871
+                FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                  Field: Selected_Task::ToCached#24
+              Object type=Field key=189 LabelKey=0 flags=1342177280 bounds=270,1011,290,1161
+                FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+                  Field: Selected_Task_Activity_ActivityEntity_EntityType::Name#15
+              Object type=Button key=200 LabelKey=0 flags=1342177280 bounds=270,1160,290,1240
+                Text flags=2 style=Button-Small-CommandLink-Center: View
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText
+                      | Perform Script [ “btn: View Task from Dashboard”; Parameter: JSONSetElement ( "{}" ; 
+                      | 
+                      | ["EntityId" ; Selected_Task_Activity_ActivityEntity::EntityId ; JSONString] ;
+                      | 
+                      | ["EntityTypeId" ; Selected_Task_Activity_ActivityEntity::EntityTypeId ; JSONString]
+                      | 
+                      |  ) ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Calculation:
+                      | JSONSetElement ( "{}" ; 
+                      | 
+                      | ["EntityId" ; Selected_Task_Activity_ActivityEntity::EntityId ; JSONString] ;
+                      | 
+                      | ["EntityTypeId" ; Selected_Task_Activity_ActivityEntity::EntityTypeId ; JSONString]
+                      | 
+                      |  )
+                      refs: fn:JSONSetElement, Selected_Task_Activity_ActivityEntity::EntityId#17, fn:JSONString, Selected_Task_Activity_ActivityEntity::EntityTypeId#16
+                    Script id=697 name="btn: View Task from Dashboard"
+              Object type=Rect key=229 LabelKey=0 flags=4 style=BlueDot bounds=277,33,283,39
+                HideCondition findMode=False
+                  Calculation:
+                    | // Hide if alert is not true
+                    | not Selected_Task_Activity::AlertInd
+                    refs: fn:not, Selected_Task_Activity::AlertInd#107
+          Object type=Text key=114 LabelKey=0 bounds=190,20,214,120
+            Text flags=2 style=Label-Medium-Left: "Showing tasks"
+          Object type=Field key=115 LabelKey=0 bounds=190,121,214,261
+            ScriptTriggers
+              Trigger event=OnObjectValidate id=6 triggerFlags=1(browse)
+                Script id=365 name="User Detail - Update Task Portal"
+                TriggerText: "User Detail - Update Task Portal"
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Pop-up Medium"
+              Field: UtilityTask::z_Search_ActivityPartyRoleId#16
+              ValueList: Task ActivityPartyRoles#33
+          Object type=Field key=118 LabelKey=0 bounds=190,271,214,500
+            FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Non Edit - Medium"
+              Field: UtilityTask_Party#Search::NameCached#19
+              ValueList: Party Id by User#32
+          Object type=Text key=121 LabelKey=0 bounds=190,550,214,620
+            Text flags=2 style=Label-Medium-Left: "which are"
+          Object type=Field key=122 LabelKey=0 bounds=190,620,214,760
+            ScriptTriggers
+              Trigger event=OnObjectValidate id=6 triggerFlags=1(browse)
+                Script id=365 name="User Detail - Update Task Portal"
+                TriggerText: "User Detail - Update Task Portal"
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Pop-up Medium"
+              Field: UtilityTask::z_Search_Status#17
+              ValueList: Task Status#34
+          Object type=Text key=123 LabelKey=0 bounds=220,20,240,620
+            Text flags=10 tableViewVisibility=0 style=Label-Small-Left-Muted: "Last update: <<UtilityTask::z_Search_LastUpdate>>"
+              Display: date format=2 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"; time flags=135 hourStyle=1 minsecStyle=1 separator=: amString=" AM" pmString=" PM" ampmString=""
+              FieldList quickFind=False
+                Field table=UtilityTask id=18 name=z_Search_LastUpdate
+          Object type=Button key=127 LabelKey=0 flags=1342177280 bounds=190,1160,230,1260
+            Text flags=2 style=Button-GreenPlus: "Add Task"
+            ButtonObj buttonFlags=0 iconSize=12 displayType=4
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “btn: Create Task From User Home” ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Script id=760 name="btn: Create Task From User Home"
+              Image name=a13_add.svg
+          Object type=Text key=131 LabelKey=0 flags=1342177280 bounds=226,881,249,1001
+            Text flags=2 style=Label-Medium-Left: "Assigned by"
+          Object type=Text key=132 LabelKey=0 flags=1342177280 bounds=226,750,250,871
+            Text flags=2 style=Label-Medium-Left: "Assigned to"
+          Object type=PopoverButton key=201 LabelKey=0 name=button.selectParty bounds=190,506,214,530
+            Text flags=2 style=Button-Invisible: "Add Users..."
+            PopoverButtonObj buttonFlags=0 key=202 iconSize=20 displayType=1
+              Image name=a47_account.svg
+              Object type=Popover key=202 LabelKey=0 style="Popover-White No Title" bounds=225,279,510,758
+                ScriptTriggers
+                  Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+                    Script id=699 name="User Detail - OnOpen Select User"
+                    TriggerText: "User Detail - OnOpen Select User"
+                TitleCalc
+                  Calculation:
+                    | "Users"
+                PopoverObj flags=2 position=3 key=201
+                  Object type=Portal key=203 LabelKey=0 bounds=250,310,486,730
+                    PortalObj portalFlags=29 numOfRows=6 initialRow=1 style="Standard Portal"
+                      TableAliasKey: User#Cartesian
+                      FieldList
+                        Field table=User#Cartesian id=106 name=DisplayName
+                      SortList BlanksLast=False Maintain=True value=True
+                        Sort type=Ascending
+                          PrimaryField
+                            Field table=User#Cartesian id=106 name=DisplayName
+                      Object type=GroupButton key=209 LabelKey=0 flags=65536 bounds=260,315,285,711
+                        GroupButtonObj numOfObjs=1
+                          Step enable=True id=1 name="Perform Script"
+                            StepText: Perform Script [ “User Detail - Select User for Search” ]
+                            DisableStepCollapsed state=False
+                            CurrentScript value=Pause
+                            Script id=700 name="User Detail - Select User for Search"
+                          Object type=Field key=204 LabelKey=0 bounds=260,315,285,711
+                            FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                              Field: User#Cartesian::DisplayName#106
+          Object type=Text key=211 LabelKey=0 flags=1342177280 bounds=226,1011,250,1161
+            Text flags=2 style=Label-Medium-Left: Type
+      Object type=SlidePanel key=77 LabelKey=0 name=Notifications flags=-1073741822 bounds=170,0,920,1280
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Portal key=104 LabelKey=0 flags=-1073741824 bounds=200,20,899,1260
+            PortalObj portalFlags=29 numOfRows=17 initialRow=1 style="Standard Portal"
+              TableAliasKey: User_Notification#PartyId
+              FieldList
+                Field table=User_Notification#PartyId id=23 name=Description
+                Field table=User_Notification#PartyId id=21 name=Date
+              SortList BlanksLast=False Maintain=True value=True
+                Sort type=Ascending
+                  PrimaryField
+                    Field table=User_Notification#PartyId id=15 name=ReadInd
+                Sort type=Descending
+                  PrimaryField
+                    Field table=User_Notification#PartyId id=12 name=CreationTimestamp
+              Object type=Field key=105 LabelKey=0 flags=1073741824 bounds=210,70,234,920
+                FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                  Field: User_Notification#PartyId::Description#23
+              Object type=Field key=106 LabelKey=0 flags=1342177280 bounds=210,930,234,1030
+                FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+                  Field: User_Notification#PartyId::Date#21
+                  Display: date format=1 monthStyle=0 dayStyle=0 separator=/ elements=5,1,0,0 separators="| |||"; time flags=129 hourStyle=0 minsecStyle=1 separator=: amString=" AM" pmString=" PM" ampmString=""
+              Object type=Button key=107 LabelKey=0 flags=1342177284 bounds=201,1050,239,1150
+                Text flags=2 style=Button-Small-CommandLink: "View Discussion"
+                ButtonObj buttonFlags=0 iconSize=18 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText
+                      | Perform Script [ “User Detail - Open Discussion”; Parameter: JSONSetElement ( "{}" ; 
+                      | 	[ "Id" ; User_Notification#PartyId_Discussion::Id ; JSONString ];
+                      | 	[ "EntityId" ; User_Notification#PartyId_Discussion_ActivityEntity::EntityId ; JSONString ];
+                      | 	[ "EntityTypeId" ; User_Notification#PartyId_Discussion_ActivityEntity::EntityTypeId ; JSONString ];
+                      | 	[ "Title" ; User_Notification#PartyId_Discussion::Title ; JSONString ]
+                      | 
+                      | ) ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Pause
+                    Calculation:
+                      | JSONSetElement ( "{}" ; 
+                      | 	[ "Id" ; User_Notification#PartyId_Discussion::Id ; JSONString ];
+                      | 	[ "EntityId" ; User_Notification#PartyId_Discussion_ActivityEntity::EntityId ; JSONString ];
+                      | 	[ "EntityTypeId" ; User_Notification#PartyId_Discussion_ActivityEntity::EntityTypeId ; JSONString ];
+                      | 	[ "Title" ; User_Notification#PartyId_Discussion::Title ; JSONString ]
+                      | 
+                      | )
+                      refs: fn:JSONSetElement, User_Notification#PartyId_Discussion::Id#6, fn:JSONString, User_Notification#PartyId_Discussion_ActivityEntity::EntityId#17, User_Notification#PartyId_Discussion_ActivityEntity::EntityTypeId#16, User_Notification#PartyId_Discussion::Title#15
+                    Script id=374 name="User Detail - Open Discussion"
+                HideCondition findMode=False
+                  Calculation:
+                    | IsEmpty ( User_Notification#PartyId_Discussion::Id )
+                    refs: fn:IsEmpty, User_Notification#PartyId_Discussion::Id#6
+              Object type=Rect key=133 LabelKey=0 flags=4 style=BlueDot bounds=215,39,225,49
+                HideCondition findMode=False
+                  Calculation:
+                    | User_Notification#PartyId::ReadInd
+                    refs: User_Notification#PartyId::ReadInd#15
+              Object type=Button key=156 LabelKey=0 flags=1342177284 bounds=201,1190,239,1240
+                Text flags=2 style=Button-Small-CommandLink: "Got It!"
+                ButtonObj buttonFlags=0 iconSize=18 displayType=0
+                  Step enable=True id=76 name="Set Field"
+                    StepText: Set Field [ User_Notification#PartyId::ReadInd; 1 ]
+                    DisableStepCollapsed state=False
+                    Calculation:
+                      | 1
+                    Field table=User_Notification#PartyId id=15 name=ReadInd
+                HideCondition findMode=False
+                  Calculation:
+                    | //IsEmpty ( User_UserNotification_Task_Deprecated::Id )
+                    | //or 
+                    | User_Notification#PartyId::ReadInd
+                    refs: User_Notification#PartyId::ReadInd#15
+              Object type=Line key=187 LabelKey=0 flags=1073754112 style=Line-Thin bounds=241,70,241,1248
+      Object type=SlidePanel key=78 LabelKey=0 name=Settings flags=-1073741822 bounds=170,0,920,1280
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Text key=92 LabelKey=0 bounds=190,20,220,490
+            Text flags=2 style=H2-Primary: "Email Settings"
+          Object type=Text key=93 LabelKey=0 bounds=220,20,244,970
+            Text flags=2 style=Label-Medium-Left: "Enter the settings for your email account to send email from Karbon. You will be prompted for your password once per session."
+          Object type=Text key=215 LabelKey=0 bounds=680,20,704,140
+            Text flags=2 style=Label-Medium-Left: "Email Signature"
+          Object type=Text key=217 LabelKey=0 bounds=540,20,564,150
+            Text flags=2 style=Label-Medium-Left: "User Name"
+          Object type=Text key=220 LabelKey=0 bounds=330,20,354,150
+            Text flags=2 style=Label-Medium-Left: Server
+          Object type=Text key=222 LabelKey=0 bounds=400,20,424,150
+            Text flags=2 style=Label-Medium-Left: Port
+          Object type=Text key=224 LabelKey=0 bounds=470,20,494,150
+            Text flags=2 style=Label-Medium-Left: Authentication
+          Object type=Field key=212 LabelKey=213 bounds=290,20,314,490
+            FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+              Field: User::SmtpEmailAddress#111
+          Object type=Text key=213 LabelKey=0 bounds=260,20,284,140
+            Text flags=2 style=Label-Medium-Left: "Email Address"
+          Object type=Field key=214 LabelKey=215 bounds=710,20,870,490
+            FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+              Field: User::EmailSignature#120
+          Object type=Field key=216 LabelKey=217 bounds=570,20,594,490
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+              Field: User::SmtpUserName#113
+          Object type=Field key=219 LabelKey=220 bounds=360,20,384,490
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+              Field: User::SmtpServer#114
+              PlaceholderText findMode=True
+                Calculation:
+                  | System::SystemEmailSmtpServer
+                  refs: System::SystemEmailSmtpServer#48
+          Object type=Field key=221 LabelKey=222 bounds=430,20,454,490
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+              Field: User::SmtpServerPort#117
+              PlaceholderText findMode=True
+                Calculation:
+                  | System::SystemEmailSmtpServerPort
+                  refs: System::SystemEmailSmtpServerPort#49
+          Object type=Field key=223 LabelKey=224 bounds=500,20,524,490
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Pop-up Medium"
+              Field: User::SmtpServerAuthentication#115
+              ValueList: SMTP Authentication#28
+              PlaceholderText findMode=True
+                Calculation:
+                  | System::SystemEmailSmtpServerAuthentication
+                  refs: System::SystemEmailSmtpServerAuthentication#51
+          Object type=Text key=225 LabelKey=0 bounds=610,20,634,150
+            Text flags=2 style=Label-Medium-Left: "Full Name"
+          Object type=Field key=226 LabelKey=225 bounds=640,20,664,490
+            FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+              Field: User::SmtpFullName#112
+  Object type=Rect key=67 LabelKey=0 flags=1073741824 bounds=120,0,170,1280
+  Object type=ButtonBar key=3 LabelKey=0 flags=1342177280 bounds=10,1220,60,1270
+    ButtonBarObj segmentKey=0
+      Object type=Button key=7 LabelKey=0 bounds=10,1220,60,1270
+        ButtonObj buttonFlags=0 iconSize=26 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Get Help” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=478 name="Get Help"
+          Image name=a55_help.svg
+  Object type=Text key=30 LabelKey=0 flags=-1879048192 bounds=870,1300,910,1350
+    Text flags=2: expand
+  Object type=Text key=35 LabelKey=0 bounds=75,20,115,1250
+    Text flags=10 tableViewVisibility=0 style=H2-Primary: <<DisplayName>>
+      FieldList quickFind=True
+        Field table=User id=106 name=DisplayName
+  Object type=ButtonBar key=60 LabelKey=0 flags=1342177280 bounds=0,2510,50,2610
+    ButtonBarObj segmentKey=0
+      Object type=Button key=61 LabelKey=0 bounds=0,2510,50,2560
+        ButtonObj buttonFlags=0 iconSize=26 displayType=1
+          Image name=a51_options.svg
+      Object type=Button key=62 LabelKey=0 bounds=0,2560,50,2610
+        ButtonObj buttonFlags=0 iconSize=26 displayType=1
+          Image name=a55_help.svg
+  Object type=Text key=66 LabelKey=0 flags=1342177540 bounds=0,2560,30,2620
+    Text flags=2: DEV
+    HideCondition findMode=True
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode
+  Object type=ButtonBar key=68 LabelKey=0 flags=268435456 bounds=120,360,170,910
+    ButtonBarObj segmentKey=69
+      Object type=Button key=69 LabelKey=0 name=NavBarTop1 bounds=120,361,170,544
+        Text flags=2
+        ButtonObj buttonFlags=2 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “User Detail - Handle Slide Panel”; Parameter: JSONSetElement( ""; "Target"; "Tasks"; JSONString ) ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | JSONSetElement( ""; "Target"; "Tasks"; JSONString )
+              refs: fn:JSONSetElement, fn:JSONString
+            Script id=364 name="User Detail - Handle Slide Panel"
+        LabelCalc
+          Calculation:
+            | "Tasks"
+      Object type=Button key=70 LabelKey=0 name=NavBarTop2 bounds=120,544,170,726
+        Text flags=2
+        ButtonObj buttonFlags=2 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “User Detail - Handle Slide Panel”; Parameter: JSONSetElement( ""; "Target"; "Notifications"; JSONString ) ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | JSONSetElement( ""; "Target"; "Notifications"; JSONString )
+              refs: fn:JSONSetElement, fn:JSONString
+            Script id=364 name="User Detail - Handle Slide Panel"
+        LabelCalc
+          Calculation:
+            | "Notifications"
+      Object type=Button key=71 LabelKey=0 name=NavBarTop3 bounds=120,726,170,909
+        Text flags=2
+        ButtonObj buttonFlags=2 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “User Detail - Handle Slide Panel”; Parameter: JSONSetElement( ""; "Target"; "Settings"; JSONString ) ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | JSONSetElement( ""; "Target"; "Settings"; JSONString )
+              refs: fn:JSONSetElement, fn:JSONString
+            Script id=364 name="User Detail - Handle Slide Panel"
+        LabelCalc
+          Calculation:
+            | "Settings"
+  Object type=ButtonBar key=80 LabelKey=0 flags=268435456 style=BB-Badge bounds=130,680,160,710
+    ButtonBarObj segmentKey=0
+      Object type=Button key=83 LabelKey=0 flags=4 bounds=130,680,160,710
+        Text flags=2 style=BB-Badge
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        HideCondition findMode=False
+          Calculation:
+            | User::UnreadNotificationCountCached < 1
+            refs: User::UnreadNotificationCountCached#121
+        LabelCalc
+          Calculation:
+            | User::UnreadNotificationCountCached
+            refs: User::UnreadNotificationCountCached#121
+  Object type=Button key=188 LabelKey=0 flags=1342243076 bounds=10,940,60,990
+    Text flags=2 style=Button-Invisible
+    ButtonObj buttonFlags=0 iconSize=26 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Add Pending Change to Build File” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=524 name="Add Pending Change to Build File"
+      Image name=code-solid-2.svg
+    HideCondition findMode=True
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode

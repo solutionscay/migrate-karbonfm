@@ -1,0 +1,20 @@
+# custom function 35: JSON.Validate.IsOneOf
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=35]
+
+CustomFunction id=35 functionArity=2 visible=True parameters=path;theList name=JSON.Validate.IsOneOf
+  Calculation:
+    | Let(
+    | [
+    | theItem = JSONGetElement( $JSONToValidate ; path  );
+    | passed =  FilterValues ( theList ; theItem ) = theItem & "¶" 
+    | 
+    | ];
+    | 
+    | If(
+    | 	passed ; "" ; 
+    | 	JSON.Error.Validation( Quote( path ) &  "should be one of '" &   Substitute(  theList ; "¶" ; ","   ) & "'" ; "")
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:FilterValues, fn:If, cf:JSON.Error.Validation, fn:Quote, fn:Substitute

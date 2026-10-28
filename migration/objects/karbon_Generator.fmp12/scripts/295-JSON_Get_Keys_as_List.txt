@@ -1,0 +1,321 @@
+# script 295: JSON Get Keys as List
+# file: karbon_Generator.fmp12
+# folder: App Modules / JSONObjects / Private
+# source: ScriptCatalog/Script[@id=295]
+# steps: 77 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=286 groupCollapsed=False includeInMenu=True
+
+   1    ################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    # PURPOSE:
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #	Generates $$Result, a list of JSON Keys
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # PARAMETERS:
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #	thisJSON
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # RETURNS:
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #	success - {id}
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #	error = {errorCode, ...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # NOTES:
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # HISTORY:
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #	2017-Jun-15		Lance Brandenberg		Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    ################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #MAKE SURE PARAMETER IS JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $data; Value:JSONFormatElements ( Get( ScriptParameter ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  23    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #SET DEFAULTS
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $Defaults; Value:JSONSetElement ( ""; 
+        
+           [ "thisKey"; "" ; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Defaults
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #Apply Defaults
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $data; Value:jsonMerge ( $Defaults ; $data ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonMerge
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #VALIDATE WITH RULES
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $error; Value:JSON.Validate.This ( $data ) & JSON.Validate.ApplyRules ( List(
+        
+        	JSON.Validate.Rule.IsRequired ( "thisJSON" );
+        	""
+        
+        
+        )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  39    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $thisKey; Value:JSONGetElement ( $data ; "thisKey" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisKey
+  43    Set Variable [ $thisJSON; Value:JSONGetElement ( $data ; "thisJSON" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisJSON
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $getKey; Value:JSONGetElement ( $thisJSON ; $thiskey ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $getKey
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #Figure out the type of object returned with this key
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Variable [ $typeOfObject; Value:Let([
+        
+        firstCharacter = Left( $getKey; 1 )
+        
+        ];
+        
+        Case(
+        firstCharacter = "?"; "Error";
+        firstCharacter = "{"; "JSON";
+        firstCharacter = "["; "Array";
+        "Value"
+        )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Left, fn:Case
+        Name: $typeOfObject
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #with a JSON object or an array, continue to drill for keys
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    If [ $typeOfObject = "JSON" or $typeOfObject = "Array" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  53    Set Variable [ $targetKeys; Value:JSONListKeys ( $thisJSON ; $thisKey ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListKeys
+        Repetition
+          Calculation:
+            | 1
+        Name: $targetKeys
+  54    Set Variable [ $targetCount; Value:ValueCount( $targetKeys ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $targetCount
+  55    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $keyCount; Value:$keyCount + 1 ]
+        DisableStepCollapsed state=False
+        Name: $keyCount
+  57    Exit Loop If [ $keyCount > $targetCount ]
+        DisableStepCollapsed state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #set the key to be passed to this script recursively
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    If [ $typeOfObject = "JSON" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $nextKey; Value:If( IsEmpty ( $thisKey );
+        GetValue( $targetKeys; $keyCount );
+        $thisKey & "." & GetValue( $targetKeys; $keyCount )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $nextKey
+  62    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Set Variable [ $nextKey; Value:$thisKey & "[" & $keyCount - 1 & "]" ]
+        DisableStepCollapsed state=False
+        Name: $nextKey
+  64    End If
+        DisableStepCollapsed state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Perform Script [ “JSON Get Keys as List”; Parameter: JSONFormatElements (
+        JSONSetElement ( "{}" ; 
+        ["thisKey"; $nextKey; JSONString];
+        ["thisJSON"; $thisJSON; JSONObject]
+        )
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Script id=295 name="JSON Get Keys as List"
+  67    End Loop
+        DisableStepCollapsed state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Else If [ $typeOfObject = "Value" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Variable [ $$result; Value:List( $$result ; $thisKey ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $$result
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    End If
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Exit Script [  ]
+        DisableStepCollapsed state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,174 @@
+# script 1277: Load Widget - TodaysTimeActivity
+# file: karbon_charts.fmp12
+# source: ScriptCatalog/Script[@id=1277]
+# steps: 35 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Load the TodaysTimeActivity widget
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #see the "Example Data" below for the data that needs to get sent into the
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #set the WebViewer name here
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $WebViewer; Value:"TodaysTimeActivityWebViewer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $WebViewer
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $WidgetName; Value:"TodaysTimeActivity" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $WidgetName
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #Example Data
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #comment this out when you get your real data
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Insert Text [ $Data ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "activities": [
+          |     {
+          |       "name": "Todd Geist",
+          |       "hours": 3.2,
+          |       "hoursBillable": 4.4,
+          |       "dollars": 1209
+          |     },
+          |     {
+          |       "name": "Dave Graham",
+          |       "hours": 6.2,
+          |       "hoursBillable": 3.0,
+          |       "dollars": 1209
+          |     }
+          |   ]
+          | }
+        Field: $Data
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $params; Value:JSONSetElement ("{}";
+         
+          ["name" ;$WidgetName; JSONString ];
+          ["data" ; $Data; JSONObject ] 
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #compile the data into Widget
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Perform Script [ “Compile Widget { name; data }” from file: “karbon_charts”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        FileReference id=5 name=karbon_charts
+          UniversalPathList: file:karbon_charts
+        Script id=1252 name="Compile Widget { name; data }"
+  22    Set Variable [ $html; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $html
+  23    If [ (
+          Error.IsError ( $html ) 
+           and 
+          Left(JSONGetElement ( $html ; "" );1 ) <> "?" 
+        ) 
+          or
+        IsEmpty ( $html ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError, fn:and, fn:Left, fn:JSONGetElement, fn:or, fn:IsEmpty
+  24    Show Custom Dialog [ Title: "Error"; Message: "Couldn't compile the Widget"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  25    Exit Script [  ]
+        DisableStepCollapsed state=False
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #load the widget into the webviewer
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Web Viewer [ Object Name: $WebViewer; URL: $html ]
+        DisableStepCollapsed state=False
+        Action value=GoToURL
+        URL custom=False
+  30    Set Variable [ $error; Value:Error.Last ( "trying to load webviewer named" & Quote( $WebViewer ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  31    If [ JSONGetElement ( $error; "errorCode" ) = 116 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  32    Show Custom Dialog [ Title: "WebViewer is missing"; Message: "Did you remember to set the webviewer name at the top of this script"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  33    Else If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  34    Show Custom Dialog [ Title: "WebViewer is missing"; Message: "Did you remember to set the webviewer name at the top of this script"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  35    End If
+        DisableStepCollapsed state=False

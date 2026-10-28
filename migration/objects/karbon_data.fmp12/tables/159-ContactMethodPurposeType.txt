@@ -1,0 +1,84 @@
+# table 159: ContactMethodPurposeType
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=159]
+# fields: 8
+# records: 3
+
+Field id=16 dataType=Number fieldType=Normal name=Id
+  AutoEnter allowEditing=False calculation=False
+    Serial increment=1 nextValue=4 generate=OnCreation
+    Calculation table=ContactMethodPurposeType (inactive):
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=ContactMethodPurposeType:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=41 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=ContactMethodPurposeType (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Text fieldType=Normal name=Name
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=48 dataType=Number fieldType=Calculated name=AsJsonNameOnly
+  Calculation table=ContactMethodPurposeType:
+    | // These names are not key value pairs. They are intended to be made into an array
+    | // like this: [ "mailing, "billing" ]. Quoting is sufficient here.
+    | Quote ( Name )
+    refs: fn:Quote, ContactMethodPurposeType::Name#47
+  Comment: Quotes the name so it can be made into an array of values in string format
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=49 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=ContactMethodPurposeType:
+    | // Created by Generator - 3/26/2018 11:43:38 AM
+    | // DO NOT format this JSON object!
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "Id" ; ContactMethodPurposeType::Id ; JSONNumber ];
+    | 	[ "Name" ; ContactMethodPurposeType::Name ; JSONString ]
+    |  
+    | )
+    refs: fn:JSONSetElement, ContactMethodPurposeType::Id#16, fn:JSONNumber, ContactMethodPurposeType::Name#47, fn:JSONString
+  AutoEnter alwaysEvaluate=True
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=ContactMethodPurposeType:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ContactMethodPurposeType:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

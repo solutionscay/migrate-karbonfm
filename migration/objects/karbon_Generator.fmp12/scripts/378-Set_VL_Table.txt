@@ -1,0 +1,223 @@
+# script 378: Set VL_Table
+# file: karbon_Generator.fmp12
+# folder: Schema Picker VirtualList
+# source: ScriptCatalog/Script[@id=378]
+# steps: 45 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=381 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #Clear this each time
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $$VL_TableName; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$VL_TableName
+   4    Set Variable [ $$VL_TableOccurenceName; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$VL_TableOccurenceName
+   5    Set Variable [ $$VL_TableFileName; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$VL_TableFileName
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $FileName; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $sqlStatement; Value:"SELECT * FROM FileMaker_Tables" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $sqlStatement
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $TableOccurenceList; Value:<Function Missing> ( $sqlStatement; "," ; ¶ ; $FileName ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableOccurenceList
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #Scripts as JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $exit; Value:ValueCount ( $TableOccurenceList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $exit
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  19    Exit Loop If [ $i > $exit ]
+        DisableStepCollapsed state=False
+  20    Set Variable [ $ThisTable; Value:GetValue( $TableOccurenceList; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTable
+  21    Set Variable [ $ThisTable; Value:Substitute ( $ThisTable; ","; ¶ ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTable
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $TableName; Value:GetValue( $ThisTable; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $TableName
+  24    Set Variable [ $TableId; Value:GetValue( $ThisTable; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableId
+  25    Set Variable [ $BaseTableName; Value:GetValue( $ThisTable; 3 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $BaseTableName
+  26    Set Variable [ $BaseFileName; Value:GetValue( $ThisTable; 4 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $BaseFileName
+  27    Set Variable [ $ModCount; Value:GetValue( $ThisTable; 5 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ModCount
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #File Name Simple
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $BaseFileName; Value:Let([
+        
+        ~paren = Position ( $BaseFileName ; "(" ; 1 ; 1 )
+        
+        ];
+        
+        If ( not IsEmpty(~paren) ; Left ( $BaseFileName ; ~paren - 2 ); $BaseFileName )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Position, fn:If, fn:not, fn:IsEmpty, fn:Left
+        Name: $BaseFileName
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    If [ $BaseFileName = $FileName ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    If [ IsNotInList ( $$VL_TableName ; $BaseTableName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:IsNotInList
+  34    Set Variable [ $$VL_TableName; Value:List( $$VL_TableName; $BaseTableName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $$VL_TableName
+  35    Set Variable [ $$VL_TableOccurenceName; Value:List( $$VL_TableOccurenceName; $TableName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $$VL_TableOccurenceName
+  36    Set Variable [ $$VL_TableFileName; Value:List( $$VL_TableFileName; $BaseFileName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $$VL_TableFileName
+  37    End If
+        DisableStepCollapsed state=False
+  38    End If
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    End Loop
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Field [ SELECTOR::virtualListFoundCount; ValueCount( $$VL_TableName ) ]
+        DisableStepCollapsed state=False
+        refs: fn:ValueCount
+        Field table=SELECTOR id=9 name=virtualListFoundCount
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False

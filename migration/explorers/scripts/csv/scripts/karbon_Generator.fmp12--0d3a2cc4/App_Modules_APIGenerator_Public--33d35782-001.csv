@@ -1,0 +1,55 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_Generator.fmp12/scripts/248-Import_Copied_Tables_to_API_Generator_Id.txt,3c7a350d6758b29c18686b3c4a83cf469cbdae1e78f8fe09d9c7f48ebe64bb88,scripts,karbon_Generator.fmp12,248,Import Copied Tables to API Generator ( Id ),utility,drop-candidate,tier3,"Reads copied BaseTable XML from the clipboard (clip_GetFMxml), and for every table creates a table-rule record and one ApiGeneratorLine record per field (table name, field name, JSON property name, comment, data type, read-only), skipping audit/join fields. Parameter: the ApiGenerator id. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","GLOBALS::ClipXml#16 (disabled step 8, not read)","SELECTOR::ApiGeneratorTableRuleId#12 (Set Field step 29, global)
+<Table Missing>::<Field Missing>#1 (Set Field step 31, unresolved table, scope unresolved)
+<Table Missing>::<Field Missing>#5 (Set Field step 32, unresolved table, scope unresolved)
+ApiGeneratorLine::ApiGeneratorId#2 (Set Field step 58, new record)
+ApiGeneratorLine::FmpTableName#10 (Set Field step 59, new record)
+ApiGeneratorLine::FmpFieldName#4 (Set Field step 60, new record)
+ApiGeneratorLine::JsonPropertyName#21 (Set Field step 61, new record)
+ApiGeneratorLine::description#22 (Set Field step 62, new record)
+ApiGeneratorLine::type#23 (Set Field step 63, new record)
+ApiGeneratorLine::readOnly#24 (Set Field step 64, new record)","karbon_Generator.fmp12/scripts/230 (""Get Field Metadata as JSON"", step 36)",none found (in Scripts menu),"<Function Missing> plugin call (step 11)
+<Function Missing> plugin call (step 24)
+<Function Missing> plugin call (step 25)","Steps 31-32 set two fields in a table that is missing from the DDR (<Table Missing>, field ids 1 and 5), probably the table-rule record's ApiGeneratorId and table name; the result cannot be resolved. Step 75 exits with $new, which is never set. Step 8 is a disabled alternative that reads GLOBALS::ClipXml. Steps 11, 24, 25 call an unresolved plugin function (<Function Missing>, XPath over the clipboard XML)."
+karbon_Generator.fmp12/scripts/309-Import_Copied_Tables_to_JSON_Schema.txt,92bbf7e267749b05d2263a4e706de62e313748254f93c7c1d5ac0ac66b002770,scripts,karbon_Generator.fmp12,309,Import Copied Tables to JSON Schema,utility,drop-candidate,tier3,"Reads copied BaseTable XML from the clipboard and builds a JSON Schema document for the copied tables (one object per table with a property per field: type, title, description, readOnly, FileMaker path and data type), then stores it in ApiGenerator::JsonSchema. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGenerator::id#1
+GLOBALS::ClipXml#16","ApiGenerator::JsonSchema#26 (Set Field step 78, current record)","karbon_Generator.fmp12/scripts/230 (""Get Field Metadata as JSON"", step 38)",none found (in Scripts menu),"<Function Missing> plugin call (step 18)
+<Function Missing> plugin call (step 25)
+<Function Missing> plugin call (step 26)","Step 80 exits with $new, which is never set. Step 16 is a disabled alternative. Steps 18, 25, 26, 38 use an unresolved plugin function (<Function Missing>). Every property gets fmp-param=1 and the fixed schema $id ""http://karbon.geistinteractive.net/karbon.json""."
+karbon_Generator.fmp12/scripts/310-Import_Copied_Tables_to_API_Generator_Schema.txt,13f1f5d57e576fa3c9a9e28a6c1d319652ad449605411c9f53105f19519c1c83,scripts,karbon_Generator.fmp12,310,Import Copied Tables to API Generator Schema,utility,drop-candidate,tier3,"Menu script: imports copied BaseTable XML into ApiGeneratorLine records for the current API. Asks whether to add to or replace the existing map (replace deletes all lines of this API), creates one line per field with FileMaker path, data type, JSON path, read-only, and decides defaults: a field is not a parameter when it is ""Id"" on a Create API, ends in ""Ind"" or contains ""cache""; global and read-only fields are ignored by default; the field ""Id"" is flagged as the result. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGenerator::Entity#19
+ApiGenerator::id#1
+ApiGenerator::APIType#18
+ApiGeneratorLine::Id#1
+ApiGeneratorLine::FmpFieldName#4
+ApiGeneratorLine::readOnly#24
+ApiGeneratorLine::JsonPropertyName#21","delete: ApiGeneratorLine (Delete All Records step 27, found set from step 25, after the Replace choice)
+ApiGeneratorLine::ApiGeneratorId#2 (Set Field step 94, new record)
+ApiGeneratorLine::FmpDataType#28 (Set Field step 95, new record)
+ApiGeneratorLine::FmpFieldId#25 (Set Field step 96, new record)
+ApiGeneratorLine::FmpFieldName#4 (Set Field step 97, new record)
+ApiGeneratorLine::FmpPath#30 (Set Field step 98, new record)
+ApiGeneratorLine::FmpTableName#10 (Set Field step 99, new record)
+ApiGeneratorLine::readOnly#24 (Set Field step 100, new record)
+ApiGeneratorLine::description#22 (Set Field step 101, new record)
+ApiGeneratorLine::type#23 (Set Field step 102, new record)
+ApiGeneratorLine::JsonPropertyName#21 (Set Field step 103, new record)
+ApiGeneratorLine::JsonPathIn#27 (Set Field step 104, new record)
+ApiGeneratorLine::FmpParam#29 (Set Field steps 108, 110, new record)
+ApiGeneratorLine::FmpIgnore#11 (Set Field step 115, new record)
+ApiGeneratorLine::FmpResult#43 (Set Field step 119, new record)
+ApiGenerator::JsonSchema#26 (Set Field step 129, current record)","karbon_Generator.fmp12/scripts/230 (""Get Field Metadata as JSON"", step 70)","objects/karbon_Generator.fmp12/layouts/61-API_Generator.txt
+objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt","<Function Missing> plugin call (step 43)
+<Function Missing> plugin call (step 64)
+<Function Missing> plugin call (step 65)","Step 129 sets ApiGenerator::JsonSchema from $json, which is never set in this script. Step 134 exits with $new, which is never set. 13 steps are disabled (the parent object creation). Step 27 deletes all records of the related ApiGeneratorLine found set after the user picks ""Replace"". Steps 43, 65 use an unresolved plugin function (<Function Missing>)."
+karbon_Generator.fmp12/scripts/328-Import_Copied_Scripts_to_Script_Table.txt,58df7acc0ff6b1360c2eec1e3bc0631ec01f03bab47164559d2b6ca7cf59ef12,scripts,karbon_Generator.fmp12,328,Import Copied Scripts to Script Table,utility,drop-candidate,tier3,Menu script: reads copied Script XML from the clipboard and loops over every copied script reading its name and id into variables. Nothing is stored; the loop only collects values. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?,none,none,none,objects/karbon_Generator.fmp12/layouts/72-Get_Schema.txt,"<Function Missing> plugin call (step 15)
+<Function Missing> plugin call (step 19)
+<Function Missing> plugin call (step 20)","The loop ends when the XPath result is ""?"" ; the name and id variables are never written to a table, so the script has no lasting effect (work in progress). Step 31 exits with $new, which is never set. Steps 15, 19, 20 use an unresolved plugin function (<Function Missing>)."
+karbon_Generator.fmp12/scripts/329-Create_Scripts_for_Selected_File.txt,c888eeb515cca6016aadb0bc5b7b16dbc166a59c8ea1b2cb81ab71e086470cdc,scripts,karbon_Generator.fmp12,329,Create Scripts for Selected File,utility,drop-candidate,tier3,"Menu script: loops over copied scripts to read names and ids, but uses $clip and $ScriptIndex that are never set in this script (step 2 is an empty Set Variable), so it does nothing useful. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?",none,none,none,none found (in Scripts menu),"<Function Missing> plugin call (step 6)
+<Function Missing> plugin call (step 10)
+<Function Missing> plugin call (step 11)","Step 2 is an empty Set Variable [ ], $clip and $ScriptIndex are not set, so the loop would not end if the XPath did not return ""?"". Step 22 exits with $new, which is never set. Unfinished; no caller found. Steps 6, 10, 11 use an unresolved plugin function (<Function Missing>)."
+karbon_Generator.fmp12/scripts/461-Import_Copied_JSON_to_API_Generator_Id.txt,8ff69b19d84def68575a57d07b31d3384736b439e6a28538971ec0f22101b84a,scripts,karbon_Generator.fmp12,461,Import Copied JSON to API Generator ( Id ),utility,drop-candidate,tier3,"Menu script: takes JSON from the clipboard (plain text), asks whether to add to or replace the existing map (replace deletes all ApiGeneratorLine records of the API), flattens the JSON into property paths (script 18) and creates one ApiGeneratorLine record per property with the JSON property name and FmpParam=1. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGeneratorLine::Id#1
+FieldMap::JSONDocument#5","delete: ApiGeneratorLine (Delete All Records step 27, found set from step 25, after the Replace choice)
+FieldMap::JSONDocument#5 (Set Field step 34, current record)
+ApiGeneratorLine::ApiGeneratorId#2 (Set Field step 50, new record)
+ApiGeneratorLine::JsonPropertyName#21 (Set Field step 51, new record)
+ApiGeneratorLine::FmpParam#29 (Set Field step 52, new record)","karbon_Generator.fmp12/scripts/18 (""Flatten( JSON )"", step 37)",objects/karbon_Generator.fmp12/layouts/61-API_Generator.txt,<Function Missing> plugin call (step 10),"Step 59 exits with $new, which is never set. Step 49 sets $null in a Let that defines $path and $value as Let variables; the Let leaves them set only inside the calculation, so JsonPropertyName may be empty; confirm. Step 10 uses an unresolved plugin function (<Function Missing>) to read the clipboard text."
+karbon_Generator.fmp12/scripts/463-New_Script.txt,34e85405dc153f94a6c65cb8a10072a74911f8df106321f5f2987087d4b4095b,scripts,karbon_Generator.fmp12,463,New Script,empty,drop-candidate,tier3,Empty script with no steps. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?,none,none,none,none found (in Scripts menu),none,Menu script (includeInMenu=True) with 0 steps.

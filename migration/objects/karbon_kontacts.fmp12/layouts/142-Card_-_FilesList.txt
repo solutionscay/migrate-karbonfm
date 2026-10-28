@@ -1,0 +1,73 @@
+# layout 142: Card - FilesList
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Invoices
+# source: LayoutCatalog/Layout[@id=142]
+# objects: 11
+# theme: Karbon-1.0
+# folder group: id=66 groupCollapsed=False includeInMenu=False
+
+Layout width=340 quickFind=True includeInMenu=False id=142 name="Card - FilesList"
+  Table id=1065293 name=File
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  Object type=Text key=5 LabelKey=0 bounds=20,20,60,260
+    Text flags=2 style=H1-Primary: Files
+  Object type=Field key=34 LabelKey=0 bounds=90,230,180,320
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Cont-Icon
+      Field: File::Thumbnail#24
+  Object type=Field key=40 LabelKey=0 bounds=90,17,114,160
+    FieldObj numOfReps=1 flags=1048596 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+      Field: File::FileName#6
+  Object type=ButtonBar key=46 LabelKey=0 style=BB-TextObject-Small-Muted bounds=121,23,141,273
+    ButtonBarObj segmentKey=0
+      Object type=Button key=49 LabelKey=0 bounds=121,23,141,273
+        Text flags=2 style=BB-TextObject-Small-Muted
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+        LabelCalc
+          Calculation:
+            | GetAsDate ( File::CreationTimestamp )
+            refs: fn:GetAsDate, File::CreationTimestamp#2
+  Object type=Button key=50 LabelKey=0 bounds=20,280,60,320
+    Text flags=2 style=Button-CardCloseCenter
+    ButtonObj buttonFlags=0 iconSize=20 displayType=1
+      Step enable=True id=121 name="Close Window"
+        StepText: Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+      Image name=a29_x.svg
+  Object type=Button key=51 LabelKey=0 flags=-1610612736 bounds=180,350,210,450
+    Text flags=6 style=Button-Small-CommandLink: Add
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “<unknown>”; Parameter: File::Id ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Exit
+        Calculation:
+          | File::Id
+          refs: File::Id#1
+        Script id=539 name=<unknown> ref=missing
+  Object type=Line key=52 LabelKey=0 flags=12288 bounds=81,0,81,353
+  Object type=Button key=53 LabelKey=0 flags=-1610612736 bounds=180,220,210,320
+    Text flags=6 style=Button-Small-CommandLink-Center: Download
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Download and Open File from SalesTransaction”; Parameter: File::FileName ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Exit
+        Calculation:
+          | File::FileName
+          refs: File::FileName#6
+        Script id=541 name="btn: Download and Open File from SalesTransaction"
+  Object type=Line key=54 LabelKey=0 flags=12288 bounds=200,380,200,733
+  Object type=Button key=55 LabelKey=0 flags=-1610612736 bounds=180,23,210,123
+    Text flags=6 style=Button-Small-CommandLink: Add
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “deprecated_btn: Add Existing File as FileAttachment to SalesTransaction”; Parameter: File::Id ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Exit
+        Calculation:
+          | File::Id
+          refs: File::Id#1
+        Script id=626 name="deprecated_btn: Add Existing File as FileAttachment to SalesTransaction"

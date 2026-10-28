@@ -1,0 +1,136 @@
+# table 145: Generators
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=145]
+# fields: 13
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=name
+  Comment: this needs to not have spaces, no caps
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Generators:
+      | Let(
+      | [
+      | s = Self;
+      | s = Lower(s);
+      | s = Substitute ( s; [" "; "-"] );
+      | s = Filter( s ; "-0123456789abcdefghijklmnopqrstuvwxyz")
+      | 
+      | 
+      | ];
+      | 
+      | s 
+      | 
+      | )
+      refs: fn:Let, fn:Self, fn:Lower, fn:Substitute, fn:Filter
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=description
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=clip
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Number fieldType=Normal name=version
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Calculated name=asJSON
+  Calculation table=Generators:
+    | 
+    | 
+    | Let(
+    | [
+    | 
+    | prompts  = List(GeneratorTokens::asJSON) ;
+    | prompts = "["  & Substitute( prompts; "¶"; "," ) & "]"
+    | 
+    | ] ;
+    | 
+    | jsonO(
+    |   jsonOp("name" ; name ) & 
+    |   jsonOp("order" ; order ) & 
+    |   jsonOp("version" ; version ) &
+    |   jsonOp("description" ; description ) &
+    |   jsonOp("clipType"; clipType ) &
+    |   jsonOp("prompts"; prompts )  
+    | )
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:List, GeneratorTokens::asJSON#7, fn:Substitute, cf:jsonO, cf:jsonOp, Generators::name#1, Generators::order#14, Generators::version#4, Generators::description#2, Generators::clipType#6
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=clipType
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Number fieldType=Normal name=lastReadMS
+  Comment: field used to check for packages that got deleted
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=readME
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=readPackageError
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Generators (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Generators:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Calculated name=clipAsCalc
+  Calculation table=Generators:
+    | "List(¶\"" & 
+    | Substitute(
+    |     clip;
+    |     ["\""; "\\\""];
+    |     [ Char(10); "\";¶\""]
+    | )
+    | &
+    | "\"¶)"
+    refs: fn:Substitute, Generators::clip#3, fn:Char
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Number fieldType=Normal name=order
+  Comment: this is for sorting a bunch of generators in a certain order
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

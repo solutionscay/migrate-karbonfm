@@ -1,0 +1,458 @@
+# script 533: Phone Lookup
+# file: karbon_kontroller.fmp12
+# folder: Modules / Twilio / Public
+# source: ScriptCatalog/Script[@id=533]
+# steps: 119 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=536 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #The Lookup API provides a way to retrieve additional information about a phone number
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {object} Data
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {string} Data.PhoneNumber
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {string} Data.CountryCode - a two-character alphanumeric ISO code for the country
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {string} [Data.Format] - inherits from settings; pass a value if you want to override. Of type enum: "National format", "E.164 standard format"
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@note There are additional parameters that cost money. For now, we're only including the free lookup functionality
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnSuccess {object} Result
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnSuccess {string} Result.PhoneNumber - the phone in national or E.164 format. See <https://en.wikipedia.org/wiki/E.164>
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@history 2018-08-12 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  31    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  40    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $defaults; Value:JSONSetElement ( "{}" ; "Format" ; "National format" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $defaults
+  48    Set Variable [ $data; Value:JSON.Merge ( $defaults ;  Get( ScriptParameter ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Merge, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $data; Value:JSON.Format( $data  ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  54    Set Variable [ $error; Value:$data ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  55    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  56    End If
+        DisableStepCollapsed state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $error; Value:JSON.Validate.This ( $data ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "PhoneNumber" ) ; 
+        		JSON.Validate.Rule.IsOneOf ( "Format" ; List ( "National format" ; "E.164 standard format" ) ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired, cf:JSON.Validate.Rule.IsOneOf
+        Name: $error
+  61    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    Set Variable [ $PhoneNumber; Value:JSONGetElement ( $data ; "PhoneNumber" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PhoneNumber
+  69    Set Variable [ $CountryCode; Value:JSONGetElement ( $data ; "CountryCode" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CountryCode
+  70    Set Variable [ $Format; Value:JSONGetElement ( $data ; "Format" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Format
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Set Variable [ $url; Value:"https://lookups.twilio.com/v1/PhoneNumbers/" & $PhoneNumber ]
+        DisableStepCollapsed state=False
+        Name: $url
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #TODO: validate Twilio is configured
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #SEND API CALL
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Set Variable [ $requestJSON; Value:Let(
+        [
+          json="{}";
+          json = JSONSetElement( json ; "method" ; "GET"; JSONString );
+          json = JSONSetElement( json ; "url" ; $url ; JSONString );
+          json = JSONSetElement( json ; "query.CountryCode" ; $CountryCode ; "" );
+          null=""
+        ];
+        
+        json
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Perform Script [ “_Authenticate and Send Request { RequestJSON }”; Parameter: $requestJSON ]
+        DisableStepCollapsed state=False
+        Script id=535 name="_Authenticate and Send Request { RequestJSON }"
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Set Variable [ $body; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    If [ Error.IsError ( $body ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  86    Set Variable [ $error; Value:$body ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  87    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  88    End If
+        DisableStepCollapsed state=False
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90 // Insert Text [ $SAMPLE RESULT ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "country_code": "US",
+          |   "phone_number": "+16191112222",
+          |   "add_ons": null,
+          |   "caller_name": null,
+          |   "carrier": null,
+          |   "national_format": "(619) 111-2222",
+          |   "url": "https://lookups.twilio.com/v1/PhoneNumbers/+16191112222"
+          | }
+        Field: $SAMPLE RESULT
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    If [ $Format = "E.164 standard format" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #Return phone number in E.164 format
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    Set Variable [ $PhoneNumber; Value:JSONGetElement ( $body ; "phone_number" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PhoneNumber
+  95    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #Use national format
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    Set Variable [ $PhoneNumber; Value:JSONGetElement ( $body ; "national_format" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PhoneNumber
+  98    End If
+        DisableStepCollapsed state=False
+  99    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 100    Set Variable [ $result; Value:JSONSetElement ( "{}" ; "PhoneNumber" ; $PhoneNumber ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 104    End Loop
+        DisableStepCollapsed state=False
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 112    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 113    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 115    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 116    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 118    End If
+        DisableStepCollapsed state=False
+ 119    #
+        DisableStepCollapsed state=False
+        Restore state=False

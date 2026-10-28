@@ -1,0 +1,329 @@
+# table 142: Activity
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=142]
+# fields: 38
+# records: 0
+
+Field id=6 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Activity:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=Activity:
+      | Get ( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=Date fieldType=Normal name=DateDisplay
+  Comment: updated via script based on Activity date rules
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=76 dataType=Time fieldType=Normal name=TimeDisplay
+  Comment: updated via script based on Activity date rules
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=Subject
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Text fieldType=Normal name=ActivityParentId
+  Comment: The activity record that this activity is related to
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=74 dataType=Number fieldType=Normal name=EmailMessageInd
+  Comment: True if this activity is a email message (subtype)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=90 dataType=Number fieldType=Normal name=EventInd
+  Comment: True if this activity is an event (subtype)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=73 dataType=Number fieldType=Normal name=NoteInd
+  Comment: True if this activity is a note (subtype)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=99 dataType=Text fieldType=Normal name=ActivityPurposeId
+  Comment: Used to categorize activities by their purpose
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=Activity:
+      | /*Template::ActivityPurposeId*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=100 dataType=Number fieldType=Normal name=ActivityTypeId
+  Comment: The foreign key of the activity type
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=107 dataType=Number fieldType=Normal name=AlertInd
+  Comment: True if the activity alert should show
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Activity (inactive):
+      | If( Self = 1 ; 1 ; 0 )
+      refs: fn:If, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=117 dataType=TimeStamp fieldType=Normal name=CompletionTimestamp_deprecated
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=Activity:
+      | If( AlertInd ; Get( CurrentHostTimestamp ) ; "" )
+      refs: fn:If, Activity::AlertInd#107, fn:Get, fn:CurrentHostTimestamp
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=118 dataType=Text fieldType=Normal name=CompletionAccountName_deprecated
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=Activity:
+      | If ( AlertInd ; Get( AccountName ) ; "" )
+      refs: fn:If, Activity::AlertInd#107, fn:Get, fn:AccountName
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=129 dataType=Text fieldType=Summary name=IdList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=1 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=171 dataType=Number fieldType=Normal name=TaskInd
+  Comment: True if this activity is a task (subtype)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=178 dataType=Number fieldType=Normal name=CommentInd
+  Comment: Indicates activity subtype of Comment
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=180 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=181 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=182 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=Activity (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=183 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=Activity:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=184 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=Activity (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=OnlyDuringDataEntry
+    Calculation table=Activity (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=188 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=Activity:
+    | Let([
+    | 	activityParties =  JSON.ArrayFromRelated ( ActivityParty::AsJSON ) ; 
+    | 
+    | 	activityJson = JSONSetElement ( "{}" ; 
+    | 
+    | 
+    | 		[ "ActivityGroupId" ; ActivityGroupId ; JSONString ];
+    | 		[ "ActivityParentID" ; ActivityParentId ; JSONString ];
+    | 		[ "ActivityPurposeId" ; ActivityPurposeId ; JSONString ];
+    | 		[ "ActivityTypeId" ; ActivityTypeId ; JSONString ];
+    | 		[ "CommentInd" ; CommentInd ; JSONString ];
+    | 	
+    | 		[ "EmailMessageInd" ; EmailMessageInd ; JSONString ];
+    | 		[ "EventInd" ; EventInd ; JSONString ];
+    | 		[ "Id" ; Id ; JSONString ];
+    | 		[ "NoteInd" ; NoteInd ; JSONString ];
+    | 		[ "Date" ; DateDisplay ; JSONString ];
+    | 		[ "Time" ; TimeDisplay ; JSONString ];
+    | 		[ "Subject" ; Subject ; JSONString ];
+    | 		[ "TaskInd" ; TaskInd ; JSONString ];
+    | 
+    | 		[ "ActivityParty" ; activityParties ; JSONArray ]
+    | 
+    | 	)
+    | 
+    | ];
+    | 
+    | 
+    | 	JSONSetElement ( "{}" ; "Activity" ; activityJson ; JSONObject )
+    | 
+    | 
+    | )
+    refs: fn:Let, cf:JSON.ArrayFromRelated, ActivityParty::AsJSON#71, fn:JSONSetElement, Activity::ActivityGroupId#191, fn:JSONString, Activity::ActivityParentId#46, Activity::ActivityPurposeId#99, Activity::ActivityTypeId#100, Activity::CommentInd#178, Activity::EmailMessageInd#74, Activity::EventInd#90, Activity::Id#1, Activity::NoteInd#73, Activity::DateDisplay#56, Activity::TimeDisplay#76, Activity::Subject#22, Activity::TaskInd#171, fn:JSONArray, fn:JSONObject
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=190 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Activity (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=191 dataType=Text fieldType=Normal name=ActivityGroupId
+  Comment: Optional field - Some activities such as tasks are grouped for simple management
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=193 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=Activity:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=194 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Activity:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=195 dataType=Number fieldType=Normal name=TemplateId
+  Comment: Foreign key
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=196 dataType=Text fieldType=Normal name=CompletedByCached_deprecated
+  Comment: The name of the Party that marked this as complete.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=197 dataType=Text fieldType=Normal name=CreatorCached
+  Comment: The name of the Party created this Activity
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=198 dataType=Text fieldType=Normal name=PartiesCached
+  Comment: a comma separated list of parties associated with this activity
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=200 dataType=Text fieldType=Normal name=OpportunityId_DEPRECATED
+  Comment: Use ActivityEntity to link activity to related entities.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=201 dataType=Number fieldType=Normal name=CallInd
+  Comment: True if this activity is a call (subtype)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=202 dataType=Number fieldType=Normal name=ChatInd
+  Comment: True if this activity is a Chat (subtype)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=205 dataType=Number fieldType=Normal name=DiscussionInd
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=206 dataType=TimeStamp fieldType=Normal name=LastUpdated
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=207 dataType=Number fieldType=Normal name=CommentCountCached
+  Comment: The number of related comments; applies to Discussions only
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=208 dataType=Text fieldType=Normal name=DiscussionAllowedFor
+  Comment: One of: Our Team Only or  Client
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

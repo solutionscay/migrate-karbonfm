@@ -1,0 +1,37 @@
+# script 28: btn: Restore to a New Request
+# file: karbon_Generator.fmp12
+# folder: App Modules / Requests / Public / Buttons
+# source: ScriptCatalog/Script[@id=28]
+# steps: 6 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=114 groupCollapsed=False includeInMenu=False
+
+   1    Set Variable [ $request; Value:RequestHistory::request ]
+        DisableStepCollapsed state=False
+        Value
+          refs: RequestHistory::request#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+   2    Set Variable [ $request; Value:jsonModify($request ; "response" ; RequestHistory::response ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonModify, RequestHistory::response#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+   3    New Record/Request
+        DisableStepCollapsed state=False
+   4    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Perform Script [ “Restore History To Current Request ( request )”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=8 name="Restore History To Current Request ( request )"

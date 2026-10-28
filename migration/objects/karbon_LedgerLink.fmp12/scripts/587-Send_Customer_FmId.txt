@@ -1,0 +1,92 @@
+# script 587: Send Customer ( FmId )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Public / Customer
+# source: ScriptCatalog/Script[@id=587]
+# steps: 22 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=588 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Send a customer to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {string} FmId the primary Id of the customer record to send to QuickBooks
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $Entity; Value:"Customer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  11    Set Variable [ $FmId; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $FmId
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ IsEmpty ( $FmId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  14    Exit Script [ Result: QBO.Error ( "Missing the Customer Id"; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:QBO.Error
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "FmId" ; $FmId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  20    Perform Script [ “Send FMData To QBO ( {Entity , FmID} )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=302 name="Send FMData To QBO ( {Entity , FmID} )"
+  21    Exit Script [ Result: Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False

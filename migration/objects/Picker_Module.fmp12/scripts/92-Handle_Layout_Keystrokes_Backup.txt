@@ -1,0 +1,145 @@
+# script 92: Handle Layout Keystrokes Backup
+# file: Picker Module.fmp12
+# folder: Modules / Contact Picker (Contacts Sample File) / Public / Triggers
+# source: ScriptCatalog/Script[@id=92]
+# steps: 42 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=17 groupCollapsed=True includeInMenu=False
+
+   1    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    If [ Code( Get ( TriggerKeystroke ) ) = 27 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:TriggerKeystroke
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #user pressed escape; cancel picker
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Cancel Picker” ]
+        DisableStepCollapsed state=False
+        Script id=75 name="Cancel Picker"
+   6    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Else If [ Get ( ActiveLayoutObjectName ) = "searchField" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:ActiveLayoutObjectName
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Else If [ Code( Get ( TriggerKeystroke ) ) = 9 // tab
+        
+        and IsEmpty( Get ( ActiveLayoutObjectName ) ) // no focus ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:TriggerKeystroke, fn:and, fn:IsEmpty, fn:ActiveLayoutObjectName
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #Pressed tab key and the current layout object isn't named, then go to the search field.
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Go to Object [ Object Name: "searchField"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Else If [ Code( Get ( TriggerKeystroke ) ) = 9 // tab
+        
+        and Get ( ActiveLayoutObjectName ) = "searchField" // currently in search field
+        
+        and Get( ActiveModifierKeys ) = 1 // shift key ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:TriggerKeystroke, fn:and, fn:ActiveLayoutObjectName, fn:ActiveModifierKeys
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #Pressed shift+tab while in the search field: go to last record in the list
+        DisableStepCollapsed state=False
+        Restore state=False
+  20 // Go to Object [ Object Name: "cancelButton"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Else If [ Code( Get ( TriggerKeystroke ) ) = 9 // pressed tab key
+        
+        and Get ( ActiveLayoutObjectName ) = "cancelButton" 
+        
+        and Get ( FoundCount ) // we have a found set ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:TriggerKeystroke, fn:and, fn:ActiveLayoutObjectName, fn:FoundCount
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #the cancel button is active and the user pressed the tab key
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ Get( LastError ) = 101 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  31    #no found set
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Go to Object [ Object Name: "buttonExecute"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  33    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #activate the picker button
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Go to Object [ Object Name: "pickerButton"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  36    End If
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Exit Script [ Result: False // cancel the intended tab behavior ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True

@@ -1,0 +1,38 @@
+# script 613: Sync With Log
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink Sync API / Public
+# source: ScriptCatalog/Script[@id=613]
+# steps: 5 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=285 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Perform Script [ “_Sync QBO With FM” ]
+        DisableStepCollapsed state=False
+        Script id=243 name="_Sync QBO With FM"
+   3    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $result; Value:JSONSetElement ( $result ;
+        
+        ["file"; Get(FileName) ; JSONString] ;
+        ["module"; "LedgerLink" ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:FileName, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result

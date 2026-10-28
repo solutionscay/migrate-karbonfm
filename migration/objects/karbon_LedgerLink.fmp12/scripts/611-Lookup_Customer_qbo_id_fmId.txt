@@ -1,0 +1,73 @@
+# script 611: Lookup Customer qbo_id ( fmId )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Karbon Overrides
+# source: ScriptCatalog/Script[@id=611]
+# steps: 13 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=605 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $fmId; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $fmId
+   4    Set Variable [ $Entity; Value:"Customer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "FMId" ; $FMId ; JSONString ];
+        	[ "Entity" ; $Entity ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   9    Perform Script [ “Lookup QBOId { FMId, Entity }” from file: “DataSourceControllerFile”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        FileReference id=7 name=DataSourceControllerFile
+          UniversalPathList
+            | file:karbon_kontroller
+            | $$DataSourceControllerFile
+        Script id=327 name="Lookup QBOId { FMId, Entity }" ref=external
+  10    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False

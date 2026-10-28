@@ -1,0 +1,167 @@
+# script 241: Handler: Address Selection from Contact Card
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Address Picker
+# source: ScriptCatalog/Script[@id=241]
+# steps: 44 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=238 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-08-04 dave@geistinteractive.com - handle selection of address from API and insert into utility fields
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Perform Script [ “Address Handler Common Tests” ]
+        DisableStepCollapsed state=False
+        Script id=243 name="Address Handler Common Tests"
+   4    Set Variable [ $results; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+   5    If [ Error.IsError ( $results ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   6    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #Init vars
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $createAddress; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $createAddress
+  12    Set Variable [ $addressCount; Value:JSONGetElement ( $results ; "Result.AddressCount" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $addressCount
+  13    Set Variable [ $addressArray; Value:JSONGetElement ( $results ; "Result.AddressArray" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $addressArray
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ Get( ScriptResult ) = -2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:ScriptResult
+  16    #user canceled; exit
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  18    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ $addressCount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #a pick was made; destroy timer
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $thisAddress; Value:JSONGetElement ( $results ; "Result.AddressArray[0]" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisAddress
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Field [ UtilityContactMethod::AddressLine1; JSONGetElement ( $thisAddress ; "AddressLine1" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=1 name=AddressLine1
+  30    Set Field [ UtilityContactMethod::AddressLine2; JSONGetElement ( $thisAddress ; "AddressLine2" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=2 name=AddressLine2
+  31    Set Field [ UtilityContactMethod::City; JSONGetElement ( $thisAddress ; "City" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=4 name=City
+  32    Set Field [ UtilityContactMethod::County; JSONGetElement ( $thisAddress ; "County" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=6 name=County
+  33    Set Field [ UtilityContactMethod::PostalCode; JSONGetElement ( $thisAddress ; "PostalCode" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=8 name=PostalCode
+  34    Set Field [ UtilityContactMethod::StateProvince; JSONGetElement ( $thisAddress ; "StateProvince" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=10 name=StateProvince
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    End If
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False

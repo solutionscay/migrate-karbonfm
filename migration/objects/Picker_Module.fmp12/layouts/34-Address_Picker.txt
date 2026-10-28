@@ -1,0 +1,71 @@
+# layout 34: Address Picker
+# file: Picker Module.fmp12
+# folder: Address Picker
+# source: LayoutCatalog/Layout[@id=34]
+# objects: 10
+# theme: Cool Gray
+# folder group: id=31 groupCollapsed=False includeInMenu=True
+
+Layout width=460 quickFind=True includeInMenu=True id=34 name="Address Picker"
+  Table id=1065117 name=VirtualListAddressPicker
+  CustomMenuSet id=1 name="[Standard FileMaker Menus]"
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=False showFieldFrames=False saveRecord=True
+  Object type=Button key=15 LabelKey=0 name=pickerButton flags=1073807360 bounds=90,0,130,460
+    ScriptTriggers
+      Trigger event=OnObjectKeystroke id=5 triggerFlags=1(browse)
+        Script id=141 name="_wip_Handle Keystroke on Address Picker Row"
+        TriggerText: "_wip_Handle Keystroke on Address Picker Row"
+    Text flags=2 style="Selector Button"
+    ButtonObj buttonFlags=0 iconSize=8 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Select Address” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Resume
+        Script id=118 name="Select Address"
+  Object type=Rect key=26 LabelKey=0 flags=268435456 style="Search Field Old" bounds=20,20,50,440
+  Object type=Button key=29 LabelKey=0 name=cancelButton flags=268435456 bounds=26,412,44,430
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=49 name=Clear
+        StepText
+          | Clear [ Picker::Search_Field ]
+          | [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+      Image name=a27_XCircle.svg
+  Object type=Button key=30 LabelKey=0 flags=268435456 bounds=27,30,43,46
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Image name=a89_find.svg
+  Object type=Field key=31 LabelKey=0 name=searchField flags=285212672 bounds=20,50,50,410
+    ScriptTriggers
+      Trigger event=OnObjectModify id=3 triggerFlags=1(browse)
+        Script id=110 name="Delay Show Results"
+        TriggerText: "Delay Show Results"
+    FieldObj numOfReps=1 flags=114 inputMode=0 keyboardType=0 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Picker::Search_Field#1
+      PlaceholderText findMode=True
+        Calculation:
+          | If ( 
+          | 	JSON.IsValid ( Picker::Settings_PlaceholderText ) ; 
+          | 		Picker::Settings_PlaceholderText 
+          | )
+          refs: fn:If, cf:JSON.IsValid, Picker::Settings_PlaceholderText#13
+  Object type=Rect key=32 LabelKey=0 name=headerBackground flags=1073741824 style="Title Bar Shape" bounds=0,0,90,461
+  Object type=Field key=38 LabelKey=0 name=ContactName bounds=100,20,118,440
+    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style="Command Link"
+      Field: VirtualListAddressPicker::Address.RowData#12
+  Object type=Field key=41 LabelKey=0 name=foundCount flags=268435456 bounds=54,20,80,380
+    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Minimal Edit Box"
+      Field: Picker::FoundCount#22
+  Object type=Field key=43 LabelKey=0 flags=268435456 bounds=65,250,80,420
+    ScriptTriggers
+      Trigger event=OnObjectModify id=3 triggerFlags=1(browse)
+        Script id=203 name="Dispatch Address Search"
+        TriggerText: "Dispatch Address Search"
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=0 displayType=4(radio-button-set) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Picker::AddressServiceProviderThisSession#25
+      ValueList: AddressServiceProvider#1
+  Object type=Text key=45 LabelKey=0 flags=268435456 bounds=54,250,69,286
+    Text flags=2 style="• Navigation Part Text": Using:

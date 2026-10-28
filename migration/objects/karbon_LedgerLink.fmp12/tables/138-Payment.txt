@@ -1,0 +1,140 @@
+# table 138: Payment
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=138]
+# fields: 17
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Invoice_PaymentLine_Payment:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=id_Customer
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Date fieldType=Normal name=date
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=FourDigitYear
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Number fieldType=Normal name=amount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=id_DepositAccount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=PrivateNote
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=PaymentRefNum
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=qbo_error
+  Comment: error message returned by QBO when attempting to sync this record
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=Always
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Number fieldType=Normal name=qbo_send
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Invoice_PaymentLine_Payment:
+      | Let(
+      | [
+      | x = GetField("")
+      | 
+      | ];
+      | Case(
+      |    $LL_IsUpdatingThisRecord ; Self;
+      |    1
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:GetField, fn:Case, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Normal name=qbo_deleted
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=id_PaymentMethod
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=TimeStamp fieldType=Normal name=qbo_LastUpdated
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Calculated name=BillTo.C.ID_MatchOpen
+  Calculation table=Invoice_PaymentLine_Payment:
+    | id_Customer & "_Open"
+    refs: Invoice_PaymentLine_Payment::id_Customer#2
+  Storage storeCalculationResults=True index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Number fieldType=Calculated name=TotalAllocatedPayments
+  Calculation table=Payment:
+    | Sum(Payment_PaymentLine::amount)
+    refs: fn:Sum, Payment_PaymentLine::amount#4
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Calculated name=TotalUnallocated
+  Calculation table=Invoice_PaymentLine_Payment:
+    | Case(
+    | amount <= 0 ; 0;
+    | amount - TotalAllocatedPayments
+    | )
+    refs: fn:Case, Invoice_PaymentLine_Payment::amount#4, Invoice_PaymentLine_Payment::TotalAllocatedPayments#19
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Calculated name=IncludedInVoiceIDs
+  Calculation table=Payment:
+    | List(Payment_PaymentLine::id_Invoice)
+    refs: fn:List, Payment_PaymentLine::id_Invoice#7
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

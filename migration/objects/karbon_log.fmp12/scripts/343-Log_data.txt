@@ -1,0 +1,152 @@
+# script 343: _Log ( data )
+# file: karbon_log.fmp12
+# folder: API / Private
+# source: ScriptCatalog/Script[@id=343]
+# steps: 34 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=339 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #if it's empty set this to something reasonable for Prod
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ IsEmpty ( Settings::DefaultLogLevelWriteToDB ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Settings::DefaultLogLevelWriteToDB#7
+   5    Set Field [ Settings::DefaultLogLevelWriteToDB; 4 ]
+        DisableStepCollapsed state=False
+        Field table=Settings id=7 name=DefaultLogLevelWriteToDB
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #check on session settings in case it has been overridden
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ IsEmpty ( Settings::SessionLogLevelWriteToDB ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Settings::SessionLogLevelWriteToDB#8
+  10    Set Variable [ $logToDBLevel; Value:Settings::DefaultLogLevelWriteToDB ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Settings::DefaultLogLevelWriteToDB#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $logToDBLevel
+  11    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $logToDBLevel; Value:Settings::SessionLogLevelWriteToDB ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Settings::SessionLogLevelWriteToDB#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $logToDBLevel
+  13    End If
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $LogEntryArray; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $LogEntryArray
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Go to Layout [ “Log” (Log) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=17 name=Log
+  18    Set Variable [ $LogEntries; Value:JSONListValues ( $LogEntryArray; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListValues
+        Repetition
+          Calculation:
+            | 1
+        Name: $LogEntries
+  19    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  20    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $LogEntry; Value:GetValue ( $LogEntries ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $LogEntry
+  22    Exit Loop If [ IsEmpty( $LogEntry ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $levelNumber; Value:Let(
+        [
+        level = JSONGetElement($LogEntry; "Level")
+        ];
+        Case(
+          level = "emerg"; 0;
+          level = "alert"; 1;
+          level = level = "crit"; 2;
+          level = "error"; 3;
+          level = "warning"; 4;
+          level = "notice"; 5;
+          level = "info"; 6;
+          level = "debug"; 7
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:JSONGetElement, fn:Case
+        Name: $levelNumber
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #write to table
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    If [ $levelNumber <= $logToDBLevel ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    New Record/Request
+        DisableStepCollapsed state=False
+  29    Set Field [ Log::LogEntryJSON; $LogEntry ]
+        DisableStepCollapsed state=False
+        Field table=Log id=4 name=LogEntryJSON
+  30    End If
+        DisableStepCollapsed state=False
+  31    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  32    End Loop
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False

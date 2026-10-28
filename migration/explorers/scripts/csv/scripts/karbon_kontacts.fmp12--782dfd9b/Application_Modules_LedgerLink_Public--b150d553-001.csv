@@ -1,0 +1,27 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/214-Send_Invoice_to_QBO_FMId.txt,fabb0112ac2749b45ae14f3e47a7d4391dd16e4ad8d05a135cf1d7f126a07773,scripts,karbon_kontacts.fmp12,214,Send Invoice to QBO( FMId ),orchestration,external-adapter,tier2,"Sends an invoice to QBO: warns and offers to create the customer in QBO when no QBO customer exists; pushes any invoice line items that lack a QBO id; sends the invoice; refreshes it from QBO (tax, balance); then sends each attached file flagged qbo_send.","SalesTransaction::id_Customer#7
+Party_PartyRole_ExternalLink::ExternalId#10
+Party_PartyRole_ExternalLink::InternalId#2
+Party_PartyRole_ExternalLink::ExternalLinkTypeId#9
+SalesLine::ItemId#9
+SalesLine::id#1
+Item::qbo_id#2
+Item::id#1
+FileAttachment::AttachmentId#8
+FileAttachment::EntityId#7
+File::qbo_send#20
+File::Id#1",none,"karbon_kontacts.fmp12/scripts/323 ""btn Send Customer to QBO"" (step 16)
+karbon_LedgerLink.fmp12/scripts/302 ""Send FMData To QBO ( {Entity , FmID} )"" (step 35, other file)
+karbon_LedgerLink.fmp12/scripts/302 ""Send FMData To QBO ( {Entity , FmID} )"" (step 48, other file)
+karbon_kontacts.fmp12/scripts/222 ""Refresh Invoice From QBO ( qbo_id )"" (step 57)
+karbon_kontacts.fmp12/scripts/535 ""Send Attachable to QBO (FmId)"" (step 69)",objects/karbon_kontacts.fmp12/scripts/329-Open_Card_-_EmailAddressPicker.txt (step 17),none,"Contains the disabled direct call to Send Invoice ( FmId ). Stops on the first error, leaving earlier items already sent. Shows dialogs, so it needs a UI. SQL.GetColumn calls are ExecuteSQL wrappers (not shown). Step 6 filters ExternalLinkTypeId = 5, which is assumed to mean QBO."
+karbon_kontacts.fmp12/scripts/222-Refresh_Invoice_From_QBO_qbo_id.txt,39a7f3de1486f0a8e9c7c4940aa778dc784c4f898df0bc77c12bf8399d0f758c,scripts,karbon_kontacts.fmp12,222,Refresh Invoice From QBO ( qbo_id ),integration,external-adapter,tier2,Pulls the current Invoice back from QBO into FileMaker by its QBO id and refreshes the window. The attachment refresh is disabled.,SalesTransaction::qbo_id#2,none,"karbon_LedgerLink.fmp12/scripts/145 ""Pull QBO Entity Into FileMaker ( {Entity, QBOId })"" (step 6, other file)","objects/karbon_kontacts.fmp12/layouts/69-Invoice.txt (layout object or trigger)
+objects/karbon_kontacts.fmp12/scripts/224-Display_Sales_Transaction_in_a_New_Window_Id.txt (dead code)
+objects/karbon_kontacts.fmp12/scripts/214-Send_Invoice_to_QBO_FMId.txt (step 57)",none,35 of 50 steps are disabled (attachment refresh via a QBO query).
+karbon_kontacts.fmp12/scripts/299-Refresh_SalesReceipt_From_QBO_qbo_id.txt,3e9c4b69ce02ca8baad13e04df344ff160dd98a302c9259248c48000842b1cd5,scripts,karbon_kontacts.fmp12,299,Refresh SalesReceipt From QBO ( qbo_id ),integration,external-adapter,tier2,Pulls the current SalesReceipt back from QBO into FileMaker by its QBO id. The attachment refresh is disabled.,SalesTransaction::qbo_id#2,none,"karbon_LedgerLink.fmp12/scripts/145 ""Pull QBO Entity Into FileMaker ( {Entity, QBOId })"" (step 7, other file)","objects/karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt (layout object or trigger)
+objects/karbon_kontacts.fmp12/scripts/224-Display_Sales_Transaction_in_a_New_Window_Id.txt (dead code)
+objects/karbon_kontacts.fmp12/scripts/582-Send_SalesReceipt_to_QBO_FMId.txt (step 15)
+objects/karbon_kontacts.fmp12/scripts/584-btn_Refresh_From_QBO.txt (step 4)",none,36 of 43 steps are disabled. No error dialog if the pull fails.
+karbon_kontacts.fmp12/scripts/535-Send_Attachable_to_QBO_FmId.txt,53cfc1cc199c95320b39deba9a3236e8f6d7de267e57aaff445b52644b9bea6a,scripts,karbon_kontacts.fmp12,535,Send Attachable to QBO (FmId),integration,external-adapter,tier2,"Sends one Attachable (File record) to QBO through the LedgerLink send script, after checking an id was given.",none,none,"karbon_LedgerLink.fmp12/scripts/289 ""_Send FMData To QBO ( {Entity , FmId )"" (step 21, other file)",objects/karbon_kontacts.fmp12/scripts/214-Send_Invoice_to_QBO_FMId.txt (step 69),none,The older Send FMData To QBO call (step 20) is disabled and replaced by an underscore version.
+karbon_kontacts.fmp12/scripts/582-Send_SalesReceipt_to_QBO_FMId.txt,89b901c7e8516205d49a4bced7276eee2f081eba0aebca5f13f54d2e4d7b7c0b,scripts,karbon_kontacts.fmp12,582,Send SalesReceipt to QBO (FMId),integration,external-adapter,tier2,"Sends a SalesReceipt to QBO through the LedgerLink send script, shows an error dialog on failure, and then refreshes the SalesReceipt from QBO.",none,none,"karbon_LedgerLink.fmp12/scripts/302 ""Send FMData To QBO ( {Entity , FmID} )"" (step 6, other file)
+karbon_kontacts.fmp12/scripts/299 ""Refresh SalesReceipt From QBO ( qbo_id )"" (step 15)",none found (may be called by name),none,"Step 4 reads the id from Get(ScriptResult) instead of Get(ScriptParameter), so the id is probably empty. The error dialog condition at step 10 is If ( IsEmpty($result); ... ), which looks inverted. No caller found."

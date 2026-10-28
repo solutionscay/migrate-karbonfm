@@ -1,0 +1,222 @@
+# script 325: Create JSONObject from Generator Using Portal
+# file: karbon_Generator.fmp12
+# folder: App Modules / JSONObjects / Public
+# source: ScriptCatalog/Script[@id=325]
+# steps: 49 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=284 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Perform Script [ “Seed Sample Data for GeneratorLine in Portal” ]
+        DisableStepCollapsed state=False
+        Script id=324 name="Seed Sample Data for GeneratorLine in Portal"
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $JSONIndex; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONIndex
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+   8    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $ThisType; Value:ApiGeneratorLine::type ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::type#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisType
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #check the type
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ $ThisType = "number" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $JSONType; Value:"JSONNumber" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONType
+  15    Else If [ $ThisType = "string" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $JSONType; Value:"JSONString" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONType
+  17    Else If [ $ThisType = "object" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $JSONType; Value:"JSONObject" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONType
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    If [ $JSONType = "JSONNumber" or $JSONType = "JSONString" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  22    Set Variable [ $ThisKey; Value:ApiGeneratorLine::JsonPropertyName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisKey
+  23    Set Variable [ $ThisValue; Value:ApiGeneratorLine::TestData ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::TestData#40
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisValue
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $Lines; Value:JSONSetElement ( $Lines ; 
+        [ "[" & $JSONIndex & "]Key" ; $ThisKey ; JSONString ];
+        [ "[" & $JSONIndex & "]JSONType" ; $JSONType ; JSONString ];
+        [ "[" & $JSONIndex & "]Value" ; $ThisValue ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Lines
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $JSONIndex; Value:$JSONIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $JSONIndex
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Go to Portal Row
+        [ Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=False
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    End Loop
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $param; Value:JSONSetElement ( "{}" ; 
+        [ "SimpleName" ; ApiGenerator::APIName & " - Generated" ; JSONString ];
+        [ "JSNObjectTypeId" ; 1005 ; JSONNumber ]; //JSON Example
+        [ "Entity" ; ApiGenerator::Entity ; JSONString ];
+        [ "JSONLines" ; $Lines ; JSONArray ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, ApiGenerator::APIName#2, fn:JSONString, fn:JSONNumber, ApiGenerator::Entity#19, fn:JSONArray
+        Name: $param
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Perform Script [ <unknown> from file: “karbon_Generator_Kontroller” (file not open); Parameter: $param ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=karbon_Generator_Kontroller
+          UniversalPathList: file:karbon_Generator_Kontroller
+        Script id=264 ref=external
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  40    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  41    Show Custom Dialog [ Title: "Error"; Message: $result; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  42    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Variable [ $JSNObjectId; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSNObjectId
+  44    Go to Layout [ “Test Detail” (Test) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=69 name="Test Detail"
+  45    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  46    Set Field [ JSNObject::Id; $JSNObjectId ]
+        DisableStepCollapsed state=False
+        Field table=JSNObject id=3 name=Id
+  47    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    End If
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False

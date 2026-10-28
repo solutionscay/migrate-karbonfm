@@ -1,0 +1,159 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/328-btn_Create_Email_Message_From_Party.txt,527d5727218673fc9d16d41fc79e9ba9a07579fb9e54112562b3c88671110aa2,scripts,karbon_kontacts.fmp12,328,btn: Create Email Message From Party,orchestration,client-ui,tier3,"Button script on a party that collects the party and its related parties as quick recipients, builds a JSON with the party's cached email contact method, and starts the email composer through Create UtilityEmailMessage (script 660). Sits in the '#Deprecated Activity - Utilities' folder.","Party::Id#1 (step 3)
+Party_PartyRelation_Party::Id#1 (step 3)
+Party::EmailAddressIdCached#145 (step 5)",none,karbon_kontacts.fmp12/scripts/660 step 7,"objects/karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+objects/karbon_kontacts.fmp12/scripts/223-btn_Apply_Retainer.txt",none,Exits with result 1 and ignores what script 660 returns.
+karbon_kontacts.fmp12/scripts/329-Open_Card_-_EmailAddressPicker.txt,50cce1724826248a1056949ab2fdd9e4e3f8d774eac3bbc223bb34cc17071593,scripts,karbon_kontacts.fmp12,329,Open Card - EmailAddressPicker,navigation,client-ui,tier3,Opens the email address picker card from the Picker Module and installs a one-second timer that runs Handle Card - EmailAddressPicker to collect the answer. The card position is calculated in disabled steps 7-10. Sits in the '#Deprecated Activity - Utilities' folder.,none,none,"Picker_Module.fmp12/scripts/214 step 17 (other file: Picker_Module.fmp12)
+karbon_kontacts.fmp12/scripts/330 step 13 (Install OnTimer Script, interval 1)","objects/karbon_kontacts.fmp12/layouts/106-Card_-_Utility_EmailMessage_-_Send.txt
+objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt
+objects/karbon_kontacts.fmp12/layouts/118-Card_-_Utility_EmailMessage_-_Read_Only.txt",none,"The parameters JSON uses $windowName, $selectMultiple, $partyRoleSubtypes, $organizationsOnly, $placeholderText, $footerMessage and $allowCreate, and $cardTop/$cardLeft come from disabled steps; none of these are set in this script, so they are empty unless set by the caller."
+karbon_kontacts.fmp12/scripts/330-Handle_Card_-_EmailAddressPicker.txt,36abeba0c0b37128fb5cf68f5d64e76466797dc145611925d65612367451d0eb,scripts,karbon_kontacts.fmp12,330,Handle Card - EmailAddressPicker,data-change,client-ui,tier3,"Timer handler for the email picker: reads the picker result, stops the timer on empty or cancelled result, otherwise keeps the needed properties of each picked contact, adds the current message id, and appends each one to the draft message's recipient array. Sits in the '#Deprecated Activity - Utilities' folder.","UtilityEmailMessage::Id#25 (step 31)
+UtilityEmailMessage::ActivityPartyArray#10 (step 34)","UtilityEmailMessage::ActivityPartyArray#10 (Set Field step 34, global)",Picker_Module.fmp12/scripts/99 step 4 (other file: Picker_Module.fmp12),objects/karbon_kontacts.fmp12/scripts/329-Open_Card_-_EmailAddressPicker.txt,none,"The recipient array is a global field of UtilityEmailMessage, so the picked recipients exist only in the user's session until the message is saved or sent."
+karbon_kontacts.fmp12/scripts/333-Send_Utility_Email_Message.txt,610dbf65325b26cd9894b2526652fe35dee325f61454b3bd6ec649900883f899,scripts,karbon_kontacts.fmp12,333,Send Utility Email Message,integration,server-domain,tier1,"Sends the email being edited: stops when the draft is not validated, asks the user for their SMTP password when they send from their own address, always adds the logged-in user as the From party (user address or system address), then edits the existing draft or creates a new email through karbon_kontroller with Send=true and closes the window. Sits in the '#Deprecated Activity - Utilities' folder.","UtilityEmailMessage::ValidatedInd#29 (step 4)
+UtilityEmailMessage::UseSystemSettingsInd#9 (step 13,74)
+Selected_User::SmtpPassword#118 (step 16,24)
+Selected_User::SmtpEmailAddress#111 (step 18)
+UtilityEmailMessage::Id#25 (step 29,33,47,67)
+UtilityEmailMessage_User::SmtpEmailAddress#111 (step 29)
+UtilityEmailMessage_User::PartyId#12 (step 29,33)
+System::SystemEmailAddress#47 (step 33)
+UtilityEmailMessage::ActivityPartyArray#10 (step 39)
+session::CurrentUserId#58 (step 42,49)
+UtilityEmailMessage::AsJSON#13 (step 49)
+UtilityEmailMessage::Attachments#8 (step 64)
+UtilityEmailMessage::EntityId#31 (step 65)
+UtilityEmailMessage::Message#7 (step 68)
+UtilityEmailMessage::Subject#6 (step 71)
+UtilityEmailMessage::TemplateId#23 (step 72)
+UtilityEmailMessage::UserId#21 (step 73)","UtilityEmailMessage::UserId#21 (Set Field step 42, global)
+selector::ActivityId#7 (Set Field step 56, global)
+selector::ActivityId#7 (Set Field step 87, global)
+Selected_User::SmtpPassword#118 (Show Custom Dialog input field step 18, related via Selected_User)","karbon_kontroller.fmp12/scripts/522 step 49 (other file: karbon_kontroller.fmp12)
+karbon_kontroller.fmp12/scripts/389 step 78 (other file: karbon_kontroller.fmp12)","objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt
+objects/karbon_kontacts.fmp12/layouts/167-Email_Message_-_View_Only.txt",none,"secret: step 18 asks for and stores the user's SMTP password (Selected_User::SmtpPassword), the target must keep it out of code. Error branches at steps 54 and 83 are marked TODO. From party role id 54 is hard-coded; EntityTypeId 11 means activity. Whether the actual SMTP send happens inside karbon_kontroller script 522 or 389 is not visible here."
+karbon_kontacts.fmp12/scripts/343-Apply_Template.txt,767078ca297b56799e76d3edbc500d25068cea1718cb13ea27dd29039e27fbcc,scripts,karbon_kontacts.fmp12,343,Apply Template,orchestration,server-domain,tier2,"Copies the chosen template's text into the draft message, asks karbon_kontroller for the merge fields found in the text, creates or patches the template's merge field records, and builds the virtual list of available and in-use merge fields. Sits in the '#Deprecated Activity - Utilities' folder.","UtilityEmailMessage_Template::Message#7 (step 6)
+UtilityEmailMessage::Message#7 (step 9)
+Template::Id#1 (step 18,54)
+Template_MergeField#byActivityType::Name#31 (step 28)
+Template_TemplateMergeField::Name#58 (step 31)
+VirtualList::Data#14 (step 44,45)","UtilityEmailMessage::Message#7 (Set Field step 6, global)
+VirtualList::Data#14 (Set Field step 28, global)
+VirtualList::Data#14 (Set Field step 45, global)
+VirtualListRows::Template.FieldsInUse#9 (Set Field step 53, global)
+VirtualListRows::Template.Id#6 (Set Field step 54, global)
+VirtualList::FoundCount#12 (Set Field step 55, global)","karbon_kontroller.fmp12/scripts/478 step 10 (other file: karbon_kontroller.fmp12)
+karbon_kontroller.fmp12/scripts/481 step 20 (other file: karbon_kontroller.fmp12)",none found (in Scripts menu),none,"Error handling is a TODO at step 13. Step 20 sends Template::Id as ActivityId, so I cannot tell whether activity or template ids are expected. The virtual list rows are global-field UI state."
+karbon_kontacts.fmp12/scripts/346-New_-_Apply_Template.txt,2efc9694eaea86605a5e2e4f08f7138db6938ab3e57fb871fc89ec4af4d5f1bf,scripts,karbon_kontacts.fmp12,346,New - Apply Template,orchestration,client-ui,tier3,"Sends the message, template id, recipients and party id to karbon_kontroller to resolve merge fields and puts the merged text back in the message field. Sits in the '#Deprecated Activity - Utilities' folder.","UtilityEmailMessage::Message#7 (step 3)
+UtilityEmailMessage::TemplateId#23 (step 3)
+UtilityEmailMessage::ActivityPartyArray#10 (step 3)
+Party::Id#1 (step 3)","UtilityEmailMessage::Message#7 (Set Field step 11, global)",karbon_kontroller.fmp12/scripts/490 step 5 (other file: karbon_kontroller.fmp12),"objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt
+objects/karbon_kontacts.fmp12/layouts/167-Email_Message_-_View_Only.txt",none,Disabled step 9 was a debugging dialog.
+karbon_kontacts.fmp12/scripts/347-Edit_Email_Message.txt,6964b5cde1738bf9211e61de1e0f3456f7cafdc6e3ca828fe48cd76b7be8c787,scripts,karbon_kontacts.fmp12,347,Edit Email Message,navigation,client-ui,tier3,"Loads an existing email activity into the utility message fields (attachments, date, entity, subject, message, template, user, recipients) and opens the read-only card for a sent mail (with a formatted recipient summary) or the edit card for a draft. Sits in the '#Deprecated Activity - Utilities' folder.","Selected_Activity_EmailMessage::Attachments#10 (step 4)
+Selected_Activity::DateDisplay#56 (step 5)
+Selected_Activity_ActivityEntity::EntityId#17 (step 6)
+Selected_Activity_ActivityEntity::EntityTypeId#16 (step 7)
+Selected_Activity::Id#1 (step 8)
+Selected_Activity_ActivityMessage::Message#12 (step 9)
+Selected_Activity::Subject#22 (step 10)
+Selected_Activity::TemplateId#195 (step 11)
+Selected_Activity::TimeDisplay#76 (step 12)
+Selected_Activity::CreationUserId#193 (step 13)
+Selected_Activity_EmailMessage::UseSystemSettingsInd#26 (step 14)
+Selected_Activity_ActivityPartyEmail::AsJson#75 (step 15)
+Selected_Activity_EmailMessage::SentInd#9 (step 20)
+UtilityEmailMessage::ToDisplay#17 (step 21)
+UtilityEmailMessage::CcArrayDisplay#18 (step 21)
+UtilityEmailMessage::BccArrayDisplay#19 (step 21)
+UtilityEmailMessage::From#16 (step 21)
+UtilityEmailMessage::Subject#6 (step 21)
+UtilityEmailMessage::Message#7 (step 21)","UtilityEmailMessage::Attachments#8 (Set Field step 4, global)
+UtilityEmailMessage::Date#14 (Set Field step 5, global)
+UtilityEmailMessage::EntityId#31 (Set Field step 6, global)
+UtilityEmailMessage::EntityTypeId#33 (Set Field step 7, global)
+UtilityEmailMessage::Id#25 (Set Field step 8, global)
+UtilityEmailMessage::Message#7 (Set Field step 9, global)
+UtilityEmailMessage::Subject#6 (Set Field step 10, global)
+UtilityEmailMessage::TemplateId#23 (Set Field step 11, global)
+UtilityEmailMessage::Time#15 (Set Field step 12, global)
+UtilityEmailMessage::UserId#21 (Set Field step 13, global)
+UtilityEmailMessage::UseSystemSettingsInd#9 (Set Field step 14, global)
+UtilityEmailMessage::ActivityPartyArray#10 (Set Field step 15, global)
+Globals::QuickFind#1 (Set Field step 18, global)
+UtilityEmailMessage::SentMailDisplay#24 (Set Field step 22, global)",none,none found (in Scripts menu),none,none
+karbon_kontacts.fmp12/scripts/348-Prevent_Keystrokes.txt,7f73bfdfca00d1fa17402ede403c4d23680e9dece77a1580d79e4138cf367e3f,scripts,karbon_kontacts.fmp12,348,_Prevent Keystrokes,utility,client-ui,tier3,Does nothing but exit with result 0; used as an object trigger to block keystrokes on the read-only email card. Sits in the '#Deprecated Activity - Utilities' folder.,none,none,none,objects/karbon_kontacts.fmp12/layouts/118-Card_-_Utility_EmailMessage_-_Read_Only.txt,none,none
+karbon_kontacts.fmp12/scripts/351-Button_Add_Party_Email_Address_to_Email_Message_To_Cc_Bcc_Em.txt,88f05102d1d4ef8ac5acb7bd4ea9893f9b52f7039c18d83a71fc0955576cc5c6,scripts,karbon_kontacts.fmp12,351,"Button: Add Party Email Address to Email Message ( To|Cc|Bcc, EmailAddress )",data-change,server-domain,tier2,"Adds the selected party email address to the open email as To, Cc or Bcc (role ids 55, 56, 57): refuses when the contact has no address, then creates the ActivityParty through karbon_kontroller and shows a message for a duplicate or other error. Sits in the '#Deprecated Activity - Utilities' folder.","Selected_NetworkAddress::Address#7 (step 3,15,18)
+Selected_NetworkAddress::AddressAndNameOut#23 (step 13)
+Selected_NetworkAddress_ContactMethod_Party::NameCached#19 (step 15,18)
+Activity::Id#1 (step 18)
+Selected_NetworkAddress::Id#1 (step 18)
+Selected_NetworkAddress_ContactMethod::PartyId#33 (step 18)",none,karbon_kontroller.fmp12/scripts/376 step 20 (other file: karbon_kontroller.fmp12),"objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt",none,"Role ids 55, 56 and 57 are hard-coded for To, Cc, Bcc."
+karbon_kontacts.fmp12/scripts/352-Go_to_Remove_Recipients_Popover.txt,e2f9241f7e6e87cdb923c799c2a31fd9b9b9b8bedb076db507ea1daa15013236,scripts,karbon_kontacts.fmp12,352,Go to Remove Recipients Popover,navigation,client-ui,tier3,Loads the message's recipient array into the virtual list and moves focus to the remove-recipients popover. Sits in the '#Deprecated Activity - Utilities' folder.,UtilityEmailMessage::ActivityPartyArray#10 (step 4),none,karbon_kontacts.fmp12/scripts/27 step 4,"objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt
+objects/karbon_kontacts.fmp12/scripts/353-Delete_Email_Recipient.txt",none,none
+karbon_kontacts.fmp12/scripts/353-Delete_Email_Recipient.txt,2f0b911c7528989ad6f64a32bd5b62803a96ac0f505cf643c9a1de54e2408bff,scripts,karbon_kontacts.fmp12,353,Delete Email Recipient,data-change,server-domain,tier2,Removes the selected recipient: asks karbon_kontroller to delete the ActivityParty by id and shows an error dialog on failure. Sits in the '#Deprecated Activity - Utilities' folder.,"Activity_ActivityParty::Id#23 (step 4)
+VirtualListRows::ActivityParty_EmailAddress#30 (step 19)
+VirtualListRows::ActivityParty_ActivityPartyRoleName#27 (step 20)
+UtilityEmailMessage::ActivityPartyArray#10 (step 23,29,34,44)","UtilityEmailMessage::ActivityPartyArray#10 (Set Field step 34, global)","karbon_kontroller.fmp12/scripts/638 step 8 (other file: karbon_kontroller.fmp12)
+karbon_kontacts.fmp12/scripts/352 step 42","objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt",none,"Step 17 is an unconditional Exit Script, so steps 19-49 never run: the code that removes the recipient from the draft's recipient array and refreshes the popover is unreachable. Callers: layout objects only."
+karbon_kontacts.fmp12/scripts/354-Select_Attachment.txt,195f83888aaced9520f3c6b8153550a5ad1d4dd10fc0f6f1449a11df6fd71559,scripts,karbon_kontacts.fmp12,354,Select Attachment,utility,client-ui,tier3,"Lets the user pick a file to attach: inserts it as a reference in the attachment container, records its file name and path in the draft's attachment list, and refreshes the attachment list. Sits in the '#Deprecated Activity - Utilities' folder.","UtilityEmailMessage::AttachmentContainer#28 (step 10,11)
+UtilityEmailMessage::Attachments#8 (step 15)","UtilityEmailMessage::Attachments#8 (Set Field step 15, global)",karbon_kontacts.fmp12/scripts/375 step 17,objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt,Insert File step 3,"Attachment is stored as a file reference (path on the user's machine), not as file content; step 3 uses 'Insert File' with Reference storage. How the attachment is turned into mail content on the server is not visible here."
+karbon_kontacts.fmp12/scripts/360-Delete_Attachment.txt,883e18d6c9b6451845eeee4162781092cf4c57ad38e25efccffef1e1f29d9c86,scripts,karbon_kontacts.fmp12,360,Delete Attachment,utility,client-ui,tier3,Removes the selected attachment (matched by file path) from the draft's attachment list and refreshes the list. Sits in the '#Deprecated Activity - Utilities' folder.,"VirtualListRows::Attachment_FilePath#35 (step 3)
+UtilityEmailMessage::Attachments#8 (step 6,12,16)","UtilityEmailMessage::Attachments#8 (Set Field step 16, global)",karbon_kontacts.fmp12/scripts/375 step 24,"objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt",none,none
+karbon_kontacts.fmp12/scripts/375-Update_Attachments_Virtual_List.txt,58a349d7038c0b4437a30e00d274c249184edc24a8a369590ef4faa289d727e3,scripts,karbon_kontacts.fmp12,375,Update Attachments Virtual List,utility,client-ui,tier3,Converts the draft's attachment list to the virtual list data and refreshes the attachment portal. Sits in the '#Deprecated Activity - Utilities' folder.,UtilityEmailMessage::Attachments#8 (step 4),none,karbon_kontacts.fmp12/scripts/27 step 4,"objects/karbon_kontacts.fmp12/scripts/701-Button_Add_Activity_Attachment_v2.txt
+objects/karbon_kontacts.fmp12/scripts/360-Delete_Attachment.txt
+objects/karbon_kontacts.fmp12/scripts/354-Select_Attachment.txt
+objects/karbon_kontacts.fmp12/scripts/725-Button_Add_Activity_Attachment_v1.txt",none,none
+karbon_kontacts.fmp12/scripts/517-Save_Utility_Email_Message_as_Draft.txt,7e6592ccff9c9bd2ca3f4cf48c400eaeb8e5d5aa49bfcc4b200b9200102363ca,scripts,karbon_kontacts.fmp12,517,Save Utility Email Message as Draft,data-change,server-domain,tier2,"Saves the open email as a draft: edits the existing email activity through karbon_kontroller with Send=false, or creates a new email activity from the utility message, then closes the window. Sits in the '#Deprecated Activity - Utilities' folder.","UtilityEmailMessage::Id#25 (step 5)
+UtilityEmailMessage::AsJSON#13 (step 7,21)
+session::CurrentUserId#58 (step 7)","selector::ActivityId#7 (Set Field step 14, global)
+selector::ActivityId#7 (Set Field step 29, global)","karbon_kontroller.fmp12/scripts/522 step 7 (other file: karbon_kontroller.fmp12)
+karbon_kontroller.fmp12/scripts/389 step 21 (other file: karbon_kontroller.fmp12)","objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+objects/karbon_kontacts.fmp12/layouts/105-Card_-_Utility_EmailMessage.txt",none,"Error branch at step 12 is a TODO (silent). Step 7 sends Send=false as the text 'False' (JSONString), step 49 of the send script sends 'True' the same way."
+karbon_kontacts.fmp12/scripts/660-Create_UtilityEmailMessage_json.txt,aa6caaeb11fd8f9df8b82e917d08daf8c08d4725f7a2e2d58795f874fd37bd54,scripts,karbon_kontacts.fmp12,660,Create UtilityEmailMessage { json },session-setup,client-ui,tier3,"Prepares a new email composer: resets the virtual list, sets the selector to the current user and party, builds the To array from the contact method, selects quick recipients, adds the user's signature (or the default template with name, employer, title, phone) to the message, fills the utility message fields and opens the email card window. Sits in the '#Deprecated Activity - Utilities' folder.","meta#dataFile::CurrentUserId#3 (step 35,91)
+session::CurrentUserPartyId#63 (step 36)
+Selected_User::SmtpEmailAddress#111 (step 85)
+Selected_NetworkAddress::Address#7 (step 97)
+Selected_NetworkAddress::AddressAndNameOut#23 (step 97)
+Selected_ContactMethod::PartyId#33 (step 97)
+Selected_Party_ContactMethod_NetworkAddress#email::Id#1 (step 109)
+Selected_User::EmailSignature#120 (step 114,117)
+System::DefaultEmailSignatureTemplate#63 (step 115)
+Selected_Party::NameCached#19 (step 115)
+Selected_Party_Person::EmployerName#131 (step 115)
+Selected_Party_Person::JobTitle#14 (step 115)
+Selected_Party::PhoneNumberCached#125 (step 115)","selector::UserId#24 (Set Field step 35, global)
+selector::PartyId#6 (Set Field step 36, global)
+selector::ContactMethodId#10 (Set Field step 96, global)
+selector::PartyId#6 (Set Field step 106, global)
+selector::ContactMethodId#10 (Set Field step 109, global)
+UtilityEmailMessage::ActivityPartyArray#10 (Set Field step 128, global)
+UtilityEmailMessage::AttachmentContainer#28 (Set Field step 129, global)
+UtilityEmailMessage::AttachmentId#27 (Set Field step 130, current record)
+UtilityEmailMessage::Attachments#8 (Set Field step 131, global)
+UtilityEmailMessage::Date#14 (Set Field step 132, global)
+UtilityEmailMessage::EntityId#31 (Set Field step 133, global)
+UtilityEmailMessage::EntityTypeId#33 (Set Field step 134, global)
+UtilityEmailMessage::From#16 (Set Field step 135, global)
+UtilityEmailMessage::Id#25 (Set Field step 136, global)
+UtilityEmailMessage::Message#7 (Set Field step 137, global)
+UtilityEmailMessage::SentInd#22 (Set Field step 138, global)
+UtilityEmailMessage::SentMailDisplay#24 (Set Field step 139, global)
+UtilityEmailMessage::Subject#6 (Set Field step 140, global)
+UtilityEmailMessage::TemplateId#23 (Set Field step 141, global)
+UtilityEmailMessage::Time#15 (Set Field step 142, global)
+UtilityEmailMessage::ToArraySearch#20 (Set Field step 143, global)
+UtilityEmailMessage::UserId#21 (Set Field step 144, global)
+UtilityEmailMessage::UseSystemSettingsInd#9 (Set Field step 145, global)",karbon_kontacts.fmp12/scripts/381 step 33,"objects/karbon_kontacts.fmp12/scripts/661-btn_Create_Email_Message_From_Opportunity.txt
+objects/karbon_kontacts.fmp12/scripts/328-btn_Create_Email_Message_From_Party.txt",none,"Exit Script returns $result, which is never set. The quick recipient and signature rules are small business rules but only affect what the draft shows. Role id 55 (To) is hard-coded; EntityTypeId is passed in (13 for opportunity)."
+karbon_kontacts.fmp12/scripts/661-btn_Create_Email_Message_From_Opportunity.txt,3302194f1cea8db69cedce540429089dbeb787f54d210040a7a57c990e2b06f8,scripts,karbon_kontacts.fmp12,661,btn: Create Email Message From Opportunity,orchestration,client-ui,tier3,Button script on an opportunity: collects the opportunity's party and related parties as quick recipients and starts the email composer with the opportunity as entity (type 13). Sits in the '#Deprecated Activity - Utilities' folder.,"Opportunity_Party::Id#1 (step 2)
+Opportunity_Party_PartyRelation::PartyIdTo#6 (step 2)
+Opportunity::Id#1 (step 4)
+Opportunity_Party_PartyRelation_Party::EmailAddressIdCached#145 (step 4)",none,karbon_kontacts.fmp12/scripts/660 step 6,none found (in Scripts menu),none,none
+karbon_kontacts.fmp12/scripts/776-Button_Add_Other_Email_Address_to_Email_Message_To_Cc_Bcc_Em.txt,50c42fbc785eb47f777dc45117768a3fd0a7f6801157660d03973042092270da,scripts,karbon_kontacts.fmp12,776,"Button: Add Other Email Address to Email Message ( To|Cc|Bcc, EmailAddress )",data-change,server-domain,tier2,"Adds a typed-in email address to the open email as To, Cc or Bcc (role ids 55, 56, 57) through karbon_kontroller, then clears the entry field. Sits in the '#Deprecated Activity - Utilities' folder.","UtilityEmailMessage::OtherEmailAddress#35 (step 3,14,16)
+Activity::Id#1 (step 16)","UtilityEmailMessage::OtherEmailAddress#35 (Set Field step 30, current record)",karbon_kontroller.fmp12/scripts/376 step 18 (other file: karbon_kontroller.fmp12),objects/karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt,none,none

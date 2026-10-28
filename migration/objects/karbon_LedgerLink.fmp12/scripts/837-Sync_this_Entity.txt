@@ -1,0 +1,65 @@
+# script 837: Sync this Entity
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices
+# source: ScriptCatalog/Script[@id=837]
+# steps: 15 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=469 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $Entity; Value:QBOEntity::name ]
+        DisableStepCollapsed state=False
+        Value
+          refs: QBOEntity::name#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Open QBO Card Window” ]
+        DisableStepCollapsed state=False
+        Script id=303 name="Open QBO Card Window"
+   6    Perform Script [ “_Sync QBO Entities With FM”; Parameter: $Entity ]
+        DisableStepCollapsed state=False
+        Script id=708 name="_Sync QBO Entities With FM"
+   7    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   8    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Else If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  12    Go to Layout [ “SyncLog” (QBO) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=35 name=SyncLog
+  13    Perform Script [ “_DisplayError”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=312 name=_DisplayError
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,107 @@
+# script 526: Edit Meeting
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / Meeting
+# source: ScriptCatalog/Script[@id=526]
+# steps: 25 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=263 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4 // Set Field [ UtilityMeeting::PartyId; Selected_Activity_Meeting::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=17 name=PartyId
+   5    Set Field [ UtilityMeeting::EntityId; Selected_Activity_ActivityEntity::EntityId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityEntity::EntityId#17
+        Field table=UtilityMeeting id=21 name=EntityId
+   6    Set Field [ UtilityMeeting::EntityTypeId; Selected_Activity_ActivityEntity::EntityTypeId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityEntity::EntityTypeId#16
+        Field table=UtilityMeeting id=23 name=EntityTypeId
+   7    Set Field [ UtilityMeeting::Id; Selected_Activity_Meeting::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=15 name=Id
+   8    Set Field [ UtilityMeeting::AddressId; Selected_Activity_Meeting::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=6 name=AddressId
+   9    Set Field [ UtilityMeeting::StartDate; Selected_Activity_Meeting::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=10 name=StartDate
+  10    Set Field [ UtilityMeeting::StartTime; Selected_Activity_Meeting::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=11 name=StartTime
+  11    Set Field [ UtilityMeeting::EndDate; Selected_Activity_Meeting::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=7 name=EndDate
+  12    Set Field [ UtilityMeeting::EndTime; Selected_Activity_Meeting::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=8 name=EndTime
+  13    Set Field [ UtilityMeeting::Subject; Selected_Activity::Subject ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::Subject#22
+        Field table=UtilityMeeting id=13 name=Subject
+  14    Set Field [ UtilityMeeting::ActivityMessage; Selected_Activity_ActivityMessage::Message ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityMessage::Message#12
+        Field table=UtilityMeeting id=14 name=ActivityMessage
+  15    Set Field [ UtilityMeeting::Location; Selected_Activity_Meeting::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=9 name=Location
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $ActivityParty; Value:JSON.ArrayFromRelated ( Selected_Activity_ActivityParty::AsJSON ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayFromRelated, Selected_Activity_ActivityParty::AsJSON#71
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityParty
+  18    Set Variable [ $PartyInvitedObject; Value:JSON.FilterByExpression ( $ActivityParty ; "JSONGetElement ( $item ; \"ActivityPartyRoleId\" ) = 60 " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyInvitedObject
+  19    Set Variable [ $PartyInvitedId; Value:JSONGetElement ( $PartyInvitedObject; "[0]PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyInvitedId
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ UtilityMeeting::PartyId; $PartyInvitedId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityMeeting id=17 name=PartyId
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    New Window [ Style: Card; Name: "Meeting"; Using layout: “Card - Utility_Meeting” (UtilityMeeting); Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=82 name="Card - Utility_Meeting"
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False

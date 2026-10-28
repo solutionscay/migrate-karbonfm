@@ -1,0 +1,200 @@
+# script 54: Store UserID On Session
+# file: karbon_kontacts.fmp12
+# folder: Modules / User Login / Private
+# source: ScriptCatalog/Script[@id=54]
+# steps: 50 (5 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=53 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Get a User ID for this login account name
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $accountName; Value:Get(AccountName) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:AccountName
+        Repetition
+          Calculation:
+            | 1
+        Name: $accountName
+  10 // If [ // Bypass if using the admin account
+        
+        $accountName = "admin" or 
+        
+        // Bypass if using OAuth (email is returned consistently)
+        
+        System::AuthenticationMethod= "OAuth"   or 
+        
+        
+        // Bypass if the account name entered matches our validation rules 
+        
+        $accountName = Filter ( $accountName  ; "abcdefghijklmnopqrstuvwxyz1234567890_." )
+        
+        // Note: Allowable characters are lowercase letters, numbers and underscores ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or, System::AuthenticationMethod#59, fn:Filter
+  11 // Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12 // #exit app?
+        DisableStepCollapsed state=False
+        Restore state=False
+  13 // End If
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  17    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “Get User Object By AccountName ( AccountName )” from file: “karbon_kontroller”; Parameter: $AccountName ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=375 name="Get User Object By AccountName ( AccountName )" in=karbon_kontroller.fmp12
+  21    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ not Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #Found a user
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $User; Value:JSONGetElement ( $result ;  "User"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $User
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Perform Script [ “Find Session Record” ]
+        DisableStepCollapsed state=False
+        Script id=43 name="Find Session Record"
+  30    Set Field [ session::CurrentUserId; JSONGetElement ( $User ;  "Id"  ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=session id=58 name=CurrentUserId
+  31    Set Field [ session::CurrentUserPartyId; JSONGetElement ( $User ;  "PartyId"  ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=session id=63 name=CurrentUserPartyId
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #warn user if PartyId is missing
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    If [ IsEmpty ( session::CurrentUserPartyId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, session::CurrentUserPartyId#63
+  35    Show Custom Dialog [ Title: "Profile Incomplete"; Message: "Please contact a system admin."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  36 // Set Variable [ $result; Value:Custom.Error ( "missing user partyId" ; $accountname ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Custom.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Field [ session::CurrentAccountName; JSONGetElement ( $User ;  "AccountName"  ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=session id=60 name=CurrentAccountName
+  40    Set Field [ session::CurrentDisplayName; JSONGetElement ( $User ;  "DisplayName"  ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=session id=61 name=CurrentDisplayName
+  41    Set Field [ meta#dataFile::CurrentUserId; JSONGetElement ( $User ;  "Id"  ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=meta#dataFile id=3 name=CurrentUserId
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    End If
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #done
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Exit Script [ Result:  $result ]
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False

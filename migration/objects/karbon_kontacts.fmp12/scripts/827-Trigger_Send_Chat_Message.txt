@@ -1,0 +1,201 @@
+# script 827: Trigger: Send Chat Message
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Chat
+# source: ScriptCatalog/Script[@id=827]
+# steps: 46 (4 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=709 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2019-Jun-18 barbara@geistinteractive.com - updated for Karbon
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2019-05-14 dave@geistinteractive.com - no longer triggering script if a user clicks out of field.
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4 // Show Custom Dialog [ Title: "Modifiers"; Message: Code ( Get ( ActiveModifierKeys ) ); Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:Code, fn:Get, fn:ActiveModifierKeys
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+   5 // Show Custom Dialog [ Title: "Triggers keystroke"; Message: Code ( Get ( TriggerKeystroke ) ); Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:Code, fn:Get, fn:TriggerKeystroke
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+   6 // Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ // NULL ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Else If [ IsEmpty ( Chat::MessageInput ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Chat::MessageInput#30
+  10    #don't send if no message
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  12    Else If [ Get (ActiveModifierKeys) = 1 //shift 
+        
+        //return or enter not pressed
+        
+        and 
+        
+        not ( 
+        
+        Code ( Get (TriggerKeystroke) ) =10 or Code ( Get (TriggerKeystroke) ) =13
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:ActiveModifierKeys, fn:and, fn:not, fn:Code, fn:TriggerKeystroke, fn:or
+  13    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  14    Else If [ Code( Get ( ActiveModifierKeys ) ) = 49 or // shift + enter/return
+        
+        Code( Get ( ActiveModifierKeys ) ) = 52 // ctrl + enter/return ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:ActiveModifierKeys, fn:or
+  15    #add a return
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Insert Calculated Result [ Chat::MessageInput; Chat::MessageInput & ¶ ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: Chat::MessageInput#30
+        Field table=Chat id=30 name=MessageInput
+  17    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  18    Else If [ Code( Get ( TriggerKeystroke ) ) = 10 // enter
+        and Get ( ActiveModifierKeys )<> 1 //shift ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:TriggerKeystroke, fn:and, fn:ActiveModifierKeys
+  19    #send message on enter
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Else If [ Code( Get ( TriggerKeystroke ) ) = 13 // return
+        
+        and Get ( ActiveModifierKeys )<> 1 //shift ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Code, fn:Get, fn:TriggerKeystroke, fn:and, fn:ActiveModifierKeys
+  21    #send message on return
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #don't send
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  25    End If
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #create the Message
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "ActivityId" ; Chat::Id ; JSONString ]  ;
+        	[ "Message" ; Chat::MessageInput ; JSONString ]  ;
+        	[ "Phone" ; Chat::PhoneList ; JSONString ]  ;
+        	[ "Direction" ; "out" ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Chat::Id#6, fn:JSONString, Chat::MessageInput#30, Chat::PhoneList#28
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Perform Script [ “Create Chat Message { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=728 name="Create Chat Message { json }" in=karbon_kontroller.fmp12
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  35    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  36    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  37    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  38    End If
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Field [ Chat::MessageInput; "" ]
+        DisableStepCollapsed state=False
+        Field table=Chat id=30 name=MessageInput
+  41    Go to Object [ Object Name: "ChatPortal"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  42    Go to Portal Row
+        [ Last ]
+        NoInteract state=False
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44 // Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

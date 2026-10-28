@@ -1,0 +1,73 @@
+# script 737: Export HTML File
+# file: karbon_kontacts.fmp12
+# folder: Modules / Web Viewer Bridge / Private 3
+# source: ScriptCatalog/Script[@id=737]
+# steps: 13 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=736 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Perform Script [ “<unknown>” from file: “karbon_charts” ]
+        DisableStepCollapsed state=False
+        FileReference id=21 name=karbon_charts
+          UniversalPathList: file:karbon_charts
+        Script id=371 name=<unknown> ref=missing
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $text; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $text
+   6    Set Variable [ $path; Value:"file:" &Get (TemporaryPath) & "index.html" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:TemporaryPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+   7    Export Field Contents [ <Table Missing>; “$path”; Create folders:No ]
+        CreateDirectories state=False
+        DisableStepCollapsed state=False
+        AutoOpen state=False
+        CreateEmail state=False
+        UniversalPathList: $path
+        Field table="" id=0 name="" ref=none
+   8    If [ Get(SystemPlatform) =1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:SystemPlatform
+   9    Set Variable [ $path; Value:Substitute(
+           $path ;
+           Get (SystemDrive) ; "///"
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:Get, fn:SystemDrive
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+  10    End If
+        DisableStepCollapsed state=False
+  11    Set Variable [ $$path; Value:$path ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$path
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Exit Script [ Result: $$path ]
+        DisableStepCollapsed state=False

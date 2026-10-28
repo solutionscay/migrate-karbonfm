@@ -1,0 +1,567 @@
+# script 576: Post/Unpost Internal ( {Id, Post} )
+# file: karbon_kontroller.fmp12
+# folder: API / Sales Transaction
+# source: ScriptCatalog/Script[@id=576]
+# steps: 151 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=572 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Post or Unpost a Sales Transaction { data }
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} data
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} data.Id the Id of the Sales Transaction to Post
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {boolean} data.Post if true the Transaction will be POSTED. If false it will be UNPOSTED
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnSuccess {boolean} result.ok will be set to true
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@history 2018-11-13 barbaracooney - updated to set Customer RetainerBalanceCached
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@history 2018-10-12 barbaracooney - updated to move single pass loop to top
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@history 2018-09-12 toddgeist - Created with profound and deep affection, by hand.
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  29    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  35    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  36    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    If [ not <Function Missing> ( "PostSalesTransactions" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  40    Set Variable [ $error; Value:Error ( 0 ; "" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  41    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  42    End If
+        DisableStepCollapsed state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $json; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  45    Set Variable [ $json; Value:JSON.Format( $json ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  46    If [ Error.IsError ( $json ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  47    Set Variable [ $error; Value:$json ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  48    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  49    End If
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $SalesTransactionId; Value:JSONGetElement ( $json ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesTransactionId
+  57    Set Variable [ $Post; Value:GetAsBoolean( JSONGetElement ( $json ; "Post" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Post
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #need this to do incrementing or decrementing
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $sign; Value:If($post; 1; -1) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If
+        Name: $sign
+  62    Set Variable [ $wildcard; Value:"WC" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $wildcard
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $nothing; Value:Log.Entry ( "info" ; "about to Post" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Log.Entry
+        Repetition
+          Calculation:
+            | 1
+        Name: $nothing
+  65    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #connect to the sales Transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    If [ DBTransactions::SalesTransactionId <> $SalesTransactionId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::SalesTransactionId#93
+  71    Set Field [ DBTransactions::SalesTransactionId; $SalesTransactionId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=93 name=SalesTransactionId
+  72    End If
+        DisableStepCollapsed state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Set Field [ SalesTransaction::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=SalesTransaction id=67 name=ONE
+  75    Set Variable [ $error; Value:Error.Last ( "Opening/Locking Sales Transaction"; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  76    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #connect to the Customer record
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Set Variable [ $CustomerId; Value:SalesTransaction::id_Customer ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::id_Customer#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerId
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Set Field [ DBTransactions::PartyRoleId; $CustomerId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=68 name=PartyRoleId
+  82    Set Field [ Customer::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Customer id=20 name=ONE
+  83    Set Variable [ $error; Value:Error.Last ( "Opening/Locking Customer record"; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  84    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Set Field [ Customer::RetainerBalanceCached; Customer::RetainerBalanceCached + ( SalesTransaction::totalRetainerAmount * $sign ) ]
+        DisableStepCollapsed state=False
+        refs: Customer::RetainerBalanceCached#55, SalesTransaction::totalRetainerAmount#65
+        Field table=Customer id=55 name=RetainerBalanceCached
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #if qbo_send is true then we can't POST
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    If [ $Post and System::UsingQBOInd and SalesTransaction::qbo_send ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and, System::UsingQBOInd#64, SalesTransaction::qbo_send#3
+  90    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  91    End If
+        DisableStepCollapsed state=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    Set Variable [ $doIt; Value:$Post <> SalesTransaction::LockedInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::LockedInd#80
+        Repetition
+          Calculation:
+            | 1
+        Name: $doIt
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    If [ $doIt ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    Set Field [ SalesTransaction::LockedInd; $Post ]
+        DisableStepCollapsed state=False
+        Field table=SalesTransaction id=80 name=LockedInd
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    #we need to summarize the changes the line items represent so that each sum record is only accessed once
+        DisableStepCollapsed state=False
+        Restore state=False
+ 100    Perform Script [ “_Summarize Line Items”; Parameter: $sign ]
+        DisableStepCollapsed state=False
+        Script id=578 name="_Summarize Line Items"
+ 101    Set Variable [ $sum; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $sum
+ 102    Set Variable [ $nothing; Value:Log.Entry ( "info" ; "Summary Of Changes To Make" ; $sum ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Log.Entry
+        Repetition
+          Calculation:
+            | 1
+        Name: $nothing
+ 103    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    #now we have to loop through the json and update each value
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    Set Variable [ $Keys; Value:JSONListKeys ( $sum; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListKeys
+        Repetition
+          Calculation:
+            | 1
+        Name: $Keys
+ 106    If [ Left($Keys; 1) <>"?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left
+ 107    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+ 108    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    Set Variable [ $key; Value:GetValue ( $Keys; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $key
+ 110    Exit Loop If [ IsEmpty ( $key ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+ 111    Set Variable [ $values; Value:JSONGetElement($sum; $key) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $values
+ 112    Set Variable [ $split; Value:Substitute ( $key ; "_" ; "¶" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $split
+ 113    Set Variable [ $period; Value:GetValue($split ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $period
+ 114    Set Variable [ $itemType; Value:GetValue($split ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $itemType
+ 115    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    Set Field [ DBTransactions::SumPeriod; $period ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=111 name=SumPeriod
+ 117    Set Field [ DBTransactions::SumItemType; $ItemType ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=112 name=SumItemType
+ 118    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 119    Set Field [ SumaryByMonth::<File Missing>; 1 ]
+        DisableStepCollapsed state=False
+        Field table=SumaryByMonth id=10 name="" ref=external
+ 120    Set Variable [ $error; Value:Error.Last ( "Opening/Locking Sales Transaction"; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 121    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 122    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 123    Set Field [ SumaryByMonth::<File Missing>; SumaryByMonth::<Field Missing> + JSONGetElement ( $values ; "TotalRevenue" ) ]
+        DisableStepCollapsed state=False
+        Field table=SumaryByMonth id=7 name="" ref=external
+ 124    Set Field [ SumaryByMonth::<File Missing>; SumaryByMonth::<Field Missing> + JSONGetElement ( $values ; "NewCustomerCount" ) ]
+        DisableStepCollapsed state=False
+        Field table=SumaryByMonth id=9 name="" ref=external
+ 125    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    Set Variable [ $n; Value:$n+ 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+ 128    End Loop
+        DisableStepCollapsed state=False
+ 129    End If
+        DisableStepCollapsed state=False
+ 130    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    End If
+        DisableStepCollapsed state=False
+ 132    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 133    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 134    Set Variable [ $result; Value:JSONSetElement(""; "ok"; True; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 135    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 136    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+ 137    End Loop
+        DisableStepCollapsed state=False
+ 138    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 139    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 140    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 141    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 142    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 143    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 144    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 145    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 146    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 147    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 148    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 149    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 150    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 151    End If
+        DisableStepCollapsed state=False

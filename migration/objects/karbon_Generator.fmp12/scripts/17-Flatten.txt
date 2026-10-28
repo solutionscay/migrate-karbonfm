@@ -1,0 +1,181 @@
+# script 17: _Flatten
+# file: karbon_Generator.fmp12
+# folder: App Modules / Maps / Private
+# source: ScriptCatalog/Script[@id=17]
+# steps: 39 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=171 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $JSON; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSON
+   4    Set Variable [ $parent; Value:$$parent ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $parent
+   5    Set Variable [ $$parent; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$parent
+   6    Set Variable [ $_SEP_; Value:Char(166) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Char
+        Name: $_SEP_
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $isObject; Value:Left($JSON;1) & Right($JSON ; 1) = "{}" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Left, fn:Right
+        Name: $isObject
+   9    Set Variable [ $isArray; Value:Left($JSON;1) & Right($JSON ; 1) = "[]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Left, fn:Right
+        Name: $isArray
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ $isArray ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Exit Script [ Result: If(not IsEmpty ( $parent ) ; $parent & $_SEP_ ) & $json ]
+        DisableStepCollapsed state=False
+        refs: fn:If, fn:not, fn:IsEmpty
+  13    End If
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ $isObject ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $keys; Value:jsonGetKeyList ( $json ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGetKeyList
+        Repetition
+          Calculation:
+            | 1
+        Name: $keys
+  17    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  18    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $key; Value:GetValue ( $keys ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $key
+  20    Exit Loop If [ IsEmpty( $key ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  21    Set Variable [ $path; Value:If(not IsEmpty ( $parent ) ; $parent & $_SEP_ )
+        
+        & $key ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:not, fn:IsEmpty
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+  22    Set Variable [ $child; Value:jsonGet($json; $key) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $child
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ Left($child;1) & Right($child ; 1) = "{}" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left, fn:Right
+  25    Set Variable [ $$parent; Value:$path ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$parent
+  26    Perform Script [ “_Flatten”; Parameter: $child ]
+        DisableStepCollapsed state=False
+        Script id=17 name=_Flatten
+  27    Set Variable [ $result; Value:List($result; Get (ScriptResult)) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  28    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $child; Value:Case(
+           ValueCount($child) > 1 ; Substitute( $child ; [Char(10); "\n"]; [Char(13); "\r"] );
+           $child
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case, fn:ValueCount, fn:Substitute, fn:Char
+        Name: $child
+  30    Set Variable [ $result; Value:List($result; $path & $_SEP_ & $child ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  34    End Loop
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    End If
+        DisableStepCollapsed state=False
+  38    Set Variable [ $$parent; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$parent
+  39    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False

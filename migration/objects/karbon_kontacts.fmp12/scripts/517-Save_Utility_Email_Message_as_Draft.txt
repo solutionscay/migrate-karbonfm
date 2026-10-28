@@ -1,0 +1,137 @@
+# script 517: Save Utility Email Message as Draft
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=517]
+# steps: 33 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #If this is a draft, send it
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ not IsEmpty ( UtilityEmailMessage::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, UtilityEmailMessage::Id#25
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Perform Script [ “Edit EmailMessage { data }” from file: “karbon_kontroller”; Parameter: JSONSetElement( UtilityEmailMessage::AsJSON; 
+        	[ "UserId"; session::CurrentUserId; JSONString ];
+        	[ "Send"; False; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: fn:JSONSetElement, UtilityEmailMessage::AsJSON#13, session::CurrentUserId#58, fn:JSONString, fn:False
+        Script id=522 name="Edit EmailMessage { data }" in=karbon_kontroller.fmp12
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  12    #TODO: Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Field [ selector::ActivityId; JSONGetElement ( $ScriptResult ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=selector id=7 name=ActivityId
+  15    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #Create a New Activity
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Perform Script [ “Create EmailMessage { data }” from file: “karbon_kontroller”; Parameter: UtilityEmailMessage::AsJSON ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: UtilityEmailMessage::AsJSON#13
+        Script id=389 name="Create EmailMessage { data }" in=karbon_kontroller.fmp12
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  26    #TODO: Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Show Custom Dialog [ Title: "Error"; Message: "This email was not created"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  28    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Field [ selector::ActivityId; JSONGetElement ( $ScriptResult ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=selector id=7 name=ActivityId
+  30    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    End If
+        DisableStepCollapsed state=False

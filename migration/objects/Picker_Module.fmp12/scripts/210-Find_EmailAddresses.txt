@@ -1,0 +1,299 @@
+# script 210: Find EmailAddresses
+# file: Picker Module.fmp12
+# folder: Modules / EmailAddress Picker
+# source: ScriptCatalog/Script[@id=210]
+# steps: 84 (2 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=207 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-07-16 dave@geistinteractive.com - completely redesigned to include parties without an email address in results
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ $$scriptTriggersAreDisabled ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Freeze Window
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #Find matching email addresses
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Go to Layout [ “Email Address - Search” (NetworkAddress) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=45 name="Email Address - Search"
+  19    Set Field [ NetworkAddress::Address; Substitute ( Picker::Search_Field; "@"; "\@" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, Picker::Search_Field#1
+        Field table=NetworkAddress id=7 name=Address
+  20 // Set Field [ NetworkAddress::EmailAddressInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=NetworkAddress id=18 name=EmailAddressInd
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    New Record/Request
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Field [ Party::NameCached; Substitute ( Picker::Search_Field; "@"; "\@" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, Picker::Search_Field#1
+        Field table=Party id=19 name=NameCached
+  25    Set Field [ NetworkAddress::Address; "*" ]
+        DisableStepCollapsed state=False
+        Field table=NetworkAddress id=7 name=Address
+  26 // Set Field [ NetworkAddress::EmailAddressInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=NetworkAddress id=18 name=EmailAddressInd
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ Get ( FoundCount ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  31    Set Variable [ $Results; Value:NetworkAddress::AsJsonEmailSearchListOf ]
+        DisableStepCollapsed state=False
+        Value
+          refs: NetworkAddress::AsJsonEmailSearchListOf#45
+        Repetition
+          Calculation:
+            | 1
+        Name: $Results
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #Find matching parties who don't have an email address
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  41    Go to Layout [ “Party With No Email - Search” (Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=46 name="Party With No Email - Search"
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Field [ Party::NameCached; Substitute ( Picker::Search_Field; "@"; "\@" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, Picker::Search_Field#1
+        Field table=Party id=19 name=NameCached
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    New Record/Request
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Omit Record
+        DisableStepCollapsed state=False
+  48    Set Field [ NetworkAddress::EmailAddressInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=NetworkAddress id=18 name=EmailAddressInd
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    If [ Get ( FoundCount ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  53    Set Variable [ $Results; Value:List ( $Results ; Party::AsJsonEmailSearchListOf ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Party::AsJsonEmailSearchListOf#144
+        Repetition
+          Calculation:
+            | 1
+        Name: $Results
+  54    End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #Display JSON object list in Virtual List
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $FoundCount; Value:ValueCount ( $Results ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $FoundCount
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Field [ Picker::Email.Found; $Results ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=36 name=Email.Found
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Go to Layout [ “Email Address Picker” (VIRTUALLISTS_Rows) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=37 name="Email Address Picker"
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    Show All Records
+        DisableStepCollapsed state=False
+  69    Go to Record/Request/Page [ $FoundCount + 1 ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+  70    Omit Multiple Records [ 9999999999999 ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Sort Records [ Keep records in sorted order; Specified Sort Order: VIRTUALLISTS_Rows::Email.PartyName; ascending
+        VIRTUALLISTS_Rows::Email.EmailAddress; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=VIRTUALLISTS_Rows id=34 name=Email.PartyName
+          Sort type=Ascending
+            PrimaryField
+              Field table=VIRTUALLISTS_Rows id=31 name=Email.EmailAddress
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Move/Resize Window [ Current Window; Height: 570 ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Set Variable [ $$PickerSearchStatus; Value:"Found " & Get( FoundCount ) & " email address(s)" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:FoundCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $$PickerSearchStatus
+  79    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Go to Field [ Picker::Search_Field ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False

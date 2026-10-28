@@ -1,0 +1,352 @@
+# layout 102: Item | Desktop
+# file: karbon_LedgerLink.fmp12
+# folder: Application / Desktop
+# source: LayoutCatalog/Layout[@id=102]
+# objects: 58
+# theme: LedgerLink PC
+# folder group: id=88 groupCollapsed=True includeInMenu=False
+
+Layout width=1024 quickFind=True includeInMenu=True id=102 name="Item | Desktop"
+  Table id=1065245 name=Item
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnModeExit id=107 triggerFlags=2(find)
+      Script id=491 name="Exit Find Mode Trigger"
+      TriggerText: "Exit Find Mode Trigger"
+  Object type=Button key=10 LabelKey=0 bounds=0,0,39,42
+    Text flags=2 style=button.nav
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Display Main Nav” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=463 name="Display Main Nav"
+      Image name=a3_list.svg
+  Object type=Text key=39 LabelKey=0 bounds=0,42,39,170
+    Text flags=2 style=text.header.title.left: Item
+  Object type=Field key=241 LabelKey=242 bounds=288,24,312,160
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::unitPrice#22
+      Display: number flags=18956 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=242 LabelKey=0 bounds=264,24,288,120
+    Text flags=6 style=text.form.field.label: "Sales price/rate"
+  Object type=Field key=243 LabelKey=0 bounds=120,24,144,280
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Item::name#7
+  Object type=Field key=244 LabelKey=0 bounds=336,24,416,424
+    FieldObj numOfReps=1 flags=1343776 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::description#5
+  Object type=Field key=245 LabelKey=0 bounds=464,24,488,192
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::purchaseCost#8
+      Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Field key=246 LabelKey=0 flags=256 bounds=168,24,192,368
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.disabled.left
+      Field: Item::fullyQualifiedName#30
+  Object type=Button key=248 LabelKey=0 flags=1342193925 bounds=0,928,40,1024
+    ConditionalFormatting
+      Item id=0 flags=1
+        Condition op=0
+          Calculation:
+            | Item::qbo_send
+            refs: Item::qbo_send#34
+        Format: -fm-underline: underline; -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | Case (
+        | 	IsEmpty ( Item::qbo_id ) ;
+        | 	"New record hasn't been sent to QBO yet." ;
+        | 
+        | 	Item::qbo_send ;
+        | 	"Record has been changed and needs to be sent to QBO."
+        | )
+        refs: fn:Case, fn:IsEmpty, Item::qbo_id#2, Item::qbo_send#34
+    Text flags=6 style=button.nav: Sync
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Sync QBO with FM, Show Progress Card” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=242 name="Sync QBO with FM, Show Progress Card"
+      Image name=a125_sync.svg
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+  Object type=Text key=249 LabelKey=0 bounds=144,24,168,176
+    Text flags=6 style=text.form.field.label: "Fully Qualified name"
+  Object type=Text key=250 LabelKey=0 bounds=96,24,121,152
+    Text flags=6 style=text.form.field.label: Name
+  Object type=Text key=251 LabelKey=0 bounds=440,24,464,192
+    Text flags=6 style=text.form.field.label: "Purchase Cost"
+  Object type=Text key=252 LabelKey=0 bounds=312,24,336,424
+    Text flags=6 style=text.form.field.label: "Sales Description"
+  Object type=Text key=253 LabelKey=0 flags=260 bounds=41,24,80,640
+    Text flags=14 tableViewVisibility=0 style=text.header.title.left: <<name>>
+      FieldList quickFind=False
+        Field table=Item id=7 name=name
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Field key=254 LabelKey=0 bounds=120,288,144,416
+    FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::type#21
+      ValueList: Item type#19
+  Object type=Text key=255 LabelKey=0 bounds=96,288,120,416
+    Text flags=6 style=text.form.field.label: Type
+  Object type=Text key=256 LabelKey=0 flags=1342177540 bounds=40,888,80,1000
+    Text flags=6 style=text.header.title.right: Inactive
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find mode */
+        | or
+        | Item::active
+        refs: fn:Get, fn:WindowMode, fn:or, Item::active#4
+  Object type=SlideControl key=257 LabelKey=0 flags=1342177540 bounds=88,872,152,1016
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+    SlideControlObj visPanelKey=258 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=258 LabelKey=0 flags=1342177280 bounds=88,872,152,1016
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=259 LabelKey=0 flags=260 bounds=96,880,136,1008
+            Text flags=2 style=button.raised.secondary: "Make Inactive"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Item::active; not Item::active ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | not Item::active
+                  refs: fn:not, Item::active#4
+                Field table=Item id=4 name=active
+            HideCondition findMode=True
+              Calculation:
+                | not Item::active
+                refs: fn:not, Item::active#4
+          Object type=Button key=260 LabelKey=0 flags=260 bounds=96,880,136,1008
+            Text flags=2 style=button.raised.primary: "Make Active"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Item::active; not Item::active ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | not Item::active
+                  refs: fn:not, Item::active#4
+                Field table=Item id=4 name=active
+            HideCondition findMode=True
+              Calculation:
+                | Item::active
+                refs: Item::active#4
+  Object type=SlideControl key=261 LabelKey=0 flags=1342177284 bounds=80,872,144,1016
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+    SlideControlObj visPanelKey=262 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=262 LabelKey=0 flags=1342177280 bounds=80,872,144,1016
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=263 LabelKey=0 bounds=96,896,120,968
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Item::active; True ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | True
+                  refs: fn:True
+                Field table=Item id=4 name=active
+              Image name=checkbox.svg
+          Object type=Button key=264 LabelKey=0 flags=260 bounds=96,896,120,968
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Item::active; "" ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | ""
+                Field table=Item id=4 name=active
+              Image name=checked.svg
+            HideCondition findMode=True
+              Calculation:
+                | Item::active ≠ 1
+                refs: Item::active#4
+          Object type=Text key=265 LabelKey=0 bounds=96,920,120,992
+            Text flags=6 style=text.form.info.left: Active
+          Object type=Button key=266 LabelKey=0 bounds=120,896,144,968
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Invoice_InvoiceItem_Item::active; False ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | False
+                  refs: fn:False
+                Field table=Invoice_InvoiceItem_Item id=4 name=active
+              Image name=checkbox.svg
+          Object type=Button key=267 LabelKey=0 flags=260 bounds=120,896,144,968
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Item::active; "" ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | ""
+                Field table=Item id=4 name=active
+              Image name=checked.svg
+            HideCondition findMode=True
+              Calculation:
+                | Item::active = 1
+                | or
+                | IsEmpty ( Item::active )
+                refs: Item::active#4, fn:or, fn:IsEmpty
+          Object type=Text key=268 LabelKey=0 bounds=120,920,144,992
+            Text flags=6 style=text.form.info.left: Inactive
+  Object type=Field key=269 LabelKey=270 flags=-1073741820 bounds=168,768,416,1008
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::qbo_error#26
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Invoice_InvoiceItem_Item::qbo_error )
+        refs: fn:IsEmpty, Invoice_InvoiceItem_Item::qbo_error#26
+  Object type=Text key=270 LabelKey=0 flags=1073741828 bounds=144,768,168,1008
+    Text flags=6 style=text.form.field.label: "sync error"
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Invoice_InvoiceItem_Item::qbo_error )
+        refs: fn:IsEmpty, Invoice_InvoiceItem_Item::qbo_error#26
+  Object type=Field key=276 LabelKey=0 bounds=512,24,592,424
+    FieldObj numOfReps=1 flags=1343776 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::purchaseDesc#9
+  Object type=Text key=277 LabelKey=0 bounds=488,24,512,424
+    Text flags=6 style=text.form.field.label: "Purchase Description"
+  Object type=Field key=278 LabelKey=0 bounds=216,24,240,416
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::sku#29
+      Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=279 LabelKey=0 bounds=192,24,216,152
+    Text flags=6 style=text.form.field.label: SKU
+  Object type=Field key=280 LabelKey=281 bounds=168,376,192,416
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.left
+      Field: Item::level#24
+      Display: number flags=16652 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=281 LabelKey=0 bounds=144,376,168,416
+    Text flags=6 style=text.form.field.label: Level
+  Object type=Field key=282 LabelKey=0 bounds=464,200,488,424
+    FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::expenseAccountRef.value#32
+      ValueList: Accounts COGS Id#3
+  Object type=Text key=283 LabelKey=0 bounds=440,200,464,424
+    Text flags=6 style=text.form.field.label: "Expense Account"
+  Object type=Field key=284 LabelKey=0 bounds=288,200,312,424
+    FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Item::incomeAccountRef.value#31
+      ValueList: Accounts Income Id#4
+  Object type=Text key=285 LabelKey=0 bounds=264,200,288,424
+    Text flags=6 style=text.form.field.label: "Income Account"
+  Object type=Button key=286 LabelKey=0 flags=260 bounds=288,168,312,192
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Item::taxable; True ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | True
+          refs: fn:True
+        Field table=Item id=19 name=taxable
+      Image name=checkbox.svg
+    HideCondition findMode=True
+      Calculation:
+        | Item::taxable
+        refs: Item::taxable#19
+  Object type=Button key=287 LabelKey=0 flags=260 bounds=288,168,312,192
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Item::taxable; False ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | False
+          refs: fn:False
+        Field table=Item id=19 name=taxable
+      Image name=checked.svg
+    HideCondition findMode=True
+      Calculation:
+        | not Item::taxable
+        refs: fn:not, Item::taxable#19
+  Object type=Text key=288 LabelKey=0 bounds=264,136,288,192
+    Text flags=6 style=text.form.field.label.right: Taxable
+  Object type=SlideControl key=289 LabelKey=0 flags=4 bounds=95,456,255,744
+    HideCondition findMode=False
+      Calculation:
+        | Item::type ≠ "Inventory"
+        refs: Item::type#21
+    SlideControlObj visPanelKey=290 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=290 LabelKey=0 bounds=95,456,255,744
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=291 LabelKey=0 flags=260 bounds=167,472,191,624
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Invoice_InvoiceItem_Item::trackQtyOnHand; True ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | True
+                  refs: fn:True
+                Field table=Invoice_InvoiceItem_Item id=20 name=trackQtyOnHand
+              Image name=checkbox.svg
+            HideCondition findMode=True
+              Calculation:
+                | Item::trackQtyOnHand
+                refs: Item::trackQtyOnHand#20
+          Object type=GroupButton key=292 LabelKey=0 bounds=167,496,191,632
+            GroupButtonObj numOfObjs=1
+              Object type=Text key=293 LabelKey=0 bounds=167,496,191,632
+                Text flags=6 style=text.form.info.left: "Track Quantity On Hand"
+          Object type=Field key=294 LabelKey=295 flags=4 bounds=167,632,191,704
+            FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+              Field: Item::qtyOnHand#13
+              Display: number flags=16384 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=0 trueString=Yes falseString=No
+            HideCondition findMode=False
+              Calculation:
+                | not Item::trackQtyOnHand
+                refs: fn:not, Item::trackQtyOnHand#20
+          Object type=Text key=295 LabelKey=0 bounds=143,472,167,632
+            Text flags=6 style=text.form.field.label: "Units On Hand"
+          Object type=Field key=296 LabelKey=0 bounds=119,472,143,600
+            FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5
+              Field: Item::invStartDate#27
+              Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+          Object type=Text key=297 LabelKey=0 bounds=95,472,119,600
+            Text flags=6 style=text.form.field.label: "Inventory Start Date"
+          Object type=Text key=298 LabelKey=0 flags=4 bounds=143,632,167,704
+            Text flags=6 style=text.form.field.label: Quantity
+            HideCondition findMode=False
+              Calculation:
+                | not Invoice_InvoiceItem_Item::trackQtyOnHand
+                refs: fn:not, Invoice_InvoiceItem_Item::trackQtyOnHand#20
+          Object type=Field key=299 LabelKey=0 bounds=215,472,239,705
+            FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+              Field: Item::assetAccountRef.value#33
+              ValueList: Accounts Asset Id#2
+          Object type=Text key=300 LabelKey=0 bounds=191,472,215,705
+            Text flags=6 style=text.form.field.label: "Asset Account"
+          Object type=Button key=302 LabelKey=0 flags=260 bounds=167,472,191,624
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Item::trackQtyOnHand; False ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | False
+                  refs: fn:False
+                Field table=Item id=20 name=trackQtyOnHand
+              Image name=checked.svg
+            HideCondition findMode=True
+              Calculation:
+                | not Item::trackQtyOnHand
+                refs: fn:not, Item::trackQtyOnHand#20
+  Object type=Text key=301 LabelKey=0 flags=-1073741824 bounds=599,1050,616,1093
+    Text flags=4: expand

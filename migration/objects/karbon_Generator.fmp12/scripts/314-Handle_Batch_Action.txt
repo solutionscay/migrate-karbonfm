@@ -1,0 +1,158 @@
+# script 314: Handle Batch Action
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / UI
+# source: ScriptCatalog/Script[@id=314]
+# steps: 40 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=298 groupCollapsed=False includeInMenu=True
+
+   1    Set Field [ SELECTOR::ApiGeneratorLineParentId; ApiGenerator::_BatchActionDestination ]
+        DisableStepCollapsed state=False
+        refs: ApiGenerator::_BatchActionDestination#29
+        Field table=SELECTOR id=14 name=ApiGeneratorLineParentId
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $lineIds; Value:List ( ApiGeneratorLine#selected::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ApiGeneratorLine#selected::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineIds
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+   6    Set Variable [ $end; Value:ValueCount ( $lineIds ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $thisLineId; Value:GetValue ( $lineIds ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisLineId
+  15    Set Field [ SELECTOR::ApiGeneratorLineId; $thisLineId ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=13 name=ApiGeneratorLineId
+  16    Set Field [ Selected_ApiGeneratorLine::ParentObjectId; ApiGenerator::_BatchActionDestination ]
+        DisableStepCollapsed state=False
+        refs: ApiGenerator::_BatchActionDestination#29
+        Field table=Selected_ApiGeneratorLine id=32 name=ParentObjectId
+  17    Set Field [ Selected_ApiGeneratorLine::JsonPathIn; Substitute ( 
+        	List ( 
+        		Selected_ApiGeneratorLine#parent::JsonPathIn ; 
+        		Selected_ApiGeneratorLine::JsonPropertyName
+        	) ; 
+        	"¶" ; 
+        	"/"
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, fn:List, Selected_ApiGeneratorLine#parent::JsonPathIn#27, Selected_ApiGeneratorLine::JsonPropertyName#21
+        Field table=Selected_ApiGeneratorLine id=27 name=JsonPathIn
+  18    Set Field [ Selected_ApiGeneratorLine::selected; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_ApiGeneratorLine id=34 name=selected
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    End Loop
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  26    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  27    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  28    Revert Record/Request
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  29    Show Custom Dialog [ Title: "Error"; Message: "The transcation failed to commit. "; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  30    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Field [ ApiGenerator::_BatchAction; "" ]
+        DisableStepCollapsed state=False
+        Field table=ApiGenerator id=28 name=_BatchAction
+  34    Set Field [ ApiGenerator::_BatchActionDestination; "" ]
+        DisableStepCollapsed state=False
+        Field table=ApiGenerator id=29 name=_BatchActionDestination
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False

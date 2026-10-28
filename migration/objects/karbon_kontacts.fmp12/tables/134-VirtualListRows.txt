@@ -1,0 +1,104 @@
+# table 134: VirtualListRows
+# file: karbon_kontacts.fmp12
+# source: BaseTableCatalog/BaseTable[@id=134]
+# fields: 11
+# records: 1000
+
+Field id=1 dataType=Number fieldType=Normal name=n
+  Comment: Indexed Row Number
+  AutoEnter allowEditing=True
+    Serial increment=1 nextValue=1001 generate=OnCreation
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=Template.FieldsInUse
+  Comment: A list of merge fields currently in use in the template
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=Template.Id
+  Comment: The primary key of the current template
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=VirtualListRows (inactive):
+      | $$TemplateID.Selected
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Number fieldType=Calculated name=Template.InUseInd
+  Calculation table=VirtualListRows:
+    | IsInList ( Template.FieldsInUse ; RowData )
+    refs: cf:IsInList, VirtualListRows::Template.FieldsInUse#9, VirtualListRows::RowData#26
+  Comment: Sort on this field to prioritize the merge fields that are in use
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=VirtualListRows (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Calculated name=RowData
+  Calculation table=VirtualListRows:
+    | GetValue ( VirtualList::Data ; n )
+    refs: fn:GetValue, VirtualList::Data#14, VirtualListRows::n#1
+  Comment: We are now referencing the global field iin the VirtualList table instead of a global variable
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Calculated name=ActivityParty_ActivityPartyRoleName
+  Calculation table=VirtualListRows:
+    | Let ( 
+    | 	theValue = JSONGetElement (  RowData ;  "ActivityPartyRoleName" ) ; 
+    | 	If ( Left ( theValue ; 1 ) = "?" ; "" ; theValue )
+    | )
+    refs: fn:Let, fn:JSONGetElement, VirtualListRows::RowData#26, fn:If, fn:Left
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Text fieldType=Calculated name=ActivityParty_EmailAddress
+  Calculation table=VirtualListRows:
+    | Let ( 
+    | 	theValue = JSONGetElement (  RowData ;  "EmailAddress" ) ; 
+    | 	If ( Left ( theValue ; 1 ) = "?" ; "" ; theValue )
+    | )
+    refs: fn:Let, fn:JSONGetElement, VirtualListRows::RowData#26, fn:If, fn:Left
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Text fieldType=Calculated name=ActivityParty_PartyName
+  Calculation table=VirtualListRows:
+    | Let ( 
+    | 	theValue = JSONGetElement (  RowData ; "PartyName" ) ; 
+    | 	If ( Left ( theValue ; 1 ) = "?" ; "" ; theValue )
+    | )
+    refs: fn:Let, fn:JSONGetElement, VirtualListRows::RowData#26, fn:If, fn:Left
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=34 dataType=Text fieldType=Calculated name=Attachment_FileName
+  Calculation table=VirtualListRows:
+    | Let ( 
+    | 	theValue = JSONGetElement (  RowData ;  "FileName" ) ; 
+    | 	If ( Left ( theValue ; 1 ) = "?" ; "" ; theValue )
+    | )
+    refs: fn:Let, fn:JSONGetElement, VirtualListRows::RowData#26, fn:If, fn:Left
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Calculated name=Attachment_FilePath
+  Calculation table=VirtualListRows:
+    | Let ( 
+    | 	theValue = JSONGetElement (  RowData ;  "FilePath" ) ; 
+    | 	If ( Left ( theValue ; 1 ) = "?" ; "" ; theValue )
+    | )
+    refs: fn:Let, fn:JSONGetElement, VirtualListRows::RowData#26, fn:If, fn:Left
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

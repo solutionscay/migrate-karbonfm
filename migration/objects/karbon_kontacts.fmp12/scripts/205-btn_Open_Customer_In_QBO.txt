@@ -1,0 +1,55 @@
+# script 205: btn: Open Customer In QBO
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Customer
+# source: ScriptCatalog/Script[@id=205]
+# steps: 9 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=560 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $Entity; Value:"Customer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+   6    Set Variable [ $QBOID; Value:Party_PartyRole_ExternalLink::ExternalId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Party_PartyRole_ExternalLink::ExternalId#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOID
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "QBOId" ; $QBOId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   9    Perform Script [ “Open in QB ( {entity , qbo_id} )” from file: “karbon_LedgerLink”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        FileReference id=6 name=karbon_LedgerLink
+          UniversalPathList: file:karbon_LedgerLink
+        Script id=501 name="Open in QB ( {entity , qbo_id} )" in=karbon_LedgerLink.fmp12

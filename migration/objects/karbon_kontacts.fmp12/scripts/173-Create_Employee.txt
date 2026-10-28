@@ -1,0 +1,131 @@
+# script 173: Create Employee
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party
+# source: ScriptCatalog/Script[@id=173]
+# steps: 28 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=True includeInMenu=False
+
+   1    #2018-02-03 Dave Graham: created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $party; Value:JSONSetElement ( "{}" ; 
+        	[ "SkipValidations" ; True ; JSONBoolean ] ; 
+        	[ "PartySubtype" ; "Person" ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $party
+   4    Set Variable [ $parameters; Value:JSONSetElement ( "{}" ; 
+        	[ "DisplayName" ; "New Employee" ; JSONString ] ; 
+        	[ "Party" ; $party ; JSONObject ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   5    Perform Script [ “_wip_Create Employee { data }” from file: “karbon_kontroller”; Parameter: $parameters ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=164 name="_wip_Create Employee { data }" in=karbon_kontroller.fmp12
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   8    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   9    Set Variable [ $errorMessage; Value:JSONGetElement ( $result ; "errorMessage" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $errorMessage
+  10    Show Custom Dialog [ Title: "Error"; Message: "An error occurred: " & $errorMessage & "."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  11    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  12    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $Id; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  17    Go to Layout [ <unknown> ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=57 name="" ref=missing
+  18    Set Field [ Party_PartyRole_Employee::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=Party_PartyRole_Employee id=6 name=Id
+  19    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    If [ Get( LastError ) <> 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  22    Show Custom Dialog [ Title: "Error"; Message: "Error Finding new Employee."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False

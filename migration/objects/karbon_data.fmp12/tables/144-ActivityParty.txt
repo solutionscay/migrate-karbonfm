@@ -1,0 +1,187 @@
+# table 144: ActivityParty
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=144]
+# fields: 20
+# records: 0
+
+Field id=6 dataType=Text fieldType=Normal name=ActivityId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=PartyId
+  AutoEnter allowEditing=True lookup=False
+    (inactive) Lookup
+      Table id=1065114 name=ActivityParty
+      Field table="" id=0 name="" ref=none
+      NoMatchCopyOption value=CopyConstant
+      CopyEmptyContent value=True
+  Validation type=OnlyDuringDataEntry
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=PartyNameCached
+  AutoEnter allowEditing=True lookup=False
+    (inactive) Lookup
+      Table id=1065114 name=ActivityParty
+      Field table="" id=0 name="" ref=none
+      NoMatchCopyOption value=DoNotCopy
+      CopyEmptyContent value=False
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=ActivityParty:
+      | Get ( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Number fieldType=Normal name=ActivityPartyRoleId
+  AutoEnter allowEditing=True constant=False
+    (inactive) ConstantData: 7
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=28 dataType=Text fieldType=Normal name=ContactMethodId
+  Comment: Allow an activity to link to a phone, address, etc. directly.
+  AutoEnter allowEditing=True lookup=False
+    (inactive) Lookup
+      Table id=0 name="" ref=none
+      Field table="" id=0 name="" ref=none
+      NoMatchCopyOption value=CopyConstant
+      CopyEmptyContent value=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Text fieldType=Normal name=PartyInitials
+  Comment: Used for reference initials in letter writing
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Number fieldType=Normal name=NotificationSentInd
+  Comment: Indicates that the notification has been sent by email (used for the notification role type records)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=Text fieldType=Summary name=IdList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=23 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=59 dataType=Text fieldType=Summary name=PartyIdList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=7 name=PartyId
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=62 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=ActivityParty:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=63 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=64 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=65 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=ActivityParty (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=66 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=ActivityParty:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=67 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=ActivityParty (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=OnlyDuringDataEntry
+    Calculation table=ActivityParty (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=71 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=ActivityParty:
+    | JSONSetElement ( "{}" ; 
+    | 	[ "ActivityId" ; ActivityId ; JSONString ];
+    | 	[ "ActivityPartyRoleId" ; ActivityPartyRoleId ; JSONString ];
+    | 	[ "ContactMethodId" ; ContactMethodId ; JSONString ];
+    | 	[ "Id" ; Id ; JSONString ];
+    | 	[ "NotificationSentInd" ; NotificationSentInd ; JSONString ];
+    | 	[ "PartyId" ; PartyId ; JSONString ]
+    | )
+    refs: fn:JSONSetElement, ActivityParty::ActivityId#6, fn:JSONString, ActivityParty::ActivityPartyRoleId#24, ActivityParty::ContactMethodId#28, ActivityParty::Id#23, ActivityParty::NotificationSentInd#47, ActivityParty::PartyId#7
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=72 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=ActivityParty (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=73 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=ActivityParty:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=74 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ActivityParty:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

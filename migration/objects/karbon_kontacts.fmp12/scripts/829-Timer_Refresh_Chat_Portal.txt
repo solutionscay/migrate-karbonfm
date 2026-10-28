@@ -1,0 +1,86 @@
+# script 829: Timer: Refresh Chat Portal
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Chat
+# source: ScriptCatalog/Script[@id=829]
+# steps: 25 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=709 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    If [ $Debug ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Step into this to cancel the timer
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ Chat::TestGlobal = Activity::Subject ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Chat::TestGlobal#32, Activity::Subject#22
+   8    #The subject hasn't changed; exit
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  10    Else If [ not IsEmpty ( Chat::MessageInput ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, Chat::MessageInput#30
+  11    #The user is editing the record; don't refresh
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  13    End If
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Freeze Window
+        DisableStepCollapsed state=False
+  16    Set Field [ Chat::TestGlobal; Activity::Subject ]
+        DisableStepCollapsed state=False
+        refs: Activity::Subject#22
+        Field table=Chat id=32 name=TestGlobal
+  17    Set Variable [ $currentObjectName; Value:Get ( ActiveLayoutObjectName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ActiveLayoutObjectName
+        Repetition
+          Calculation:
+            | 1
+        Name: $currentObjectName
+  18    Refresh Portal [ Object Name: "ChatPortal" ]
+        DisableStepCollapsed state=False
+  19    Go to Object [ Object Name: "ChatPortal"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  20    Go to Portal Row
+        [ Last ]
+        NoInteract state=False
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  21    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Go to Object [ Object Name: $currentObjectName; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

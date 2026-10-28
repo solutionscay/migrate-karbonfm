@@ -1,0 +1,35 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/265-Open_Card_-_UtilityMeeting.txt,5ca0b53131050f127c6280fd3f0bbef8c9c6ac18c3cabc3dc122e912c8fb5235,scripts,karbon_kontacts.fmp12,265,Open Card - UtilityMeeting,navigation,client-ui,tier3,"Opens the ""Card - Utility_Meeting"" card: commits, parses the JSON parameter and copies 13 meeting fields (activity message, address, dates, times, entity, id, location, party, subject) into the UtilityMeeting record, then opens the card window.",none,"selector::ActivityId#7 (Set Field step 6, global)
+13 fields on UtilityMeeting (Set Field steps 8-19, current record: ActivityMessage#14, AddressId#6, EndDate#7, EndTime#8, EntityId#21, Id#15, Location#9, MeetingInd#16, PartyId#17, StartDate#10, StartTime#11, Subject#13)",none,objects/karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt,none,"Folder ""#Deprecated Activity - Utilities"". The write goes to a utility table used as a form buffer; durable save is in 266."
+karbon_kontacts.fmp12/scripts/266-Save_Card_-_UtiityMeeting.txt,51c8110afac38d8c5171cb2f2f4f837d4bf3185fb19aff77ff32b5db323f3a36,scripts,karbon_kontacts.fmp12,266,Save Card - UtiityMeeting,data-change,server-domain,tier2,"Saves the meeting card: builds a JSON of the card fields (with the current user's party id as CreatorId), commits and calls ""Create Meeting"" (545) in karbon_kontroller when there is no selected activity, otherwise ""Edit Meeting"" (546). On error shows ""This Meeting was not created/edited"" else closes the card window.","UtilityMeeting::ActivityMessage#14
+UtilityMeeting::AddressId#6
+session::CurrentUserPartyId#63
+UtilityMeeting::EndDate#7
+UtilityMeeting::EndTime#8
+UtilityMeeting::Id#15
+UtilityMeeting::Location#9
+UtilityMeeting::EntityId#21
+UtilityMeeting::PartyId#17
+UtilityMeeting::StartDate#10
+UtilityMeeting::StartTime#11
+UtilityMeeting::Subject#13
+Selected_Activity::Id#1
+UtilityMeeting::<Field Missing> (step 3, EntityTypeId)",none,"karbon_kontroller.fmp12/scripts/545 (""Create Meeting { data }"", step 9)
+karbon_kontroller.fmp12/scripts/546 (""Edit Meeting { data }"", step 11)",objects/karbon_kontacts.fmp12/layouts/82-Card_-_Utility_Meeting.txt,none,"Folder ""#Deprecated Activity - Utilities"". Step 3 sends EntityTypeId from a missing field (UtilityMeeting::<Field Missing>), so EntityTypeId is sent empty. Window title typo ""UtiityMeeting"" in the script name."
+karbon_kontacts.fmp12/scripts/526-Edit_Meeting.txt,387e5a3e6d3c7bfccb87ddcd7ff69c89de93f0e3b15a3c7bd8ce0a3e2d36f9b1,scripts,karbon_kontacts.fmp12,526,Edit Meeting,navigation,client-ui,tier3,"Opens the meeting card for editing: copies the selected activity's entity, subject and message into UtilityMeeting, finds the invited party (the activity party with role 60) and stores its id, then opens the card.","Selected_Activity_ActivityEntity::EntityId#17
+Selected_Activity_ActivityEntity::EntityTypeId#16
+Selected_Activity::Subject#22
+Selected_Activity_ActivityMessage::Message#12
+Selected_Activity_ActivityParty::AsJSON#71
+Selected_Activity_Meeting::<Field Missing> (steps 7-12, 15)","UtilityMeeting::EntityId#21 (Set Field step 5, current record)
+UtilityMeeting::EntityTypeId#23 (Set Field step 6, current record)
+UtilityMeeting::Id#15 (Set Field step 7, current record, source field missing)
+UtilityMeeting::AddressId#6 (Set Field step 8, current record, source field missing)
+UtilityMeeting::StartDate#10 (Set Field step 9, current record, source field missing)
+UtilityMeeting::StartTime#11 (Set Field step 10, current record, source field missing)
+UtilityMeeting::EndDate#7 (Set Field step 11, current record, source field missing)
+UtilityMeeting::EndTime#8 (Set Field step 12, current record, source field missing)
+UtilityMeeting::Subject#13 (Set Field step 13, current record)
+UtilityMeeting::ActivityMessage#14 (Set Field step 14, current record)
+UtilityMeeting::Location#9 (Set Field step 15, current record, source field missing)
+UtilityMeeting::PartyId#17 (Set Field step 21, current record)",none,none found (in Scripts menu),none,"Folder ""#Deprecated Activity - Utilities"". Seven steps copy from the Selected_Activity_Meeting TO whose field is missing from the DDR (<Field Missing>: Id, AddressId, StartDate, StartTime, EndDate, EndTime, Location), so those values are not copied; confirm the intended source. Step 4 (PartyId) is disabled. Role 60 = invited party is a literal in step 18. No caller found."

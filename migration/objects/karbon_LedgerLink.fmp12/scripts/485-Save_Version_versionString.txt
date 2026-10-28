@@ -1,0 +1,70 @@
+# script 485: Save Version ( versionString )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices
+# source: ScriptCatalog/Script[@id=485]
+# steps: 17 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=469 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $versionString; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $versionString
+   3    If [ IsEmpty ( $versionString ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   4    Show Custom Dialog [ Title: "ERROR"; Message: "Version string was empty."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   5    Halt Script
+        DisableStepCollapsed state=False
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Next Serial Value [ QBOConfig::metaData; $versionString
+        & "¶1" /* this prevents the data from being changed when a new record is created */ ]
+        DisableStepCollapsed state=False
+        Field table=QBOConfig id=13 name=metaData
+   9    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  10    Show Custom Dialog [ Title: "ERROR"; Message: "FileMaker error code: " & Get ( LastError ) & " after set next serial value step."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:Get, fn:LastError
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  11    Halt Script
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Field [ QBOConfig::versionForDisplay; "" /* trigger the field's auto-enter calc */ ]
+        DisableStepCollapsed state=False
+        Field table=QBOConfig id=14 name=versionForDisplay
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Script [  ]
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False

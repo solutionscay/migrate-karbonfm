@@ -1,0 +1,493 @@
+# script 352: _Create Otto Migration
+# file: karbon_Build.fmp12
+# folder: API / Private
+# source: ScriptCatalog/Script[@id=352]
+# steps: 127 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=339 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Creates a migration record in the Otto Migrator app
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {object} Migration
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {string} Migration.AppBuildId
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@result {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@result {boolean} result.OK
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@description This script is not transactional
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@history 2019-09-25 dave@geistinteractive.com - completely refactored
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@history 2018-08-14 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  32    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Insert Calculated Result [ $json; Get ( ScriptParameter ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptParameter
+        Field: $json
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Insert Calculated Result [ $json; JSON.Format( $json ; "" ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: cf:JSON.Format
+        Field: $json
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ Error.IsError ( $json ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  45    Insert Calculated Result [ $error; $json ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $error
+  46    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Insert Calculated Result [ $error; JSON.Validate.This ( $json ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "AppBuildId" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Field: $error
+  52    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Insert Calculated Result [ $AppBuildId; JSONGetElement ( $json ; "AppBuildId" ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field: $AppBuildId
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #GO TO APP BUILD
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Go to Layout [ “AppBuild” (AppBuild) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=20 name=AppBuild
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    If [ AppBuild::Id <> $AppBuildId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: AppBuild::Id#1
+  69    Perform Find [ Specified Find Requests: Find Records; Criteria: AppBuild::Id: “$AppBuildId” ]
+        [ Restore ]
+        DisableStepCollapsed state=False
+        Restore state=True
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=AppBuild id=1 name=Id
+              Text: $AppBuildId
+  70    Insert Calculated Result [ $error; Error.Last ( "finding app build" ; "" ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: cf:Error.Last
+        Field: $error
+  71    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  72    End If
+        DisableStepCollapsed state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Set Variable [ $File; Value:JSON.ArrayFromRelated ( AppBuild_FileBuild_File::AsJson ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayFromRelated, AppBuild_FileBuild_File::AsJson#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $File
+  80    Set Variable [ $Notes; Value:"This migration was created automagically from karbon_Build on " & Get ( CurrentHostTimestamp ) & "." ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:CurrentHostTimestamp
+        Repetition
+          Calculation:
+            | 1
+        Name: $Notes
+  81    Set Variable [ $Description; Value:"Build " & Tx_AppBuild::Version ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Tx_AppBuild::Version#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $Description
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    #CALL API
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    Set Variable [ $Migration; Value:JSONSetElement (  ""; 
+         
+        //	[ "CloseFileTimeoutSeconds" ; $CloseFileTimeoutSeconds ; JSONNumber ];
+        //	[ "ConcurrentFiles" ; $ConcurrentFiles ; JSONNumber ];
+        	[ "Description" ; $Description ; JSONString ];
+        //	[ "DownloadCopiesAfterMigrationInd" ; $DownloadCopiesAfterMigrationInd ; JSONNumber ];
+        //	[ "DownloadFolder" ; $DownloadFolder ; JSONString ];
+        //	[ "FmsDbFolder" ; $FmsDbFolder ; JSONString ];
+        	[ "CloneAccount" ; System::MigrationAccountName; JSONString ];
+        	[ "SourceAccount" ; System::MigrationAccountName; JSONString ];
+        	[ "ClonePassword" ; System::MigrationAccountPassword ; JSONString ];
+        	[ "SourcePassword" ; System::MigrationAccountPassword ; JSONString ];
+        	[ "File" ; $File; JSONArray ];
+        	[ "Notes" ; $Notes ; JSONString ];
+        	[ "ProjectId" ; System::OttoMigratorProjectId ; JSONString ];
+        //	[ "RetainAccountsFromServerId" ; $RetainAccountsFromServerId ; JSONString ];
+        //	[ "RetainFontsFromServerId" ; $RetainFontsFromServerId ; JSONString ];
+        //	[ "RetainValuelistsFromServerId" ; $RetainValuelistsFromServerId ; JSONString ];
+        	[ "ServerIdFrom" ; System::OttoMigratorFromServerId ; JSONString ];
+        	[ "ServerIdTo" ; System::OttoMigratorToServerId ; JSONString ];
+        //	[ "Subfolder" ; $Subfolder ; JSONString ];
+        	[ "Type" ; "Build" ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, System::MigrationAccountName#9, System::MigrationAccountPassword#10, fn:JSONArray, System::OttoMigratorProjectId#11, System::OttoMigratorFromServerId#12, System::OttoMigratorToServerId#13
+        Repetition
+          Calculation:
+            | 1
+        Name: $Migration
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    Perform Script [ <unknown> from file: “Otto Migrator” (file not open); Parameter: $Migration ]
+        DisableStepCollapsed state=False
+        FileReference id=22 name="Otto Migrator"
+          UniversalPathList: $$OttoMigratorDataSource
+        Script id=112 ref=external
+  93    Set Variable [ $error; Value:Error.Last ( "calling API to create migration" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  94    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  97    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  98    Insert Calculated Result [ $error; $result ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $error
+  99    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+ 100    End If
+        DisableStepCollapsed state=False
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    Set Variable [ $MigrationId; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $MigrationId
+ 103    Set Field [ AppBuild::OttoMigrationId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=AppBuild id=8 name=OttoMigrationId
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    Insert Calculated Result [ $result; JSONSetElement ( "{}" ; 
+        	[ "OK" ; True ; JSONBoolean ] 
+        ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:True, fn:JSONBoolean
+        Field: $result
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 111    End Loop
+        DisableStepCollapsed state=False
+ 112    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 114    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 115    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    Show Custom Dialog [ Title: "Migration Created"; Message: "The Otto migration was successfully created."; Default Button: “Go”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Go"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+ 117    If [ Get ( LastMessageChoice ) = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+ 118    Perform Script [ <unknown> from file: “Otto Migrator” (file not open); Parameter: $MigrationId ]
+        DisableStepCollapsed state=False
+        FileReference id=22 name="Otto Migrator"
+          UniversalPathList: $$OttoMigratorDataSource
+        Script id=114 ref=external
+ 119    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 120    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 121    Show Custom Dialog [ Title: "Error"; Message: "The Otto migration could not be displayed."; Default Button: “Ugh”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Ugh"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+ 122    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+ 123    End If
+        DisableStepCollapsed state=False
+ 124    End If
+        DisableStepCollapsed state=False
+ 125    End If
+        DisableStepCollapsed state=False
+ 126    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False

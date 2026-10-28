@@ -1,0 +1,108 @@
+# layout 112: Template Detail
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Admin
+# source: LayoutCatalog/Layout[@id=112]
+# objects: 18
+# theme: Karbon-1.0
+# folder group: id=73 groupCollapsed=False includeInMenu=False
+
+Layout width=1240 quickFind=True includeInMenu=False id=112 name="Template Detail"
+  Table id=1065232 name=Template
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  Object type=Text key=105 LabelKey=0 flags=-805306368 bounds=810,1290,840,1360
+    Text flags=2: expand
+  Object type=Field key=121 LabelKey=122 bounds=60,20,84,500
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Template::Name#15
+  Object type=Text key=122 LabelKey=0 bounds=30,20,54,500
+    Text flags=2 style=Label-Medium-Left: Name
+  Object type=Field key=123 LabelKey=124 bounds=140,20,164,500
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Template::Subject#6
+  Object type=Text key=124 LabelKey=0 bounds=110,20,134,500
+    Text flags=2 style=Label-Medium-Left: Subject/Regarding
+  Object type=Field key=125 LabelKey=126 bounds=220,20,860,800
+    FieldObj numOfReps=1 flags=1048864 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium
+      Field: Template::Message#7
+  Object type=Text key=126 LabelKey=0 bounds=190,20,214,500
+    Text flags=2 style=Label-Medium-Left: Body
+  Object type=Portal key=127 LabelKey=0 bounds=220,840,860,1220
+    PortalObj portalFlags=25 numOfRows=22 initialRow=1 style="Standard Portal"
+      TableAliasKey: VirtualListRows
+      FieldList
+        Field table=VirtualListRows id=26 name=RowData
+        Field table=VirtualListRows_MergeField id=44 name=RequiredInd
+      SortList BlanksLast=False Maintain=True value=True
+        Sort type=Descending
+          PrimaryField
+            Field table=VirtualListRows id=10 name=Template.InUseInd
+        Sort type=Ascending
+          PrimaryField
+            Field table=VirtualListRows id=3 name="" ref=missing
+      Object type=Field key=128 LabelKey=0 flags=1 bounds=225,845,246,1100
+        ConditionalFormatting
+          Item id=0 flags=1
+            Condition op=0
+              Calculation:
+                | VirtualListRows::Template.InUseInd
+                refs: VirtualListRows::Template.InUseInd#10
+            Format: font-weight: bold; -fm-icon-color: rgba(0%,0%,0%,0);
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Small-NoChrome
+          Field: VirtualListRows::RowData#26
+      Object type=Field key=136 LabelKey=0 flags=4 bounds=223,1158,246,1181
+        FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Checkbox
+          Field: VirtualListRows_MergeField::RequiredInd#44
+          ValueList: Boolean#1
+        HideCondition findMode=False
+          Calculation:
+            | not VirtualListRows::Template.InUseInd
+            refs: fn:not, VirtualListRows::Template.InUseInd#10
+  Object type=Text key=129 LabelKey=0 bounds=150,840,174,1220
+    Text flags=2 style=Label-Medium-Left: "Merge Fields"
+  Object type=Field key=131 LabelKey=0 bounds=60,840,110,1170
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Checkbox-Medium
+      Field: Template::ActivityTypeId#16
+      ValueList: ActivityType#26
+  Object type=Text key=132 LabelKey=0 bounds=30,840,54,1320
+    Text flags=2 style=Label-Medium-Left: "Activity Type(s)"
+  Object type=Text key=133 LabelKey=0 bounds=190,1131,214,1210
+    Text flags=2 style=Label-Medium-Left: Required
+  Object type=Text key=135 LabelKey=0 bounds=190,841,214,920
+    Text flags=2 style=Label-Medium-Left: Name
+  Object type=Button key=137 LabelKey=0 bounds=30,590,70,740
+    Text flags=2: "Call Schema Picker"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open Schema Picker” from file: “Picker Module” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Script id=244 name="Open Schema Picker" in=Picker_Module.fmp12
+  Object type=Button key=138 LabelKey=0 bounds=80,590,120,740
+    Text flags=2: "Controller Fields"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open Schema Picker” from file: “Picker Module”; Parameter: JSONSetElement ( "" ; "ControllerFields" ; True ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Calculation:
+          | JSONSetElement ( "" ; "ControllerFields" ; True ; JSONBoolean )
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean
+        Script id=244 name="Open Schema Picker" in=Picker_Module.fmp12
+  Object type=Button key=139 LabelKey=0 bounds=130,590,170,740
+    Text flags=2: "Controller Scripts"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open Schema Picker” from file: “Picker Module”; Parameter: JSONSetElement ( "" ; "ControllerScripts" ; True ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Calculation:
+          | JSONSetElement ( "" ; "ControllerScripts" ; True ; JSONBoolean )
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean
+        Script id=244 name="Open Schema Picker" in=Picker_Module.fmp12

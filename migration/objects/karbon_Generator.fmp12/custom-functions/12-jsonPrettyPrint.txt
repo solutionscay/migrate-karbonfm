@@ -1,0 +1,96 @@
+# custom function 12: jsonPrettyPrint
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=12]
+
+CustomFunction id=12 functionArity=2 visible=True parameters=json;whiteSpace name=jsonPrettyPrint
+  Calculation:
+    | /**
+    |  * =====================================
+    |  * jsonPrettyPrint ( json ; whiteSpace )
+    |  *
+    |  * PURPOSE:
+    |  *	Pretty Prints a json Object with an indent.
+    |  *
+    |  * RETURNS:
+    |  *	the prettified JSON Object
+    |  *
+    |  * PARAMETERS:
+    |  *	json = the json string to pretty print
+    |  *	whiteSpace = the character or characters to use as whiteSpace
+    |  *
+    |  * DEPENDENCIES:
+    |  *	BaseElements Plugin version 3.0 or greater
+    |  *
+    |  * HISTORY:
+    |  *	MODIFIED on 2015-APR-21 Todd Geist, todd@geistinteractive.com
+    |  *		return "?" on error and the actual Error is set into $json.error
+    |  *	MODIFED on 2015-JAN-07 Todd Geist, todd@geistinteractive.com
+    |  *		added second parameter to set the white space character
+    |  *	CREATED on 2015-JAN-06 Todd Geist, todd@geistinteractive.com
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | Let(
+    | [
+    | 	firstAndLast = Left ( json ; 1 ) & Right ( json ; 1 ) ;
+    | 	valueIsJson = firstAndLast = "{}" or firstAndLast = "[]" 
+    | ];
+    |  If( not valueIsJson ; json ; 
+    | 
+    | 
+    | 
+    | 
+    | 
+    | Let( [
+    | 	js =
+    | 		List (
+    | 			"var json = " & json & " ; " ;
+    | 			"var whiteSpace = " & Quote(whiteSpace) & " ; " ;
+    | 		) &
+    | 		"¶¶"&
+    | 		"if (whiteSpace === \"\"){"&"¶"&
+    | 		"    whiteSpace = \"  \""&"¶"&
+    | 		"}"&"¶"&
+    | 		""&"¶"&
+    | 		"json = JSON.stringify(json, null , whiteSpace);"&"¶"&
+    | 		""
+    | 	;
+    | 	result = <Function Missing> ( js ) ;
+    | 	isError = not IsEmpty (
+    | 		FilterValues (
+    | 			LeftWords ( result ; 1 ) ;
+    | 			List (
+    | 				"SyntaxError" ;
+    | 				"RangeError" ;
+    | 				"EvalError" ;
+    | 				"ReferenceError" ;
+    | 				"TypeError" ;
+    | 				"URIError"
+    | 			)
+    | 		)
+    | 	) ;
+    | 	$json.error = 
+    | 		Case (
+    | 			<Function Missing> = "?" ;
+    | 			"BaseElements plugin is not available" ;
+    | 			
+    | 			isError ;
+    | 			result ;
+    | 		
+    | 			/* else: clear the error */
+    | 			""
+    | 		)
+    | ] ;
+    | 	If ( isError ;
+    | 		"?" ;
+    | 		Substitute ( result ; Char ( 10 ) ; "¶" )
+    | 	)
+    | )
+    | 
+    | 
+    | 
+    | 
+    | )
+    | )
+    refs: fn:Let, fn:Left, fn:Right, fn:or, fn:If, fn:not, fn:List, fn:Quote, fn:IsEmpty, fn:FilterValues, fn:LeftWords, fn:Case, fn:Substitute, fn:Char

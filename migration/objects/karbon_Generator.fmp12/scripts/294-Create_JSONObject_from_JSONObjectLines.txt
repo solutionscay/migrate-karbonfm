@@ -1,0 +1,114 @@
+# script 294: Create JSONObject from JSONObjectLines
+# file: karbon_Generator.fmp12
+# folder: App Modules / JSONObjects / Public
+# source: ScriptCatalog/Script[@id=294]
+# steps: 23 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=284 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Go to Object [ Object Name: "JSONLines"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+   4    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $Key; Value:JSNObject_JSNObjectLine::Key ]
+        DisableStepCollapsed state=False
+        Value
+          refs: JSNObject_JSNObjectLine::Key#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $Key
+   6    Set Variable [ $Value; Value:JSNObject_JSNObjectLine::Value ]
+        DisableStepCollapsed state=False
+        Value
+          refs: JSNObject_JSNObjectLine::Value#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $Value
+   7    If [ JSNObject_JSNObjectLine::RunTimeInd = "Expression" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: JSNObject_JSNObjectLine::RunTimeInd#15
+   8    Set Variable [ $Expression; Value:JSNObject_JSNObjectLine::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Expression
+   9    Set Variable [ $Result; Value:JSONSetElement ( $Result ; $Key ; Evaluate( $Expression ) ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Evaluate, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  10    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ Length( $value ) = Length( Filter ( $value ; "0123456789" ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Length, fn:Filter
+  12    Set Variable [ $Result; Value:JSONSetElement ( $Result ; $Key ; $Value ; JSONNumber ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  13    Else If [ $value = True or $Value = False ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:True, fn:or, fn:False
+  14    Set Variable [ $Result; Value:JSONSetElement ( $Result ; $Key ; $Value ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  15    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Result; Value:JSONSetElement ( $Result ; $Key ; $Value ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  17    End If
+        DisableStepCollapsed state=False
+  18    End If
+        DisableStepCollapsed state=False
+  19    Go to Portal Row
+        [ Next ]
+        NoInteract state=False
+        SelectAll state=False
+        Exit state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  20    Exit Loop If [ IsEmpty ( JSNObject_JSNObjectLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, JSNObject_JSNObjectLine::Id#3
+  21    End Loop
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Field [ JSNObject::JSONObjectAsText; JSONFormatElements ($Result) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONFormatElements
+        Field table=JSNObject id=7 name=JSONObjectAsText

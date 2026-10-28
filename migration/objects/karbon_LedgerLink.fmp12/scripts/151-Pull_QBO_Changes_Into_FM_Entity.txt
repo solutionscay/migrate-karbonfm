@@ -1,0 +1,403 @@
+# script 151: _Pull QBO Changes Into FM ( Entity )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink Sync API / Private
+# source: ScriptCatalog/Script[@id=151]
+# steps: 94 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=149 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Pull changes from QBO into FileMaker since the last time it was pulled
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {string} Entity one of the QBO Entities
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @returnSuccess {number} result.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnError {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnError {number} result.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # /#
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Error Capture [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  16    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $Entity; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #need this to get last sync from DB
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Field [ QBO::selectedEntityName; $Entity ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=7 name=selectedEntityName
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Field [ QBOEntity_selected::getError; "" ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=6 name=getError
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $totalRecords; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $totalRecords
+  28    Set Variable [ $StartPosition; Value:If( IsEmpty(QBOEntity_selected::getQBOStartPosition ); 1; QBOEntity_selected::getQBOStartPosition  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, QBOEntity_selected::getQBOStartPosition#27
+        Name: $StartPosition
+  29    Set Variable [ $Since; Value:QBOEntity_selected::getQBOTimeStamp ]
+        DisableStepCollapsed state=False
+        Value
+          refs: QBOEntity_selected::getQBOTimeStamp#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $Since
+  30    Set Variable [ $MaxResults; Value:387 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $MaxResults
+  31 // Set Variable [ $Inactive; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $Inactive
+  32    Set Variable [ $start; Value:Get(CurrentTimestamp) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:CurrentTimestamp
+        Repetition
+          Calculation:
+            | 1
+        Name: $start
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $EntityPluralName; Value:QBOEntity_selected::namePlural ]
+        DisableStepCollapsed state=False
+        Value
+          refs: QBOEntity_selected::namePlural#30
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityPluralName
+  36    Set Field [ QBO::syncLabel; List(
+        "Getting changed";
+        $EntityPluralName
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List
+        Field table=QBO id=42 name=syncLabel
+  37    Pause/Resume Script [ Duration (seconds): .01 ]
+        DisableStepCollapsed state=False
+        PauseTime value=ForDuration
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "StartPosition" ; $StartPosition ; JSONNumber ];
+        	[ "lastGetTimeStampUTC" ; $Since ; JSONString ];
+        	[ "MaxResults" ; $MaxResults ; JSONNumber ];
+        	[ "Inactive" ; $Inactive ; "" ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  41    Perform Script [ “Get Changed QBO Data ({Entity, ...  )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=135 name="Get Changed QBO Data ({Entity, ...  )"
+  42    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  43    Exit Loop If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $QBOTime; Value:JSONGetElement ( $result ;  "time"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOTime
+  46    Set Variable [ $Response; Value:JSONGetElement ( $result ;  "QueryResponse"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Response
+  47    Set Variable [ $recordCount; Value:JSONGetElement ( $Response ;  "maxResults"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $recordCount
+  48    Set Variable [ $lastPage; Value:GetAsNumber($recordCount) < GetAsNumber($MaxResults) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $lastPage
+  49    Set Variable [ $Records; Value:JSONGetElement ( $Response ;  $Entity  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Records
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "Records" ; $Records ; JSONArray ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  53    Perform Script [ “Save QBO Records To FM ( {Entity, Records )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=154 name="Save QBO Records To FM ( {Entity, Records )"
+  54    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  55    Exit Loop If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Set Variable [ $totalRecords; Value:$recordCount + $totalRecords ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $totalRecords
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Exit Loop If [ $lastPage ]
+        DisableStepCollapsed state=False
+  60    Set Variable [ $StartPosition; Value:1 + $totalRecords ]
+        DisableStepCollapsed state=False
+        Name: $StartPosition
+  61    End Loop
+        DisableStepCollapsed state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Set Variable [ $duration; Value:Get(CurrentTimestamp) - $start ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:CurrentTimestamp
+        Repetition
+          Calculation:
+            | 1
+        Name: $duration
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Perform Script [ “_Open Sync Record” ]
+        DisableStepCollapsed state=False
+        Script id=180 name="_Open Sync Record"
+  70    Set Variable [ $openRecordResult; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $openRecordResult
+  71    If [ not Error.IsError ( $openRecordResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  74    Set Field [ QBOEntity_selected::getError; $result ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=6 name=getError
+  75    Set Field [ QBOEntity_selected::getQBOStartPosition; $StartPosition ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=27 name=getQBOStartPosition
+  76    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  77    End If
+        DisableStepCollapsed state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    # It worked ??
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Set Field [ QBOEntity_selected::getQBOStartPosition; 1 ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=27 name=getQBOStartPosition
+  82    Set Field [ QBOEntity_selected::getDuration; $duration ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=7 name=getDuration
+  83    Set Field [ QBOEntity_selected::getQBOTimeStamp; $QBOTime ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=2 name=getQBOTimeStamp
+  84    Set Field [ QBOEntity_selected::getRecordCount; $totalRecords ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=8 name=getRecordCount
+  85    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  86    Set Variable [ $error; Value:Error(0;""; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  87    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  88    End If
+        DisableStepCollapsed state=False
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91 // Show Custom Dialog [ Title: "Sync Record Lock Error"; Message: "This shouldn't happen."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    Exit Script [ Result: $openRecordResult ]
+        DisableStepCollapsed state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False

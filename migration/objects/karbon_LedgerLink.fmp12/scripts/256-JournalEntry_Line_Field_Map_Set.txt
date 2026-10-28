@@ -1,0 +1,228 @@
+# script 256: JournalEntry Line :: Field Map :: Set
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Transactions
+# source: ScriptCatalog/Script[@id=256]
+# steps: 60 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=246 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # This script is repsonsible for saving the data from QBO into a FileMaker Record
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # context QBO Layout, related to the target record
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} json the record just pulled from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  10    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  11    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $Id; Value:JSONGetElement( $json ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  20    Set Variable [ $Description; Value:JSONGetElement( $json ; "Description" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Description
+  21    Set Variable [ $Amount; Value:JSONGetElement( $json ; "Amount" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Amount
+  22    Set Variable [ $JournalEntryLineDetail.AccountRef.value; Value:JSONGetElement( $json ; "JournalEntryLineDetail.AccountRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $JournalEntryLineDetail.AccountRef.value
+  23    Set Variable [ $JournalEntryLineDetail.PostingType; Value:JSONGetElement( $json ; "JournalEntryLineDetail.PostingType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $JournalEntryLineDetail.PostingType
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #Get the FM ID for the account
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $JournalEntryLineDetail.AccountRef.value; Value:QBO.LookupFMId ( "Account" ; $JournalEntryLineDetail.AccountRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $JournalEntryLineDetail.AccountRef.value
+  35    If [ $JournalEntryLineDetail.PostingType = "Debit" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $Debit_Amount; Value:$Amount ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Debit_Amount
+  37    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $Credit_Amount; Value:$Amount ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Credit_Amount
+  39    End If
+        DisableStepCollapsed state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Field [ qbo_JournalEntryItem::qbo_id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=qbo_JournalEntryItem id=3 name=qbo_id
+  48    Set Field [ qbo_JournalEntryItem::description; $Description ]
+        DisableStepCollapsed state=False
+        Field table=qbo_JournalEntryItem id=4 name=description
+  49    Set Field [ qbo_JournalEntryItem::id_Account; $JournalEntryLineDetail.AccountRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_JournalEntryItem id=7 name=id_Account
+  50    Set Field [ qbo_JournalEntryItem::postingType; $JournalEntryLineDetail.PostingType ]
+        DisableStepCollapsed state=False
+        Field table=qbo_JournalEntryItem id=6 name=postingType
+  51    Set Field [ qbo_JournalEntryItem::amount_debit; $Debit_Amount ]
+        DisableStepCollapsed state=False
+        Field table=qbo_JournalEntryItem id=5 name=amount_debit
+  52    Set Field [ qbo_JournalEntryItem::amount_credit; $Credit_Amount ]
+        DisableStepCollapsed state=False
+        Field table=qbo_JournalEntryItem id=11 name=amount_credit
+  53    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False

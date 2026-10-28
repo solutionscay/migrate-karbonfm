@@ -1,0 +1,49 @@
+# script 328: btn: Create Email Message From Party
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=328]
+# steps: 9 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $QuickRecipientPartyIdList; Value:List ( Party::Id ; List ( Party_PartyRelation_Party::Id ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Party::Id#1, Party_PartyRelation_Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $QuickRecipientPartyIdList
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "QuickRecipientPartyIdList" ; $QuickRecipientPartyIdList ; JSONString ]  ;
+        //	[ "TemplateId" ; $TemplateId ; JSONNumber ]  ;
+        	[ "ToContactMethodId" ; Party::EmailAddressIdCached ; JSONString ]  ;
+        	[ "UseSystemSettingsInd" ; False ; JSONBoolean ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, Party::EmailAddressIdCached#145, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Perform Script [ “Create UtilityEmailMessage { json }”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=660 name="Create UtilityEmailMessage { json }"
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

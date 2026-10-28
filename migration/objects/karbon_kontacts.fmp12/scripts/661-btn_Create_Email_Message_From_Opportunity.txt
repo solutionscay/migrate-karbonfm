@@ -1,0 +1,45 @@
+# script 661: btn: Create Email Message From Opportunity
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=661]
+# steps: 8 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $QuickRecipientPartyIdList; Value:List ( Opportunity_Party::Id ; Opportunity_Party_PartyRelation::PartyIdTo ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Opportunity_Party::Id#1, Opportunity_Party_PartyRelation::PartyIdTo#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $QuickRecipientPartyIdList
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Opportunity::Id ; JSONString ]  ;
+        	[ "EntityTypeId" ; 13 ; JSONNumber ]  ;
+        	[ "QuickRecipientPartyIdList" ; $QuickRecipientPartyIdList ; JSONString ]  ;
+        //	[ "TemplateId" ; $TemplateId ; JSONNumber ]  ;
+        	[ "ToContactMethodId" ; Opportunity_Party_PartyRelation_Party::EmailAddressIdCached ; JSONString ]  ;
+        	[ "UseSystemSettingsInd" ; False ; JSONBoolean ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Opportunity::Id#1, fn:JSONString, fn:JSONNumber, Opportunity_Party_PartyRelation_Party::EmailAddressIdCached#145, fn:False, fn:JSONBoolean
+        Name: $json
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Perform Script [ “Create UtilityEmailMessage { json }”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=660 name="Create UtilityEmailMessage { json }"
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

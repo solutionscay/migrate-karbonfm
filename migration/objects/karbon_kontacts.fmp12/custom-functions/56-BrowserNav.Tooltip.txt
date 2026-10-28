@@ -1,0 +1,22 @@
+# custom function 56: BrowserNav.Tooltip
+# file: karbon_kontacts.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=56]
+
+CustomFunction id=56 functionArity=1 visible=True parameters=which name=BrowserNav.Tooltip
+  Calculation:
+    | Let([
+    | ~CommonHistory= JSONGetElement ( $$BrowserNav ; "commonHistory" ) ;
+    | ~hName = If( ~commonHistory ; "history.common" ; "history." & Get(WindowName) ) ; // Use window name if not set as common history
+    | 
+    | ~forwardLayout = JSONGetElement ( $$BrowserNav ;  ~hName & ".forward[0].layoutName" ) ;
+    | ~forwardWindow = JSONGetElement ( $$BrowserNav ;  ~hName & ".forward[0].windowName" ) ;
+    | ~backwardLayout = JSONGetElement ( $$BrowserNav ;  ~hName & ".backward[1].layoutName" ) ;
+    | ~backwardWindow = JSONGetElement ( $$BrowserNav ;  ~hName & ".backward[1].windowName" ) 
+    | 
+    | ];
+    | Case(
+    | which = "forward" ; If( IsEmpty( ~forwardLayout ) ; "Nowhere to go…" ; If( ~commonHistory ; ~forwardWindow & ": " ) & ~forwardLayout ) ;
+    | which = "backward" ; If( IsEmpty( ~backwardLayout ) ; "Nowhere to go…" ;  If( ~commonHistory ; ~backwardWindow & ": " ) & ~backwardLayout ) 
+    | )
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:If, fn:Get, fn:WindowName, fn:Case, fn:IsEmpty

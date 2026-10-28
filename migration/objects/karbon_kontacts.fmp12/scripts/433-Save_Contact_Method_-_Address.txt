@@ -1,0 +1,227 @@
+# script 433: Save Contact Method - Address
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Contact Methods / Popover Edits
+# source: ScriptCatalog/Script[@id=433]
+# steps: 38 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=429 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $AddressLine1; Value:UtilityContactMethod::AddressLine1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::AddressLine1#1
+        Name: $AddressLine1
+   5    Set Variable [ $AddressLine2; Value:UtilityContactMethod::AddressLine2 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::AddressLine2#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $AddressLine2
+   6    Set Variable [ $AddressLine3; Value:UtilityContactMethod::AddressLine3 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::AddressLine3#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $AddressLine3
+   7    Set Variable [ $Comment ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Comment
+   8    Set Variable [ $City; Value:UtilityContactMethod::City ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::City#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $City
+   9    Set Variable [ $Country; Value:UtilityContactMethod::Country ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::Country#5
+        Repetition
+          Calculation:
+            | 1
+        Name: $Country
+  10    Set Variable [ $County; Value:UtilityContactMethod::County ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::County#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $County
+  11    Set Variable [ $Id; Value:UtilityContactMethod::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::Id#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  12    Set Variable [ $Label; Value:UtilityContactMethod::Label ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::Label#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $Label
+  13    Set Variable [ $PartyId; Value:Party::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+  14    Set Variable [ $PostalCode; Value:UtilityContactMethod::PostalCode ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::PostalCode#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $PostalCode
+  15    Set Variable [ $Primary ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Primary
+  16    Set Variable [ $StateProvince; Value:UtilityContactMethod::StateProvince ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::StateProvince#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $StateProvince
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Field [ selector::ContactMethodId; UtilityContactMethod::Id ]
+        DisableStepCollapsed state=False
+        refs: UtilityContactMethod::Id#16
+        Field table=selector id=10 name=ContactMethodId
+  19    Set Variable [ $Purpose; Value:
+        "[\"" & 
+        
+        Substitute(
+            List( Selected_ContactMethod_ContactMethodPurpose_ContactMethodPurposeType::Name ) ; 
+            "¶" ; "\",\""
+        )
+        
+        & 
+        
+        "\"]" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:List, Selected_ContactMethod_ContactMethodPurpose_ContactMethodPurposeType::Name#47
+        Repetition
+          Calculation:
+            | 1
+        Name: $Purpose
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $address; Value:JSONSetElement (  ""; 
+         
+        	[ "AddressLine1" ; $AddressLine1 ; JSONString ];
+        	[ "AddressLine2" ; $AddressLine2 ; JSONString ];
+        	[ "AddressLine3" ; $AddressLine3 ; JSONString ];
+        	[ "Comment" ; $Comment ; JSONString ];
+        	[ "City" ; $City ; JSONString ];
+        	[ "Country" ; $Country ; JSONString ];
+        	[ "County" ; $County ; JSONString ];
+        	[ "Id" ; $Id ; JSONString ];
+        	[ "Label" ; $Label ; JSONString ];
+        	[ "PartyId" ; $PartyId ; JSONString ];
+        	[ "PostalCode" ; $PostalCode ; JSONString ];
+        	[ "Primary" ; $Primary ; JSONBoolean ];
+        	[ "StateProvince" ; $StateProvince ; JSONString ];
+        	[ "Purpose" ; $Purpose ; JSONArray ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONBoolean, fn:JSONArray
+        Name: $address
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Close Popover
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Perform Script [ “Create or Edit Address { data }” from file: “karbon_kontroller”; Parameter: $address ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=194 name="Create or Edit Address { data }" in=karbon_kontroller.fmp12
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  34    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  35    #Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Show Custom Dialog [ Title: "Error"; Message: "This Address was not created."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False

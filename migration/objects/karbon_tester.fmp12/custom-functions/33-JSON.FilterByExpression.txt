@@ -1,0 +1,39 @@
+# custom function 33: JSON.FilterByExpression
+# file: karbon_tester.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=33]
+
+CustomFunction id=33 functionArity=2 visible=True parameters=array;expression name=JSON.FilterByExpression
+  Calculation:
+    | Let(
+    | [
+    | 
+    | $newArray = Case ( IsEmpty ($newArray) ; "[]" ; $newArray );
+    | 
+    | notValid = Left(JSONFormatElements(array);1) = "?" ;
+    | c = ValueCount( JSONListValues ( array ; "" ));
+    | 
+    | 
+    | 
+    | 
+    | $item = JSONGetElement ( array ;  0  );
+    | 
+    | array  = JSONDeleteElement(array ;0 ) ;
+    | 
+    | passed = GetAsBoolean(  Evaluate( expression )  );
+    | 
+    | 
+    | n = ValueCount( JSONListValues ( $newArray ; "" ));
+    | $newArray  = Case ( passed and c >0 ; JSONSetElement ( $newArray; n ; $item ; "") ; $newArray ) ;
+    | $item = ""
+    | 
+    | ];
+    |     Case(
+    | 
+    | 	c < 1 or notValid    ; $newArray &  Let($newArray=""; "" );
+    |       JSON.FilterByExpression (array ; expression )
+    |         
+    |         
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:Case, fn:IsEmpty, fn:Left, fn:JSONFormatElements, fn:ValueCount, fn:JSONListValues, fn:JSONGetElement, fn:JSONDeleteElement, fn:GetAsBoolean, fn:Evaluate, fn:and, fn:JSONSetElement, fn:or, cf:JSON.FilterByExpression

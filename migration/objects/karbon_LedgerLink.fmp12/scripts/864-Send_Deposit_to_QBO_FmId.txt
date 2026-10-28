@@ -1,0 +1,125 @@
+# script 864: Send Deposit to QBO ( FmId )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Public / Deposit
+# source: ScriptCatalog/Script[@id=864]
+# steps: 30 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=862 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Sends a deposit directly
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {string} fmId
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @returnSuccess {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @returnSuccess {number} error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnError {number} error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Entity; Value:"Deposit" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  17    Set Variable [ $FmId; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $FmId
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Call Key Fields, Build Config” ]
+        DisableStepCollapsed state=False
+        Script id=233 name="Call Key Fields, Build Config"
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #Send the Deposit
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ;  $Entity ; JSONString ];
+        	[ "FmId" ; $FmId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  24    Perform Script [ “Send FMData To QBO ( {Entity , FmID} )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=302 name="Send FMData To QBO ( {Entity , FmID} )"
+  25    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  26    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  27    Show Custom Dialog [ Title: "Error"; Message: "Deposit was not sent!¶¶" & If ( not IsEmpty($result); JSONFormatElements ( $result ) ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If, fn:not, fn:IsEmpty, fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  28    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  29    End If
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False

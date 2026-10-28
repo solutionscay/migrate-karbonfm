@@ -1,0 +1,356 @@
+# table 165: System
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=165]
+# fields: 42
+# records: 1
+
+Field id=1 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=System:
+      | // ensure this field always evaluates to true
+      | IsEmpty ( Self ) or not IsEmpty ( Self )
+      refs: fn:IsEmpty, fn:Self, fn:or, fn:not
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Number fieldType=Normal name=AutomaticallyFormatPhoneNumbersInd
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=CountryId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Number fieldType=Calculated name=CountryIdd
+  Calculation table=System:
+    | /*system country#country::IDD*/
+  Comment: International dialing prefix
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Normal name=AreaCode
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=MergeFieldReferences
+  Comment: A return-separated list of FileMaker field references based on fields added to the activitymergefield layout and set here via script.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=32 dataType=Text fieldType=Normal name=CountryCode
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Text fieldType=Normal name=SystemEmailUserName
+  Comment: The name that you use to log in to the mail server
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Text fieldType=Normal name=SystemEmailAccountPassword
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=Text fieldType=Normal name=OwnerId
+  Comment: The Party ID of the owner of this solution
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=42 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=System (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=43 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=System (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=System (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=44 dataType=Text fieldType=Normal name=CreatedByTestBatchID
+  Comment: A value in this field indicates this record was created by a TEST. It will contain  UUID that can be used by the test runner to find and delete the record
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=System:
+      | /*Globals::TestBatchID*/
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=45 dataType=Text fieldType=Normal name=DefaultTaxCodeId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=System:
+    | // Created by Generator - 7/21/2018 8:06:25 AM
+    | // DO NOT format this JSON object!
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "AlertsSendGeneralEmailErrorsTo" ; System::AlertsSendGeneralEmailErrorsTo ; JSONString ];
+    | 	[ "AreaCode" ; System::AreaCode ; JSONNumber ];
+    | 	[ "AuthenticationMethod" ; System::AuthenticationMethod ; JSONString ];
+    | 	[ "AutomaticallyFormatPhoneNumbersInd" ; System::AutomaticallyFormatPhoneNumbersInd ; JSONNumber ];
+    | 	[ "BookCloseDate" ; System::BookCloseDate ; JSONString ];
+    | 	[ "Country" ; System::CountryId ; JSONString ];
+    | 	[ "CountryCode" ; System::CountryCode ; JSONString ];
+    | 	[ "CreatedByTestBatchID" ; System::CreatedByTestBatchID ; JSONString ];
+    | 	[ "CreationUserId" ; System::CreationUserId ; JSONString ];
+    | 	[ "DefaultEmailSignatureTemplate" ; System::DefaultEmailSignatureTemplate ; JSONString ];
+    | 	[ "DefaultTaxCodeId" ; System::DefaultTaxCodeId ; JSONString ];
+    | 	[ "MergeFieldReferences" ; System::MergeFieldReferences ; JSONString ];
+    | 	[ "ModificationUserId" ; System::ModificationUserId ; JSONString ];
+    | 	[ "OwnerId" ; System::OwnerId ; JSONString ];
+    | 	[ "ServerType" ; System::ServerType ; JSONString ];
+    | 	[ "SmartyStreetsAuthId" ; System::SmartyStreetsAuthId ; JSONString ];
+    | 	[ "SmartyStreetsAuthToken" ; System::SmartyStreetsAuthToken ; JSONString ];
+    | 	[ "SystemEmailAccountPassword" ; System::SystemEmailAccountPassword ; JSONString ];
+    | 	[ "SystemEmailAddress" ; System::SystemEmailAddress ; JSONString ];
+    | 	[ "SystemEmailFullName" ; System::SystemEmailFullName ; JSONString ];
+    | 	[ "SystemEmailSmtpServer" ; System::SystemEmailSmtpServer ; JSONString ];
+    | 	[ "SystemEmailSmtpServerAuthentication" ; System::SystemEmailSmtpServerAuthentication ; JSONString ];
+    | 	[ "SystemEmailSmtpServerEncryptionType" ; System::SystemEmailSmtpServerEncryptionType ; JSONString ];
+    | 	[ "SystemEmailSmtpServerPort" ; System::SystemEmailSmtpServerPort ; JSONNumber ];
+    | 	[ "SystemEmailUserName" ; System::SystemEmailUserName ; JSONString ];
+    | 	[ "TimesheetNotificationsTo" ; System::TimesheetNotificationsTo ; JSONString ]
+    |  
+    | )
+    | 
+    | 
+    | 
+    | /* Saved 
+    | 
+    | 
+    | // Created by Generator - 3/26/2018 11:48:05 AM
+    | // DO NOT format this JSON object!
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "AreaCode" ; System::AreaCode ; JSONNumber ];
+    | 	[ "AutomaticallyFormatPhoneNumbersInd" ; System::AutomaticallyFormatPhoneNumbersInd ; JSONNumber ];
+    | 	[ "Country" ; System::Country ; JSONString ];
+    | 	[ "CountryCode" ; System::CountryCode ; JSONString ];
+    | 	[ "CreatedByTestBatchID" ; System::CreatedByTestBatchID ; JSONString ];
+    | 	[ "DefaultTaxCodeId" ; System::DefaultTaxCodeId ; JSONString ];
+    | 	[ "MergeFieldReferences" ; System::MergeFieldReferences ; JSONString ];
+    | 	[ "OwnerId" ; System::OwnerId ; JSONString ];
+    | 	[ "SystemEmailAccountName" ; System::SystemEmailUserName ; JSONString ];
+    | 	[ "SystemEmailAccountPassword" ; System::SystemEmailAccountPassword ; JSONString ]
+    |  
+    | )
+    | 
+    | */
+    refs: fn:JSONSetElement, System::AlertsSendGeneralEmailErrorsTo#53, fn:JSONString, System::AreaCode#13, fn:JSONNumber, System::AuthenticationMethod#59, System::AutomaticallyFormatPhoneNumbersInd#10, System::BookCloseDate#62, System::CountryId#11, System::CountryCode#32, System::CreatedByTestBatchID#44, System::CreationUserId#60, System::DefaultEmailSignatureTemplate#63, System::DefaultTaxCodeId#45, System::MergeFieldReferences#17, System::ModificationUserId#61, System::OwnerId#39, System::ServerType#57, System::SmartyStreetsAuthId#54, System::SmartyStreetsAuthToken#55, System::SystemEmailAccountPassword#37, System::SystemEmailAddress#47, System::SystemEmailFullName#52, System::SystemEmailSmtpServer#48, System::SystemEmailSmtpServerAuthentication#51, System::SystemEmailSmtpServerEncryptionType#50, System::SystemEmailSmtpServerPort#49, System::SystemEmailUserName#36, System::TimesheetNotificationsTo#56
+  AutoEnter alwaysEvaluate=True
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Text fieldType=Normal name=SystemEmailAddress
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=48 dataType=Text fieldType=Normal name=SystemEmailSmtpServer
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=49 dataType=Number fieldType=Normal name=SystemEmailSmtpServerPort
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Text fieldType=Normal name=SystemEmailSmtpServerEncryptionType
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Normal name=SystemEmailSmtpServerAuthentication
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=52 dataType=Text fieldType=Normal name=SystemEmailFullName
+  Comment: The full name portion of the sender's email address
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=53 dataType=Text fieldType=Normal name=AlertsSendGeneralEmailErrorsTo
+  Comment: A comma-separate list of email address that general alerts and error messages will be sent to
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=54 dataType=Text fieldType=Normal name=SmartyStreetsAuthId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=55 dataType=Text fieldType=Normal name=SmartyStreetsAuthToken
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=Text fieldType=Normal name=TimesheetNotificationsTo
+  Comment: A comma-separated list of email addresses that timesheet notifications should be sent to.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=57 dataType=Text fieldType=Normal name=ServerType
+  Comment: One of type: development, staging, production
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=58 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=System (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=59 dataType=Text fieldType=Normal name=AuthenticationMethod
+  Comment: One of type: External Server, OATH, FileMaker
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=60 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=System:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=61 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=System:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=62 dataType=Date fieldType=Normal name=BookCloseDate
+  Comment: QBO Preferences.AccountingInfoPrefs.BookCloseDate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=63 dataType=Text fieldType=Normal name=DefaultEmailSignatureTemplate
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=64 dataType=Number fieldType=Normal name=UsingQBOInd
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=65 dataType=Number fieldType=Normal name=InitialSetupDoneInd
+  Comment: True if the Karbon setup process is complete
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=67 dataType=Binary fieldType=Normal name=Logo
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage maxRepetition=1
+  DisplayNames enable=False
+
+Field id=68 dataType=Text fieldType=Normal name=TwilioAccountSid
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=69 dataType=Text fieldType=Normal name=TwilioAuthToken
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=70 dataType=Text fieldType=Normal name=TwilioFormatOption
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=72 dataType=Text fieldType=Normal name=SystemEmailSender
+  Comment: MSGraph, SMTP, ?
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=73 dataType=Text fieldType=Normal name=MSGraphTennentId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=74 dataType=Text fieldType=Normal name=TwilioSMSFromPhoneNumber
+  Comment: this is the phone number we send SMS from. It must be formatted in E.164 format
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=76 dataType=Text fieldType=Normal name=FullContactAPIKey
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

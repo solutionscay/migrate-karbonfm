@@ -1,0 +1,67 @@
+# script 317: #wip Go to Discussion Entity _Deprecated
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion
+# source: ScriptCatalog/Script[@id=317]
+# steps: 15 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=305 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $EntityTypeId; Value:Activity_ActivityEntity::EntityTypeId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Activity_ActivityEntity::EntityTypeId#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityTypeId
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $Param; Value:JSONSetElement ( "{}" ; 
+        
+        	[ "EntityTypeId" ; $EntityTypeId ; JSONNumber ];
+        	[ "EntityId" ; Activity_ActivityEntity::EntityId ; JSONString ]
+        
+        	) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, Activity_ActivityEntity::EntityId#17, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Param
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Else If [ $EntityTypeId = 10 //Party ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Perform Script [ “Resolve Discussion -Party”; Parameter: $Param ]
+        DisableStepCollapsed state=False
+        Script id=477 name="Resolve Discussion -Party"
+  11    Else If [ $EntityTypeId = 11 //Activity ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Perform Script [ “Resolve Discussion -Activity”; Parameter: $Param ]
+        DisableStepCollapsed state=False
+        Script id=319 name="Resolve Discussion -Activity"
+  13    Else If [ $EntityTypeId = 12 //SalesTransaction ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Perform Script [ “Resolve Discussion -Invoice”; Parameter: $Param ]
+        DisableStepCollapsed state=False
+        Script id=320 name="Resolve Discussion -Invoice"
+  15    End If
+        DisableStepCollapsed state=False

@@ -1,0 +1,44 @@
+# custom function 61: CleanText
+# file: karbon_kontacts.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=61]
+
+CustomFunction id=61 functionArity=1 visible=True parameters=text name=CleanText
+  Calculation:
+    |       //  SYNTAX:     CleanText ( text ) — originally named Trim4 ( text )
+    |      //   ORIGIN:      http://www.nightwingenterprises.com
+    |     //    NOTES:       Trims leading and trailing spaces, non-breaking spaces, tabs and CRs
+    |    //                       (this version requires FileMaker 10 or later)
+    |   //     VERSION:    1.0v3
+    |  //      © 2004 Ray Cologon, NightWing Enterprises, Melbourne, Australia
+    | 
+    | // @history 2018-09-25 dave@geistinteractive.com - 1) using verbose variables for clarity; 2) stripping text formatting. See original version at the bottom.
+    | 
+    | 
+    | Let( [
+    | 	stripOneLeft = PatternCount ( "  	¶" ; Left ( text; 1 ) )  ;	
+    | 	stripOneRight = PatternCount ( "  	¶" ; Right ( text; 1 ) ) ; 
+    | 	stripCount = stripOneLeft + stripOneRight
+    | ] ;
+    | 
+    | If ( 
+    | 	stripCount ; 
+    | 		CleanText ( Middle ( TextFormatRemove ( text ); 1 + stripOneLeft ; Length ( text ) - stripCount ) ) ; 
+    | 
+    | 		TextFormatRemove ( text ) )
+    | )
+    | 
+    | 
+    | /*  Original Version: 
+    | 
+    | Let([
+    | sT = Char(9) & Char(13) & Char(32) & Char(160);
+    | C1 = PatternCount(sT; Left(text; 1));
+    | Cn = PatternCount(sT; Right(text; 1));
+    | Ca = C1 + Cn];
+    | If(Ca;
+    | Trim4(Middle(text; 1 + C1; Length(text) - Ca));
+    | Text)
+    | )
+    | 
+    | ) */
+    refs: fn:Let, fn:PatternCount, fn:Left, fn:Right, fn:If, cf:CleanText, fn:Middle, fn:TextFormatRemove, fn:Length

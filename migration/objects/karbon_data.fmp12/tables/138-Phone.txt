@@ -1,0 +1,304 @@
+# table 138: Phone
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=138]
+# fields: 28
+# records: 2
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False calculation=False
+    Calculation table=Phone (inactive):
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Number fieldType=Calculated name=AreaCode
+  Calculation table=Phone:
+    | Left( Filter( Number ; "0123456789" ) ; 3 )
+    refs: fn:Left, fn:Filter, Phone::Number#8
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=Number
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=Extension
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Phone:
+      | CleanText ( Self )
+      refs: cf:CleanText, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=Country
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Calculated name=CountryDisplay
+  Calculation table=Phone:
+    | If( IsEmpty( Country ) ; Country#default::Country ; Country )
+    refs: fn:If, fn:IsEmpty, Phone::Country#13, Country#default::Country#7
+  AutoEnter alwaysEvaluate=True
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Number fieldType=Calculated name=LengthFilteredPhoneNumber
+  Calculation table=Phone:
+    | Let( [ 
+    | 
+    | phoneNumber = Number ; 
+    | 
+    | // strip extension if entered in phone field (remember it and tack it on later)
+    | 
+    | testForExtension1 = Position ( phoneNumber ; "ext" ; 1 ; 1 ) ; 
+    | testForExtension2 = Position ( phoneNumber ; "x" ; 1 ; 1 )  ; 
+    | positionOfExtension = Min ( testForExtension1 ; testForExtension2 ) ; 
+    | 
+    | // strip extension and all non-numerical characters
+    | 
+    | phoneNumberFiltered = Filter ( Left ( phoneNumber ; positionOfExtension ) ; "0123456789" )  
+    | 
+    | 
+    | ] ; 
+    | 
+    | Length( phoneNumberFiltered ) 
+    | 
+    | )
+    refs: fn:Let, Phone::Number#8, fn:Position, fn:Min, fn:Filter, fn:Left, fn:Length
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Number fieldType=Normal name=CountryCode
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Calculated name=InternationalNumberInd
+  Calculation table=Phone:
+    | CountryDisplay <> Country#default::Country
+    refs: Phone::CountryDisplay#14, Country#default::Country#7
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Normal name=PrimaryInd
+  Comment: True if this is the primary phone
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Calculated name=NumberDisplay
+  Calculation table=Phone:
+    | If ( 
+    | 
+    | 	not IsEmpty( Number ) 
+    | 
+    | ; 
+    | 
+    | 
+    | /* TODO: need to test and enable country codes
+    | 
+    | 	// if this number is out of the country, prefix with the IDD and country code
+    | 
+    | 	Case( 
+    | 		not IsEmpty ( CountryCode ) and 
+    | 		CountryCode <> Country#default::CountryCode ;
+    | 			Country#phone::IDD & "-" & Country#phone::CountryCode & "-"
+    | 	) &
+    | 
+    | */
+    | 
+    | 	Number & 
+    | 
+    | 	If( not IsEmpty ( Extension ) ; " x" & Extension ) 
+    | 
+    | )
+    refs: fn:If, fn:not, fn:IsEmpty, Phone::Number#8, Phone::Extension#9
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Calculated name=CountryDefault
+  Calculation table=Phone:
+    | Country#default::Country
+    refs: Country#default::Country#7
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Number fieldType=Normal name=FaxInd
+  Comment: True if this phone is used for fax purposes. This should be set programmatically explicitly, or possibly in the case of label selection.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Calculated name=NumberDigitsOnly
+  Calculation table=Phone:
+    | Filter ( Number ; "0123456789" )
+    refs: fn:Filter, Phone::Number#8
+  Storage storeCalculationResults=True index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=38 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=Phone (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=Phone:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=Phone (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=Phone (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=41 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Phone:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=44 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Phone (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=45 dataType=Number fieldType=Normal name=VoiceInd
+  Comment: True if this phone is used for voice purposes. This should be set programmatically explicitly, or possibly in the case of label selection.
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Number fieldType=Normal name=SmsInd
+  Comment: True if this phone is used for SMS purposes. This should be set programmatically explicitly, or possibly in the case of label selection.
+  AutoEnter allowEditing=True constant=False
+    (inactive) ConstantData: 1
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=Phone:
+    | Let ( [ 
+    | 
+    | 	type = "[]" ; 
+    | 	type = If ( FaxInd ; JSON.Push ( type ; "fax" ; JSONString ) ) ; 
+    | 	type = If ( SmsInd ; JSON.Push ( type ; "sms" ; JSONString ) ) ; // added 2018-02-10 Dave Graham
+    | 	type = If ( VoiceInd ; JSON.Push ( type ; "voice" ; JSONString ) ) ; 
+    | 
+    | 	purpose = JSON.ArrayFromRelated ( ContactMethodPurposeType::AsJsonNameOnly )
+    | 
+    | ] ; 
+    | 
+    | 
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "Id" ; Id ; JSONString ];
+    | 	[ "Comment" ; ContactMethod::Comment ; JSONString ];
+    | 	[ "CountryCode" ; CountryCode ; JSONNumber ];
+    | 	[ "Extension" ; Extension ; JSONString ];
+    | 	[ "Label" ; ContactMethod::Label ; JSONString ];
+    | 	[ "Number" ; Number ; JSONString ];
+    | 	[ "PartyId" ; ContactMethod::PartyId ; JSONString ];
+    | 	[ "Primary" ; PrimaryInd ; JSONBoolean ];
+    | 	[ "Purpose" ; purpose ; JSONArray ];
+    | 	[ "Type" ; type ; JSONArray ]
+    |  
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:If, Phone::FaxInd#27, cf:JSON.Push, fn:JSONString, Phone::SmsInd#46, Phone::VoiceInd#45, cf:JSON.ArrayFromRelated, ContactMethodPurposeType::AsJsonNameOnly#48, fn:JSONSetElement, Phone::Id#1, ContactMethod::Comment#51, Phone::CountryCode#17, fn:JSONNumber, Phone::Extension#9, ContactMethod::Label#47, Phone::Number#8, ContactMethod::PartyId#33, Phone::PrimaryInd#20, fn:JSONBoolean, fn:JSONArray
+  Comment: The phone is now the parent JSON object instead of the ContactMethod. Created 2018-02-10 by Dave Graham.
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=48 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=Phone:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=49 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Phone:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Text fieldType=Calculated name=AsJsonPhoneSearch
+  Calculation table=Phone:
+    | JSONSetElement ( "{}" ; 
+    | 	[ "IsClient" ; PartyRole::CustomerInd ; JSONBoolean ] ; 
+    | 	[ "OrganizationName" ; Organization::OrganizationName ; JSONString ] ; 
+    | 	[ "PartyId" ; Party::Id ; JSONString ] ; 
+    | 	[ "PartyName" ; Party::NameCached; JSONString ] ;
+    | 	[ "Phone" ; Number ; JSONString ] ;
+    | 	[ "PhoneId" ; Id ; JSONString ] 
+    | 	//[ "Type" ; Type ; JSONString ]
+    | )
+    refs: fn:JSONSetElement, PartyRole::CustomerInd#42, fn:JSONBoolean, Organization::OrganizationName#19, fn:JSONString, Party::Id#1, Party::NameCached#19, Phone::Number#8, Phone::Id#1
+  Comment: Used to construct a JSON array of phones in the picker module
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Summary name=AsJsonPhoneSearchListOf
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=50 name=AsJsonPhoneSearch
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+

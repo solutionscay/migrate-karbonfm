@@ -1,0 +1,35 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/423-Create_UserNotification_deprecated.txt,500476492395c28c71d2b1b5d2da5c633fa9ee0b5289631f8b4483fc261e948b,scripts,karbon_kontroller.fmp12,423,Create UserNotification_deprecated,data-change,server-domain,tier2,"Creates a Notification record from JSON (UserId required; optional CommentId, DiscussionId, Display, TaskId). Stores the discussion id as EntityId and the display text as Description, and the other ids in the deprecated Notification fields. Returns the new notification Id. Runs inside the Start Transaction / Save Transaction Result / End Transaction wrapper (scripts 28, 29, 31); the DBTransactions record carries the keys and setting a ""ONE"" field on the related record locks or creates it.","DBTransactions::NotificationId#90
+Notification::Id#6","DBTransactions::NotificationId#90 (Set Field step 85, current record)
+Notification::ONE#7 (Set Field step 88, related via DBTransactions, new record)
+Notification::CommentId_Deprecated#10 (Set Field step 97, related via Notification)
+Notification::EntityId#20 (Set Field step 98, related via Notification)
+Notification::Description#23 (Set Field step 99, related via Notification)
+Notification::TaskId_Deprecated#22 (Set Field step 100, related via Notification)
+Notification::UserId_Deprecated#9 (Set Field step 101, related via Notification)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 36)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 120)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 121)",none found (may be called by name),none,"Name says ""_deprecated"" and the fields it fills are *_Deprecated; no caller found. $Id (step 84-85) is never set in this script, so DBTransactions::NotificationId is set to empty and a new record is always created. Only UserId is validated."
+karbon_kontroller.fmp12/scripts/445-wip_Mark_Notification_as_Read.txt,de80a19ae92edc2ca02f9ead0f2f62156d892154e90e00693e13568bf6c76e80,scripts,karbon_kontroller.fmp12,445,_wip_Mark Notification as Read,data-change,server-domain,tier2,"Marks as read every Notification that matches a discussion and party (DiscussionId and PartyId required) by looping over the related notification ids and setting ReadInd to true. Returns the id of the last related Notification. Runs inside the Start Transaction / Save Transaction Result / End Transaction wrapper (scripts 28, 29, 31); the DBTransactions record carries the keys and setting a ""ONE"" field on the related record locks or creates it.","Notification#ByDiscussionAndParty::Id#6
+Notification::Id#6","DBTransactions::ActivityId#58 (Set Field step 77, current record)
+DBTransactions::PartyId#25 (Set Field step 78, current record)
+DBTransactions::NotificationId#90 (Set Field step 89, current record)
+Notification::ReadInd#15 (Set Field step 91, related via DBTransactions, each notification of the discussion and party)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 36)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 112)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 113)","objects/karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt (dead code, step 162)
+objects/karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt (step 142)
+objects/karbon_kontacts.fmp12/scripts/715-Open_Card_-_Discussion_v1__Deprecated.txt (dead code, step 138)
+objects/karbon_kontacts.fmp12/scripts/715-Open_Card_-_Discussion_v1__Deprecated.txt (step 118)",none,"Name starts with ""_wip_"" (work in progress). The discussion id is put into DBTransactions::ActivityId (step 77), i.e. discussion ids and activity ids share the field. The result Id (step 100) is the first related notification and is returned even when none matched."
+karbon_kontroller.fmp12/scripts/670-wip_Create_Notification_data.txt,a232653ae986d5e28835c7c1411b3cbf7bbccd73724c99f9e02bbe5ad805b4ac,scripts,karbon_kontroller.fmp12,670,_wip_Create Notification { data },data-change,server-domain,tier2,"Creates a Notification record for an entity and party (EntityId, EntityTypeId, PartyId required; Date defaults to today). The description is the title of the related discussion. Returns the new notification Id. Runs inside the Start Transaction / Save Transaction Result / End Transaction wrapper (scripts 28, 29, 31); the DBTransactions record carries the keys and setting a ""ONE"" field on the related record locks or creates it.","DBTransactions::NotificationId#90
+DBTransactions::ActivityId#58
+Discussion::Title#15","DBTransactions::NotificationId#90 (Set Field step 88, current record)
+Notification::ONE#7 (Set Field step 91, related via DBTransactions, new record)
+DBTransactions::ActivityId#58 (Set Field step 98, current record)
+Notification::Date#21 (Set Field step 106, related via Notification)
+Notification::Description#23 (Set Field step 107, related via Notification)
+Notification::EntityId#20 (Set Field step 108, related via Notification)
+Notification::EntityTypeId#24 (Set Field step 109, related via Notification)
+Notification::PartyId#25 (Set Field step 110, related via Notification)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 36)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 132)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 133)","objects/karbon_kontroller.fmp12/scripts/391-Create_Task_data.txt (step 170)
+objects/karbon_kontroller.fmp12/scripts/422-Create_ActivityComment.txt (step 178)
+objects/karbon_kontroller.fmp12/scripts/544-Edit_Task_data__deprecated.txt (step 134)",none,"Name starts with ""_wip_"". $Id (step 87-88) is never set, so a new notification is always created. The description is taken from Discussion::Title for the entity id placed in DBTransactions::ActivityId, so EntityId is assumed to be a discussion id regardless of EntityTypeId. Menu script."

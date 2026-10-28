@@ -1,0 +1,110 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+karbon_kontacts.fmp12/layouts/69-Invoice.txt,351bb64ce6739e8156a874ecb15afc48a304663e2a42e43b4453927a3cc037b9,layouts,karbon_kontacts.fmp12,69,Invoice,form,"Invoice (base Invoice, karbon_data.fmp12)","key 47 buttonbar | hidden when the QuickBooks Online integration is not in use
+key 50 button ""Open in QBO"" | hidden when the transaction has no QBO id or the window is in find mode
+key 251 button ""Remove From QBO"" | hidden when the transaction has no QBO id, or its date is on or before the QBO book-close date
+key 380 text (no label) | hidden when the transaction already has a QBO id and the QBO integration is in use
+key 211 button ""(icon)"" | hidden when the line is not taxable, or the line has no item and the window is not in find mode (description-only line)
+key 219 button ""=""remove value"""" | hidden when the line has no item selected
+key 210 button ""(icon)"" | hidden when the line is taxable, or the line has no item and the window is not in find mode (description-only line)
+key 106 field Invoice::id_Term#18 | hidden always (the calculation is the constant True)
+key 235 text ""Payments Received: <<countOfPayment>>"" | hidden when the invoice has no payments
+key 236 popover button ""(icon)"" | hidden always (the calculation is the constant 1)
+key 272 field SalesTransaction_FileAttachment::IncludeOnSend#9 | hidden when the attachment portal row has no attachment record
+key 275 field SalesTransaction_FileAttachment_File::FileName#6 | hidden when the attachment portal row has no attachment record
+key 381 button ""(icon)"" | hidden when the attachment portal row has no attachment record
+key 333 buttonbar | hidden when retainer amounts are already applied on the lines, or the balance is zero or less
+key 374 popover button ""(icon)"" | hidden when the transaction has a QBO id
+key 378 buttonbar | hidden when the transaction has no QBO id
+key 388 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 327 field Invoice::countOfPayment#16 | hidden when the invoice has no payments","key 219 button ""=""remove value"""" | when the line has no item selected | hide
+key 91 button ""(icon)"" | when the billing address has no line 1, line 2, city, state, postal code or country | style
+key 104 button ""=""remove value"""" | when the invoice has no term selected | hide
+key 383 field SalesTransaction_FileAttachment_File::FileSize#27 | when the attached file is larger than 20000 (QBO attachment limit) | style
+key 200 button ""(icon)"" | when the shipping address has no line 1, line 2, city, state, postal code or country | style","layout | OnRecordCommit | script 376 On Commit - Sales Transactions | recomputes subtotal, taxable subtotal, total and balance, and sets qbo_send to True
+key 6 field SalesLine::amount#6 | OnObjectExit | script 270 SalesLine Amount OnObjectExit Trigger | rounds the line amount and recomputes unit price from amount and quantity (mimics QBO auto-calculation)","key 48 (icon) | opens popover ""LedgerLink""
+key 50 Open in QBO | script 213 btn: Invoice Open In QBO | param JSON {Entity: Invoice, QBOId: SalesTransaction::qbo_id}
+key 251 Remove From QBO | script 609 btn: Remove Sales Transaction From QBO
+key 265 Lock | script 377 btn: Lock SalesTransaction
+key 211 (icon) | Set Field [ SalesLine::taxable; not SalesLine::taxable ]
+key 210 (icon) | Set Field [ SalesLine::taxable; not SalesLine::taxable ]
+key 219 remove value | Set Field [ SalesLine::ItemId; """" ]
+key 91 (icon) | script 268 Open Map ( address ) | param address lines as a list: billAddressLine1, billAddressLine2, billAddressCity, billAddressState, billAddressPostalCode, billAddressCountry
+key 104 remove value | Set Field [ Invoice::id_Term; """" ]
+key 105 edit list in QBO | script 501 Open in QB ( {entity , qbo_id} ) | param JSON {Entity: Term}
+key 234 Payments Received: <<countOfPayment>> | script 285 btn: Open Payments Portal Ob Invoice
+key 236 (icon) | opens popover ""Popover""
+key 374 (icon) | opens popover ""Popover""
+key 241 (icon) | script 277 btn: Go To Payment
+key 247 Discuss | script 851 Open Discussion from SalesTransaction
+key 381 (icon) | script 627 btn: Delete FileAttachment from SalesTransaction
+key 200 (icon) | script 268 Open Map ( address ) | param address lines as a list: shipAddressLine1, shipAddressLine2, shipAddressCity, shipAddressState, shipAddressPostalCode, shipAddressCountry
+key 304 Show Existing | script 533 Open Card - File List_DEPRECATED
+key 334 Apply Retainer | opens popover ""Popover""
+key 340 OK | script 223 btn: Apply Retainer
+key 353 Choose… | script 163 Open Party Info Card { Id } | param JSON {Id: SalesTransaction_Customer_PartyRole::PartyId}
+key 376 delete | script 212 btn: Delete SalesTransaction
+key 379 (icon) | no step
+key 382 (icon) | script 622 btn: Add New File as FileAttachment to SalesTransaction
+key 387 Refresh from QBO | script 222 Refresh Invoice From QBO ( qbo_id )","key 219 | remove value
+key 104 | remove value
+key 105 | edit list in QBO
+key 272 | Attach to email
+key 383 | shows ""This file exceeds the QBO maximum"" when the file size is over 20000, else nothing","key 1 SalesLine | none | none
+key 238 Invoice_PaymentLine_Payment | none | none
+key 271 SalesTransaction_FileAttachment | none | none","Items Id (id 15)
+LL Class Id (id 6)
+LL Terms Id Active (id 9)
+LL Terms Id (id 8)
+Boolean (id 1)",page,"Terms field Invoice::id_Term (key 106) is always hidden, while its ""remove value"" and ""edit list in QBO"" buttons are still on the layout; confirm what replaces it
+OnRecordCommit trigger sets SalesTransaction::qbo_send to True on every commit
+a button runs script 533 ""Open Card - File List_DEPRECATED"", whose name marks it deprecated or work-in-progress"
+karbon_kontacts.fmp12/layouts/85-Card_-_New_Payment.txt,c74d817a821996249493de1c0486f9a99c9132b6716755df2f29a3482f44325a,layouts,karbon_kontacts.fmp12,85,Card - New Payment,dialog,"Payment (base Payment, karbon_data.fmp12)","key 41 field Payment_PaymentLine_Invoice::totalAmt#25 | hidden when the payment line row is empty
+key 42 field Payment_PaymentLine::TransactionDocNumber#18 | hidden when the payment line row is empty
+key 43 field Payment_PaymentLine::TransactionDate#17 | hidden when the payment line row is empty
+key 44 field Payment_PaymentLine::amount#4 | hidden when the payment line row is empty
+key 45 field Payment_PaymentLine_Invoice::balance#26 | hidden when the payment line row is empty",none,"layout | OnRecordCommit | script 278 Block Payment Commit | blocks the commit unless $$allow_commit is set, then clears it","key 2 OK | script 283 btn Save Payment
+key 3 Cancel | script 279 btn Cancel Payment
+key 17 Add An Invoice To Payment | opens popover ""Popover""
+keys 21,22,23 (×3) (icon) | no step
+key 29 (icon) | script 280 btn: Choose Open Invoice
+key 71 (calc) payment total / unallocated amount | no step
+key 73 (calc) payment total / unallocated amount | no step",none,"key 24 Payment_Customer_OpenInvoices | none | shows only open invoices of the customer that are not yet in the payment lines and not in Payment::IncludedInvoiceIDs
+key 40 Payment_PaymentLine | none | filter off (calculation is False)","PaymentMethods Id (id 13)
+LL Accounts Bank Id (id 18)",modal,"Three icon-only buttons (keys 21, 22, 23) have no step
+OnRecordCommit trigger blocks every commit unless $$allow_commit is set; which script sets it (OK runs 283 ""btn Save Payment"") was not checked here"
+karbon_kontacts.fmp12/layouts/142-Card_-_FilesList.txt,e1611d4882f7c3aee4c2190252e96ac6a7c815f0b37055b73fe10f2d0aad02e5,layouts,karbon_kontacts.fmp12,142,Card - FilesList,dialog,"File (base File, karbon_data.fmp12)",none,none,none,"key 49 (calc) file creation date | no step
+key 50 (icon) | Close Window [ Current Window ]
+key 51 Add | script 539 <unknown> | param File::Id
+key 53 Download | script 541 btn: Download and Open File from SalesTransaction | param File::FileName
+key 55 Add | script 626 deprecated_btn: Add Existing File as FileAttachment to SalesTransaction | param File::Id",none,none,none,modal,"Only opened by script 533, whose name ends in _DEPRECATED
+script id 539 named by a button shows <unknown> in the DDR (script missing or renamed)
+a button runs script 626 ""deprecated_btn: Add Existing File as FileAttachment to SalesTransaction"", whose name marks it deprecated or work-in-progress"
+karbon_kontacts.fmp12/layouts/143-Invoice_-_View_Only.txt,c53cacc6892f52b9a881c524e4aa86b14436321f3b7cf6960c0c4c781a33c25a,layouts,karbon_kontacts.fmp12,143,Invoice - View Only,form,"Invoice (base Invoice, karbon_data.fmp12)","key 47 buttonbar | hidden when the QuickBooks Online integration is not in use
+key 50 button ""Open in QBO"" | hidden when the transaction has no QBO id or the window is in find mode
+key 211 button ""(icon)"" | hidden when the line is not taxable, or the line has no item and the window is not in find mode (description-only line)
+key 210 button ""(icon)"" | hidden when the line is taxable, or the line has no item and the window is not in find mode (description-only line)
+key 377 popover button ""(icon)"" | hidden when the line is not flagged as deleted in QBO
+key 235 text ""Payments Received: <<countOfPayment>>"" | hidden when the invoice has no payments
+key 236 popover button ""(icon)"" | hidden always (the calculation is the constant 1)
+key 272 field SalesTransaction_FileAttachment::IncludeOnSend#9 | hidden when the attachment portal row has no attachment record
+key 327 button group ""=""download"""" | hidden when the attachment portal row has no attachment record
+key 321 field SalesTransaction_FileAttachment_File::FileSize#27 | hidden when the attachment portal row has no attachment record
+key 344 button ""Receive Payment"" | hidden when the transaction balance is zero
+key 544 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)
+key 635 field Invoice::countOfPayment#16 | hidden when the invoice has no payments",none,key 6 field SalesLine::amount#6 | OnObjectExit | script 270 SalesLine Amount OnObjectExit Trigger | rounds the line amount and recomputes unit price from amount and quantity (mimics QBO auto-calculation),"key 48 (icon) | opens popover ""LedgerLink""
+key 50 Open in QBO | script 213 btn: Invoice Open In QBO | param JSON {Entity: Invoice, QBOId: SalesTransaction::qbo_id}
+keys 211,210,526 (×3) (icon) | no step
+key 377 (icon) | opens popover """"
+key 234 Payments Received: <<countOfPayment>> | script 285 btn: Open Payments Portal Ob Invoice
+key 236 (icon) | opens popover ""Popover""
+key 241 (icon) | script 277 btn: Go To Payment
+key 327 download | script 541 btn: Download and Open File from SalesTransaction | param SalesTransaction_FileAttachment_File::FileName
+key 343 Unlock | script 335 btn: Unlock Sales Transaction ( Id ) | param SalesTransaction::id
+key 344 Receive Payment | script 221 btn: New Payment
+key 545 Discuss | script 851 Open Discussion from SalesTransaction","key 272 | Attach to email
+key 275 | download","key 1 SalesLine | none | none
+key 238 Invoice_PaymentLine_Payment | none | none
+key 271 SalesTransaction_FileAttachment | none | none","Items Id (id 15)
+LL Class Id (id 6)
+LL Terms Id (id 8)
+Boolean (id 1)",merge,"View-only twin of Invoice (layout 69), opened by script 224 ""Display Sales Transaction in a New Window""; the rule that picks this layout over layout 69 sits in the script and was not verified here"

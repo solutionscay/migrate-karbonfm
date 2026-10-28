@@ -1,0 +1,199 @@
+# script 435: Generate Test - Loop Through Lines
+# file: karbon_Generator.fmp12
+# folder: Test XML
+# source: ScriptCatalog/Script[@id=435]
+# steps: 54 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=410 groupCollapsed=False includeInMenu=False
+
+   1    #@history 2018-3-30 lance@geistinteractive.com
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Connect to the TestLine using SELECTOR
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $TestLineList; Value:List( Test_TestLine::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Test_TestLine::Id#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineList
+   6    Set Variable [ $TestLineListCount; Value:ValueCount ( $TestLineList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineListCount
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  10    Exit Loop If [ $i > $TestLineListCount ]
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Field [ SELECTOR::TestLineId; GetValue( $TestLineList; $i ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetValue
+        Field table=SELECTOR id=18 name=TestLineId
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #Either perform a script or execute SQL
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ Selected_TestLine::SQL_Ind ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_TestLine::SQL_Ind#23
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “Generate Test - TestLine - Execute SQL” ]
+        DisableStepCollapsed state=False
+        Script id=436 name="Generate Test - TestLine - Execute SQL"
+  18    Set Variable [ $result; Value:List( $Result; Get( ScriptResult ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Perform Script [ “Generate Test - TestLine - Run Script” ]
+        DisableStepCollapsed state=False
+        Script id=415 name="Generate Test - TestLine - Run Script"
+  24    Set Variable [ $result; Value:List( $Result; Get( ScriptResult ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #Generate the assertions based on the TestLine
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $EvaluateJSON; Value:If ( Selected_TestLine::SQL_Ind = 1 and Selected_TestLine::SQL_FieldJSONInd <> 1; False; True ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, Selected_TestLine::SQL_Ind#23, fn:and, Selected_TestLine::SQL_FieldJSONInd#21, fn:False, fn:True
+        Name: $EvaluateJSON
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    If [ $EvaluateJSON ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Perform Script [ “Generate Test - TestLine - Evaluate TestLineResults for TestLine” ]
+        DisableStepCollapsed state=False
+        Script id=438 name="Generate Test - TestLine - Evaluate TestLineResults for TestLine"
+  35    Set Variable [ $result; Value:List( $Result; Get( ScriptResult ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Perform Script [ “*Generate Test - TestLine - Evaluate Result by Text” ]
+        DisableStepCollapsed state=False
+        Script id=437 name="*Generate Test - TestLine - Evaluate Result by Text"
+  40    Set Variable [ $result; Value:List( $Result; Get( ScriptResult ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    End If
+        DisableStepCollapsed state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    End Loop
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Exit Script [ Result: $Result ]
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False

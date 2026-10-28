@@ -1,0 +1,527 @@
+# script 252: _Set Field Children ( { Entity, Record } )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Private
+# source: ScriptCatalog/Script[@id=252]
+# steps: 127 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=108 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # handles the looping through children
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # and calls the correct the Line Map script
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # and handles deleting line items that were deleted in QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} params.Entity the target Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {object} params.Record an array of records to Save
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnSuccess {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnSuccess {number} error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @returnError {number} error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  20    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  21    Set Variable [ $Record; Value:JSONGetElement ( $params ;  "Record" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Record
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23 // Set Variable [ $Lines; Value:JSONGetElement($Record ; "Line" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Lines
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #get the parent id from the Sync Field
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $parentSyncFieldName; Value:Config ( $Entity & ".fields.syncId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $parentSyncFieldName
+  27    Set Variable [ $ParentID; Value:GetField($parentSyncFieldName) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetField
+        Repetition
+          Calculation:
+            | 1
+        Name: $ParentID
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $allLineIdsInFM; Value:QBO.LookupRelatedLinesFMId ( $Entity ; $ParentId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupRelatedLinesFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $allLineIdsInFM
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    If [ $Entity="Attachable" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $Lines; Value:JSONGetElement($Record ; "AttachableRef" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Lines
+  33    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $Lines; Value:JSONGetElement($Record ; "Line" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Lines
+  35    End If
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #  -------- LOOP LINES --------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ not IsEmpty ( $Lines ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  39    Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  40    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $line; Value:JSONGetElement( $Lines; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $line
+  42    Exit Loop If [ IsEmpty ( $line ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    # here we have to get the ID for the Line
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #get the qbo Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ $Entity = "Payment" or $Entity = "Attachable" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  48    #payments don't have a qbo_id so we have to use the line number
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $qbo_id; Value:$n+1 ]
+        DisableStepCollapsed state=False
+        Name: $qbo_id
+  50    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $qbo_id; Value:JSONGetElement ( $line ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $qbo_id
+  52    End If
+        DisableStepCollapsed state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #finally get the Line ID
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $lineFMId; Value:QBO.LookupFMIdLine ( $Entity ; $qbo_id ; $ParentID ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMIdLine
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineFMId
+  57    Set Variable [ $foundFMIds; Value:List($foundFMIds;$lineFMId) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $foundFMIds
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #protection against 504 bug
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Go to Field [ QBO::Lock ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=QBO id=33 name=Lock
+  61    Set Variable [ $lineSyncFieldName; Value:Config ( $Entity & ".fields.line.syncId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineSyncFieldName
+  62    Set Field By Name [ $lineSyncFieldName; $lineFMId ]
+        DisableStepCollapsed state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #open the record
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $lineQBOIdField; Value:Config ( $Entity & ".fields.line.qboId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineQBOIdField
+  67    Set Field By Name [ $lineQBOIdField; $qbo_id ]
+        DisableStepCollapsed state=False
+  68    Set Variable [ $error; Value:Error.Last ( "opening the line record" ; JSONSetElement( "" ; "config" ; Config($Entity) ; JSONObject )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, fn:JSONSetElement, cf:Config, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  69    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Variable [ $lineParentField; Value:Config ( $Entity & ".fields.line.parentId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineParentField
+  72    Set Field By Name [ $lineParentField; $ParentID ]
+        DisableStepCollapsed state=False
+  73    Set Variable [ $error; Value:Error.Last ( "setting parent in key in line item" ; JSONSetElement( "" ; "config" ; Config($Entity) ; JSONObject )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, fn:JSONSetElement, cf:Config, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  74    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #call the line script
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Set Variable [ $lineParams; Value:JSONSetElement("";
+        
+        	["Entity" ; $Entity; JSONString];
+        	["Line" ; $line ; JSONObject ]
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineParams
+  78    Perform Script [ “Call Set Field Lines Scripts ( Entity, Line })”; Parameter: $lineParams ]
+        DisableStepCollapsed state=False
+        Script id=255 name="Call Set Field Lines Scripts ( Entity, Line })"
+  79    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Variable [ $n; Value:1 + $n ]
+        DisableStepCollapsed state=False
+        Name: $n
+  83    End Loop
+        DisableStepCollapsed state=False
+  84    End If
+        DisableStepCollapsed state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #handle deleting records that have been removed from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    # exit here if you don't want line items to be deleted
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    Set Variable [ $IdsToDelete; Value:AntiFilterValues ( $allLineIdsInFM ; $foundFMIds ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:AntiFilterValues
+        Repetition
+          Calculation:
+            | 1
+        Name: $IdsToDelete
+  91    If [ IsEmpty ( $IdsToDelete ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  92    Exit Script [ Result:  $error ]
+        DisableStepCollapsed state=False
+  93    End If
+        DisableStepCollapsed state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    Set Variable [ $syncFieldName; Value:Config ( $Entity & ".fields.line.syncId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $syncFieldName
+  97    Set Variable [ $portalObjectName; Value:$Entity & "Lines" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $portalObjectName
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+ 100    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Set Variable [ $idToDelete; Value:GetValue($IdsToDelete ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $idToDelete
+ 102    Exit Loop If [ IsEmpty ( $IdToDelete ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+ 103    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    #protection against 504 bug
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    Go to Field [ QBO::Lock ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=QBO id=33 name=Lock
+ 106    Set Field By Name [ $syncFieldName; $IdToDelete ]
+        DisableStepCollapsed state=False
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #select a record in the correct portal
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    Go to Object [ Object Name: $portalObjectName; Repetition: 1 ]
+        DisableStepCollapsed state=False
+ 111    Set Variable [ $error; Value:Error.Last ( "selecting a portal named  " & Quote($portalObjectName)  ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 112    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 113    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+ 115    Set Variable [ $error; Value:Error.Last ( "going to selected portal row on a portal named  " & Quote($portalObjectName)  ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 116    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 117    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    Delete Portal Row
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+ 119    Set Variable [ $error; Value:Error.Last ( "deleting portal row on  a portal named  " & Quote($portalObjectName)  ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 120    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 121    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 122    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+ 123    End Loop
+        DisableStepCollapsed state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    Exit Script [ Result:  $error ]
+        DisableStepCollapsed state=False
+ 127    #
+        DisableStepCollapsed state=False
+        Restore state=False

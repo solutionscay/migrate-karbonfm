@@ -1,0 +1,70 @@
+# script 850: Open Discussion from Contact
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion
+# source: ScriptCatalog/Script[@id=850]
+# steps: 8 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=305 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $params; Value:Let ([
+        
+        relatedContacts = List ( Party_PartyRelation_Party_Person::Id) ; 
+        
+        
+        displayPartyIds = List ( relatedContacts ; Person::Id )
+        
+        ];
+        
+        
+        JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Party::Id ; JSONString ];
+        	[ "EntityTypeId" ; 10 ; JSONNumber ]; //Party
+        	[ "Title" ; Party::NameCached ; JSONString ] ;
+        	[ "DisplayPartyIds" ; displayPartyIds ; JSONString ]
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:List, Party_PartyRelation_Party_Person::Id#1, Person::Id#1, fn:JSONSetElement, Party::Id#1, fn:JSONString, fn:JSONNumber, Party::NameCached#19
+        Name: $params
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4 // Set Variable [ $params; Value:Let ([
+        
+        relatedContacts = List ( Party_PartyRelation_Party_Person::AsJson ) ; 
+        
+        thisParty = "[" & Party::AsJson & "]" ; 
+        
+        displayPartys= JSON.ArrayConcat ( relatedContacts ; thisParty )
+        
+        
+        ];
+        
+        
+        JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Party::Id ; JSONString ];
+        	[ "EntityTypeId" ; 10 ; JSONNumber ]; //Party
+        	[ "Title" ; Party::NameCached ; JSONString ] ;
+        	[ "DisplayPartys" ; displayPartys ; JSONString ]
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:List, Party_PartyRelation_Party_Person::AsJson#132, Party::AsJson#137, cf:JSON.ArrayConcat, fn:JSONSetElement, Party::Id#1, fn:JSONString, fn:JSONNumber, Party::NameCached#19
+        Name: $params
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Open Discussion in New Window { data } v2”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=313 name="Open Discussion in New Window { data } v2"

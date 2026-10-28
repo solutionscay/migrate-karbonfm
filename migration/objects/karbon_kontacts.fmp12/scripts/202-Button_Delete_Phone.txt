@@ -1,0 +1,94 @@
+# script 202: Button: Delete Phone
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Contact Methods
+# source: ScriptCatalog/Script[@id=202]
+# steps: 21 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=175 groupCollapsed=False includeInMenu=True
+
+   1    #2018-02-06 Dave Graham: created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Freeze Window
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "Id" ; Party_ContactMethod::Id ; JSONString ] ; 
+        	[ "PartyId" ; Party::Id ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Party_ContactMethod::Id#1, fn:JSONString, Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Perform Script [ “Delete Phone { Id, PartyId }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=213 name="Delete Phone { Id, PartyId }" in=karbon_kontroller.fmp12
+  10    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  13    Set Variable [ $message; Value:JSONGetElement ( $result ; "errorMessage" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $message
+  14    Show Custom Dialog [ Title: "Error"; Message: "An error occurred: " & $message & "."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Close Popover
+        DisableStepCollapsed state=False
+  18    Refresh Portal [ Object Name: "PhonesPortal" ]
+        DisableStepCollapsed state=False
+  19    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

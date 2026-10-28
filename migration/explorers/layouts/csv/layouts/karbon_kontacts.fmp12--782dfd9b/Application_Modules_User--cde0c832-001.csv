@@ -1,0 +1,55 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+karbon_kontacts.fmp12/layouts/101-User_Home.txt,6889ccbe4f01b7d89f2eb440aabc37f93e9c6566c562b4bf12452d54dfedf2f1,layouts,karbon_kontacts.fmp12,101,User Home,dashboard,"User (base User, karbon_data.fmp12)","key 185 text “DEV” | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production) (rule not applied in Find mode)
+key 229 rect | hidden when Selected_Task_Activity::AlertInd is false/empty (rule not applied in Find mode)
+key 107 button “View Discussion” | hidden when User_Notification#PartyId_Discussion::Id is empty (rule not applied in Find mode)
+key 133 rect | hidden when User_Notification#PartyId::ReadInd is true (rule not applied in Find mode)
+key 156 button “Got It!” | hidden when User_Notification#PartyId::ReadInd is true (rule not applied in Find mode)
+key 66 text “DEV” | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)
+key 83 button “calc User::UnreadNotificationCount…” | hidden when the user has no unread notifications (rule not applied in Find mode)
+key 188 button (icon) | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)","key 175 button (icon) | when BrowserNav.SaveNavHistory is evaluated (side effect only: it records the visited layout in the $$BrowserNav history; the item has no Format) | none
+key 179 field Globals::RecordNav | when the typed record number (field value) differs from the current record number | style","layout | OnLayoutEnter | id 363 “User Detail - On Layout Enter” | sets default task search values (role Assigned To, status Incomplete, current user party) when blank
+layout | OnRecordLoad | id 418 “User Detail - On Record Load” | sets the task search party to the user, refreshes the task portal and the notifications badge
+key 179 field Globals::RecordNav | OnObjectEnter | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""Open""
+key 179 field Globals::RecordNav | OnObjectExit | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""exit""
+key 115 field UtilityTask::z_Search_ActivityPartyRoleId | OnObjectValidate | id 365 “User Detail - Update Task Portal” | refreshes the task portal by getting the activity list for the search criteria from the kontroller file
+key 122 field UtilityTask::z_Search_Status | OnObjectValidate | id 365 “User Detail - Update Task Portal” | refreshes the task portal by getting the activity list for the search criteria from the kontroller file
+key 202 popover | OnObjectEnter | id 699 “User Detail - OnOpen Select User” | loads the list of users into selector::UserId when the user popover opens","key 173 (icon) | Perform Script [ “Display Main Nav” ] (script id 105)
+key 175 (icon) | Perform Script [ “Browser Nav (forward or backward)” ] (script id 466) | param ""Backward""
+key 176 (icon) | Perform Script [ “Browser Nav (forward or backward)” ] (script id 466) | param ""Forward""
+key 177 {{RecordNumber}} | no step
+key 178 {{RecordNumber}} | no step
+key 181 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""prev""
+key 182 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""next""
+key 184 calc If ( /* Find mode requests*/ Get (… | Perform Script [ “Record Nav” ] (script id 382) | param ""ToggleFoundSet""
+key 200 View | Perform Script [ “btn: View Task from Dashboard” ] (script id 697) | param JSON {EntityId: Selected_Task_Activity_ActivityEntity::EntityId, EntityTypeId: Selected_Task_Activity_ActivityEntity::EntityTypeId}
+key 127 Add Task | Perform Script [ “btn: Create Task From User Home” ] (script id 760)
+key 201 Add Users... | opens popover ""Users""
+key 209 (icon) | Perform Script [ “User Detail - Select User for Search” ] (script id 700)
+key 107 View Discussion | Perform Script [ “User Detail - Open Discussion” ] (script id 374) | param JSON {Id: User_Notification#PartyId_Discussion::Id, EntityId: User_Notification#PartyId_Discussion_ActivityEntity::EntityId, EntityTypeId: User_Notification#PartyId_Discussion_ActivityEntity::EntityTypeId, Title: User_Notification#PartyId_Discussion::Title}
+key 156 Got It! | Set Field [ User_Notification#PartyId::ReadInd; 1 ]
+key 7 (icon) | Perform Script [ “Get Help” ] (script id 478)
+key 61 (icon) | no step
+key 62 (icon) | no step
+key 69 calc ""Tasks"" | Perform Script [ “User Detail - Handle Slide Panel” ] (script id 364) | param JSON {Target: Tasks}
+key 70 calc ""Notifications"" | Perform Script [ “User Detail - Handle Slide Panel” ] (script id 364) | param JSON {Target: Notifications}
+key 71 calc ""Settings"" | Perform Script [ “User Detail - Handle Slide Panel” ] (script id 364) | param JSON {Target: Settings}
+key 83 calc User::UnreadNotificationCountCached | no step
+key 188 (icon) | Perform Script [ “Add Pending Change to Build File” ] (script id 524)","key 175 | name of the previous layout in the browser-style history (BrowserNav.Tooltip), or ""Nowhere to go…""
+key 176 | name of the next layout in the browser-style history (BrowserNav.Tooltip), or ""Nowhere to go…""","key 109 | Selected_Task | sort Ascending Selected_Task_Activity::AlertInd, Ascending Selected_Task_Activity::DateDisplay | none
+key 203 | User#Cartesian | sort Ascending User#Cartesian::DisplayName | none
+key 104 | User_Notification#PartyId | sort Ascending User_Notification#PartyId::ReadInd, Descending User_Notification#PartyId::CreationTimestamp | none","Task ActivityPartyRoles
+Party Id by User
+Task Status
+SMTP Authentication",page,
+karbon_kontacts.fmp12/layouts/122-Card_-_Utility_User.txt,0780a2a9d3f5503460394c337ddcbebdd1514c407245fafd0cbe723d0f3c628a,layouts,karbon_kontacts.fmp12,122,Card - Utility_User,dialog,"UtilityUser (base UtilityUser, karbon_kontacts.fmp12)","key 127 field UtilityUser::FirstName | hidden when the user is a person (NotAPersonInd is not 1) (rule not applied in Find mode)
+key 128 field UtilityUser::LastName | hidden when the user is a person (NotAPersonInd is not 1) (rule not applied in Find mode)
+key 84 button “Create” | hidden when UtilityUser::AccountName is empty (rule not applied in Find mode)
+key 115 field UtilityUser::FirstName | hidden when UtilityUser::NotAPersonInd is true (rule not applied in Find mode)
+key 117 field UtilityUser::LastName | hidden when UtilityUser::NotAPersonInd is true (rule not applied in Find mode)",none,none,"key 84 Create | Perform Script [ “Utility User - Handle Create” ] (script id 493)
+key 103 (icon) | Close Window [ Current Window ]
+key 121 (icon) | opens popover """"
+key 108 (icon) | opens popover ""Popover""
+key 111 Use | Perform Script [ “Utility User - Select Existing Party” ] (script id 490)
+key 112 None of the Above Match | Perform Script [ “Utility User - No Matches” ] (script id 491)
+key 126 Back | Perform Script [ “Go to Object” ] (script id 416) | param ""User""",none,key 106 | Selected_Party#partyList | sort none | none,"SMTP Authentication
+Boolean",modal,

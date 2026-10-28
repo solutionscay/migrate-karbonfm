@@ -1,0 +1,375 @@
+# script 69: Find Contacts
+# file: Picker Module.fmp12
+# folder: Modules / Contact Picker (Contacts Sample File) / Private
+# source: ScriptCatalog/Script[@id=69]
+# steps: 104 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=13 groupCollapsed=False includeInMenu=False
+
+   1    #v2.0 2016-10-25: No more spotlight searching. Minor fixes
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ $$disableScriptTriggers = True ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:True
+   5    Set Variable [ $$disableScriptTriggers; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$disableScriptTriggers
+   6    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #This find can be executed by pressing return in the search field. If the user clicks on the find button instead, we need to skip validation or this script will run twice.
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $$disableScriptTriggers; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $$disableScriptTriggers
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #init
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $searchValue; Value:Substitute ( Picker::Search_Field ; "@" ; "\@" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, Picker::Search_Field#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $searchValue
+  14    Set Variable [ $partySubtypes; Value:JSONGetElement ( Picker::Settings ; "partySubtypes" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $partySubtypes
+  15    Set Variable [ $partyRoleSubtypes; Value:JSONGetElement ( Picker::Settings ; "partyRoleSubtypes" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyRoleSubtypes
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “Init Field References” ]
+        DisableStepCollapsed state=False
+        Script id=95 name="Init Field References"
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #Perform find
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    If [ IsEmpty( Picker::Search_Field ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Picker::Search_Field#1
+  22    #no find critera
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Show All Records
+        DisableStepCollapsed state=False
+  24    Show Omitted Only
+        DisableStepCollapsed state=False
+  25    Perform Script [ “Go To Correct Layout” ]
+        DisableStepCollapsed state=False
+        Script id=79 name="Go To Correct Layout"
+  26    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $$FirstFindHasBeenPerformed; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $$FirstFindHasBeenPerformed
+  30    #update display to tell the user we're doing something
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $$PickerSearchStatus; Value:"Searching…" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$PickerSearchStatus
+  32    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  33    #has find critera, perform find operation
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Freeze Window
+        DisableStepCollapsed state=False
+  35    Go to Layout [ “Contact Configuration” (Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=9 name="Contact Configuration"
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Perform Quick Find [ Picker::Search_Field ]
+        DisableStepCollapsed state=False
+        refs: Picker::Search_Field#1
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #-
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #Restrict to party subtypes
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #-
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ not IsEmpty ( $partySubtypes ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  45    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  46    If [ Picker::Settings_OrganizationsOnly ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Picker::Settings_OrganizationsOnly#11
+  47    Set Field [ Party::OrganizationInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Party id=18 name=OrganizationInd
+  48    Else If [ Picker::Settings_PeopleOnly ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Picker::Settings_PeopleOnly#16
+  49    Set Field [ Party::OrganizationInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Party id=18 name=OrganizationInd
+  50    End If
+        DisableStepCollapsed state=False
+  51    Constrain Found Set [  ]
+        Option state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    End If
+        DisableStepCollapsed state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #-
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #Constrain to party role subtypes
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #-
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    If [ not IsEmpty ( $partyRoleSubtypes ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  61    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  62    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  63    Set Variable [ $count; Value:ValueCount ( $partyRoleSubtypes ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $count
+  64    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Set Variable [ $thisSubtype; Value:GetValue ( $partyRoleSubtypes ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisSubtype
+  66    If [ $thisSubtype = "Vendor" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Set Field [ PartyRole::VendorInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=PartyRole id=44 name=VendorInd
+  68    End If
+        DisableStepCollapsed state=False
+  69    If [ $thisSubtype = "Customer" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Set Field [ PartyRole::CustomerInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=PartyRole id=42 name=CustomerInd
+  71    End If
+        DisableStepCollapsed state=False
+  72    If [ $thisSubtype = "Employee" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Set Field [ PartyRole::EmployeeInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=PartyRole id=43 name=EmployeeInd
+  74    End If
+        DisableStepCollapsed state=False
+  75    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  76    Exit Loop If [ $n > $count ]
+        DisableStepCollapsed state=False
+  77    New Record/Request
+        DisableStepCollapsed state=False
+  78    End Loop
+        DisableStepCollapsed state=False
+  79    Constrain Found Set [  ]
+        Option state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    End If
+        DisableStepCollapsed state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Error Capture [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  83    Perform Script [ “Go To Correct Layout” ]
+        DisableStepCollapsed state=False
+        Script id=79 name="Go To Correct Layout"
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #optional: call sort script
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Perform Script [ “Sort Results” ]
+        DisableStepCollapsed state=False
+        Script id=73 name="Sort Results"
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    Set Field [ Picker::Settings; JSONSetElement ( Picker::Settings ; "footerMessage" ; "Didn't find what you were looking for?" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, Picker::Settings#4, fn:JSONString
+        Field table=Picker id=4 name=Settings
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    End If
+        DisableStepCollapsed state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #update search status
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    Set Variable [ $$PickerSearchStatus; Value:"Found " & Get( FoundCount ) & " records (of " & Get( TotalRecordCount ) & " records)" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:FoundCount, fn:TotalRecordCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $$PickerSearchStatus
+  94    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    If [ Get ( FoundCount ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  97    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  98    Perform Script [ “Go to Picker Button” ]
+        DisableStepCollapsed state=False
+        Script id=93 name="Go to Picker Button"
+  99    End If
+        DisableStepCollapsed state=False
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Set Variable [ $$disableScriptTriggers; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$disableScriptTriggers
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False

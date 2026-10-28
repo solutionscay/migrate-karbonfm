@@ -1,0 +1,458 @@
+# layout 153: Opportunities
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales
+# source: LayoutCatalog/Layout[@id=153]
+# objects: 60
+# theme: Karbon-1.0
+# folder group: id=31 groupCollapsed=False includeInMenu=False
+
+Layout width=1280 quickFind=True includeInMenu=False id=153 name=Opportunities
+  Table id=1065301 name=Opportunity
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=False showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnLayoutEnter id=101 triggerFlags=1(browse)
+      Script id=767 name="Set up Opportunity List View"
+      TriggerText: "Set up Opportunity List View"
+  Object type=Field key=170 LabelKey=0 flags=260 bounds=340,50,390,100
+    FieldObj numOfReps=1 flags=1081396 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=7 style=Cont-Icon
+      Field: Globals::PersonIconOut#36
+    HideCondition findMode=True
+      Calculation:
+        | Opportunity_Party::OrganizationInd
+        | 
+        | or Get ( WindowMode ) = 1
+        refs: Opportunity_Party::OrganizationInd#18, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=172 LabelKey=0 flags=260 bounds=340,50,390,100
+    FieldObj numOfReps=1 flags=1081396 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=7 style=Cont-Icon
+      Field: Globals::OrganizationIconOut#35
+    HideCondition findMode=True
+      Calculation:
+        | Opportunity_Party::PersonInd
+        | 
+        | or Get ( WindowMode ) = 1
+        refs: Opportunity_Party::PersonInd#130, fn:or, fn:Get, fn:WindowMode
+  Object type=Rect key=114 LabelKey=0 flags=1073741824 style=Shape-Dark bounds=0,0,70,1280
+  Object type=Text key=115 LabelKey=0 bounds=15,120,55,460
+    Text flags=2 style=H1-Muted: Sales
+  Object type=ButtonBar key=116 LabelKey=0 style=BB-KarbonMenu bounds=15,10,55,50
+    ButtonBarObj segmentKey=0
+      Object type=Button key=117 LabelKey=0 flags=65536 bounds=15,10,55,50
+        Text flags=6 style=BB-KarbonMenu
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Display Main Nav” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=105 name="Display Main Nav"
+          Image name=a5_menu.svg
+  Object type=ButtonBar key=118 LabelKey=0 style=BB-NavHeader bounds=15,50,55,110
+    ButtonBarObj flags=2 segmentKey=0
+      ActiveSegmentCalc
+        Calculation:
+          | ""
+      Object type=Button key=119 LabelKey=0 flags=16385 bounds=15,50,55,80
+        ConditionalFormatting
+          Item id=0 flags=1
+            Condition op=0
+              Calculation:
+                | BrowserNav.SaveNavHistory
+                refs: cf:BrowserNav.SaveNavHistory
+        ToolTip
+          Calculation:
+            | BrowserNav.Tooltip ( "backward" )
+            refs: cf:BrowserNav.Tooltip
+        Text flags=6 style=BB-NavHeader
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Browser Nav (forward or backward)”; Parameter: "Backward" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Backward"
+            Script id=466 name="Browser Nav (forward or backward)"
+          Image name=a33_leftChevron.svg
+      Object type=Button key=120 LabelKey=0 flags=16384 bounds=15,80,55,110
+        ToolTip
+          Calculation:
+            | BrowserNav.Tooltip ( "forward" )
+            refs: cf:BrowserNav.Tooltip
+        Text flags=6 style=BB-NavHeader
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Browser Nav (forward or backward)”; Parameter: "Forward" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Forward"
+            Script id=466 name="Browser Nav (forward or backward)"
+          Image name=a35_rightChevron.svg
+  Object type=GroupButton key=121 LabelKey=0 flags=1342177280 bounds=20,900,50,1020
+    GroupButtonObj numOfObjs=3
+      Object type=GroupButton key=122 LabelKey=0 flags=1342177280 bounds=20,930,50,990
+        GroupButtonObj numOfObjs=2
+          Object type=Field key=123 LabelKey=0 name=Nav.RecordNumberField flags=1 bounds=20,930,50,990
+            ConditionalFormatting
+              Item id=0 flags=3
+                Condition op=0
+                  Calculation:
+                    | Get(RecordNumber) <> Self
+                    refs: fn:Get, fn:RecordNumber, fn:Self
+                Format: color: rgba(32.9412%,36.8627%,45.4902%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+            ScriptTriggers
+              Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+                Script id=382 name="Record Nav"
+                  Calculation:
+                    | "Open"
+                TriggerText: "Record Nav"; Parameter: "Open"
+              Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+                Script id=382 name="Record Nav"
+                  Calculation:
+                    | "exit"
+                TriggerText: "Record Nav"; Parameter: "exit"
+            FieldObj numOfReps=1 flags=1048800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-StatusAreaRecordNumber
+              Field: Globals::RecordNav#31
+          Object type=Text key=124 LabelKey=0 name=Nav.RecordNumberMerge bounds=20,930,50,990
+            Text flags=10 tableViewVisibility=0 style=Text-StatusAreaRecordNavOverlay: {{RecordNumber}}
+              FieldList quickFind=False
+      Object type=Button key=125 LabelKey=0 flags=1342242816 bounds=20,900,50,930
+        Text flags=2 style=Button-NavPrev
+        ButtonObj buttonFlags=0 iconSize=12 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Record Nav”; Parameter: "prev" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "prev"
+            Script id=382 name="Record Nav"
+          Image name=a34_leftChevronOutline.svg
+      Object type=Button key=126 LabelKey=0 flags=1342242816 bounds=20,990,50,1020
+        Text flags=2 style=Button-NavNext
+        ButtonObj buttonFlags=0 iconSize=12 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Record Nav”; Parameter: "next" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "next"
+            Script id=382 name="Record Nav"
+          Image name=a36_rightChevronOutline.svg
+  Object type=ButtonBar key=127 LabelKey=0 flags=1342177280 style=BB-NavHeaderRecords bounds=20,1030,50,1120
+    ButtonBarObj segmentKey=0
+      Object type=Button key=128 LabelKey=0 flags=65536 bounds=20,1030,50,1120
+        Text flags=2 style=BB-NavHeaderRecords
+        ButtonObj buttonFlags=3 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Record Nav”; Parameter: "ToggleFoundSet" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "ToggleFoundSet"
+            Script id=382 name="Record Nav"
+        LabelCalc
+          Calculation:
+            | If ( 
+            | 
+            | 	// Find mode requests 
+            | 	Get ( WindowMode ) = 1 ; 
+            | 		Get ( TotalRecordCount ) & " Find Requests" ; 
+            | 
+            | 
+            | 		// Browse mode record counts
+            | 		If ( Get(TotalRecordCount) = Get(FoundCount) ; 
+            | 			Get ( TotalRecordCount ) & "¶Total" ; 
+            | 			Get ( FoundCount ) & " / " & Get ( TotalRecordCount ) & "¶Found" 
+            | 		) & 
+            | 
+            | 		// Sort status
+            | 		If ( Get( SortState ) = 0 ; " (Unsorted)" ; " (Sorted)" )
+            | 
+            | )
+            refs: fn:If, fn:Get, fn:WindowMode, fn:TotalRecordCount, fn:FoundCount, fn:SortState
+  Object type=Text key=129 LabelKey=0 flags=260 bounds=0,350,30,410
+    Text flags=6: DEV
+    HideCondition findMode=True
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=130 LabelKey=0 flags=268435456 bounds=16,620,56,660
+    FieldObj numOfReps=1 flags=1048628 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Cont-Icon
+      Field: System::Logo#67
+  Object type=Button key=38 LabelKey=0 flags=1073807360 bounds=330,0,390,1280
+    Text flags=2 style=Button-RowHighlight
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Go to Opportunity Detail { Id }”; Parameter: // JSONSetElement ( "{}" ; "Id" ; Party_PartyRole::Id ; JSONString ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Exit
+        Calculation:
+          | // JSONSetElement ( "{}" ; "Id" ; Party_PartyRole::Id ; JSONString )
+        Script id=603 name="Go to Opportunity Detail { Id }"
+  Object type=Rect key=14 LabelKey=0 flags=1073741826 style=Shape-Header bounds=120,0,270,1280
+  Object type=Text key=43 LabelKey=0 flags=1342177280 bounds=246,414,270,784
+    Text flags=2 style=Label-Medium-Left: "Next Task"
+  Object type=Field key=47 LabelKey=0 flags=1073741824 bounds=340,114,362,394
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewPrimary
+      Field: Opportunity::Name#69
+  Object type=Field key=50 LabelKey=0 flags=1342177280 bounds=340,970,362,1110
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewSecondary
+      Field: Opportunity::StatusCached#50
+      Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Field key=52 LabelKey=0 flags=1342177280 bounds=340,850,362,960
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewSecondary
+      Field: Opportunity::Value#53
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=0 trueString=Yes falseString=No
+  Object type=Text key=54 LabelKey=0 flags=1342177280 bounds=246,850,270,960
+    Text flags=2 style=Label-Medium: Value
+  Object type=ButtonBar key=77 LabelKey=0 flags=1342177280 bounds=10,1120,60,1270
+    ButtonBarObj segmentKey=0
+      Object type=Button key=106 LabelKey=0 bounds=10,1120,60,1170
+        Text flags=2
+        ButtonObj buttonFlags=0 iconSize=26 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “btn: Create Opportunity” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=602 name="btn: Create Opportunity"
+          Image name=a15_smallAdd.svg
+      Object type=PopoverButton key=107 LabelKey=0 bounds=10,1170,60,1220
+        PopoverButtonObj buttonFlags=0 key=108 iconSize=26 displayType=1
+          Image name=a89_find.svg
+          Object type=Popover key=108 LabelKey=0 name=FindPopover style="Popover-White No Title" bounds=71,1045,230,1345
+            ScriptTriggers
+              Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+                Script id=248 name="Trigger: Set Up QuickFind Popover"
+                TriggerText: "Trigger: Set Up QuickFind Popover"
+            TitleCalc
+              Calculation:
+                | "Find Opportunities"
+            PopoverObj flags=2 position=1 key=107
+              Object type=Field key=109 LabelKey=0 bounds=90,1066,114,1326
+                ScriptTriggers
+                  Trigger event=OnObjectSave id=4 triggerFlags=1(browse)
+                    Script id=250 name="Perform QuickFind"
+                    TriggerText: "Perform QuickFind"
+                FieldObj numOfReps=1 flags=1179872 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+                  Field: Globals::QuickFind#1
+                  PlaceholderText findMode=True
+                    Calculation:
+                      | "Search For..."
+              Object type=Button key=113 LabelKey=0 flags=65536 bounds=180,1064,210,1324
+                Text flags=2 style=Button-Info: "Show All"
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Close Find Popover and Show All” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Exit
+                    Script id=251 name="Close Find Popover and Show All"
+              Object type=Button key=145 LabelKey=0 name=AdvancedFindButton flags=65536 bounds=130,1064,160,1324
+                Text flags=2 style=Button-Info: "Advanced Find"
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Button: Go to Advanced Find Layout ( EntityName )”; Parameter: "opportunity" ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Exit
+                    Calculation:
+                      | "opportunity"
+                    Script id=804 name="Button: Go to Advanced Find Layout ( EntityName )"
+      Object type=Button key=84 LabelKey=0 bounds=10,1220,60,1270
+        ButtonObj buttonFlags=0 iconSize=26 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Get Help” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=478 name="Get Help"
+          Image name=a55_help.svg
+  Object type=Button key=131 LabelKey=0 flags=1342243076 bounds=10,850,60,900
+    Text flags=2 style=Button-Invisible
+    ButtonObj buttonFlags=0 iconSize=26 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Add Pending Change to Build File” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=524 name="Add Pending Change to Build File"
+      Image name=code-solid-2.svg
+    HideCondition findMode=True
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode
+  Object type=ButtonBar key=132 LabelKey=0 flags=268435456 style=BB-KarbonSubMenu bounds=70,265,120,1015
+    ButtonBarObj segmentKey=134
+      Object type=Button key=133 LabelKey=0 name=Customers bounds=70,266,120,416
+        Text flags=2 style=BB-KarbonSubMenu
+        ButtonObj buttonFlags=2 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Sales Nav”; Parameter: "Customers" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Customers"
+            Script id=506 name="Sales Nav"
+        LabelCalc
+          Calculation:
+            | "Customers"
+      Object type=Button key=134 LabelKey=0 flags=65536 bounds=70,416,120,565
+        Text flags=2 style=BB-KarbonSubMenu
+        ButtonObj buttonFlags=2 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Sales Nav”; Parameter: "Leads" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Leads"
+            Script id=506 name="Sales Nav"
+        LabelCalc
+          Calculation:
+            | "Opportunities"
+      Object type=Button key=135 LabelKey=0 name=Transactions bounds=70,565,120,715
+        Text flags=2 style=BB-KarbonSubMenu
+        ButtonObj buttonFlags=2 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Sales Nav”; Parameter: "Sales" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Sales"
+            Script id=506 name="Sales Nav"
+        LabelCalc
+          Calculation:
+            | "Transactions"
+      Object type=Button key=136 LabelKey=0 bounds=70,715,120,864
+        Text flags=2 style=BB-KarbonSubMenu
+        ButtonObj buttonFlags=2 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Sales Nav”; Parameter: "Items" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Items"
+            Script id=506 name="Sales Nav"
+        LabelCalc
+          Calculation:
+            | "Items"
+      Object type=Button key=137 LabelKey=0 name=Payments flags=65536 bounds=70,864,120,1014
+        Text flags=2 style=BB-KarbonSubMenu
+        ButtonObj buttonFlags=2 iconSize=12 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Sales Nav”; Parameter: "Payments" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Exit
+            Calculation:
+              | "Payments"
+            Script id=506 name="Sales Nav"
+        LabelCalc
+          Calculation:
+            | "Payments"
+  Object type=Field key=140 LabelKey=141 flags=1342177280 bounds=340,1120,362,1260
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewSecondary
+      Field: Opportunity::Probability#54
+      Display: number flags=2572 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=141 LabelKey=0 flags=1342177280 bounds=246,1120,270,1260
+    Text flags=2 style=Label-Medium-Left: Probability
+  Object type=Text key=143 LabelKey=0 bounds=246,0,270,70
+    Text flags=2 style=Label-Medium-Left: Active
+  Object type=Field key=144 LabelKey=0 bounds=340,26,358,44
+    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=3(checkbox-set) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Checkbox-Medium
+      Field: Opportunity::ActiveInd#59
+      ValueList: Boolean#1
+  Object type=GroupButton key=148 LabelKey=0 bounds=455,10,485,580
+    GroupButtonObj numOfObjs=2
+      Object type=Text key=146 LabelKey=0 flags=4 bounds=460,120,482,580
+        Text flags=10 tableViewVisibility=0 style=Label-Medium-Left-Muted: "Showing {{FoundCount}} of {{TotalRecordCount}} Records"
+          FieldList quickFind=False
+        HideCondition findMode=False
+          Calculation:
+            | Get ( FoundCount ) = Get(TotalRecordCount)
+            refs: fn:Get, fn:FoundCount, fn:TotalRecordCount
+      Object type=Button key=147 LabelKey=0 flags=65540 bounds=455,10,485,110
+        Text flags=2 style=_DEPRECATED_Button-Medium: "Show All"
+        ButtonObj buttonFlags=0 iconSize=12 displayType=0
+          Step enable=True id=23 name="Show All Records"
+            StepText: Show All Records
+            DisableStepCollapsed state=False
+        HideCondition findMode=False
+          Calculation:
+            | Get ( FoundCount ) = Get(TotalRecordCount)
+            refs: fn:Get, fn:FoundCount, fn:TotalRecordCount
+  Object type=Field key=151 LabelKey=0 flags=1342177280 bounds=340,414,364,840
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewPrimary
+      Field: Opportunity_ActivityEntity_Activity#incompleteTask::Subject#22
+  Object type=Button key=152 LabelKey=0 flags=65536 bounds=246,114,270,394
+    Text flags=2 style=Button-Medium-CommandLink: Name
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=39 name="Sort Records"
+        StepText
+          | Sort Records [ Keep records in sorted order; Specified Sort Order: Opportunity_Party::NameCached; ascending ]
+          | [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=Opportunity_Party id=19 name=NameCached
+  Object type=Button key=153 LabelKey=0 flags=1342242816 bounds=246,970,270,1110
+    Text flags=2 style=Button-Medium-CommandLink: Status
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=39 name="Sort Records"
+        StepText
+          | Sort Records [ Keep records in sorted order; Specified Sort Order: Opportunity::StatusCached; ascending
+          | Opportunity_Party::NameCached; ascending ]
+          | [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=Opportunity id=50 name=StatusCached
+          Sort type=Ascending
+            PrimaryField
+              Field table=Opportunity_Party id=19 name=NameCached
+  Object type=Text key=154 LabelKey=0 flags=1073741824 bounds=291,20,320,1260
+    Text flags=10 tableViewVisibility=0 style=H3-Primary: <<StatusCached>>
+      FieldList quickFind=True
+        Field table=Opportunity id=50 name=StatusCached
+  Object type=Line key=156 LabelKey=0 flags=1073745920 style=Line-Thin bounds=389,114,389,1360
+  Object type=Button key=157 LabelKey=0 flags=65536 bounds=140,20,170,130
+    Text flags=2 style=Button-SuccessPill: "Show Active"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Button: Show Active and Sort by Status” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=789 name="Button: Show Active and Sort by Status"
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=Opportunity id=59 name=ActiveInd
+              Text: 1
+  Object type=Field key=164 LabelKey=0 flags=1073741824 bounds=361,114,383,394
+    FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewSecondary
+      Field: Opportunity_Party::NameCached#19
+  Object type=Field key=165 LabelKey=0 flags=1342177280 bounds=360,414,384,840
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewSecondary
+      Field: Opportunity_ActivityEntity_Activity#incompleteTask::DateDisplay#56
+  Object type=Field key=166 LabelKey=0 flags=1342177280 bounds=400,850,433,960
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium-NoChrome
+      Field: Opportunity::ValueTotal#63
+      Display: number flags=2574 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=0 trueString=Yes falseString=No
+  Object type=Field key=167 LabelKey=0 flags=260 bounds=340,50,390,100
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=7 style="Org icon"
+      Field: Opportunity_Party::Photo#32
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1
+        refs: fn:Get, fn:WindowMode
+  Object type=Text key=169 LabelKey=0 flags=1073741824 bounds=401,970,430,2210
+    Text flags=10 tableViewVisibility=0 style=Label-Medium-Left: "<<StatusCached>> subtotal"
+      FieldList quickFind=True
+        Field table=Opportunity id=50 name=StatusCached
+  Object type=ExternalObject key=158 LabelKey=0 name=SalesOppChartWebViewer flags=1342177280 bounds=140,680,237,1260
+    ExternalObj typeID=WEBV typeIndex=0 externalFlagSet=32801
+      Calculation index=0:
+        | ""

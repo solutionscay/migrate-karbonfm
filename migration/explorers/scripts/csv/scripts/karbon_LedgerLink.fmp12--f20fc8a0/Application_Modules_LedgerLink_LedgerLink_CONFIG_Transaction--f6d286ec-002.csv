@@ -1,0 +1,190 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_LedgerLink.fmp12/scripts/373-Payment_Line_Field_Map_Get.txt,18b42a95af9027def09d5d27a4ef1f71481d0b0c8e74c1ce04065214b3c1545b,scripts,karbon_LedgerLink.fmp12,373,Payment Line :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a payment line from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. It links the payment to an Invoice by looking up the QBO id of the invoice.","qbo_PaymentLine::amount#4
+qbo_PaymentLine::id_Invoice#7",none,none,objects/karbon_LedgerLink.fmp12/scripts/296-Call_Get_Field_Lines_Scripts_Entity_CurrenQBOLIneData.txt (step 34),none,"$LinkedTxnType is hard-coded to ""Invoice"" (step 13), so the JournalEntry branch at step 24 can never differ; confirm payments only link to invoices."
+karbon_LedgerLink.fmp12/scripts/520-Estimate_Key_Fields.txt,3deabb175c141fedacdf50956bbc5eb9352f61d04634a231e1c39ecb2136d40d,scripts,karbon_LedgerLink.fmp12,520,Estimate :: Key Fields,utility,external-adapter,tier3,"Returns a JSON map of the FileMaker key field names (QBO id, FM id, send flag, line item fields) that the LedgerLink sync uses for Estimate; reads only field names through GetFieldName, no data.","qbo_Estimate::qbo_id#2 (name only, GetFieldName step 9)
+qbo_Estimate::id#1 (name only, GetFieldName step 13)
+qbo_Estimate::qbo_send#3 (name only, GetFieldName step 17)
+qbo_EstimateItem::qbo_id#2 (name only, GetFieldName step 25)
+qbo_EstimateItem::id#1 (name only, GetFieldName step 28)
+qbo_EstimateItem::id_Estimate#10 (name only, GetFieldName step 31)
+qbo_EstimateItem::qbo_lineNum#4 (name only, GetFieldName step 32)",none,none,objects/karbon_LedgerLink.fmp12/scripts/233-Call_Key_Fields_Build_Config.txt (step 74),none,"$qboLastUpdate is set only in disabled step 38, so the result always carries an empty qboLastUpdate."
+karbon_LedgerLink.fmp12/scripts/521-Estimate_Field_Map_Set.txt,713c2792492ab0e4723412ab5f260414fb9d493716424c93ff704cc3ada64735,scripts,karbon_LedgerLink.fmp12,521,Estimate :: Field Map :: Set,integration,external-adapter,tier2,"Saves a QuickBooks Online Estimate JSON into the current FileMaker record: parses the JSON into variables, converts QBO ids to FM ids and ISO dates, then sets the fields. The record context comes from the caller. It also pulls the shipping amount out of the QBO line array (the line whose item is SHIPPING_ITEM_ID) into the shipAmt field.",none,"qbo_Estimate::id_Term#28 (step 81, current record)
+qbo_Estimate::id_Customer#7 (step 82, current record)
+qbo_Estimate::billAddressLine1#8 (step 83, current record)
+qbo_Estimate::billAddressLine2#9 (step 84, current record)
+qbo_Estimate::billAddressCity#10 (step 85, current record)
+qbo_Estimate::billAddressState#15 (step 86, current record)
+qbo_Estimate::billAddressPostalCode#14 (step 87, current record)
+qbo_Estimate::docNumber#4 (step 88, current record)
+qbo_Estimate::id_TaxCode#31 (step 89, current record)
+qbo_Estimate::totalTax#30 (step 90, current record)
+qbo_Estimate::customerMemo#27 (step 91, current record)
+qbo_Estimate::date#5 (step 92, current record)
+qbo_Estimate::expirationDate#54 (step 93, current record)
+qbo_Estimate::TxnStatus#52 (step 94, current record)
+qbo_Estimate::shipAddressState#47 (step 95, current record)
+qbo_Estimate::shipAddressLine1#44 (step 96, current record)
+qbo_Estimate::shipAddressLine2#45 (step 97, current record)
+qbo_Estimate::shipAddressCity#42 (step 98, current record)
+qbo_Estimate::shipAddressPostalCode#46 (step 99, current record)
+qbo_Estimate::totalAmt#25 (step 100, current record)
+qbo_Estimate::billEmailAddress#29 (step 101, current record)
+qbo_Estimate::privateNote#6 (step 102, current record)
+qbo_Estimate::AcceptedBy#57 (step 103, current record)
+qbo_Estimate::acceptedDate#55 (step 104, current record)
+qbo_Estimate::shipAmt#41 (step 105, current record)",none,objects/karbon_LedgerLink.fmp12/scripts/232-Call_Set_Field_Scripts_Entity_Record.txt (step 126),none,"Step 97 sets shipAddressLine2 from $ShipAddr.Line2, which is never parsed from the JSON, so it is always cleared. The ""skip"" exit is guarded by If [ 0 ] so it never runs. Sets $Id but does not write it (qbo_id is presumably set by the caller)."
+karbon_LedgerLink.fmp12/scripts/522-Estimate_Field_Map_Get.txt,dd46d7aa8cbcd35e686f4b786d77b127d2bc8d6607e0b3c65f37435e37cc367e,scripts,karbon_LedgerLink.fmp12,522,Estimate :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Estimate from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. When shipAmt is above zero it adds a Line entry for shipping with item SHIPPING_ITEM_ID.","qbo_Estimate::id_Term#28
+qbo_Estimate::docNumber#4
+qbo_Estimate::date#5
+qbo_Estimate::expirationDate#54
+qbo_Estimate::TxnStatus#52
+qbo_Estimate::totalTax#30
+qbo_Estimate::id_TaxCode#31
+qbo_Estimate::id_Customer#7
+qbo_Estimate::customerMemo#27
+qbo_Estimate::privateNote#6
+qbo_Estimate::billAddressLine1#8
+qbo_Estimate::billAddressLine2#9
+qbo_Estimate::billAddressCity#10
+qbo_Estimate::billAddressState#15
+qbo_Estimate::billAddressPostalCode#14
+qbo_Estimate::shipAddressState#47
+qbo_Estimate::shipAddressLine1#44
+qbo_Estimate::shipAddressCity#42
+qbo_Estimate::shipAddressPostalCode#46
+qbo_Estimate::totalAmt#25
+qbo_Estimate::billEmailAddress#29
+qbo_Estimate::acceptedDate#55
+qbo_Estimate::AcceptedBy#57
+qbo_Estimate::shipAmt#41",none,none,objects/karbon_LedgerLink.fmp12/scripts/291-Call_Get_Field_Scripts_Entity_CurrentQBOData.txt (step 71),none,"$Id is used at step 62 but never set in this script, so Id is only sent if it already sits in the incoming $json. Tax code mapping is disabled as deprecated (steps 46-47)."
+karbon_LedgerLink.fmp12/scripts/523-Estimate_Line_Field_Map_Set.txt,3e5ae68b192df0cb2acdb2e59297af5a2e6eecb9f26bdb45d40069e972722809,scripts,karbon_LedgerLink.fmp12,523,Estimate Line :: Field Map :: Set,integration,external-adapter,tier2,"Saves a QuickBooks Online Estimate line JSON into the current FileMaker record: parses the JSON into variables, converts QBO ids to FM ids and ISO dates, then sets the fields. The record context comes from the caller. The line is marked taxable when its tax code is anything other than NON.",none,"qbo_EstimateItem::description#5 (step 47, current record)
+qbo_EstimateItem::amount#6 (step 48, current record)
+qbo_EstimateItem::id_Item#9 (step 49, current record)
+qbo_EstimateItem::taxable#11 (step 50, current record)
+qbo_EstimateItem::unitPrice#7 (step 51, current record)
+qbo_EstimateItem::qty#8 (step 52, current record)",none,objects/karbon_LedgerLink.fmp12/scripts/255-Call_Set_Field_Lines_Scripts_Entity_Line.txt (step 25),none,"qbo_lineNum is not set here, unlike the SalesReceipt and Deposit line scripts."
+karbon_LedgerLink.fmp12/scripts/524-Estimate_Line_Field_Map_Get.txt,77f86f19b46e33446e5ce7ceb4bf5c09ecf2664037c4f3438544f52fabf86fdc,scripts,karbon_LedgerLink.fmp12,524,Estimate Line :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Estimate line from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. Line breaks in the description become LF characters and taxable becomes TAX or NON.","qbo_EstimateItem::description#5
+qbo_EstimateItem::amount#6
+qbo_EstimateItem::id_Item#9
+qbo_EstimateItem::taxable#11
+qbo_EstimateItem::unitPrice#7
+qbo_EstimateItem::qty#8",none,none,objects/karbon_LedgerLink.fmp12/scripts/296-Call_Get_Field_Lines_Scripts_Entity_CurrenQBOLIneData.txt (step 19),none,none
+karbon_LedgerLink.fmp12/scripts/539-PurchaseOrder_Field_Map_Get.txt,d2391dac41f24504a5ecd848d3dba0119ffdb16b133cb7f921a3f55fcb9428ba,scripts,karbon_LedgerLink.fmp12,539,PurchaseOrder :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Purchase Order from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. The bill address is sent as VendorAddr.","qbo_PurchaseOrder::billAddressLine1#8
+qbo_PurchaseOrder::billAddressLine2#9
+qbo_PurchaseOrder::shipAddressState#60
+qbo_PurchaseOrder::shipAddressLine1#57
+qbo_PurchaseOrder::shipAddressCity#55
+qbo_PurchaseOrder::shipAddressPostalCode#59
+qbo_PurchaseOrder::status#54
+qbo_PurchaseOrder::docNumber#4
+qbo_PurchaseOrder::date#5
+qbo_PurchaseOrder::id_Vendor#7
+qbo_PurchaseOrder::id_APAccountRef#52",none,none,objects/karbon_LedgerLink.fmp12/scripts/291-Call_Get_Field_Scripts_Entity_CurrentQBOData.txt (step 101),none,"$TotalAmt is added to the JSON at step 58 but is never read from a field, so TotalAmt is always empty. $Id is used at step 43 but never set here. The reads list has no total or line fields."
+karbon_LedgerLink.fmp12/scripts/540-PurchaseOrder_Line_Field_Map_Get.txt,4552a37761caca7597cddbbbf476e0f11efc24116943a9ba685cd898be8aeb59,scripts,karbon_LedgerLink.fmp12,540,PurchaseOrder Line :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Purchase Order line from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. It picks AccountBasedExpenseLineDetail when an expense account is set, else ItemBasedExpenseLineDetail when an item is set, and sends only that detail block.","qbo_PurchaseOrderLine::amount#6
+qbo_PurchaseOrderLine::description#5
+qbo_PurchaseOrderLine::taxable#11
+qbo_PurchaseOrderLine::id_Item#9
+qbo_PurchaseOrderLine::unitPrice#7
+qbo_PurchaseOrderLine::qty#8
+qbo_PurchaseOrderLine::Id_BillableCustomer#16
+qbo_PurchaseOrderLine::id_ExpenseAccount#17",none,none,objects/karbon_LedgerLink.fmp12/scripts/296-Call_Get_Field_Lines_Scripts_Entity_CurrenQBOLIneData.txt (step 43),none,"The billable customer id (step 19) is sent without a QBO id lookup, unlike item and account. When neither account nor item is set, $DetailType stays empty."
+karbon_LedgerLink.fmp12/scripts/557-JournalEntry_Field_Map_Get.txt,53d835b4a7e51f717f07b29615b23fe71415bd12540df2af6d0a4e0ff40b1694,scripts,karbon_LedgerLink.fmp12,557,JournalEntry :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Journal Entry from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. Only the header fields (date, doc number, note, total).","qbo_JournalEntry::docNumber#2
+qbo_JournalEntry::privateNote#7
+qbo_JournalEntry::date#1
+qbo_JournalEntry::TotalAmt#10",none,none,objects/karbon_LedgerLink.fmp12/scripts/291-Call_Get_Field_Scripts_Entity_CurrentQBOData.txt (step 57),none,$Id is used at step 35 but never set in this script.
+karbon_LedgerLink.fmp12/scripts/558-JournalEntry_Line_Field_Map_Get.txt,d5373146645f5f8cd1ed1cd67e485a38108e6995d09d4b164d3bd988d03ab4a3,scripts,karbon_LedgerLink.fmp12,558,JournalEntry Line:: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Journal Entry line from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. The amount comes from the debit or credit field depending on the posting type.","qbo_JournalEntryItem::amount_debit#5
+qbo_JournalEntryItem::amount_credit#11
+qbo_JournalEntryItem::description#4
+qbo_JournalEntryItem::id_Account#7
+qbo_JournalEntryItem::postingType#6",none,none,objects/karbon_LedgerLink.fmp12/scripts/296-Call_Get_Field_Lines_Scripts_Entity_CurrenQBOLIneData.txt (step 23),none,$Id is used at step 42 but never set in this script.
+karbon_LedgerLink.fmp12/scripts/618-SalesReceipt_Key_Fields.txt,7452573709b91a90dd710a944c8a61b0f13602800feb1320fd6514f1d5a009c1,scripts,karbon_LedgerLink.fmp12,618,SalesReceipt :: Key Fields,utility,external-adapter,tier3,"Returns a JSON map of the FileMaker key field names (QBO id, FM id, send flag, customer id, line item fields) that the LedgerLink sync uses for SalesReceipt; reads only field names through GetFieldName, no data. Also names the invoice total, date and balance fields used to accept payments.","qbo_SalesReceipt::qbo_id#2 (name only, GetFieldName step 9)
+qbo_SalesReceipt::id#1 (name only, GetFieldName step 13)
+qbo_SalesReceipt::id_Customer#7 (name only, GetFieldName step 17)
+qbo_SalesReceipt::qbo_send#3 (name only, GetFieldName step 21)
+qbo_SalesReceiptItem::qbo_id#2 (name only, GetFieldName step 30)
+qbo_SalesReceiptItem::id#1 (name only, GetFieldName step 33)
+qbo_SalesReceiptItem::id_Item#9 (name only, GetFieldName step 36)
+qbo_SalesReceiptItem::id_SalesReceipt#10 (name only, GetFieldName step 39)
+qbo_SalesReceiptItem::qbo_lineNum#4 (name only, GetFieldName step 40)
+qbo_Invoice::totalAmt#25 (name only, GetFieldName step 50)
+qbo_Invoice::date#5 (name only, GetFieldName step 51)
+qbo_Invoice::balance#26 (name only, GetFieldName step 52)",none,none,objects/karbon_LedgerLink.fmp12/scripts/233-Call_Key_Fields_Build_Config.txt (step 70),none,"$qboLastUpdate is set only in disabled step 46, so the result carries an empty value. The invoice fields come from qbo_Invoice, so this key map depends on that table."
+karbon_LedgerLink.fmp12/scripts/619-SalesReceipt_Field_Map_Set.txt,94314b03e334811579784d8d9b966522cfec59b920c4c323854a6d854224dfca,scripts,karbon_LedgerLink.fmp12,619,SalesReceipt :: Field Map :: Set,integration,external-adapter,tier2,"Saves a QuickBooks Online SalesReceipt JSON into the current FileMaker record: parses the JSON into variables, converts QBO ids to FM ids and ISO dates, then sets the fields. The record context comes from the caller. The customer id is resolved through the Karbon script ""Lookup Customer fmID ( qboId )"" because ZeitGeist replaces the stock customer table.",none,"qbo_SalesReceipt::id_Term#28 (step 81, current record)
+qbo_SalesReceipt::id_Customer#7 (step 82, current record)
+qbo_SalesReceipt::id_AccountDeposit#71 (step 83, current record)
+qbo_SalesReceipt::billAddressLine1#8 (step 84, current record)
+qbo_SalesReceipt::billAddressLine2#9 (step 85, current record)
+qbo_SalesReceipt::billAddressCity#10 (step 86, current record)
+qbo_SalesReceipt::billAddressState#15 (step 87, current record)
+qbo_SalesReceipt::billAddressPostalCode#14 (step 88, current record)
+qbo_SalesReceipt::billEmailAddress#29 (step 89, current record)
+qbo_SalesReceipt::emailStatus#72 (step 90, current record)
+qbo_SalesReceipt::docNumber#4 (step 91, current record)
+qbo_SalesReceipt::totalTax#30 (step 92, current record)
+qbo_SalesReceipt::customerMemo#27 (step 93, current record)
+qbo_SalesReceipt::privateNote#6 (step 94, current record)
+qbo_SalesReceipt::date#5 (step 95, current record)
+qbo_SalesReceipt::shipAddressLine1#44 (step 96, current record)
+qbo_SalesReceipt::shipAddressCity#42 (step 97, current record)
+qbo_SalesReceipt::shipAddressState#47 (step 98, current record)
+qbo_SalesReceipt::shipAddressPostalCode#46 (step 99, current record)
+qbo_SalesReceipt::totalAmt#25 (step 100, current record)","karbon_LedgerLink.fmp12/scripts/609 ""Lookup Customer fmID ( qboId )"" (step 63)",objects/karbon_LedgerLink.fmp12/scripts/232-Call_Set_Field_Scripts_Entity_Record.txt (step 115),none,"DueDate, Deposit and Balance are parsed (steps 26, 27, 49) but never written. Disabled steps 73-75 reference a missing table (""create the super""). The ""skip"" exit is guarded by If [ 0 ]."
+karbon_LedgerLink.fmp12/scripts/620-Sales_Receipt_Line_Field_Map_Set.txt,3969d1a7a0576da16636d9d916c445e0e13625c172d52f5b79cd734c53fdb403,scripts,karbon_LedgerLink.fmp12,620,Sales Receipt Line :: Field Map :: Set,integration,external-adapter,tier2,"Saves a QuickBooks Online SalesReceipt line JSON into the current FileMaker record: parses the JSON into variables, converts QBO ids to FM ids and ISO dates, then sets the fields. The record context comes from the caller. The tax code is reduced to a taxable flag (not NON).",none,"qbo_SalesReceiptItem::id_Item#9 (step 52, current record)
+qbo_SalesReceiptItem::description#5 (step 53, current record)
+qbo_SalesReceiptItem::amount#6 (step 54, current record)
+SalesReceiptItem::qbo_lineNum#4 (step 55, current record)
+qbo_SalesReceiptItem::taxable#11 (step 56, current record)
+qbo_SalesReceiptItem::unitPrice#7 (step 57, current record)
+qbo_SalesReceiptItem::qty#8 (step 58, current record)",none,objects/karbon_LedgerLink.fmp12/scripts/255-Call_Set_Field_Lines_Scripts_Entity_Line.txt (step 22),none,"Step 55 sets SalesReceiptItem::qbo_lineNum (no qbo_ prefix, table occurrence id 4) while the other fields use qbo_SalesReceiptItem; confirm whether that is a typo or a separate table occurrence."
+karbon_LedgerLink.fmp12/scripts/838-Deposit_Key_Fields.txt,604a897e9ad2a897e68c75c6fb4e592d2ae6fb1ec090cc633bb3e07b400df8d5,scripts,karbon_LedgerLink.fmp12,838,Deposit :: Key Fields,utility,external-adapter,tier3,"Returns a JSON map of the FileMaker key field names (QBO id, FM id, send flag, account id, line item fields) that the LedgerLink sync uses for Deposit; reads only field names through GetFieldName, no data.","qbo_Deposit::qbo_Id#8 (name only, GetFieldName step 9)
+qbo_Deposit::id#6 (name only, GetFieldName step 13)
+qbo_Deposit::id_Account#13 (name only, GetFieldName step 17)
+qbo_Deposit::qbo_send#10 (name only, GetFieldName step 20)
+qbo_DepositLine::qbo_id#8 (name only, GetFieldName step 29)
+qbo_DepositLine::id#18 (name only, GetFieldName step 32)
+qbo_DepositLine::id_Account#12 (name only, GetFieldName step 35)
+qbo_DepositLine::id_Deposit#6 (name only, GetFieldName step 38)
+qbo_DepositLine::qbo_lineNum#10 (name only, GetFieldName step 39)
+qbo_Deposit::qbo_LastUpdated#9 (name only, GetFieldName step 45)",none,none,objects/karbon_LedgerLink.fmp12/scripts/233-Call_Key_Fields_Build_Config.txt (step 30),none,none
+karbon_LedgerLink.fmp12/scripts/839-Deposit_Field_Map_Set.txt,497af9e7382795be3193e0dbede1e553f82a0ade41d6bb90ba3af93f1f505eb6,scripts,karbon_LedgerLink.fmp12,839,Deposit :: Field Map :: Set,integration,external-adapter,tier2,"Saves a QuickBooks Online Deposit JSON into the current FileMaker record: parses the JSON into variables, converts QBO ids to FM ids and ISO dates, then sets the fields. The record context comes from the caller. It stores the department, deposit account, amount and date.",none,"qbo_Deposit::id_Department#14 (step 53, current record)
+qbo_Deposit::id_Account#13 (step 54, current record)
+qbo_Deposit::amount#11 (step 55, current record)
+qbo_Deposit::date#12 (step 56, current record)",none,objects/karbon_LedgerLink.fmp12/scripts/232-Call_Set_Field_Scripts_Entity_Record.txt (step 89),none,none
+karbon_LedgerLink.fmp12/scripts/840-Deposit_Field_Map_Get.txt,8506d54cf6872090629812cc038240bdd1bdf020f0cff4b65aef53c72b2aec9f,scripts,karbon_LedgerLink.fmp12,840,Deposit :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Deposit from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. It sends department, deposit-to account, total and date.","qbo_Deposit::id_Department#14
+qbo_Deposit::id_Account#13
+qbo_Deposit::amount#11
+qbo_Deposit::date#12",none,none,objects/karbon_LedgerLink.fmp12/scripts/291-Call_Get_Field_Scripts_Entity_CurrentQBOData.txt (step 50),none,$Id is used at step 38 but never set in this script.
+karbon_LedgerLink.fmp12/scripts/841-Deposit_Line_Field_Map_Set.txt,2ec7a661a0d40744d57c99c76009816c99bf372ab5e1405accebce32cf6f3095,scripts,karbon_LedgerLink.fmp12,841,Deposit Line :: Field Map :: Set,integration,external-adapter,tier2,"Saves a QuickBooks Online Deposit line JSON into the current FileMaker record: parses the JSON into variables, converts QBO ids to FM ids and ISO dates, then sets the fields. The record context comes from the caller. It stores amount, account, check number, class, entity, payment method, description and line number.",none,"qbo_DepositLine::amount#14 (step 51, current record)
+qbo_DepositLine::id_Account#12 (step 52, current record)
+qbo_DepositLine::CheckNum#19 (step 53, current record)
+qbo_DepositLine::id_Class#16 (step 54, current record)
+qbo_DepositLine::id_Entity#17 (step 55, current record)
+qbo_DepositLine::id_PaymentMethod#15 (step 56, current record)
+qbo_DepositLine::description#20 (step 57, current record)
+qbo_DepositLine::qbo_lineNum#10 (step 58, current record)",none,objects/karbon_LedgerLink.fmp12/scripts/255-Call_Set_Field_Lines_Scripts_Entity_Line.txt (step 13),none,none
+karbon_LedgerLink.fmp12/scripts/842-Deposit_Line_Field_Map_Get.txt,9c8ac3f639c761bd4423a38db62b043e32fc139b717424e72432d9dcd5b363b7,scripts,karbon_LedgerLink.fmp12,842,Deposit Line :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Deposit line from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. Account, class, entity (always looked up as a Customer) and payment method are sent as QBO ids.","qbo_DepositLine::amount#14
+qbo_DepositLine::id_Account#12
+qbo_DepositLine::CheckNum#19
+qbo_DepositLine::id_Class#16
+qbo_DepositLine::id_Entity#17
+qbo_DepositLine::id_PaymentMethod#15
+qbo_DepositLine::description#20
+qbo_DepositLine::qbo_lineNum#10",none,none,objects/karbon_LedgerLink.fmp12/scripts/296-Call_Get_Field_Lines_Scripts_Entity_CurrenQBOLIneData.txt (step 16),none,"Account, class, entity and payment method ids are sent with JSONNumber (steps 50-53) while other scripts send ids as strings; the entity lookup assumes the deposit entity is always a Customer."
+karbon_LedgerLink.fmp12/scripts/845-Purchase_Key_Fields.txt,a7a6c0b57ec7ca2bb72766ff9c9c67a1f4ef31f3e1baabb3b9be5824cc3d2f43,scripts,karbon_LedgerLink.fmp12,845,Purchase :: Key Fields,utility,external-adapter,tier3,"Returns a JSON map of the FileMaker key field names (QBO id, FM id, send flag, deleted flag, line item fields) that the LedgerLink sync uses for Purchase; reads only field names through GetFieldName, no data.","qbo_Purchase::qbo_Id#8 (name only, GetFieldName step 9)
+qbo_Purchase::id#6 (name only, GetFieldName step 13)
+qbo_Purchase::id_Account#13 (name only, GetFieldName step 16)
+qbo_Purchase::qbo_deleted#18 (name only, GetFieldName step 19)
+qbo_Purchase::qbo_send#10 (name only, GetFieldName step 22)
+qbo_PurchaseLine::qbo_id#8 (name only, GetFieldName step 30)
+qbo_PurchaseLine::id#18 (name only, GetFieldName step 33)
+qbo_PurchaseLine::id_Purchase#6 (name only, GetFieldName step 36)
+qbo_PurchaseLine::qbo_lineNum#10 (name only, GetFieldName step 37)
+qbo_PurchaseLine::qbo_LastUpdated#9 (name only, GetFieldName step 43)",none,none,objects/karbon_LedgerLink.fmp12/scripts/233-Call_Key_Fields_Build_Config.txt (step 86),none,"The vendorId key maps to qbo_Purchase::id_Account (step 16) although the comment says Vendor ID. qboLastUpdate reads qbo_PurchaseLine::qbo_LastUpdated, a line table field, for a header key."
+karbon_LedgerLink.fmp12/scripts/846-Purchase_Field_Map_Set.txt,a6c07a699582f2fcb0986baa535f19d24633fec06448b8a75bb66772bbf1785e,scripts,karbon_LedgerLink.fmp12,846,Purchase :: Field Map :: Set,integration,external-adapter,tier2,"Saves a QuickBooks Online Purchase JSON into the current FileMaker record: parses the JSON into variables, converts QBO ids to FM ids and ISO dates, then sets the fields. The record context comes from the caller. It stores date, total, payment type and account.",none,"qbo_Purchase::date#12 (step 47, current record)
+qbo_Purchase::TotalAmt#11 (step 48, current record)
+qbo_Purchase::PaymentType#16 (step 49, current record)
+qbo_Purchase::id_Account#13 (step 50, current record)",none,objects/karbon_LedgerLink.fmp12/scripts/232-Call_Set_Field_Scripts_Entity_Record.txt (step 159),none,none
+karbon_LedgerLink.fmp12/scripts/847-Purchase_Field_Map_Get.txt,43a741b9c32b7fbf8e870eb39aa06414694522559d7ca878b9cc65362153d632,scripts,karbon_LedgerLink.fmp12,847,Purchase :: Field Map :: Get,integration,external-adapter,tier2,"Builds the QuickBooks Online JSON for a Purchase from the current FileMaker record: reads the fields into variables, converts FM ids to QBO ids and dates to ISO, then returns the JSON. It sends account, payment type, date and total.","qbo_Purchase::date#12
+qbo_Purchase::TotalAmt#11
+qbo_Purchase::id_Account#13
+qbo_Purchase::PaymentType#16",none,none,objects/karbon_LedgerLink.fmp12/scripts/291-Call_Get_Field_Scripts_Entity_CurrentQBOData.txt (step 93),none,"$Id is used at step 37 but never set in this script. The comment at step 24 (""paid by check"") has no code after it."

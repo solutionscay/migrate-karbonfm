@@ -1,0 +1,146 @@
+# script 235: Set Field Block for Patch
+# file: karbon_Generator.fmp12
+# folder: App Modules / Generators / Public / Kontroller
+# source: ScriptCatalog/Script[@id=235]
+# steps: 21 (3 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=233 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $FieldBlock; Value:List( 
+        
+        "Id";
+        "CreationAccountName";
+        "CreationTimestamp";
+        "ModificationAccountName";
+        "ModificationCount";
+        "ModificationTimestamp";
+        "ONE";
+        "AsJSON";
+        "DisplayName";
+        "Taxable";
+        "PrintOnCheckName";
+        "DefaultTaxCodeRef";
+        "Notes";
+        "Job";
+        "BillWithParent";
+        "ParentRef";
+        "Level";
+        "SalesTermRef";
+        "PaymentMethodRef";
+        "Balance";
+        "OpenBalanceDate";
+        "BalanceWithJobs";
+        "CurrencyRef";
+        "PreferredDeliveryMethod";
+        "ResaleNum";
+        "z_xJoin"
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldBlock
+   3    Set Variable [ $TableName; Value:"Customer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableName
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5 // Set Variable [ $data; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7 // Set Variable [ $FieldBlock; Value:JSONGetElement ( $data ; "FieldBlock" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldBlock
+   8 // Set Variable [ $TableName; Value:JSONGetElement( $data ; "TableName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableName
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $exit; Value:ValueCount( $FieldBlock ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $exit
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  15    Exit Loop If [ $i > $exit ]
+        DisableStepCollapsed state=False
+  16    Set Variable [ $ThisField; Value:$TableName & "::" & GetValue ( $FieldBlock ; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisField
+  17    Set Variable [ $XML; Value:List( $XML; ScriptStep_SetField_Patch ( $ThisField ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_SetField_Patch
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  18    End Loop
+        DisableStepCollapsed state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $XML; Value:Substitute ( $XML ; ¶ ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $XML
+  21    Set Variable [ $Result; Value:clip_Set ( $XML ; "Script Steps" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_Set
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result

@@ -1,0 +1,94 @@
+# script 244: Open Schema Picker
+# file: Picker Module.fmp12
+# folder: Modules / Schema
+# source: ScriptCatalog/Script[@id=244]
+# steps: 20 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=219 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $ControllerFields; Value:JSONGetElement ( $data ; "ControllerFields" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ControllerFields
+   5    Set Variable [ $ControllerScripts; Value:JSONGetElement ( $data ; "ControllerScripts" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ControllerScripts
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Field [ Picker::Schema_Results; "" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=28 name=Schema_Results
+   8    Set Field [ Picker::Settings; JSONSetElement ( Picker::Settings ; "AllowMultipleSelections" ; False ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, Picker::Settings#4, fn:False, fn:JSONBoolean
+        Field table=Picker id=4 name=Settings
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    New Window [ Style: Card; Using layout: “Schema Picker” (Picker); Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=40 name="Schema Picker"
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Perform Script [ “Set File Array” ]
+        DisableStepCollapsed state=False
+        Script id=221 name="Set File Array"
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ $ControllerFields ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Select TableOccurence”; Parameter: JSONSetElement ( "" ; 
+        	[ "FileName" ; "karbon_kontroller" ; JSONString ];
+        	[ "TableOccurenceName" ; "DBTransactions" ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Script id=228 name="Select TableOccurence"
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    If [ $ControllerScripts ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Select File”; Parameter: JSONSetElement ( "" ; 
+        	[ "FileName" ; "karbon_kontroller" ; JSONString ];
+        	[ "ScriptsInd" ; True ; JSONBoolean ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString, fn:True, fn:JSONBoolean
+        Script id=226 name="Select File"
+  20    End If
+        DisableStepCollapsed state=False

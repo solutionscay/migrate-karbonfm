@@ -1,0 +1,291 @@
+# script 682: Charge Card ( {card, amount, currency} )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO Payments / Public
+# source: ScriptCatalog/Script[@id=682]
+# steps: 70 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=324 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # exchanges card details for a token then charges the card
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # using the token instead of the card
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {string} params.amount Amount of the transaction. Valid values range 0.00 through 99999.99.
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} [params.currencyCode=USD] three-letter ISO 4217 currency code representing the currency in which the charge was made.
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {object} params.card card object
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @param {object} params.context context object
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @param {boolean} params.context.mobile true if the charge occurs on a mobile device
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @param {boolean} params.context.isEcommerce true if it is a web Charge
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @returnSuccess {object} response
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    # @returnSuccess {string} response.created
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    # @returnSuccess {string} response.amount
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    # @returnSuccess {string} response.token
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    # @returnSuccess {string} response.id
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    # @returnSuccess {string} authCode.id
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $card; Value:JSONGetElement($params; "card" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $card
+  27    Set Variable [ $amount; Value:JSONGetElement($params; "amount" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $amount
+  28    Set Variable [ $currency; Value:JSONGetElement($params; "currency" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $currency
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Perform Script [ “Create Card Token ( {card} )”; Parameter: $card ]
+        DisableStepCollapsed state=False
+        Script id=326 name="Create Card Token ( {card} )"
+  31    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  34    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  35    End If
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $token; Value:JSONGetElement ($result ; "value") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $token
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $context; Value:JSONGetElement($params ; "context" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $context
+  42    If [ IsEmpty ( $context ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  43    Set Variable [ $context; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $context
+  44    End If
+        DisableStepCollapsed state=False
+  45    Set Variable [ $mobile; Value:JSONGetElement($context; "mobile" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $mobile
+  46    If [ IsEmpty ( $mobile ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  47    Set Variable [ $context; Value:JSONSetElement($context ; "mobile" ; False ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $context
+  48    End If
+        DisableStepCollapsed state=False
+  49    Set Variable [ $isEcommerce; Value:JSONGetElement($context; "isEcommerce" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $isEcommerce
+  50    If [ IsEmpty ( $isEcommerce ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  51    Set Variable [ $context; Value:JSONSetElement($context ; "isEcommerce" ; False ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:False, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $context
+  52    End If
+        DisableStepCollapsed state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Set Variable [ $chargeData; Value:JSONSetElement ("" ;
+        
+        ["amount"; $amount ; JSONString];
+        ["token"; $token ; JSONString];
+        ["currency"; $currency; JSONString];
+        ["context"; $context ; JSONObject]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $chargeData
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Perform Script [ “Charge Card Token ( {chargeData })”; Parameter: $chargeData ]
+        DisableStepCollapsed state=False
+        Script id=328 name="Charge Card Token ( {chargeData })"
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Exit Script [ Result:  $result ]
+        DisableStepCollapsed state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False

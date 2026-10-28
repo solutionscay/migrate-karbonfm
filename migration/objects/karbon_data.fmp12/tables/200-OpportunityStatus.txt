@@ -1,0 +1,89 @@
+# table 200: OpportunityStatus
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=200]
+# fields: 9
+# records: 7
+
+Field id=1 dataType=Number fieldType=Normal name=Id
+  Comment: Inherits from PartyRole Id
+  AutoEnter allowEditing=False
+    Serial increment=1 nextValue=8 generate=OnCreation
+  Validation type=OnlyDuringDataEntry
+    StrictDataType value=Numeric
+    NotEmpty value=True
+    Unique value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=OpportunityStatus:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=48 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=OpportunityStatus (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Text fieldType=Normal name=Name
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=OpportunityStatus:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=61 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=OpportunityStatus:
+    | JSONSetElement ( "{}" ; 
+    | 	[ "Id" ; Id ; JSONNumber ] ; 
+    | 	[ "Name" ; Name ; JSONString ] ; 
+    | 	[ "ActiveInd" ; ActiveInd ; JSONNumber ] 
+    | )
+    refs: fn:JSONSetElement, OpportunityStatus::Id#1, fn:JSONNumber, OpportunityStatus::Name#50, fn:JSONString, OpportunityStatus::ActiveInd#62
+  AutoEnter alwaysEvaluate=True
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=62 dataType=Number fieldType=Normal name=ActiveInd
+  Comment: True if the opportunity is active with this status
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 0
+    Calculation table=OpportunityStatus:
+      | GetAsBoolean ( Self )
+      refs: fn:GetAsBoolean, fn:Self
+  Validation type=OnlyDuringDataEntry
+    StrictDataType value=Numeric
+    NotEmpty value=True
+    Range to=1 from=0
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

@@ -1,0 +1,176 @@
+# script 196: Test Merge Loop
+# file: karbon_kontacts.fmp12
+# source: ScriptCatalog/Script[@id=196]
+# steps: 38 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+
+   1    #Can I set up a looping script to mimic a recursive custom function so I can debug it?
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $target; Value:JSONGetElement ( $json ; "target" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $target
+   6    Set Variable [ $source; Value:JSONGetElement ( $json ; "source" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $source
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $sourceKeys; Value:JSONListKeys ( $source ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListKeys
+        Repetition
+          Calculation:
+            | 1
+        Name: $sourceKeys
+  11    Set Variable [ $targetKeys; Value:JSONListKeys ( $target ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListKeys
+        Repetition
+          Calculation:
+            | 1
+        Name: $targetKeys
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ Left ( $sourceKeys ; 1 ) = "?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left
+  14    Exit Script [ Result: $sourceKeys & " in source" ]
+        DisableStepCollapsed state=False
+  15    Else If [ Left ( $targetKeys ; 1 ) = "?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left
+  16    Exit Script [ Result: $targetKeys & " in target" ]
+        DisableStepCollapsed state=False
+  17    Else If [ Left( JSONGetElement ( $source ; "" ) ; 1 ) = "[" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left, fn:JSONGetElement
+  18    Exit Script [ Result: "? * Array in Source. Must be an object" ]
+        DisableStepCollapsed state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    If [ ValueCount ( $sourceKeys ) < 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:ValueCount
+  22    Exit Script [ Result: $target ]
+        DisableStepCollapsed state=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $thisKey; Value:GetValue( $sourceKeys ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $thisKey
+  26    Set Variable [ $thisValue; Value:JSONGetElement( $source; $thisKey ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisValue
+  27    Set Variable [ $firstChar; Value:Left( $thisValue ; 1) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Left
+        Name: $firstChar
+  28    Set Variable [ $needToCheckForNumber; Value:Filter( $firstChar ; "0123456789") = $firstChar ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Filter
+        Name: $needToCheckForNumber
+  29    Set Variable [ $JSONType; Value:If( $needToCheckForNumber and GetAsText( $thisValue) <> GetAsNumber( $thisValue)  ; JSONString ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:and, fn:GetAsText, fn:GetAsNumber, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONType
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $newTarget; Value:JSONSetElement ( $target ; $thisKey ; $thisValue ; $JSONType ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $newTarget
+  32    Set Variable [ $newSource; Value:JSONDeleteElement ( $source ; $thisKey ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $newSource
+  33    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "target" ; $newTarget ; "" ] ;
+        	[ "source" ; $newSource ; "" ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  34    Perform Script [ “Test Merge Loop”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=196 name="Test Merge Loop"
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Exit Loop If [ ValueCount ( $sourceKeys ) ]
+        DisableStepCollapsed state=False
+        refs: fn:ValueCount
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    End Loop
+        DisableStepCollapsed state=False

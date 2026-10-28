@@ -1,0 +1,46 @@
+# custom function 57: Log.Entry
+# file: karbon_kontroller.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=57]
+
+CustomFunction id=57 functionArity=3 visible=True parameters=level;message;data name=Log.Entry
+  Calculation:
+    | /**
+    | 
+    | Adds an entry to the $$Log.Data variable
+    | Log levels conform to https://tools.ietf.org/html/rfc5424 
+    | 
+    | @param {string} [level=info] the log level one of "debug" ; "info" ; "notice" ; "warning"; "error" , "crit", "alert", "emerg", 
+    | @param {string} message the message to write into the log;
+    | @param {object} data any other data you'd like to include
+    | 
+    | */
+    | 
+    | 
+    | Let([
+    | levels = List("debug" ; "info" ; "notice" ; "warning" ; "error" ; "crit"; "alert"; "emerg");
+    | level = If( IsEmpty(FilterValues(levels; level )) ; "info"; level);
+    | 
+    | 
+    | dataIsNotJSON = Left( JSONFormatElements ( data ); 1) = "?";
+    | dataType = If(dataIsNotJSON; JSONString ; "" );
+    | 
+    | newEntry = JSONSetElement ( ""; 
+    | ["Meta.UTC" ; Get(CurrentTimeUTCMilliseconds) ; JSONNumber];
+    | ["Meta.Script" ; Get(ScriptName) ; JSONString];
+    | ["Meta.Account" ; Get(AccountName) ; JSONString];
+    | ["Meta.File" ; Get(FileName) ; JSONString];
+    | ["Level" ; level ; JSONString];
+    | ["Message" ; Message ; JSONString];
+    | ["Data" ; data ; dataType]
+    | );
+    | 
+    | $$Log.Data = JSON.Push ( $$Log.Data ; newEntry ; "" )
+    | 
+    | 
+    | ];
+    | 
+    | 
+    | ""
+    | 
+    | )
+    refs: fn:Let, fn:List, fn:If, fn:IsEmpty, fn:FilterValues, fn:Left, fn:JSONFormatElements, fn:JSONString, fn:JSONSetElement, fn:Get, fn:CurrentTimeUTCMilliseconds, fn:JSONNumber, fn:ScriptName, fn:AccountName, fn:FileName, cf:JSON.Push

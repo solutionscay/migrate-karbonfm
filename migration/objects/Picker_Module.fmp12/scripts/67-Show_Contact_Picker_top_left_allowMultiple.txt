@@ -1,0 +1,417 @@
+# script 67: Show Contact Picker( { top { ; left { ; allowMultiple } } } )
+# file: Picker Module.fmp12
+# folder: Modules / Contact Picker (Contacts Sample File) / Public / API
+# source: ScriptCatalog/Script[@id=67]
+# steps: 96 (3 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=15 groupCollapsed=True includeInMenu=False
+
+   1    #v2.0 2017-06-20: Updated to support v16 (cards, JSON)
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #init
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $defaultSettings; Value:JSONFormatElements ( JSONSetElement ( "{}" ; 
+        	[ "selectMultiple" ; True ; JSONBoolean ] ; 
+        	[ "organizationsOnly" ; False ; JSONBoolean ] ;
+        	[ "allowCreate" ; True ; JSONBoolean ] ; 
+        
+        	[ "placeholderText" ; "Search..." ; JSONString ] ; 
+        	[ "footerMessage" ; "Search first. If there's no match then add a new contact." ; JSONString ] ; 
+        
+        	[ "partySubtypes" ; "" ; JSONNull ] ; 
+        	[ "partyRoleSubtypes" ; "" ; JSONNull ] ; 
+        
+        	[ "cardTop" ; "" ; JSONNull ] ; 
+        	[ "cardLeft" ; "" ; JSONNull ] ; 
+        	[ "windowTop" ; "" ; JSONNull ] ; 
+        	[ "windowLeft" ; "" ; JSONNull ] 
+        ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:True, fn:JSONBoolean, fn:False, fn:JSONString, fn:JSONNull
+        Repetition
+          Calculation:
+            | 1
+        Name: $defaultSettings
+  11    Set Field [ Picker::Settings; JSON.Merge ( $defaultSettings ; $parameters ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.Merge
+        Field table=Picker id=4 name=Settings
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $defaultResult; Value:// Init default
+        
+        JSONFormatElements ( Let ( [ 
+        
+        	parentObject = JSONSetElement ( "{}" ; "Result" ; "" ; JSONNull ) ; 
+        
+        	resultObject = JSONSetElement ( "{}" ; 
+        		[ "CreateParty" ; False ; JSONBoolean ] ;
+        		[ "PartyCount" ; 0 ; JSONNumber ] ;
+        		[ "PartyArray" ; "[]" ; JSONArray ]
+        	) 
+        
+        ] ; 
+        
+        	JSONSetElement ( "{}" ; "Result" ; resultObject ; JSONObject )
+        
+        ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:Let, fn:JSONSetElement, fn:JSONNull, fn:False, fn:JSONBoolean, fn:JSONNumber, fn:JSONArray, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $defaultResult
+  14    Set Field [ Picker::Results; $defaultResult ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=2 name=Results
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $cardTop; Value:JSONGetElement ( Picker::Settings ; "cardTop" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $cardTop
+  17    Set Variable [ $cardLeft; Value:JSONGetElement ( Picker::Settings ; "cardLeft" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $cardLeft
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $windowName; Value:JSONGetElement ( Picker::Settings ; "windowName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowName
+  20    Set Variable [ $windowTop; Value:JSONGetElement ( Picker::Settings ; "windowTop" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowTop
+  21    Set Variable [ $windowLeft; Value:JSONGetElement ( Picker::Settings ; "windowLeft" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowLeft
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $DisplayPartyIds; Value:JSONGetElement ( Picker::Settings ; "DisplayPartyIds" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $DisplayPartyIds
+  24    Set Variable [ $SubscriberPartyIds; Value:JSONGetElement ( Picker::Settings ; "SubscriberPartyIds" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $SubscriberPartyIds
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #Clear search and result fields
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Field [ Picker::Search_Field; "" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+  30    Set Field [ VIRTUALLISTS::foundCount; 0 ]
+        DisableStepCollapsed state=False
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #Init variables
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $$FirstFindHasBeenPerformed; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$FirstFindHasBeenPerformed
+  34    Set Variable [ $$PickerSearchStatus; Value:"Found " & Get( FoundCount ) & " records (of " & Get( TotalRecordCount ) & " records)" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:FoundCount, fn:TotalRecordCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $$PickerSearchStatus
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #Set configuration options
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Perform Script [ “Configure” ]
+        DisableStepCollapsed state=False
+        Script id=26 name=Configure
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #Initialize references
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Perform Script [ “Init Field References” ]
+        DisableStepCollapsed state=False
+        Script id=95 name="Init Field References"
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #Validate VirtualList
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Perform Script [ “Reset Rows Table” ]
+        DisableStepCollapsed state=False
+        Script id=85 name="Reset Rows Table"
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #Setup picker window
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    New Window [ Style: Card; Name: "Contact Search"; Using layout: “Contact Picker - No Results No Selection” (Party); Height: 565; Width: 460; Top: $cardTop; Left: $cardLeft; Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=13 name="Contact Picker - No Results No Selection"
+  47    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  48    New Window [ Style: Dialog; Name: $windowName; Using layout: “Contact Picker - No Results No Selection” (Party); Height: 565; Width: 460; Top: $windowTop; Left: $windowLeft; Close: Yes; Minimize: No; Maximize: No; Resize: Yes; Menu Bar: No; Dim parent window: No; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Dialog Close=Yes Minimize=No Maximize=No Resize=Yes Styles=3221291524
+        Layout id=13 name="Contact Picker - No Results No Selection"
+  49    End If
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #set up picker
+        DisableStepCollapsed state=False
+        Restore state=False
+  52 // Adjust Window
+        [ Resize to Fit ]
+        DisableStepCollapsed state=False
+        WindowState value=ResizeToFit
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #OPTIONAL: start with all records
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    If [ not IsEmpty ( $DisplayPartyIds ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  56    #Starting with a list of parties
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Set Field [ selector::PartyId; $DisplayPartyIds ]
+        DisableStepCollapsed state=False
+        Field table=selector id=6 name=PartyId
+  58    Go to Related Record [ From table: “selected_Party”; Using layout: “Contact Picker - Results With Selection” (Party) ]
+        [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065122 name=selected_Party
+        Layout id=14 name="Contact Picker - Results With Selection"
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #Perform a default find
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Perform Script [ “Find Contacts” ]
+        DisableStepCollapsed state=False
+        Script id=69 name="Find Contacts"
+  63    End If
+        DisableStepCollapsed state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #select existing subscribers
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  68    Set Variable [ $end; Value:ValueCount ( $SubscriberPartyIds) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+  69    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  71    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  72    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  73    Set Variable [ $thisPartyId; Value:GetValue ( $SubscriberPartyIds; $n) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPartyId
+  74    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #test each party to see if they are a current subscriber
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    If [ $thisPartyId = Party::Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party::Id#1
+  77    Perform Script [ “Select Party” ]
+        DisableStepCollapsed state=False
+        Script id=71 name="Select Party"
+  78    End If
+        DisableStepCollapsed state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Go to Record/Request/Page
+        [ Next; Exit after last ]
+        NoInteract state=False
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  81    End Loop
+        DisableStepCollapsed state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83 // Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    End Loop
+        DisableStepCollapsed state=False
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #OPTIONAL: start with empty set
+        DisableStepCollapsed state=False
+        Restore state=False
+  90 // Show Omitted Only
+        DisableStepCollapsed state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    Go to Object [ Object Name: "searchField"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False

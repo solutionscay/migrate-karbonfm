@@ -1,0 +1,111 @@
+# script 360: Delete Attachment
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=360]
+# steps: 28 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $filePath; Value:VirtualListRows::Attachment_FilePath ]
+        DisableStepCollapsed state=False
+        Value
+          refs: VirtualListRows::Attachment_FilePath#35
+        Repetition
+          Calculation:
+            | 1
+        Name: $filePath
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+   6    Set Variable [ $end; Value:JSON.ArrayLength ( UtilityEmailMessage::Attachments ; "" ) - 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength, UtilityEmailMessage::Attachments#8
+        Name: $end
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $thisValue; Value:JSONGetElement ( UtilityEmailMessage::Attachments ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, UtilityEmailMessage::Attachments#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisValue
+  13    Set Variable [ $thisFilePath; Value:JSONGetElement ( $thisValue ; "FilePath" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisFilePath
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ $thisFilePath = $filePath ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Field [ UtilityEmailMessage::Attachments; JSONDeleteElement ( UtilityEmailMessage::Attachments ; $n ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONDeleteElement, UtilityEmailMessage::Attachments#8
+        Field table=UtilityEmailMessage id=8 name=Attachments
+  17    Set Variable [ $end; Value:$end - 1 ]
+        DisableStepCollapsed state=False
+        Name: $end
+  18    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    End Loop
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Perform Script [ “Update Attachments Virtual List” ]
+        DisableStepCollapsed state=False
+        Script id=375 name="Update Attachments Virtual List"
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,56 @@
+# script 12: btn: Create Request
+# file: karbon_Generator.fmp12
+# folder: App Modules / Requests / Public / Buttons
+# source: ScriptCatalog/Script[@id=12]
+# steps: 10 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=114 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ RESOURCES::UseLegacy ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: RESOURCES::UseLegacy#7
+   4    Set Variable [ $xml; Value:List(
+           ScriptStep_InsertCalculatedResult ( "$requestJSON" ; Requests::requestJSONFileMakerCalcModify ; 1 );
+           ScriptStep_PerformScript ( "HTTP ( {request} )" ; "$requestJSON" ; "" );
+           ScriptStep_InsertCalculatedResult ( "$response" ; "Get( ScriptResult )" ; 1 );
+           ScriptStep_InsertCalculatedResult ( "$body" ; "jsonGet($response; \"body\")" ; 1 )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_InsertCalculatedResult, Requests::requestJSONFileMakerCalcModify#20, cf:ScriptStep_PerformScript
+        Name: $xml
+   5    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $xml; Value:List(
+           ScriptStep_InsertCalculatedResult ( "$requestJSON" ; Requests::requestJSONFileMakerCalcModifyNative ; 1 );
+           ScriptStep_PerformScript ( "HTTP ( {request} )" ; "$requestJSON" ; "" );
+           ScriptStep_InsertCalculatedResult ( "$response" ; "Get( ScriptResult )" ; 1 );
+           ScriptStep_InsertCalculatedResult ( "$body" ; "JSONGetElement($response; \"body\")" ; 1 )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_InsertCalculatedResult, Requests::requestJSONFileMakerCalcModifyNative#31, cf:ScriptStep_PerformScript
+        Name: $xml
+   7    End If
+        DisableStepCollapsed state=False
+   8    Set Variable [ $result; Value:clip_Set ( $xml ; "ScriptSteps" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_Set
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Close Popover
+        DisableStepCollapsed state=False

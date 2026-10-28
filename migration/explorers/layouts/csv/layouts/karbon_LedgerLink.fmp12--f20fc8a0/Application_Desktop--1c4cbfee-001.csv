@@ -1,0 +1,462 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+karbon_LedgerLink.fmp12/layouts/91-Invoices_Desktop.txt,9cdd1d2ef35a3931fcbf99edc93bc62faa74a694a9300caa19a66a528eb4ab9c,layouts,karbon_LedgerLink.fmp12,91,Invoices | Desktop,list,"Invoice (base Invoice, karbon_LedgerLink.fmp12)",key 37 text “Deleted” | hidden when Invoice::deleted is false/empty or in Find mode,none,"layout | OnModeEnter | id 490 “Enter Find Mode Trigger” | on entering Find mode, routes the user to the Desktop find layout of the current table (Invoice, Customer, Item, Vendor, Bill, Estimate, PO, Journal)","key 7 (icon) | no step
+key 8 Customer | no step
+key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 25 (icon) | Go to Layout [ “Invoice | Desktop” (Invoice) ] (layout id 97)
+key 26 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 27 Date | no step
+key 28 No. | no step
+key 29 Due Date | no step
+key 30 Balance | no step
+key 31 Total | no step
+key 38 Chart | Perform Script [ “Go To Chart” ] (script id 480)",none,none,none,page,
+karbon_LedgerLink.fmp12/layouts/97-Invoice_Desktop.txt,83f6cca95f88ceba3ea3e71323ea00356dad5b0f635796e851ac2a46baf271e3,layouts,karbon_LedgerLink.fmp12,97,Invoice | Desktop,form,"Invoice (base Invoice, karbon_LedgerLink.fmp12)","key 65 text “<<docNumber>> <<Invoice_Customer::displayName>>” | hidden when in Find mode
+key 76 field Invoice::docNumber | hidden when always (constant True) (rule not applied in Find mode)
+key 97 field InvoiceItem::qty | hidden when InvoiceItem::id_Item is empty (rule not applied in Find mode)
+key 98 field InvoiceItem::unitPrice | hidden when InvoiceItem::id_Item is empty (rule not applied in Find mode)
+key 99 field InvoiceItem::amount | hidden when InvoiceItem::id_Item is empty (rule not applied in Find mode)
+key 101 button (icon) | hidden when InvoiceItem::id is empty (rule not applied in Find mode)
+key 102 button (icon) | hidden when InvoiceItem::taxable is true or ( InvoiceItem::id_Item is empty and not in Find mode )
+key 104 button (icon) | hidden when InvoiceItem::taxable is false/empty or ( InvoiceItem::id_Item is empty and not in Find mode )
+key 111 field Invoice::totalTax | hidden when InvoiceItem::summaryTotalAmountTaxable = 0 (rule not applied in Find mode)
+key 121 field Invoice::qbo_error | hidden when Invoice::qbo_error is empty (rule not applied in Find mode)
+key 122 text “sync error” | hidden when Invoice::qbo_error is empty (rule not applied in Find mode)
+key 136 popoverbutton (icon) | hidden when Invoice::shipAmt is empty or in Find mode
+key 139 popoverbutton (icon) | hidden when not ( Invoice::qbo_send is true and Invoice::qbo_id is not empty ) or in Find mode
+key 142 field Invoice::id_Class | hidden when Invoice_Preferences::AccountingInfoPrefs.ClassTrackingPerTxn is false/empty (rule not applied in Find mode)
+key 143 text “Class” | hidden when Invoice_Preferences::AccountingInfoPrefs.ClassTrackingPerTxn is false/empty (rule not applied in Find mode)
+key 144 field Invoice::id_Department | hidden when Invoice_Preferences::AccountingInfoPrefs.TrackDepartments is false/empty (rule not applied in Find mode)
+key 145 text “<<Invoice_Preferences::SalesFormsPrefs.DepartmentTerminolog…” | hidden when Invoice_Preferences::AccountingInfoPrefs.TrackDepartments is false/empty (rule not applied in Find mode)
+key 164 popoverbutton (icon) | hidden when in Find mode
+key 179 button (icon) | hidden when Invoice::id_Customer is empty (rule not applied in Find mode)
+key 180 slidecontrol | hidden when in Find mode
+key 182 button “Delete” | hidden when Invoice::deleted is true (rule not applied in Find mode)
+key 183 button “Restore” | hidden when Invoice::deleted is false/empty (rule not applied in Find mode)
+key 184 text “Will be deleted on next sync.” | hidden when Invoice::deleted is false/empty (rule not applied in Find mode)
+key 185 slidecontrol | hidden when always (constant True) (rule not applied in Find mode)
+key 188 button (icon) | hidden when the Invoice is not flagged deleted
+key 193 field Invoice::id_Term | hidden when always (constant True) (rule not applied in Find mode)
+key 205 button “Sync” | hidden when in Find mode
+key 206 button “Open in QBO” | hidden when Invoice::qbo_id is empty or in Find mode
+key 233 text “Payments Received: <<countOfPayment>>” | hidden when Invoice::countOfPayment ≤ 0 (rule not applied in Find mode)
+key 234 popoverbutton (icon) | hidden when always (constant 1) (rule not applied in Find mode)
+key 242 button “Receive Payment” | hidden when the record has not been modified yet (Get(RecordModificationCount) = 0) (rule not applied in Find mode)
+key 295 button (icon) | hidden when Invoice_AttachableRef::Id is empty
+key 291 field Invoice_AttachableRef::IncludeOnSend | hidden when Invoice_AttachableRef::Id is empty (rule not applied in Find mode)
+key 309 buttonbar | hidden when Invoice_AttachableRef::Id is empty or Invoice_AttachableRef_Attachable::FileSizeKB is empty (rule not applied in Find mode)
+key 300 button “Send Invoice” | hidden when in Find mode
+key 72 field Invoice_Preferences::AccountingInfoPrefs.TrackDepartments | hidden when Invoice_Preferences::AccountingInfoPrefs.TrackDepartments is false/empty (rule not applied in Find mode)
+key 85 field Invoice_Preferences::SalesFormsPrefs.DepartmentTerminology | hidden when Invoice_Preferences::AccountingInfoPrefs.TrackDepartments is false/empty (rule not applied in Find mode)
+key 94 field Invoice::countOfPayment | hidden when Invoice::countOfPayment ≤ 0 (rule not applied in Find mode)","key 202 button (icon) | when InvoiceItem::id_Item is empty | hide
+key 191 button (icon) | when Invoice::id_Term is empty | hide
+key 205 button “Sync” | when Invoice::qbo_send is true | style
+key 280 button (icon) | when Invoice::billAddressLine1 is empty and Invoice::billAddressCity is empty and Invoice::billAddressState is empty and Invoice::billAddressPostalCode is empty | style
+key 286 button (icon) | when Invoice::shipAddressLine1 is empty and Invoice::shipAddressCity is empty and Invoice::shipAddressState is empty and Invoice::shipAddressPostalCode is empty | style
+key 310 button “calc ""("" & (Invoice_AttachableRef_…” | when Invoice_AttachableRef_Attachable::FileSizeKB > 20000 | style","layout | OnRecordCommit | id 477 “Invoice OnCommit Trigger” | flags the Invoice for QBO sync (qbo_send) and refreshes subtotal and taxable subtotal from the line items
+layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table
+key 99 field InvoiceItem::amount | OnObjectExit | id 474 “InvoiceItem Amount OnObjectExit Trigger” | rounds the line amount to 2 decimals and back-adjusts unit price (7 decimals) so qty x price matches the amount
+key 165 popover | OnObjectEnter | id 471 “Select Customer for Invoice On Popover Open” | clears the GLOBAL::FILTER field, focuses it and refreshes the customer picker portal
+key 165 popover | OnObjectExit | id 472 “Select Customer for Invoice On Popover Close” | clears the GLOBAL::FILTER field and refreshes the customer picker portal
+key 171 field GLOBAL::FILTER | OnObjectModify | id 473 “Select Customer for Invoice: Filter” | re-filters the customer picker portal as the user types, keeping the text cursor position","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 101 (icon) | Delete Portal Row
+key 102 (icon) | Set Field [ InvoiceItem::taxable; not InvoiceItem::taxable ]
+key 104 (icon) | Set Field [ InvoiceItem::taxable; not InvoiceItem::taxable ]
+key 202 remove value | Set Field [ InvoiceItem::id_Item; """" ]
+key 136 (icon) | opens popover """"
+key 139 (icon) | opens popover """"
+key 164 (icon) | opens popover ""Popover""
+key 170 (icon) | Perform Script [ “Select Customer for Invoice” ] (script id 475)
+key 172 Add | Go to Object [ Object Name: ""field.newCustomerName""; Repetition: 1 ]
+key 175 Save | Perform Script [ “Add Customer From Invoice” ] (script id 476)
+key 176 Cancel | Close Popover
+key 179 go to Customer | Go to Related Record [ From table: “Invoice_Customer”; Using layout: “Customer | Desktop” (Customer) ] (layout id 100)
+key 182 Delete | Set Field [ Invoice::deleted; True ]
+key 183 Restore | Set Field [ Invoice::deleted; """" ]
+key 187 (icon) | Set Field [ Invoice::deleted; True ]
+key 188 (icon) | Set Field [ Invoice::deleted; """" ]
+key 191 remove value | Set Field [ Invoice::id_Term; """" ]
+key 192 edit list in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: Term}
+key 205 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 206 Open in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: Invoice, QBOId: Invoice::qbo_id}
+key 241 Payments Received: <<countOfPayment>> | Perform Script [ “Open Payments Portal Ob Invoice” ] (script id 579)
+key 234 (icon) | opens popover ""Popover""
+key 254 (icon) | Perform Script [ “Go To Payment” ] (script id 601)
+key 242 Receive Payment | Perform Script [ “New Payment” ] (script id 582)
+key 280 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the billing address (line 1-2, city, state, postal code, country) from Invoice
+key 286 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the shipping address (line 1-2, city, state, postal code, country) from Invoice
+key 305 <<Invoice_AttachableRef_Attachable::FileName>> | no step
+key 306 <<Invoice_AttachableRef_Attachable::FileName>> | Perform Script [ “btn: Download File and Open (filename)” ] (script id 663) | param Invoice_AttachableRef_Attachable::FileName (field value)
+key 295 (icon) | Delete Portal Row
+key 310 calc ""("" & (Invoice_AttachableRef_Attac… | no step
+key 297 (icon) | Perform Script [ “btn: Add New File as FileAttachment to Invoice” ] (script id 660)
+key 298 Show Existing | Perform Script [ “Open Card - Attachable List” ] (script id 659)
+key 300 Send Invoice | Perform Script [ “Send Invoice ( FmId )” ] (script id 456) | param Invoice::id (field value)","key 202 | remove value
+key 179 | go to Customer
+key 182 | Flag this record as deleted to have it deleted from QuickBooks on the next sync.
+key 191 | remove value
+key 192 | edit list in QBO
+key 205 | when Invoice::qbo_id is empty: ""New record hasn't been sent to QBO yet.""; when Invoice::qbo_send is true: ""Record has been changed and needs to be sent to QBO.""
+key 291 | Attach to email
+key 310 | ""This file exceeds QBO Maximum size"" when the attachment is larger than 20000 KB","key 94 | InvoiceItem | sort none | none
+key 168 | Invoice_Customer~all | sort Ascending Invoice_Customer~all::displayName | filter shows customers whose displayName contains the typed GLOBAL::FILTER text (all when empty)
+key 236 | Invoice_PaymentLine_Payment | sort none | none
+key 290 | Invoice_AttachableRef | sort none | none","Item Id Active
+Item Id
+Class Id
+Department Id
+Customer displayName
+Term Id Active
+Term Id
+TaxCode Id Active
+TaxCode Id
+1",page,"HideCondition findMode flag: rules with findMode=False and a constant True/1 (docNumber k76, k193, k234, slide controls k185) look like Find-mode-only or dead objects; confirm what findMode=False means and whether k185/k193/k234 are dead."
+karbon_LedgerLink.fmp12/layouts/98-Customers_Desktop.txt,2b1e9fc6dd1e8b348c332479822b63d153f0b62a4c0cfc8656b02094c9cee5aa,layouts,karbon_LedgerLink.fmp12,98,Customers | Desktop,list,"Customer (base Customer, karbon_LedgerLink.fmp12)",key 53 text “Inactive” | hidden when in Find mode or Customer::active is true,none,"layout | OnModeEnter | id 490 “Enter Find Mode Trigger” | on entering Find mode, routes the user to the Desktop find layout of the current table (Invoice, Customer, Item, Vendor, Bill, Estimate, PO, Journal)","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 47 (icon) | Go to Layout [ “Customer | Desktop” (Customer) ] (layout id 100)
+key 48 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 49 Customer | no step
+key 50 Phone | no step
+key 55 QBO Balance | no step",none,none,none,page,
+karbon_LedgerLink.fmp12/layouts/99-Invoice_Chart_Desktop.txt,35dbb5247b33b12f5b71e1b7b60efcfd3c580d4b9898bc365b59638b5090ff83,layouts,karbon_LedgerLink.fmp12,99,Invoice Chart | Desktop,dashboard,"Invoice (base Invoice, karbon_LedgerLink.fmp12)",none,none,none,"key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 48 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)",none,none,none,page,"Native chart object ""graph"" (CHRT, title ""Sales Per Month"", x Invoice::period, y Invoice::totalAmtSummary, current found set) has no layout script; confirm the chart is rebuilt rather than ported."
+karbon_LedgerLink.fmp12/layouts/100-Customer_Desktop.txt,96764195b2b446fa432190770cdbe6cf22b173a3038eaf1397894764984026d1,layouts,karbon_LedgerLink.fmp12,100,Customer | Desktop,form,"Customer (base Customer, karbon_LedgerLink.fmp12)","key 147 field Customer::printOnCheckName | hidden when Customer::printOnCheckAsDisplayName is false/empty or in Find mode
+key 155 field Customer::printOnCheckName | hidden when Customer::printOnCheckAsDisplayName is true and not in Find mode
+key 160 button “Sync” | hidden when in Find mode
+key 169 field Customer::shipAddressCity | hidden when Customer::shipSameAsBilling is true (rule not applied in Find mode)
+key 170 field Customer::shipAddressCountry | hidden when Customer::shipSameAsBilling is true (rule not applied in Find mode)
+key 171 field Customer::shipAddressLine1 | hidden when Customer::shipSameAsBilling is true (rule not applied in Find mode)
+key 172 field Customer::shipAddressPostalCode | hidden when Customer::shipSameAsBilling is true (rule not applied in Find mode)
+key 173 field Customer::shipAddressState | hidden when Customer::shipSameAsBilling is true (rule not applied in Find mode)
+key 174 field Customer::shipAddressLine2 | hidden when Customer::shipSameAsBilling is true (rule not applied in Find mode)
+key 175 button (icon) | hidden when Customer::printOnCheckAsDisplayName is true
+key 176 button (icon) | hidden when Customer::printOnCheckAsDisplayName is false/empty
+key 192 button (icon) | hidden when Customer::taxable is true
+key 193 button (icon) | hidden when Customer::taxable is false/empty
+key 194 text “Default tax code” | hidden when Customer::taxable is false/empty (rule not applied in Find mode)
+key 196 text “<<displayName>>” | hidden when in Find mode
+key 197 button (icon) | hidden when Customer::shipSameAsBilling is true
+key 198 button (icon) | hidden when Customer::shipSameAsBilling is false/empty
+key 208 button “Open in QBO” | hidden when Customer::qbo_id is empty or in Find mode
+key 209 text “Inactive” | hidden when in Find mode or Customer::active is true
+key 246 field Customer::id_TaxCode | hidden when Customer::taxable is false/empty
+key 247 button (icon) | hidden when Customer::taxable is false/empty (rule not applied in Find mode)
+key 248 button (icon) | hidden when Customer::taxable is false/empty (rule not applied in Find mode)
+key 249 field Customer::id_TaxCode | hidden when Customer::taxable is false/empty (rule not applied in Find mode)
+key 252 slidecontrol | hidden when in Find mode
+key 254 button “Make Inactive” | hidden when Customer::active is false/empty
+key 255 button “Make Active” | hidden when Customer::active is true
+key 256 slidecontrol | hidden when always (constant True) (rule not applied in Find mode)
+key 259 button (icon) | hidden when the Customer is not active
+key 262 button (icon) | hidden when the Customer is active or the flag is empty
+key 264 button “New Invoice” | hidden when Customer::active is false/empty or in Find mode
+key 265 button “View Invoices” | hidden when in Find mode
+key 266 field Customer::qbo_error | hidden when Customer::qbo_error is empty (rule not applied in Find mode)
+key 267 text “sync error” | hidden when Customer::qbo_error is empty (rule not applied in Find mode)
+key 268 button (icon) | hidden when Customer::shipSameAsBilling is true (rule not applied in Find mode)
+key 269 button “New ESTIMATE” | hidden when Customer::active is false/empty or in Find mode
+key 270 button “View Estimates” | hidden when in Find mode","key 160 button “Sync” | when Customer::qbo_send is true | style
+key 242 button (icon) | when Customer::id_Term is empty | hide
+key 245 button (icon) | when Customer::billAddressLine1 is empty and Customer::billAddressCity is empty and Customer::billAddressState is empty and Customer::billAddressPostalCode is empty | style
+key 247 button (icon) | when Customer::id_TaxCode is empty | hide
+key 250 button (icon) | when Customer::webAddress is empty | style
+key 251 button (icon) | when Customer::primaryEmail is empty | style
+key 268 button (icon) | when Customer::shipAddressLine1 is empty and Customer::shipAddressCity is empty and Customer::shipAddressState is empty and Customer::shipAddressPostalCode is empty | style","layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table
+key 151 field Customer::displayName | OnObjectEnter | id 502 “Return Parameter” | only returns its script parameter; the trigger parameter calculation sets $$DYNAMICVALUELIST (name/company combinations for the display-name drop-down) | param calculation sets $$DYNAMICVALUELIST with combinations of the name and company fields (value list DYNAMICVALUELIST for displayName)","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 160 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 175 (icon) | Set Field [ Customer::printOnCheckAsDisplayName; True ]
+key 176 (icon) | Set Field [ Customer::printOnCheckAsDisplayName; False ]
+key 192 (icon) | Set Field [ Customer::taxable; True ]
+key 193 (icon) | Set Field [ Customer::taxable; False ]
+key 197 (icon) | Set Field [ Customer::shipSameAsBilling; True ]
+key 198 (icon) | Set Field [ Customer::shipSameAsBilling; False ]
+key 208 Open in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: Customer, QBOId: Customer::qbo_id}
+key 242 remove value | Set Field [ Customer::id_Term; """" ]
+key 243 edit list in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: Term}
+key 245 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the billing address (line 1-2, city, state, postal code, country) from Customer
+key 247 remove value | Set Field [ Customer::id_TaxCode; """" ]
+key 248 edit list in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: TaxCode}
+key 250 (icon) | Perform Script [ “Open ( url )” ] (script id 499) | param Customer::webAddress (field value)
+key 251 (icon) | Perform Script [ “Send Email ( to )” ] (script id 504) | param Customer::primaryEmail (field value)
+key 254 Make Inactive | Set Field [ Customer::active; not Customer::active ]
+key 255 Make Active | Set Field [ Customer::active; not Customer::active ]
+key 258 (icon) | Set Field [ Customer::active; True ]
+key 259 (icon) | Set Field [ Customer::active; """" ]
+key 261 (icon) | Set Field [ Customer::active; False ]
+key 262 (icon) | Set Field [ Customer::active; """" ]
+key 264 New Invoice | Perform Script [ “New Invoice for ( id_Customer )” ] (script id 478) | param Customer::id (field value)
+key 265 View Invoices | Go to Related Record [ From table: “Customer_Invoice”; Using layout: “Invoices | Desktop” (Invoice) ] [ Show only related records ] (layout id 91)
+key 268 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the shipping address (line 1-2, city, state, postal code, country) from Customer
+key 269 New ESTIMATE | Perform Script [ “New Estimate for ( id_Customer )” ] (script id 533) | param Customer::id (field value)
+key 270 View Estimates | Go to Related Record [ From table: “Customer_Estimate”; Using layout: “Estimates | Desktop” (Estimate) ] [ Show only related records ] (layout id 111)","key 160 | when Customer::qbo_id is empty: ""New record hasn't been sent to QBO yet.""; when Customer::qbo_send is true: ""Record has been changed and needs to be sent to QBO.""
+key 242 | remove value
+key 243 | edit list in QBO
+key 247 | remove value
+key 248 | edit list in QBO",none,"DYNAMICVALUELIST
+Term Id Active
+Term Id
+TaxCode Id Active
+TaxCode Id",page,"Display-name field k151 runs ""Return Parameter"" on enter only to set $$DYNAMICVALUELIST (a global-variable-backed value list); confirm how the suggestions should be rebuilt."
+karbon_LedgerLink.fmp12/layouts/101-Items_Desktop.txt,145f48260190152169f3ccd961a2c006ea7b1a07348ac6c0bbde7818a6a21228,layouts,karbon_LedgerLink.fmp12,101,Items | Desktop,list,"Item (base Item, karbon_LedgerLink.fmp12)",none,none,"layout | OnModeEnter | id 490 “Enter Find Mode Trigger” | on entering Find mode, routes the user to the Desktop find layout of the current table (Invoice, Customer, Item, Vendor, Bill, Estimate, PO, Journal)","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 54 (icon) | Go to Layout [ “Item | Desktop” (Item) ] (layout id 102)
+key 56 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 57 Item | no step
+key 58 Description | no step
+key 66 Type | no step",none,none,none,page,
+karbon_LedgerLink.fmp12/layouts/102-Item_Desktop.txt,ee24d03ffb092f70a5f0bf3099f47ee13c126bdd5ea66e7b5d38812213004248,layouts,karbon_LedgerLink.fmp12,102,Item | Desktop,form,"Item (base Item, karbon_LedgerLink.fmp12)","key 248 button “Sync” | hidden when in Find mode
+key 253 text “<<name>>” | hidden when in Find mode
+key 256 text “Inactive” | hidden when in Find mode or Item::active is true
+key 257 slidecontrol | hidden when in Find mode
+key 259 button “Make Inactive” | hidden when Item::active is false/empty
+key 260 button “Make Active” | hidden when Item::active is true
+key 261 slidecontrol | hidden when always (constant True) (rule not applied in Find mode)
+key 264 button (icon) | hidden when the Item is not active
+key 267 button (icon) | hidden when the Item is active or the flag is empty
+key 269 field Item::qbo_error | hidden when Invoice_InvoiceItem_Item::qbo_error is empty (rule not applied in Find mode)
+key 270 text “sync error” | hidden when Invoice_InvoiceItem_Item::qbo_error is empty (rule not applied in Find mode)
+key 286 button (icon) | hidden when Item::taxable is true
+key 287 button (icon) | hidden when Item::taxable is false/empty
+key 289 slidecontrol | hidden when the Item type is not ""Inventory"" (rule not applied in Find mode)
+key 291 button (icon) | hidden when Item::trackQtyOnHand is true
+key 294 field Item::qtyOnHand | hidden when Item::trackQtyOnHand is false/empty (rule not applied in Find mode)
+key 298 text “Quantity” | hidden when Invoice_InvoiceItem_Item::trackQtyOnHand is false/empty (rule not applied in Find mode)
+key 302 button (icon) | hidden when Item::trackQtyOnHand is false/empty",key 248 button “Sync” | when Item::qbo_send is true | style,"layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 248 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 259 Make Inactive | Set Field [ Item::active; not Item::active ]
+key 260 Make Active | Set Field [ Item::active; not Item::active ]
+key 263 (icon) | Set Field [ Item::active; True ]
+key 264 (icon) | Set Field [ Item::active; """" ]
+key 266 (icon) | Set Field [ Invoice_InvoiceItem_Item::active; False ]
+key 267 (icon) | Set Field [ Item::active; """" ]
+key 286 (icon) | Set Field [ Item::taxable; True ]
+key 287 (icon) | Set Field [ Item::taxable; False ]
+key 291 (icon) | Set Field [ Invoice_InvoiceItem_Item::trackQtyOnHand; True ]
+key 292 Track Quantity On Hand | no step
+key 302 (icon) | Set Field [ Item::trackQtyOnHand; False ]","key 248 | when Item::qbo_id is empty: ""New record hasn't been sent to QBO yet.""; when Item::qbo_send is true: ""Record has been changed and needs to be sent to QBO.""",none,"Item type
+Accounts COGS Id
+Accounts Income Id
+Accounts Asset Id",page,"Buttons k266 and k291 set Invoice_InvoiceItem_Item::active / ::trackQtyOnHand, a different table occurrence than Item; confirm which record they change."
+karbon_LedgerLink.fmp12/layouts/103-Vendors_Desktop.txt,9b8bd4afe2f09abb73933949f926580d93bc7ca25738d7ee7736241e0682fe05,layouts,karbon_LedgerLink.fmp12,103,Vendors | Desktop,list,"Vendor (base Vendor, karbon_LedgerLink.fmp12)",key 53 text “Inactive” | hidden when in Find mode or Vendor::active is true,none,"layout | OnModeEnter | id 490 “Enter Find Mode Trigger” | on entering Find mode, routes the user to the Desktop find layout of the current table (Invoice, Customer, Item, Vendor, Bill, Estimate, PO, Journal)
+layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table","key 7 (icon) | no step
+key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 47 (icon) | Go to Layout [ “Vendor | Desktop” (Vendor) ] (layout id 104)
+key 48 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 49 Vendor | no step
+key 50 Phone | no step
+key 54 email | no step",none,none,none,page,
+karbon_LedgerLink.fmp12/layouts/104-Vendor_Desktop.txt,9c997d5e3be76d97106d1d15de98503e18a05316a2a7ca4cb7505d4de6ab3e73,layouts,karbon_LedgerLink.fmp12,104,Vendor | Desktop,form,"Vendor (base Vendor, karbon_LedgerLink.fmp12)","key 160 button “Sync” | hidden when in Find mode
+key 196 text “<<displayName>>” | hidden when in Find mode
+key 208 button “Open in QBO” | hidden when Vendor::qbo_id is empty or in Find mode
+key 242 field Customer::printOnCheckName | hidden when Customer::printOnCheckAsDisplayName is false/empty or in Find mode
+key 250 field Vendor::printOnCheckName | hidden when Vendor::printOnCheckAsDisplayName is true and not in Find mode
+key 267 button (icon) | hidden when Vendor::printOnCheckAsDisplayName is true
+key 268 button (icon) | hidden when Vendor::printOnCheckAsDisplayName is false/empty
+key 299 slidecontrol | hidden when in Find mode
+key 301 button “Make Inactive” | hidden when Vendor::active is false/empty
+key 302 button “Make Active” | hidden when Vendor::active is true
+key 303 slidecontrol | hidden when always (constant True) (rule not applied in Find mode)
+key 306 button (icon) | hidden when the Vendor is not active
+key 309 button (icon) | hidden when the Vendor is active or the flag is empty
+key 321 text “Inactive” | hidden when in Find mode or Vendor::active is true
+key 341 button (icon) | hidden when Vendor::Vendor1099 is false/empty
+key 342 button (icon) | hidden when Vendor::Vendor1099 is true
+key 343 button “New Bill” | hidden when in Find mode
+key 344 button “View Bills” | hidden when in Find mode
+key 345 button “New PO” | hidden when in Find mode
+key 346 button “View POs” | hidden when in Find mode","key 160 button “Sync” | when Vendor::qbo_send is true | style
+key 315 button (icon) | when Vendor::billAddressLine1 is empty and Vendor::billAddressCity is empty and Vendor::billAddressState is empty and Vendor::billAddressPostalCode is empty | style
+key 317 button (icon) | when Vendor::webAddress is empty | style
+key 318 button (icon) | when Vendor::primaryEmail is empty | style
+key 329 button (icon) | when Vendor::id_Term is empty | hide","layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table
+key 246 field Vendor::displayName | OnObjectEnter | id 502 “Return Parameter” | only returns its script parameter; the trigger parameter calculation sets $$DYNAMICVALUELIST (name/company combinations for the display-name drop-down) | param calculation sets $$DYNAMICVALUELIST with combinations of the name and company fields (value list DYNAMICVALUELIST for displayName)","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 160 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 208 Open in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: Vendor, QBOId: Vendor::qbo_id}
+key 267 (icon) | Set Field [ Vendor::printOnCheckAsDisplayName; True ]
+key 268 (icon) | Set Field [ Vendor::printOnCheckAsDisplayName; False ]
+key 301 Make Inactive | Set Field [ Vendor::active; not Vendor::active ]
+key 302 Make Active | Set Field [ Vendor::active; not Vendor::active ]
+key 305 (icon) | Set Field [ Vendor::active; True ]
+key 306 (icon) | Set Field [ Vendor::active; True ]
+key 308 (icon) | Set Field [ Vendor::active; False ]
+key 309 (icon) | Set Field [ Vendor::active; """" ]
+key 315 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the billing address (line 1-2, city, state, postal code, country) from Vendor
+key 317 (icon) | Perform Script [ “Open ( url )” ] (script id 499) | param Vendor::webAddress (field value)
+key 318 (icon) | Perform Script [ “Send Email ( to )” ] (script id 504) | param Vendor::primaryEmail (field value)
+key 329 remove value | Set Field [ Vendor::id_Term; """" ]
+key 330 edit list in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: Term}
+key 341 (icon) | Set Field [ Vendor::Vendor1099; False ]
+key 342 (icon) | Set Field [ Vendor::Vendor1099; True ]
+key 343 New Bill | Perform Script [ “New Bill for ( id_Vendor )” ] (script id 537) | param Vendor::id (field value)
+key 344 View Bills | Go to Related Record [ From table: “Vendor_Bill”; Using layout: “Bills | Desktop” (Bill) ] [ Show only related records ] (layout id 105)
+key 345 New PO | Perform Script [ “New PO for ( id_Vendor )” ] (script id 556) | param Vendor::id (field value)
+key 346 View POs | Go to Related Record [ From table: “Vendor_PurchaseOrder”; Using layout: “Purchase Orders | Desktop” (PurchaseOrder) ] [ Show only related records ] (layout id 113)","key 160 | when Vendor::qbo_id is empty: ""New record hasn't been sent to QBO yet.""; when Vendor::qbo_send is true: ""Record has been changed and needs to be sent to QBO.""
+key 329 | remove value
+key 330 | edit list in QBO",none,"DYNAMICVALUELIST
+Term Id",page,Hidden field k242 shows Customer::printOnCheckName on a Vendor layout (copy artefact?).
+karbon_LedgerLink.fmp12/layouts/105-Bills_Desktop.txt,000ff2dd4b5faa3187e65b39c8daa376e77cb1a52d8751b88c142df180f95dd3,layouts,karbon_LedgerLink.fmp12,105,Bills | Desktop,list,"Bill (base Bill, karbon_LedgerLink.fmp12)",none,none,"layout | OnModeEnter | id 490 “Enter Find Mode Trigger” | on entering Find mode, routes the user to the Desktop find layout of the current table (Invoice, Customer, Item, Vendor, Bill, Estimate, PO, Journal)","key 45 (icon) | Go to Layout [ “Bill | Desktop” (Bill) ] (layout id 106)
+key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 26 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 40 PAYEE | no step
+key 41 Date | no step
+key 47 due date | no step
+key 49 balance | no step
+key 51 total | no step",none,none,none,page,
+karbon_LedgerLink.fmp12/layouts/106-Bill_Desktop.txt,f2debc92bc3abb7cdd6ae8653887c58cb426a91aa68ffac14023e2b599187ad9,layouts,karbon_LedgerLink.fmp12,106,Bill | Desktop,form,"Bill (base Bill, karbon_LedgerLink.fmp12)","key 41 popoverbutton (icon) | hidden when in Find mode
+key 64 button “Sync” | hidden when in Find mode
+key 66 text “<<balance>> DUE” | hidden when the Bill balance is 0 or less, the bill is not yet in QBO, it is flagged deleted, or in Find mode
+key 67 text “PAID” | hidden when the Bill balance is not 0, the bill is not yet in QBO, it is flagged deleted, or in Find mode
+key 68 button (icon) | hidden when Bill::id_Vendor is empty (rule not applied in Find mode)
+key 76 field Bill::docNumber | hidden when always (constant True) (rule not applied in Find mode)
+key 77 button “Open in QBO” | hidden when Bill::qbo_Id is empty or in Find mode
+key 101 button (icon) | hidden when BillLine_AccountBasedExpenseLineDetail::id is empty (rule not applied in Find mode)
+key 146 field BillLine_AccountBasedExpenseLineDetail::amount | hidden when BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount is empty (rule not applied in Find mode)
+key 147 button (icon) | hidden when BillLine_AccountBasedExpenseLineDetail::taxable is false/empty or ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount is empty and not in Find mode )
+key 175 button (icon) | hidden when BillLine_AccountBasedExpenseLineDetail::billable is false/empty or ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount is empty and not in Find mode )
+key 179 button (icon) | hidden when BillLine_AccountBasedExpenseLineDetail::taxable is true or ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount is empty and not in Find mode )
+key 183 button (icon) | hidden when BillLine_AccountBasedExpenseLineDetail::billable is true or ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount is empty and not in Find mode )
+key 121 field Bill::qbo_error | hidden when Bill::qbo_error is empty (rule not applied in Find mode)
+key 122 text “sync error” | hidden when Bill::qbo_error is empty (rule not applied in Find mode)
+key 135 field Bill::id_Term | hidden when always (constant True) (rule not applied in Find mode)
+key 159 button (icon) | hidden when BillLine_ItemBasedExpenseType::id is empty (rule not applied in Find mode)
+key 163 button (icon) | hidden when BillLine_ItemBasedExpenseType::taxable is false/empty or ( BillLine_ItemBasedExpenseType::id_Item is empty and not in Find mode )
+key 164 button (icon) | hidden when BillLine_ItemBasedExpenseType::billable is false/empty or ( BillLine_ItemBasedExpenseType::id_Item is empty and not in Find mode )
+key 176 field BillLine_ItemBasedExpenseType::amount | hidden when BillLine_ItemBasedExpenseType::id_Item is empty (rule not applied in Find mode)
+key 180 button (icon) | hidden when BillLine_ItemBasedExpenseType::taxable is true or ( BillLine_ItemBasedExpenseType::id_Item is empty and not in Find mode )
+key 182 button (icon) | hidden when BillLine_ItemBasedExpenseType::billable is true or ( BillLine_ItemBasedExpenseType::id_Item is empty and not in Find mode )
+key 189 field Bill::totalTax | hidden when BillLine::summaryTotalAmountTaxable = 0 (rule not applied in Find mode)
+key 196 popoverbutton (icon) | hidden when not ( Bill::qbo_send is true and Bill::qbo_Id is not empty ) or in Find mode","key 64 button “Sync” | when Bill::qbo_send is true | style
+key 103 button (icon) | when BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount is empty | hide
+key 118 button (icon) | when Bill::id_Term is empty | hide
+key 123 button (icon) | when Bill_Vendor::billAddressLine1 is empty and Bill_Vendor::billAddressCity is empty and Bill_Vendor::billAddressState is empty and Bill_Vendor::billAddressPostalCode is empty | style
+key 160 button (icon) | when BillLine_ItemBasedExpenseType::id_Item is empty | hide
+key 200 button (icon) | when Bill::id_TaxCode is empty | hide","layout | OnRecordCommit | id 536 “Bill OnCommit Trigger” | flags the Bill for QBO sync and refreshes subtotal and taxable subtotal from the bill lines
+layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table
+key 42 popover | OnObjectEnter | id 513 “Select Vendor for Bill On Popover Open” | clears the GLOBAL::FILTER field, focuses it and refreshes the vendor picker portal
+key 42 popover | OnObjectExit | id 514 “Select Vendor for Bill On Popover Close” | clears the GLOBAL::FILTER field and refreshes the vendor picker portal
+key 48 field GLOBAL::FILTER | OnObjectModify | id 515 “Select Vendor for Bill: Filter” | re-filters the vendor picker portal as the user types, keeping the text cursor position
+key 146 field BillLine_AccountBasedExpenseLineDetail::amount | OnObjectExit | id 538 “BillItem Amount OnObjectExit Trigger” | rounds the bill line amount to 2 decimals and back-adjusts unit price; branch chosen by the line detail type parameter | param BillLine_AccountBasedExpenseLineDetail::detailType (field value)
+key 176 field BillLine_ItemBasedExpenseType::amount | OnObjectExit | id 538 “BillItem Amount OnObjectExit Trigger” | rounds the bill line amount to 2 decimals and back-adjusts unit price; branch chosen by the line detail type parameter | param BillLine_AccountBasedExpenseLineDetail::detailType (field value)","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 41 (icon) | opens popover ""Popover""
+key 47 (icon) | Perform Script [ “Select Vendor for Bill” ] (script id 516)
+key 49 Add | Go to Object [ Object Name: ""field.newVendorName""; Repetition: 1 ]
+key 52 Save | Perform Script [ “Add Vendor From Bill” ] (script id 517)
+key 53 Cancel | Close Popover
+key 64 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 68 go to Vendor | Go to Related Record [ From table: “Bill_Vendor”; Using layout: “Vendor | Desktop” (Vendor) ] (layout id 104)
+key 77 Open in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: Bill, QBOId: Bill::qbo_Id}
+key 101 (icon) | Delete Portal Row
+key 103 remove value | Set Field [ BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount; """" ]
+key 147 (icon) | Set Field [ BillLine_AccountBasedExpenseLineDetail::taxable; not BillLine_AccountBasedExpenseLineDetail::taxable ]
+key 175 (icon) | Set Field [ BillLine_AccountBasedExpenseLineDetail::billable; not BillLine_AccountBasedExpenseLineDetail::billable ]
+key 179 (icon) | Set Field [ BillLine_AccountBasedExpenseLineDetail::taxable; not BillLine_AccountBasedExpenseLineDetail::taxable ]
+key 183 (icon) | Set Field [ BillLine_AccountBasedExpenseLineDetail::billable; not BillLine_AccountBasedExpenseLineDetail::billable ]
+key 118 remove value | Set Field [ Bill::id_Term; """" ]
+key 119 edit list in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param ""Term""
+key 123 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the billing address (line 1-2, city, state, postal code, country) from Bill_Vendor
+key 159 (icon) | Delete Portal Row
+key 160 remove value | Set Field [ BillLine_ItemBasedExpenseType::id_Item; """" ]
+key 163 (icon) | Set Field [ BillLine_ItemBasedExpenseType::taxable; not BillLine_ItemBasedExpenseType::taxable ]
+key 164 (icon) | Set Field [ BillLine_ItemBasedExpenseType::billable; not BillLine_ItemBasedExpenseType::billable ]
+key 180 (icon) | Set Field [ BillLine_ItemBasedExpenseType::taxable; not BillLine_ItemBasedExpenseType::taxable ]
+key 182 (icon) | Set Field [ BillLine_ItemBasedExpenseType::billable; not BillLine_ItemBasedExpenseType::billable ]
+key 196 (icon) | opens popover """"
+key 200 remove value | Set Field [ Bill::id_TaxCode; """" ]
+key 201 edit list in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param ""TaxCode""","key 64 | when Bill::qbo_Id is empty: ""New record hasn't been sent to QBO yet.""; when Bill::qbo_send is true: ""Record has been changed and needs to be sent to QBO.""
+key 68 | go to Vendor
+key 103 | remove value
+key 118 | remove value
+key 119 | edit list in QBO
+key 160 | remove value
+key 200 | remove value
+key 201 | edit list in QBO","key 45 | Bill_Vendor~all | sort Ascending Bill_Vendor~all::displayName | filter shows vendors whose displayName contains the typed GLOBAL::FILTER text (all when empty)
+key 94 | BillLine_AccountBasedExpenseLineDetail | sort none | none
+key 155 | BillLine_ItemBasedExpenseType | sort none | none","Term Id Active
+Accounts Expense Id
+Term Id
+Item Id Active
+Item Id
+TaxCode Id",page,"Text k207 ""If not using AST"" has no explanation; confirm what AST refers to (automated sales tax?)."
+karbon_LedgerLink.fmp12/layouts/111-Estimates_Desktop.txt,0f662ea793c88815bd72a86af8c419e3f226152d9be8bef57ccf7709b44748ea,layouts,karbon_LedgerLink.fmp12,111,Estimates | Desktop,list,"Estimate (base Estimate, karbon_LedgerLink.fmp12)",none,none,"layout | OnModeEnter | id 490 “Enter Find Mode Trigger” | on entering Find mode, routes the user to the Desktop find layout of the current table (Invoice, Customer, Item, Vendor, Bill, Estimate, PO, Journal)","key 7 (icon) | no step
+key 8 Customer | no step
+key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 25 (icon) | Go to Layout [ “Estimate | Desktop” (Estimate) ] (layout id 112)
+key 26 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 27 Date | no step
+key 28 No. | no step
+key 31 Total | no step
+key 40 STATUS | no step",none,none,none,page,
+karbon_LedgerLink.fmp12/layouts/112-Estimate_Desktop.txt,8d2d0da3fa97a8161d1dab67ae98fe03f1c8cf420d970136f00e2c0187d5c3e1,layouts,karbon_LedgerLink.fmp12,112,Estimate | Desktop,form,"Estimate (base Estimate, karbon_LedgerLink.fmp12)","key 65 text “<<docNumber>> <<Estimate_Customer::displayName>>” | hidden when in Find mode
+key 66 text “<<totalAmt>>” | hidden when the total is 0 or less, the estimate is not yet in QBO, it is flagged deleted, or in Find mode
+key 67 text “PAID” | hidden when Estimate::qbo_id is empty or Estimate::deleted is true or in Find mode
+key 76 field Estimate::docNumber | hidden when always (constant True) (rule not applied in Find mode)
+key 83 text “DELETED” | hidden when Estimate::deleted is false/empty or in Find mode
+key 97 field EstimateItem::qty | hidden when EstimateItem::id_Item is empty (rule not applied in Find mode)
+key 98 field EstimateItem::unitPrice | hidden when EstimateItem::id_Item is empty (rule not applied in Find mode)
+key 99 field EstimateItem::amount | hidden when EstimateItem::id_Item is empty (rule not applied in Find mode)
+key 101 button (icon) | hidden when EstimateItem::id is empty (rule not applied in Find mode)
+key 102 button (icon) | hidden when EstimateItem::taxable is true or ( EstimateItem::id_Item is empty and not in Find mode )
+key 104 button (icon) | hidden when EstimateItem::taxable is false/empty or ( EstimateItem::id_Item is empty and not in Find mode )
+key 121 field Estimate::qbo_error | hidden when Estimate::qbo_error is empty (rule not applied in Find mode)
+key 122 text “sync error” | hidden when Estimate::qbo_error is empty (rule not applied in Find mode)
+key 164 popoverbutton (icon) | hidden when in Find mode
+key 179 button (icon) | hidden when Invoice::id_Customer is empty (rule not applied in Find mode)
+key 180 slidecontrol | hidden when in Find mode
+key 184 text “Will be deleted on next sync.” | hidden when Estimate::deleted is false/empty (rule not applied in Find mode)
+key 182 button “Delete” | hidden when Estimate::deleted is true (rule not applied in Find mode)
+key 183 button “Restore” | hidden when Estimate::deleted is false/empty (rule not applied in Find mode)
+key 185 slidecontrol | hidden when always (constant True) (rule not applied in Find mode)
+key 188 button (icon) | hidden when the Estimate is not flagged deleted
+key 205 button “Sync” | hidden when in Find mode
+key 206 button “Open in QBO” | hidden when Estimate::qbo_id is empty or in Find mode
+key 212 text “Accepted By” | hidden when the estimate status is not ""Accepted"" (or empty) (rule not applied in Find mode)
+key 213 field Estimate::acceptedDate | hidden when the estimate status is not ""Accepted"" (or empty) (rule not applied in Find mode)
+key 214 text “Accepted date” | hidden when the estimate status is not ""Accepted"" (or empty) (rule not applied in Find mode)
+key 231 field Estimate::AcceptedBy | hidden when the estimate status is not ""Accepted"" (or empty) (rule not applied in Find mode)
+key 267 field Estimate::totalTax | hidden when EstimateItem::summaryTotalAmountTaxable = 0 (rule not applied in Find mode)","key 202 button (icon) | when EstimateItem::id_Item is empty | hide
+key 195 button (icon) | when Estimate::id_TaxCode is empty | hide
+key 205 button “Sync” | when Estimate::qbo_send is true | style
+key 251 button (icon) | when Estimate::billAddressLine1 is empty and Estimate::billAddressCity is empty and Estimate::billAddressState is empty and Estimate::billAddressPostalCode is empty | style
+key 259 button (icon) | when Estimate::billAddressLine1 is empty and Estimate::billAddressCity is empty and Estimate::billAddressState is empty and Estimate::billAddressPostalCode is empty | style","layout | OnRecordCommit | id 534 “Estimate OnCommit Trigger” | flags the Estimate for QBO sync and refreshes subtotal and taxable subtotal from the estimate items
+layout | OnModeExit | id 491 “Exit Find Mode Trigger” | on leaving Find mode, routes found records to the Desktop list/detail layout of the current table
+key 99 field EstimateItem::amount | OnObjectExit | id 532 “EstimateItem Amount OnObjectExit Trigger” | rounds the estimate line amount to 2 decimals and back-adjusts unit price
+key 165 popover | OnObjectEnter | id 527 “Select Customer for Estimate On Popover Open” | clears GLOBAL::FILTER, goes to the customer filter field and refreshes the customer picker portal
+key 165 popover | OnObjectExit | id 528 “Select Customer for Estimate On Popover Close” | clears GLOBAL::FILTER and refreshes the customer picker portal
+key 171 field GLOBAL::FILTER | OnObjectModify | id 529 “Select Customer for Estimate: Filter” | re-filters the customer picker portal as the user types, keeping the text cursor position","key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 101 (icon) | Delete Portal Row
+key 102 (icon) | Set Field [ EstimateItem::taxable; not EstimateItem::taxable ]
+key 104 (icon) | Set Field [ EstimateItem::taxable; not EstimateItem::taxable ]
+key 202 remove value | Set Field [ EstimateItem::id_Item; """" ]
+key 164 (icon) | opens popover ""Popover""
+key 170 (icon) | Perform Script [ “Select Customer for Estimate” ] (script id 530)
+key 172 Add | Go to Object [ Object Name: ""field.newCustomerName""; Repetition: 1 ]
+key 175 Save | Perform Script [ “Add Customer From Estimate” ] (script id 531)
+key 176 Cancel | Close Popover
+key 179 go to Customer | Go to Related Record [ From table: “Estimate_Customer”; Using layout: “Customer | Desktop” (Customer) ] (layout id 100)
+key 182 Delete | Set Field [ Estimate::deleted; True ]
+key 183 Restore | Set Field [ Estimate::deleted; """" ]
+key 187 (icon) | Set Field [ Estimate::deleted; True ]
+key 188 (icon) | Set Field [ Estimate::deleted; """" ]
+key 195 remove value | Set Field [ Estimate::id_TaxCode; """" ]
+key 196 edit list in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param ""TaxCode""
+key 205 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 206 Open in QBO | Perform Script [ “Open in QB ( {entity , qbo_id} )” ] (script id 501) | param JSON {Entity: Estimate, QBOId: Estimate::qbo_id}
+key 260 Billing address | no step
+key 251 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the billing address (line 1-2, city, state, postal code, country) from Estimate
+key 259 (icon) | Perform Script [ “Open Map ( address )” ] (script id 500) | param the shipping address (line 1-2, city, state, postal code, country) from Estimate","key 202 | remove value
+key 179 | go to Customer
+key 182 | Flag this record as deleted to have it delete from QuickBooks on the next sync.
+key 195 | remove value
+key 196 | edit list in QBO
+key 205 | when Estimate::qbo_id is empty: ""New record hasn't been sent to QBO yet.""; when Estimate::qbo_send is true: ""Record has been changed and needs to be sent to QBO.""","key 94 | EstimateItem | sort none | none
+key 168 | Estimate_Customer~all | sort Ascending Estimate_Customer~all::displayName | filter shows customers whose displayName contains the typed GLOBAL::FILTER text (all when empty)","Item Id Active
+Item Id
+Customer displayName
+TaxCode Id Active
+TaxCode Id
+Estimate Status",page,"Text k243 ""If not using AST"" and header ""PAID"" (k67) on an Estimate layout; confirm they are leftovers."
+karbon_LedgerLink.fmp12/layouts/113-Purchase_Orders_Desktop.txt,709c6851274fc0ba72e6971c45b516ce4dd79780f2efca4af348edb28672356a,layouts,karbon_LedgerLink.fmp12,113,Purchase Orders | Desktop,list,"PurchaseOrder (base PurchaseOrder, karbon_LedgerLink.fmp12)",key 37 text “Deleted” | hidden when PurchaseOrder::deleted is false/empty or in Find mode,none,"layout | OnModeEnter | id 490 “Enter Find Mode Trigger” | on entering Find mode, routes the user to the Desktop find layout of the current table (Invoice, Customer, Item, Vendor, Bill, Estimate, PO, Journal)","key 7 (icon) | no step
+key 8 Vendor | no step
+key 10 (icon) | Perform Script [ “Display Main Nav” ] (script id 463)
+key 25 (icon) | Go to Layout [ “Purchase Order | Desktop” (PurchaseOrder) ] (layout id 114)
+key 26 Sync | Perform Script [ “Sync QBO with FM, Show Progress Card” ] (script id 242)
+key 27 Date | no step
+key 28 No. | no step
+key 31 Total | no step",none,none,none,page,

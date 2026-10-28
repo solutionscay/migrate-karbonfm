@@ -1,0 +1,562 @@
+# script 729: Send SMS Message { json }
+# file: karbon_kontroller.fmp12
+# folder: Modules / Twilio / Public
+# source: ScriptCatalog/Script[@id=729]
+# steps: 151 (3 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=536 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Send SMS Message { json }
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} SMS
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} SMS.ActivityMessageId
+        DisableStepCollapsed state=False
+        Restore state=False
+   7 // #@param {string} SMS.Body
+        DisableStepCollapsed state=False
+        Restore state=False
+   8 // #@param {string} SMS.To - Phone number in E.164 formt (ex: +16191112222)
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnSuccess {string} result.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@history 2019-04-01 admin - Created by Generator version 2.5.4
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  30    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  39    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $json; Value:JSON.Format( $json ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    If [ Error.IsError ( $json ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  52    Set Variable [ $error; Value:$json ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  53    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  54    End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Variable [ $error; Value:JSON.Validate.This ( $json ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "ActivityMessageId" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  59    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $ActivityMessageId; Value:JSONGetElement ( $json ; "ActivityMessageId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityMessageId
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #Create/connect to the activity message record
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    If [ DBTransactions::ChatMessageId <> $ActivityMessageId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::ChatMessageId#117
+  76    Set Field [ DBTransactions::ChatMessageId; $ActivityMessageId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=117 name=ChatMessageId
+  77    End If
+        DisableStepCollapsed state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Set Field [ ChatMessage::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ChatMessage id=17 name=ONE
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Set Variable [ $error; Value:Error.Last ( "Locking the activity message" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  82    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    #Create/connect to the SMS record
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    If [ DBTransactions::ActivityId <> ChatMessage::ActivityId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::ActivityId#58, ChatMessage::ActivityId#6
+  86    Set Field [ DBTransactions::ActivityId; ChatMessage::ActivityId ]
+        DisableStepCollapsed state=False
+        refs: ChatMessage::ActivityId#6
+        Field table=DBTransactions id=58 name=ActivityId
+  87    End If
+        DisableStepCollapsed state=False
+  88    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    Set Field [ Chat::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Chat id=15 name=ONE
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    Set Variable [ $error; Value:Error.Last ( "Locking SMS record" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  92    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    Set Variable [ $Body; Value:ChatMessage::Message ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ChatMessage::Message#12
+        Repetition
+          Calculation:
+            | 1
+        Name: $Body
+ 100    Set Variable [ $To; Value:Chat::PhoneList ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Chat::PhoneList#28
+        Repetition
+          Calculation:
+            | 1
+        Name: $To
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    Insert Text [ $DataTemplate ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Text: To={To}&From={From}&Body={Body}
+        Field: $DataTemplate
+ 103    Set Variable [ $data; Value:Substitute ( $DataTemplate ; 
+        	[ "{Body}" ; GetAsURLEncoded ( $Body ) ] ; 
+        	//[ "{From}" ; "+15164075800" ] ; 
+        	[ "{From}" ; GetAsURLEncoded ( System#cartesian::TwilioSMSFromPhoneNumber) ] ; 
+        	[ "{To}" ; GetAsURLEncoded( $To)  ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:GetAsURLEncoded, System#cartesian::TwilioSMSFromPhoneNumber#74
+        Name: $data
+ 104 // Set Variable [ $data; Value:Substitute ( $DataTemplate ; 
+        	[ "{Body}" ; GetAsURLEncoded ( $Body ) ] ; 
+        	[ "{From}" ; "+15164075800" ] ; 
+        
+        	//[ "{From}" ; GetAsURLEncoded ( System#cartesian::TwilioSMSFromPhoneNumber) ] ; 
+        	[ "{To}" ; GetAsURLEncoded ( $To ) ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:GetAsURLEncoded
+        Name: $data
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #SEND REQUEST
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "auth.user" ; System#cartesian::TwilioAccountSid ; JSONString ]  ;
+        	[ "auth.password" ; System#cartesian::TwilioAuthToken ; JSONString ]  ;
+        	[ "data" ; $data ; JSONString ]  ;
+        	[ "headers.Content-Type" ; "application/x-www-form-urlencoded" ; JSONString ]  ;
+        	[ "method" ; "POST" ; JSONString ]  ;
+        	[ "url" ; "https://api.twilio.com/2010-04-01/Accounts/" & System#cartesian::TwilioAccountSid & "/Messages.json" ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, System#cartesian::TwilioAccountSid#68, fn:JSONString, System#cartesian::TwilioAuthToken#69
+        Name: $json
+ 111    Perform Script [ “HTTP ( {request} )”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=345 name="HTTP ( {request} )"
+ 112    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 114    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 116    Set Variable [ $error; Value:$result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 117    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 118    End If
+        DisableStepCollapsed state=False
+ 119    Set Variable [ $code; Value:JSONGetElement ( $result; "code" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $code
+ 120    If [ $code = 400 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 121    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 122    Set Field [ ChatMessage::StatusFailedInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ChatMessage id=25 name=StatusFailedInd
+ 123    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    Set Field [ ChatMessage::StatusAcceptedInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ChatMessage id=23 name=StatusAcceptedInd
+ 126    Set Field [ ChatMessage::ExternalMessageId; JSONGetElement ( $result ; "body.sid" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=ChatMessage id=20 name=ExternalMessageId
+ 127    End If
+        DisableStepCollapsed state=False
+ 128    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 130    Set Variable [ $result; Value:JSONSetElement( "{}"; "Id" ; Chat::Id ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Chat::Id#6, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 131    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 132    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 133    End Loop
+        DisableStepCollapsed state=False
+ 134    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 135    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 136    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 138    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 139    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 140    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 141    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 142    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 143    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 144    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 145    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 146    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 147    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 148    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 149    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 150    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 151    End If
+        DisableStepCollapsed state=False

@@ -1,0 +1,121 @@
+# script 25: Revoke Access
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO GI OAuth2  / Public
+# source: ScriptCatalog/Script[@id=25]
+# steps: 27 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=70 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   4    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    ##proxy2 replace
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    ##proxy2 change name to "Revoke Access"
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Perform Script [ “On Get Config” ]
+        DisableStepCollapsed state=False
+        Script id=639 name="On Get Config"
+  10    Set Variable [ $config; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $config
+  11    Set Variable [ $sandbox; Value:JSONGetElement ( $config ;  "sandbox"  ) = 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $sandbox
+  12    Set Variable [ $companyId; Value:JSONGetElement ( $config; "companyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $companyId
+  13    Set Variable [ $apiKey; Value:JSONGetElement ( $config; "apiKey" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $apiKey
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “_OAuth BaseURL” ]
+        DisableStepCollapsed state=False
+        Script id=28 name="_OAuth BaseURL"
+  16    Set Variable [ $url; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  17    Set Variable [ $url; Value:$url & "/revoke?companyId="  & $companyId ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  18    Set Variable [ $url; Value:$url & "&apiKey="  & $apiKey ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  19    If [ $sandbox ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $url; Value:$url & "&sandbox=1" ]
+        DisableStepCollapsed state=False
+        Name: $url
+  21    End If
+        DisableStepCollapsed state=False
+  22    Insert from URL [ $response; $url ]
+        [ Select; No dialog ]
+        NoInteract state=True
+        DontEncodeURL state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        VerifySSLCertificates state=False
+        Field: $response
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ GetAsBoolean( JSONGetElement ( $response ; "success" ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:GetAsBoolean, fn:JSONGetElement
+  25    Perform Script [ “<unknown>” ]
+        DisableStepCollapsed state=False
+        Script id=0 name=<unknown> ref=none
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False

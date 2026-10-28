@@ -1,0 +1,395 @@
+# script 80: Read This Package From Disk
+# file: karbon_Generator.fmp12
+# folder: App Modules / Generators / Private
+# source: ScriptCatalog/Script[@id=80]
+# steps: 96 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=127 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $packageName; Value:Generators::name ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Generators::name#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $packageName
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $packagePath; Value:PathToPackage ( $packageName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:PathToPackage
+        Repetition
+          Calculation:
+            | 1
+        Name: $packagePath
+   9    Set Variable [ $packageJSONPath; Value:$packagePath & PathSeperator & "package.json" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:PathSeperator
+        Repetition
+          Calculation:
+            | 1
+        Name: $packageJSONPath
+  10    Set Variable [ $READMEPath; Value:$packagePath & PathSeperator  & "readme.md" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:PathSeperator
+        Repetition
+          Calculation:
+            | 1
+        Name: $READMEPath
+  11    Set Variable [ $packageJSON; Value:<Function Missing> ( $packageJSONPath ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $packageJSON
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $id; Value:Generators::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Generators::id#12
+        Repetition
+          Calculation:
+            | 1
+        Name: $id
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Field [ Generators::readPackageError; "" ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=9 name=readPackageError
+  19    If [ IsEmpty ( $packageJSON ) or $packageJSON = "?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:or
+  20    Set Field [ Generators::readPackageError; "A Generator Module requires a package.json file. This package doesn't have one." ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=9 name=readPackageError
+  21    Exit Script [  ]
+        DisableStepCollapsed state=False
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $packageNameFromPackagJSON; Value:jsonGet($packageJSON; "name") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $packageNameFromPackagJSON
+  25    If [ $packageNameFromPackagJSON ="?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Field [ Generators::readPackageError; "package.json exists but can't be parsed" ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=9 name=readPackageError
+  27    Exit Script [  ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ $packageNameFromPackagJSON <> $packageName ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Field [ Generators::readPackageError; "The name in package.json doesn't match the name of the Generator Module folder" ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=9 name=readPackageError
+  32    Exit Script [  ]
+        DisableStepCollapsed state=False
+  33    End If
+        DisableStepCollapsed state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $version; Value:jsonGet($packageJSON; "version") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $version
+  37    Set Variable [ $description; Value:jsonGet($packageJSON; "description") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $description
+  38    Set Variable [ $clipType; Value:jsonGet($packageJSON; "clipType") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $clipType
+  39    Set Variable [ $mainClipPath; Value:$packagePath & PathSeperator & jsonGet($packageJSON; "main") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:PathSeperator, cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $mainClipPath
+  40    Set Variable [ $clipXML; Value:<Function Missing> ( $mainClipPath ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $clipXML
+  41    Set Variable [ $readME; Value:<Function Missing> ( $READMEPath ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $readME
+  42    Set Variable [ $prompts; Value:jsonGet($packageJSON; "prompts") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $prompts
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Field [ Generators::readME; $readME ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=8 name=readME
+  47    Set Field [ Generators::clip; $clipXML ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=3 name=clip
+  48    Set Field [ Generators::description; $description ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=2 name=description
+  49    Set Field [ Generators::clipType; $clipType ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=6 name=clipType
+  50    Set Field [ Generators::version; $version ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=4 name=version
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Perform Script [ “Create Temporary Utility Window” ]
+        DisableStepCollapsed state=False
+        Script id=56 name="Create Temporary Utility Window"
+  54    Go to Layout [ “GeneratorTokens” (GeneratorTokens) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=44 name=GeneratorTokens
+  55    Set Variable [ $updateBatch; Value:Get(UUID) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:UUID
+        Repetition
+          Calculation:
+            | 1
+        Name: $updateBatch
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Set Variable [ $n; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  58    Set Variable [ $c; Value:<Function Missing> ( $prompts ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $c
+  59    If [ $c > 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $prompt; Value:
+        <Function Missing> ( $prompts ; "$[" & $n & "]" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $prompt
+  62    Set Variable [ $name; Value:jsonGet($prompt ; "name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Perform Find [ Specified Find Requests: Find Records; Criteria: GeneratorTokens::idGenerator: “$id” AND GeneratorTokens::name: “$name” ]
+        [ Restore ]
+        DisableStepCollapsed state=False
+        Restore state=True
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=GeneratorTokens id=2 name=idGenerator
+              Text: $id
+            Criteria
+              Field table=GeneratorTokens id=3 name=name
+              Text: $name
+  65    If [ Get(LastError) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  66    New Record/Request
+        DisableStepCollapsed state=False
+  67    Set Field [ GeneratorTokens::idGenerator; $id ]
+        DisableStepCollapsed state=False
+        Field table=GeneratorTokens id=2 name=idGenerator
+  68    End If
+        DisableStepCollapsed state=False
+  69    Set Field [ GeneratorTokens::name; $name ]
+        DisableStepCollapsed state=False
+        Field table=GeneratorTokens id=3 name=name
+  70    Set Field [ GeneratorTokens::example; jsonGet($prompt ; "example" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=GeneratorTokens id=6 name=example
+  71    Set Field [ GeneratorTokens::helpText; jsonGet($prompt ; "helpText" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=GeneratorTokens id=4 name=helpText
+  72    Set Field [ GeneratorTokens::updateBatch; $updateBatch ]
+        DisableStepCollapsed state=False
+        Field table=GeneratorTokens id=8 name=updateBatch
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  76    Exit Loop If [ $n  >= $c ]
+        DisableStepCollapsed state=False
+  77    End Loop
+        DisableStepCollapsed state=False
+  78    End If
+        DisableStepCollapsed state=False
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #remove any records that were not found
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Perform Find [ Specified Find Requests: Find Records; Criteria: GeneratorTokens::idGenerator: “$id”
+        Omit Records; Criteria: GeneratorTokens::updateBatch: “$updateBatch” ]
+        [ Restore ]
+        DisableStepCollapsed state=False
+        Restore state=True
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=GeneratorTokens id=2 name=idGenerator
+              Text: $id
+          RequestRow operation=Exclude
+            Criteria
+              Field table=GeneratorTokens id=8 name=updateBatch
+              Text: $updateBatch
+  83    If [ Get(LastError) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  84    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  85    End If
+        DisableStepCollapsed state=False
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    Perform Script [ “Close Temporary Utility Window” ]
+        DisableStepCollapsed state=False
+        Script id=57 name="Close Temporary Utility Window"
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False

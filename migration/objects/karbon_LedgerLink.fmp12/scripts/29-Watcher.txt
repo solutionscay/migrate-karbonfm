@@ -1,0 +1,86 @@
+# script 29: _Watcher
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO GI OAuth2  / Private
+# source: ScriptCatalog/Script[@id=29]
+# steps: 18 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=27 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $source; Value:GetLayoutObjectAttribute ( "wc" ; "content" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetLayoutObjectAttribute
+        Repetition
+          Calculation:
+            | 1
+        Name: $source
+   7    Set Variable [ $done; Value:PatternCount($source ; "|---") > 0 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:PatternCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $done
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ $done ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Install OnTimer Script [ “_Watcher”; Interval: "" ]
+        DisableStepCollapsed state=False
+        Script id=29 name=_Watcher
+  11    Set Variable [ $$jwt; Value:Let(
+        [
+        s = $source ;
+        startTag = "---|";
+        endTag = "|---";
+        start = Position ( s; startTag; 1;1 ) + Length(startTag);
+        end = Position ( s; endTag; 1; 1 );
+        size = end-start
+        ];
+        
+        Middle ( s; start; size )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Position, fn:Length, fn:Middle
+        Name: $$jwt
+  12    Pause/Resume Script [ Duration (seconds): 1 ]
+        DisableStepCollapsed state=False
+        PauseTime value=ForDuration
+  13    Set Web Viewer [ Object Name: "wc"; URL: "https://www.geistinteractive.com" ]
+        DisableStepCollapsed state=False
+        Action value=GoToURL
+        URL custom=False
+  14    Pause/Resume Script [ Duration (seconds): 1 ]
+        DisableStepCollapsed state=False
+        PauseTime value=ForDuration
+  15    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  16    Exit Script [ Result:  $result ]
+        DisableStepCollapsed state=False
+  17    End If
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False

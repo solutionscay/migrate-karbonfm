@@ -1,0 +1,563 @@
+# script 521: Send Email Message Activity { json }
+# file: karbon_kontroller.fmp12
+# folder: API / EmailMessage / Public
+# source: ScriptCatalog/Script[@id=521]
+# steps: 141 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=706 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Send Email Message { data }
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} EmailMessage
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} EmailMessage.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {string} [EmailMessage.UserId]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnSuccess {string} result.ActivityId
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnSuccess {boolean} result.Sent
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@history 2019-02-26 dave@geistinteractive.com - lots of small tweaks and bug fixes
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@history 2018-07-21 dave@geistinteractive.com - validation to prevent sending after creation for nested transactions
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@history 2018-08-2 lance@geistinteractive.com
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  30    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $Transaction.Payload; Value:JSONSetElement ( "" ; 
+        
+        	["scriptParameter" ; Get(ScriptParameter) ; JSONObject ];
+        	["scriptName" ; Get(ScriptName) ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:ScriptParameter, fn:JSONObject, fn:ScriptName, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Transaction.Payload
+  38    If [ not IsEmpty ( JSONGetElement ( $Transaction.Payload ; "scriptParameter.Password" ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:JSONGetElement
+  39    #Make sure we aren't storing passwords in the transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $Transaction.Payload; Value:JSONSetElement ( $Transaction.Payload ; "scriptParameter.Password" ; "<removed>" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Transaction.Payload
+  41    End If
+        DisableStepCollapsed state=False
+  42    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  45    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $EmailMessage; Value:JSON.Format ( Get ( ScriptParameter ); "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailMessage
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    If [ Error.IsError ( $EmailMessage ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  54    Set Variable [ $error; Value:$EmailMessage ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  55    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  56    End If
+        DisableStepCollapsed state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $error; Value:JSON.Validate.This ( $EmailMessage ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "Id" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  61    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    Set Variable [ $Id; Value:JSONGetElement ( $EmailMessage ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  69    Set Variable [ $UserId; Value:JSONGetElement ( $EmailMessage ; "UserId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $UserId
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #Create/connect to the EmailMessage record
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    If [ DBTransactions::ActivityId <> $Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::ActivityId#58
+  78    Set Field [ DBTransactions::ActivityId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=58 name=ActivityId
+  79    End If
+        DisableStepCollapsed state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Set Field [ EmailMessage::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=EmailMessage id=11 name=ONE
+  82    Set Variable [ $error; Value:Error.Last ( "Creating/locking the EmailMessage record. " ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  83    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Set Variable [ $UseSystemSettingsInd; Value:EmailMessage::UseSystemSettingsInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: EmailMessage::UseSystemSettingsInd#26
+        Repetition
+          Calculation:
+            | 1
+        Name: $UseSystemSettingsInd
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #SEND EMAIL
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    Set Field [ EmailMessage::SentInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=EmailMessage id=9 name=SentInd
+  93    Set Field [ Activity::AlertInd; False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+        Field table=Activity id=107 name=AlertInd
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #Get From
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    Set Field [ DBTransactions::ActivityPartyRoleId; 54 ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=77 name=ActivityPartyRoleId
+  97    Set Variable [ $From; Value:ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddressFormatted ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddressFormatted#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $From
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    #Get To's
+        DisableStepCollapsed state=False
+        Restore state=False
+ 100    Set Field [ DBTransactions::ActivityPartyRoleId; 55 ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=77 name=ActivityPartyRoleId
+ 101    Set Variable [ $To; Value:Substitute ( 
+        	List ( ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddress ) ; 
+        	¶ ; 
+        	"," 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:List, ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddress#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $To
+ 102    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    #Get Cc's
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    Set Field [ DBTransactions::ActivityPartyRoleId; 56 ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=77 name=ActivityPartyRoleId
+ 105    Set Variable [ $Cc; Value:Substitute ( 
+        	List ( ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddress ) ; 
+        	¶ ; 
+        	"," 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:List, ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddress#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $Cc
+ 106    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #Get Bcc's
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    Set Field [ DBTransactions::ActivityPartyRoleId; 57 ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=77 name=ActivityPartyRoleId
+ 109    Set Variable [ $Bcc; Value:Substitute ( 
+        	List ( ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddress ) ; 
+        	¶ ; 
+        	"," 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:List, ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddress#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $Bcc
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    Set Variable [ $Subject; Value:Activity::Subject ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Activity::Subject#22
+        Repetition
+          Calculation:
+            | 1
+        Name: $Subject
+ 112    Set Variable [ $Message; Value:ActivityMessage::Message ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ActivityMessage::Message#12
+        Repetition
+          Calculation:
+            | 1
+        Name: $Message
+ 113    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    #Send the email
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    Set Variable [ $SendEmail; Value:JSONSetElement (  ""; 
+         
+        	[ "Cc" ; $Cc ; JSONString ];
+        	[ "From" ; $From ; JSONString ];
+        	[ "Message" ; $Message ; JSONString ];
+        	[ "Subject" ; $Subject ; JSONString ];
+        	[ "To" ; $To ; JSONString ];
+        	[ "UserId" ; $UserId ; JSONString ];
+        	[ "UseSystemSmtpSettings" ; $UseSystemSettingsInd ; JSONBoolean ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $SendEmail
+ 116    Perform Script [ “_Send Email Message”; Parameter: $SendEmail ]
+        DisableStepCollapsed state=False
+        Script id=337 name="_Send Email Message"
+ 117    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 119    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 120    Set Variable [ $error; Value:$result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 121    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+ 122    End If
+        DisableStepCollapsed state=False
+ 123    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    Set Field [ EmailMessage::SmtpTimestamp; Get ( CurrentHostTimestamp ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:CurrentHostTimestamp
+        Field table=EmailMessage id=25 name=SmtpTimestamp
+ 126    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 128    End Loop
+        DisableStepCollapsed state=False
+ 129    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 130    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    Set Variable [ $result; Value:JSONSetElement ( "{}" ; 
+        	[ "ActivityId" ; Activity::Id ; JSONString ] ; 
+        	[ "Sent" ; True ; JSONBoolean ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Activity::Id#1, fn:JSONString, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 132    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 133    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 134    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 135    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 136    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 138    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 139    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 140    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 141    Exit Script [ Result: Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult

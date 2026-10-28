@@ -1,0 +1,30 @@
+# custom function 37: JSON.Validator.ApplyRules
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=37]
+
+CustomFunction id=37 functionArity=1 visible=True parameters=ListOfRules name=JSON.Validator.ApplyRules
+  Calculation:
+    | Let(
+    | [
+    | 
+    | listOfErrors = ListOfRules;
+    | $JSONToValidate = ""
+    | ];
+    | 
+    | Case(
+    |    IsEmpty( listOfErrors) ; Error(0 ; "" ; ""); // no errors found so return no error
+    | 
+    |   
+    | 	Let(
+    | 	[
+    | 	ArrayOfErrors = "[" & Substitute( listOfErrors ; "¶" ; "," ) & "]" ;
+    | 	error = JSON.Error.Validation ( "Applying Rules" ; $JSONToValidate ) 
+    | 	];
+    | 	    JSONSetElement(error; "errors "; ArrayofErrors ; "" )
+    | 	)
+    | 
+    | 
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:Case, fn:IsEmpty, cf:Error, fn:Substitute, cf:JSON.Error.Validation, fn:JSONSetElement

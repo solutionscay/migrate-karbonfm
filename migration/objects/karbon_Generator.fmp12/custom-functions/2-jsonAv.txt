@@ -1,0 +1,68 @@
+# custom function 2: jsonAv
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=2]
+
+CustomFunction id=2 functionArity=1 visible=True parameters=value name=jsonAv
+  Calculation:
+    | /**
+    |  * =====================================
+    |  * jsonAv( value )
+    |  *
+    |  * RETURNS:
+    |  *	prepares a string for inclusion as an element in a JSON array
+    |  *
+    |  * PARAMETERS:
+    |  *	value = the value of the Array element
+    |  *
+    |  * DEPENDENCIES:
+    |  *	BaseElements Plugin version 3.0 or greater
+    |  *
+    |  * HISTORY:
+    |  *	MODIFIED on 2015-APR-22 Daniel Smith, dansmith65@gmail.com
+    |  *		allow the value to be json with leading/trailing whitespace
+    |  *		return "?" on error and store error message in $json.error
+    |  *	MODIFIED on 2015-JAN-24 Todd Geist, todd@geistinteractive.com
+    |  *		changed the name to jsonAv( arrayValues )
+    |  *	MODIFIED on 2015-JAN-07 Todd Geist, todd@geistinteractive.com
+    |  *		changed name to jsonNewArrayValue ( value )
+    |  *	CREATED on 2015-JAN-06 Todd Geist, todd@geistinteractive.com
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | Let ( [
+    | 	json = <Function Missing> ( value ; "$" ) ;  // attempt to read value as json
+    | 	firstAndLast = Left ( json ; 1 ) & Right ( json ; 1 ) ;
+    | 	valueIsJson = firstAndLast = "{}" or firstAndLast = "[]" ;
+    | 	encoded = If ( valueIsJson ;
+    | 		json ;
+    | 		<Function Missing> ( "" ; value )
+    | 	) ;
+    | 	isError = not IsEmpty ( <Function Missing> ) ;
+    | 	result =
+    | 		Case (
+    | 			isError ;
+    | 			"?" ;
+    | 			
+    | 			valueIsJson ;
+    | 			encoded & "," ;
+    | 			
+    | 			/* else */
+    | 			Right (  // extract the encoded value
+    | 				encoded ;
+    | 				Length ( encoded ) - Position ( encoded ; ":" ; 1 ; 1 )
+    | 			) & ","
+    | 		)
+    | 	;
+    | 	$json.error = If ( isError ;
+    | 		If ( <Function Missing> = "?" ;
+    | 			"BaseElements plugin is not available" ;
+    | 			Substitute ( <Function Missing> ; Char ( 10 ) ; "¶" )
+    | 		) ;
+    | 		/* else: don't modify the error */
+    | 		$json.error
+    | 	)
+    | ] ;
+    | 	result
+    | )
+    refs: fn:Let, fn:Left, fn:Right, fn:or, fn:If, fn:not, fn:IsEmpty, fn:Case, fn:Length, fn:Position, fn:Substitute, fn:Char

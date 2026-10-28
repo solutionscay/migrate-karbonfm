@@ -1,0 +1,198 @@
+# script 631: Handler: Address Selection from New Contact Wizard
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Address Picker
+# source: ScriptCatalog/Script[@id=631]
+# steps: 50 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=238 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-08-04 dave@geistinteractive.com - handle selection of address from API and insert into utility fields
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Perform Script [ “Address Handler Common Tests” ]
+        DisableStepCollapsed state=False
+        Script id=243 name="Address Handler Common Tests"
+   4    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   5    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   6    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #Init vars
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $createAddress; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $createAddress
+  12    Set Variable [ $addressCount; Value:JSONGetElement ( $result ; "Result.AddressCount" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $addressCount
+  13    Set Variable [ $addressArray; Value:JSONGetElement ( $result ; "Result.AddressArray" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $addressArray
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ Get( ScriptResult ) = -2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:ScriptResult
+  16    #user canceled; exit
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  18    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ $addressCount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #a pick was made; destroy timer
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27 // Insert Text [ $SAMPLE ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | JSONSetElement ( "{}" ; 
+          | 	[ "Result.AddressCount" ; $AddressCount ; JSONNumber ] ; 
+          | 	[ "Result.AddressArray[0]" ; $addressOut ; JSONObject ] ; 
+          | 	[ "Result.Phone" ; $phone ; JSONString ] ; 
+          | 	[ "Result.Name" ; $Name ; JSONString ] ; 
+          | 	[ "Result.Website" ; $website ; JSONString ] 
+          | )
+        Field: $SAMPLE
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $thisAddress; Value:JSONGetElement ( $result ; "Result.AddressArray[0]" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisAddress
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Field [ UtilityParty::OrgAddressLine1; JSONGetElement ( $thisAddress ; "AddressLine1" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=8 name=OrgAddressLine1
+  32    Set Field [ UtilityParty::OrgAddressLine2; JSONGetElement ( $thisAddress ; "AddressLine2" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=9 name=OrgAddressLine2
+  33    Set Field [ UtilityParty::OrgCity; JSONGetElement ( $thisAddress ; "City" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=10 name=OrgCity
+  34    Set Field [ UtilityParty::OrgCounty; JSONGetElement ( $thisAddress ; "County" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=12 name=OrgCounty
+  35    Set Field [ UtilityParty::OrgPostalCode; JSONGetElement ( $thisAddress ; "PostalCode" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=13 name=OrgPostalCode
+  36    Set Field [ UtilityParty::OrgStateProvince; JSONGetElement ( $thisAddress ; "StateProvince" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=14 name=OrgStateProvince
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ IsEmpty ( UtilityParty::OrganizationName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, UtilityParty::OrganizationName#4
+  39    Set Field [ UtilityParty::OrganizationName; JSONGetElement ( $result ; "Result.Name" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=4 name=OrganizationName
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Field [ UtilityParty::OrgPhone; JSONGetElement ( $result ; "Result.Phone" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=15 name=OrgPhone
+  43    Set Field [ UtilityParty::OrgWebsite; JSONGetElement ( $result ; "Result.Website" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=16 name=OrgWebsite
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

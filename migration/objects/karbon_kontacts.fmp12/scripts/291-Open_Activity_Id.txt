@@ -1,0 +1,220 @@
+# script 291: Open Activity { Id }
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity
+# source: ScriptCatalog/Script[@id=291]
+# steps: 58 (10 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=252 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   3    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $Id; Value:JSONGetElement ( $data ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   8    Set Variable [ $DisplayPartyIds; Value:JSONGetElement ( $data ; "DisplayPartyIds" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DisplayPartyIds
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10 // Set Variable [ $EmployeePartyIdList; Value:Let ([
+        
+        columnField = Party_PartyRole::PartyId  ;
+        whereField = Party_PartyRole::EmployeeInd ;
+        whereValue = 1 ;
+        whereField2 = Party_PartyRole::CurrentInd ;
+        whereValue2 = 1 
+        
+        ];
+        SQL.GetColumn2Fields ( columnField ; whereField ; whereValue ; whereField2 ; whereValue2 )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, Party_PartyRole::PartyId#45, Party_PartyRole::EmployeeInd#43, Party_PartyRole::CurrentInd#22, cf:SQL.GetColumn2Fields
+        Name: $EmployeePartyIdList
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Field [ selector::ActivityId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=selector id=7 name=ActivityId
+  13    Set Field [ selector::EntityId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=selector id=26 name=EntityId
+  14    Set Variable [ $value; Value:"nothing" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $value
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16 // If [ Selected_Activity::DiscussionAllowedFor = "Client" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_Activity::DiscussionAllowedFor#208
+  17 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  18 // #Client - load picker all parties this entity and employees
+        DisableStepCollapsed state=False
+        Restore state=False
+  19 // Set Field [ UtilityDiscussion::DisplayPartyIds; List ( $DisplayPartyIds ; $EmployeePartyIdList ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List
+        Field table=UtilityDiscussion id=21 name=DisplayPartyIds
+  20 // Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  22 // #Our Team Only, limit picker to employees
+        DisableStepCollapsed state=False
+        Restore state=False
+  23 // Set Field [ UtilityDiscussion::DisplayPartyIds; $EmployeePartyIdList ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=21 name=DisplayPartyIds
+  24 // End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    If [ IsEmpty ( Selected_Activity::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_Activity::Id#1
+  27    Exit Script [  ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ Selected_Activity::NoteInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_Activity::NoteInd#73
+  31    Perform Script [ “Open Note in New Window { Id }”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        Script id=667 name="Open Note in New Window { Id }"
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Else If [ Selected_Activity::CallInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_Activity::CallInd#201
+  34    Perform Script [ “Open Call in New Window { Id }”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        Script id=705 name="Open Call in New Window { Id }"
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Else If [ Selected_Activity::EventInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_Activity::EventInd#90
+  37    Perform Script [ “Open Meeting in New Window { Id }”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        Script id=684 name="Open Meeting in New Window { Id }"
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Else If [ Selected_Activity::TaskInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_Activity::TaskInd#171
+  40    Perform Script [ “Open Task in New Window { Id }”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        Script id=671 name="Open Task in New Window { Id }"
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Else If [ Selected_Activity_EmailMessage::ONE ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_Activity_EmailMessage::ONE#11
+  43    Perform Script [ “Open Email Message in New Window { Id }”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        Script id=692 name="Open Email Message in New Window { Id }"
+  44    End If
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #setup the discussion
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Field [ selector::DiscussionActivityId; Selected_Activity_ActivityEntity#EntityId::ActivityId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityEntity#EntityId::ActivityId#15
+        Field table=selector id=35 name=DiscussionActivityId
+  49    Set Field [ selector::ParentId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=selector id=19 name=ParentId
+  50    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #load display parties
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Set Field [ UtilityDiscussion::DisplayPartyIds; $DisplayPartyIds ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=21 name=DisplayPartyIds
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #load subscribers
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Field [ UtilityDiscussion::SubscriberPartyIds; UniqueValues (  Selected_Discussion_ActivityParty::PartyIdList ) ]
+        DisableStepCollapsed state=False
+        refs: fn:UniqueValues, Selected_Discussion_ActivityParty::PartyIdList#59
+        Field table=UtilityDiscussion id=19 name=SubscriberPartyIds
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

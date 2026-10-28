@@ -1,0 +1,117 @@
+# table 144: UtilityUser
+# file: karbon_kontacts.fmp12
+# source: BaseTableCatalog/BaseTable[@id=144]
+# fields: 14
+# records: 0
+
+Field id=6 dataType=Text fieldType=Normal name=AccountName
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=UtilityUser:
+      | CleanText ( Self )
+      refs: cf:CleanText, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=EmailAddress
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=EmailSignature
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=SmtpServer
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=SmtpServerAuthentication
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=SmtpServerEncryptionType
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=SmtpServerPort
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=SmtpUserName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=UtilityUser:
+    | JSONSetElement ( "{}" ; 
+    | [ "AccountName" ; AccountName ; JSONString ];
+    | [ "EmailAddress" ; EmailAddress ; JSONString ];
+    | [ "EmailSignature" ; EmailSignature ; JSONString ];
+    | [ "FirstName" ; FirstName ; JSONString ];
+    | [ "LastName" ; LastName ; JSONString ];
+    | [ "NotAPersonInd" ; NotAPersonInd ; JSONNumber ];
+    | [ "NoMatchesInd" ; NoMatchesInd ; JSONNumber ];
+    | [ "PartyId" ; PartyId ; JSONString ];
+    | [ "SmtpEmailAddress" ; EmailAddress ; JSONString ];
+    | [ "SmtpFullName" ; FirstName & " " & LastName ; JSONString ];
+    | [ "SmtpServer" ; SmtpServer ; JSONString ];
+    | [ "SmtpServerPort" ; SmtpServerPort ; JSONString ];
+    | [ "SmtpUserName" ; SmtpUserName ; JSONString ]
+    | )
+    refs: fn:JSONSetElement, UtilityUser::AccountName#6, fn:JSONString, UtilityUser::EmailAddress#8, UtilityUser::EmailSignature#9, UtilityUser::FirstName#19, UtilityUser::LastName#20, UtilityUser::NotAPersonInd#21, fn:JSONNumber, UtilityUser::NoMatchesInd#22, UtilityUser::PartyId#23, UtilityUser::SmtpServer#13, UtilityUser::SmtpServerPort#16, UtilityUser::SmtpUserName#17
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Normal name=FirstName
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=UtilityUser:
+      | CleanText ( Self )
+      refs: cf:CleanText, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=LastName
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=UtilityUser:
+      | CleanText ( Self )
+      refs: cf:CleanText, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Number fieldType=Normal name=NotAPersonInd
+  Comment: This will be selected when the User record should not have an associated Party record
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Number fieldType=Normal name=NoMatchesInd
+  Comment: If the user is prompted with matches in the party table, but decides none of the existing parties match
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Normal name=PartyId
+  Comment: If the User being created matches an existing party, we set it here.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+

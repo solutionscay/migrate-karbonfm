@@ -1,0 +1,113 @@
+# script 319: Resolve Discussion -Activity
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / Private_deprecated
+# source: ScriptCatalog/Script[@id=319]
+# steps: 28 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=686 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   3    Set Variable [ $Data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Data
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $EntityId; Value:JSONGetElement ( $data ; "EntityId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityId
+   6    Set Variable [ $ResolutionId; Value:JSONGetElement ( $data ; "ResolutionId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ResolutionId
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ Get( WindowStyle ) = 3 //Card ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:WindowStyle
+   9    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Go to Layout [ “Party Detail” (Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=50 name="Party Detail"
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Field [ Party::Id; $ResolutionId ]
+        DisableStepCollapsed state=False
+        Field table=Party id=1 name=Id
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ Get( LastError ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Field [ selector::ActivityId; $EntityId ]
+        DisableStepCollapsed state=False
+        Field table=selector id=7 name=ActivityId
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  26    Show Custom Dialog [ Title: "Error"; Message: "The Activity can not be found."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,884 @@
+# layout 100: Customer | Desktop
+# file: karbon_LedgerLink.fmp12
+# folder: Application / Desktop
+# source: LayoutCatalog/Layout[@id=100]
+# objects: 93
+# theme: LedgerLink PC
+# folder group: id=88 groupCollapsed=True includeInMenu=False
+
+Layout width=1024 quickFind=True includeInMenu=True id=100 name="Customer | Desktop"
+  Table id=1065093 name=Customer
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnModeExit id=107 triggerFlags=2(find)
+      Script id=491 name="Exit Find Mode Trigger"
+      TriggerText: "Exit Find Mode Trigger"
+  Object type=Button key=10 LabelKey=0 bounds=0,0,39,42
+    Text flags=2 style=button.nav
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Display Main Nav” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=463 name="Display Main Nav"
+      Image name=a3_list.svg
+  Object type=Text key=39 LabelKey=0 bounds=0,42,39,170
+    Text flags=2 style=text.header.title.left: Customer
+  Object type=Text key=146 LabelKey=0 bounds=344,456,368,856
+    Text flags=6 style=text.form.field.label: "Shipping address"
+  Object type=Field key=147 LabelKey=0 flags=260 bounds=264,24,288,424
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.disabled.left
+      Field: Customer::printOnCheckName#10
+    HideCondition findMode=True
+      Calculation:
+        | not Customer::printOnCheckAsDisplayName
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:not, Customer::printOnCheckAsDisplayName#43, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=148 LabelKey=0 bounds=168,24,192,424
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Customer::companyName#23
+  Object type=Field key=149 LabelKey=150 bounds=120,80,144,176
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::contactGivenName#7
+  Object type=Text key=150 LabelKey=0 bounds=96,80,120,176
+    Text flags=6 style=text.form.field.label: "First name"
+  Object type=Field key=151 LabelKey=0 bounds=216,24,240,424
+    ScriptTriggers
+      Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+        Script id=502 name="Return Parameter"
+          Calculation:
+            | /**
+            |  * Create the values to display in the value DYNAMICVALUELIST
+            |  * by combining the name/company fields in different ways.
+            |  */
+            | 
+            | Let ( [
+            | 	$$DYNAMICVALUELIST = List (
+            | 	/* full
+            | 		NOTE: this should be the same as the displayName field's auto-enter calculation
+            | 	*/
+            | 		Substitute ( List (
+            | 			Customer::contactTitle ;
+            | 			Customer::contactGivenName ;
+            | 			Customer::contactMiddleName ;
+            | 			Customer::contactFamilyName ;
+            | 			Customer::contactSuffix ;
+            | 		) ;  "¶"; " " ) ;
+            | 		
+            | 	/* first last */
+            | 		Substitute ( List (
+            | 			Customer::contactGivenName ;
+            | 			Customer::contactFamilyName ;
+            | 		) ;  "¶"; " " ) ;
+            | 		
+            | 	/* last, first */
+            | 		If ( not IsEmpty ( Customer::contactFamilyName ) and not IsEmpty ( Customer::contactGivenName ) ;
+            | 			Substitute ( List (
+            | 				Customer::contactFamilyName & ",";
+            | 				Customer::contactGivenName ;
+            | 			) ;  "¶"; " " )
+            | 		) ;
+            | 		
+            | 	/* company */
+            | 		Customer::companyName
+            | 	)
+            | ] ;
+            | 	""
+            | )
+            refs: fn:Let, fn:List, fn:Substitute, Customer::contactTitle#27, Customer::contactGivenName#7, Customer::contactMiddleName#26, Customer::contactFamilyName#8, Customer::contactSuffix#28, fn:If, fn:not, fn:IsEmpty, fn:and, Customer::companyName#23
+        TriggerText
+          | "Return Parameter"; Parameter: /**
+          |  * Create the values to display in the value DYNAMICVALUELIST
+          |  * by combining the name/company fields in different ways.
+          |  */
+          | 
+          | Let ( [
+          | 	$$DYNAMICVALUELIST = List (
+          | 	/* full
+          | 		NOTE: this should be the same as the displayName field's auto-enter calculation
+          | 	*/
+          | 		Substitute ( List (
+          | 			Customer::contactTitle ;
+          | 			Customer::contactGivenName ;
+          | 			Customer::contactMiddleName ;
+          | 			Customer::contactFamilyName ;
+          | 			Customer::contactSuffix ;
+          | 		) ;  "¶"; " " ) ;
+          | 		
+          | 	/* first last */
+          | 		Substitute ( List (
+          | 			Customer::contactGivenName ;
+          | 			Customer::contactFamilyName ;
+          | 		) ;  "¶"; " " ) ;
+          | 		
+          | 	/* last, first */
+          | 		If ( not IsEmpty ( Customer::contactFamilyName ) and not IsEmpty ( Customer::contactGivenName ) ;
+          | 			Substitute ( List (
+          | 				Customer::contactFamilyName & ",";
+          | 				Customer::contactGivenName ;
+          | 			) ;  "¶"; " " )
+          | 		) ;
+          | 		
+          | 	/* company */
+          | 		Customer::companyName
+          | 	)
+          | ] ;
+          | 	""
+          | )
+    FieldObj numOfReps=1 flags=525344 inputMode=0 keyboardType=1 displayType=1(drop-down-list) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Customer::displayName#9
+      ValueList: DYNAMICVALUELIST#22
+  Object type=Field key=152 LabelKey=0 bounds=168,592,192,720
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::mobilePhone#40
+  Object type=Field key=153 LabelKey=0 flags=-2147483648 bounds=504,24,648,856
+    FieldObj numOfReps=1 flags=1343776 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::notes#41
+  Object type=Field key=154 LabelKey=0 bounds=168,456,192,584
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::primaryPhone#24
+  Object type=Field key=155 LabelKey=0 flags=260 bounds=264,24,288,424
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::printOnCheckName#10
+    HideCondition findMode=True
+      Calculation:
+        | Customer::printOnCheckAsDisplayName
+        | and
+        | Get ( WindowMode ) ≠ 1  /* Find Mode */
+        refs: Customer::printOnCheckAsDisplayName#43, fn:and, fn:Get, fn:WindowMode
+  Object type=Text key=156 LabelKey=0 bounds=240,456,264,512
+    Text flags=6 style=text.form.field.label: Taxable
+  Object type=Text key=159 LabelKey=0 flags=-1073741824 bounds=514,1040,531,1083
+    Text flags=4: expand
+  Object type=Button key=160 LabelKey=0 flags=1342193925 bounds=0,928,40,1024
+    ConditionalFormatting
+      Item id=0 flags=1
+        Condition op=0
+          Calculation:
+            | Customer::qbo_send
+            refs: Customer::qbo_send#38
+        Format: -fm-underline: underline; -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | Case (
+        | 	IsEmpty ( Customer::qbo_id ) ;
+        | 	"New record hasn't been sent to QBO yet." ;
+        | 
+        | 	Customer::qbo_send ;
+        | 	"Record has been changed and needs to be sent to QBO."
+        | )
+        refs: fn:Case, fn:IsEmpty, Customer::qbo_id#36, Customer::qbo_send#38
+    Text flags=6 style=button.nav: Sync
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Sync QBO with FM, Show Progress Card” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=242 name="Sync QBO with FM, Show Progress Card"
+      Image name=a125_sync.svg
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+  Object type=Text key=161 LabelKey=0 bounds=240,24,264,128
+    Text flags=6 style=text.form.field.label: "Print on check as"
+  Object type=Field key=162 LabelKey=0 bounds=416,24,440,224
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::billAddressCity#14
+      PlaceholderText findMode=True
+        Calculation:
+          | "City"
+  Object type=Field key=163 LabelKey=0 bounds=440,224,464,424
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::billAddressCountry#15
+      PlaceholderText findMode=True
+        Calculation:
+          | "Country"
+  Object type=Field key=164 LabelKey=0 bounds=368,24,392,400
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::billAddressLine1#13
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Field key=165 LabelKey=0 bounds=440,24,464,224
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::billAddressPostalCode#17
+      PlaceholderText findMode=True
+        Calculation:
+          | "ZIP"
+  Object type=Field key=166 LabelKey=0 bounds=416,224,440,424
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::billAddressState#16
+      PlaceholderText findMode=True
+        Calculation:
+          | "State"
+  Object type=Field key=167 LabelKey=0 bounds=392,24,416,424
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::billAddressLine2#29
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Text key=168 LabelKey=0 bounds=344,24,368,424
+    Text flags=6 style=text.form.field.label: "Billing address"
+  Object type=Field key=169 LabelKey=0 flags=4 bounds=416,456,440,656
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::shipAddressCity#19
+      PlaceholderText findMode=True
+        Calculation:
+          | "City"
+    HideCondition findMode=False
+      Calculation:
+        | Customer::shipSameAsBilling
+        refs: Customer::shipSameAsBilling#44
+  Object type=Field key=170 LabelKey=0 flags=4 bounds=440,656,464,856
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::shipAddressCountry#20
+      PlaceholderText findMode=True
+        Calculation:
+          | "Country"
+    HideCondition findMode=False
+      Calculation:
+        | Customer::shipSameAsBilling
+        refs: Customer::shipSameAsBilling#44
+  Object type=Field key=171 LabelKey=0 flags=4 bounds=368,456,392,832
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::shipAddressLine1#18
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+    HideCondition findMode=False
+      Calculation:
+        | Customer::shipSameAsBilling
+        refs: Customer::shipSameAsBilling#44
+  Object type=Field key=172 LabelKey=0 flags=4 bounds=440,456,464,656
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::shipAddressPostalCode#22
+      PlaceholderText findMode=True
+        Calculation:
+          | "ZIP"
+    HideCondition findMode=False
+      Calculation:
+        | Customer::shipSameAsBilling
+        refs: Customer::shipSameAsBilling#44
+  Object type=Field key=173 LabelKey=0 flags=4 bounds=416,656,440,856
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::shipAddressState#21
+      PlaceholderText findMode=True
+        Calculation:
+          | "State"
+    HideCondition findMode=False
+      Calculation:
+        | Customer::shipSameAsBilling
+        refs: Customer::shipSameAsBilling#44
+  Object type=Field key=174 LabelKey=0 flags=4 bounds=392,456,416,856
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::shipAddressLine2#30
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+    HideCondition findMode=False
+      Calculation:
+        | Customer::shipSameAsBilling
+        refs: Customer::shipSameAsBilling#44
+  Object type=Button key=175 LabelKey=0 flags=260 bounds=240,128,264,256
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Customer::printOnCheckAsDisplayName; True ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | True
+          refs: fn:True
+        Field table=Customer id=43 name=printOnCheckAsDisplayName
+      Image name=checkbox.svg
+    HideCondition findMode=True
+      Calculation:
+        | Customer::printOnCheckAsDisplayName
+        refs: Customer::printOnCheckAsDisplayName#43
+  Object type=Button key=176 LabelKey=0 flags=260 bounds=240,128,264,256
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Customer::printOnCheckAsDisplayName; False ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | False
+          refs: fn:False
+        Field table=Customer id=43 name=printOnCheckAsDisplayName
+      Image name=checked.svg
+    HideCondition findMode=True
+      Calculation:
+        | not Customer::printOnCheckAsDisplayName
+        refs: fn:not, Customer::printOnCheckAsDisplayName#43
+  Object type=Field key=177 LabelKey=178 bounds=120,184,144,264
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::contactMiddleName#26
+  Object type=Text key=178 LabelKey=0 bounds=96,184,120,264
+    Text flags=6 style=text.form.field.label: "Middle name"
+  Object type=Field key=179 LabelKey=180 bounds=120,272,144,368
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::contactFamilyName#8
+  Object type=Text key=180 LabelKey=0 bounds=96,272,120,368
+    Text flags=6 style=text.form.field.label: "Last name"
+  Object type=Text key=181 LabelKey=0 bounds=144,24,168,152
+    Text flags=6 style=text.form.field.label: Company
+  Object type=Text key=182 LabelKey=0 bounds=192,24,217,152
+    Text flags=6 style=text.form.field.label: "Display name"
+  Object type=Text key=183 LabelKey=0 bounds=240,152,264,272
+    Text flags=6 style=text.form.info.left: "Use display name"
+  Object type=Field key=184 LabelKey=185 bounds=120,456,144,832
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::primaryEmail#12
+  Object type=Text key=185 LabelKey=0 bounds=96,456,120,584
+    Text flags=6 style=text.form.field.label: Email
+  Object type=Text key=186 LabelKey=0 bounds=144,456,168,584
+    Text flags=6 style=text.form.field.label: Phone
+  Object type=Text key=187 LabelKey=0 bounds=144,592,168,720
+    Text flags=6 style=text.form.field.label: Mobile
+  Object type=Field key=188 LabelKey=189 bounds=168,728,192,856
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::alternatePhone#39
+  Object type=Text key=189 LabelKey=0 bounds=144,728,168,856
+    Text flags=6 style=text.form.field.label: Other
+  Object type=Field key=190 LabelKey=191 bounds=216,456,240,832
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::webAddress#25
+  Object type=Text key=191 LabelKey=0 bounds=192,456,216,584
+    Text flags=6 style=text.form.field.label: Website
+  Object type=Button key=192 LabelKey=0 flags=260 bounds=264,456,288,480
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Customer::taxable; True ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | True
+          refs: fn:True
+        Field table=Customer id=5 name=taxable
+      Image name=checkbox.svg
+    HideCondition findMode=True
+      Calculation:
+        | Customer::taxable
+        refs: Customer::taxable#5
+  Object type=Button key=193 LabelKey=0 flags=260 bounds=264,456,288,480
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Customer::taxable; False ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | False
+          refs: fn:False
+        Field table=Customer id=5 name=taxable
+      Image name=checked.svg
+    HideCondition findMode=True
+      Calculation:
+        | not Customer::taxable
+        refs: fn:not, Customer::taxable#5
+  Object type=Text key=194 LabelKey=0 flags=4 bounds=240,520,264,720
+    Text flags=6 style=text.form.field.label: "Default tax code"
+    HideCondition findMode=False
+      Calculation:
+        | not Customer::taxable
+        refs: fn:not, Customer::taxable#5
+  Object type=Text key=195 LabelKey=0 bounds=480,24,504,424
+    Text flags=6 style=text.form.field.label: Notes
+  Object type=Text key=196 LabelKey=0 flags=260 bounds=40,24,80,640
+    Text flags=14 tableViewVisibility=0 style=text.header.title.left: <<displayName>>
+      FieldList quickFind=False
+        Field table=Customer id=9 name=displayName
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Button key=197 LabelKey=0 flags=260 bounds=344,568,368,720
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Customer::shipSameAsBilling; True ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | True
+          refs: fn:True
+        Field table=Customer id=44 name=shipSameAsBilling
+      Image name=checkbox.svg
+    HideCondition findMode=True
+      Calculation:
+        | Customer::shipSameAsBilling
+        refs: Customer::shipSameAsBilling#44
+  Object type=Button key=198 LabelKey=0 flags=260 bounds=344,568,368,720
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Customer::shipSameAsBilling; False ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | False
+          refs: fn:False
+        Field table=Customer id=44 name=shipSameAsBilling
+      Image name=checked.svg
+    HideCondition findMode=True
+      Calculation:
+        | not Customer::shipSameAsBilling
+        refs: fn:not, Customer::shipSameAsBilling#44
+  Object type=Text key=199 LabelKey=0 bounds=344,592,368,728
+    Text flags=6 style=text.form.info.left: "Same as billing address"
+  Object type=Field key=200 LabelKey=201 bounds=120,376,144,424
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::contactSuffix#28
+  Object type=Text key=201 LabelKey=0 bounds=96,376,120,424
+    Text flags=6 style=text.form.field.label: Suffix
+  Object type=Field key=202 LabelKey=203 bounds=120,24,144,72
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::contactTitle#27
+  Object type=Text key=203 LabelKey=0 bounds=96,24,120,72
+    Text flags=6 style=text.form.field.label: Title
+  Object type=Field key=204 LabelKey=205 bounds=264,728,288,856
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::resaleNum#46
+  Object type=Text key=205 LabelKey=0 bounds=240,728,264,856
+    Text flags=6 style=text.form.field.label: "Exemption details"
+  Object type=Text key=207 LabelKey=0 bounds=288,24,312,152
+    Text flags=6 style=text.form.field.label: Terms
+  Object type=Button key=208 LabelKey=0 flags=1342177540 bounds=0,784,40,928
+    Text flags=6 style=button.nav: "Open in QBO"
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "Customer" ; JSONString];
+          | 	[ "QBOId" ;  Customer::qbo_id ; JSONString ]
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "Customer" ; JSONString];
+          | 	[ "QBOId" ;  Customer::qbo_id ; JSONString ]
+          | )
+          refs: fn:JSONSetElement, fn:JSONString, Customer::qbo_id#36
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a11_share.svg
+    HideCondition findMode=True
+      Calculation:
+        | IsEmpty ( Customer::qbo_id )
+        | or
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:IsEmpty, Customer::qbo_id#36, fn:or, fn:Get, fn:WindowMode
+  Object type=Text key=209 LabelKey=0 flags=1342177540 bounds=40,888,80,1000
+    Text flags=6 style=text.header.title.right: Inactive
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find mode */
+        | or
+        | Customer::active
+        refs: fn:Get, fn:WindowMode, fn:or, Customer::active#11
+  Object type=Field key=241 LabelKey=0 bounds=312,24,336,176
+    FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::id_Term#47
+      ValueList: Term Id Active#16
+  Object type=Button key=242 LabelKey=0 flags=16385 bounds=312,200,336,224
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Customer::id_Term )
+            refs: fn:IsEmpty, Customer::id_Term#47
+        Format: -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | "remove value"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Customer::id_Term; "" ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | ""
+        Field table=Customer id=47 name=id_Term
+      Image name=a32_smallXOutline.svg
+  Object type=Button key=243 LabelKey=0 flags=16384 bounds=312,176,336,200
+    ToolTip
+      Calculation:
+        | "edit list in QBO"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: JSONSetElement ( "{}" ; "Entity" ; "Term" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ( "{}" ; "Entity" ; "Term" ; JSONString )
+          refs: fn:JSONSetElement, fn:JSONString
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a72_editOutline.svg
+  Object type=Field key=244 LabelKey=0 bounds=312,24,336,176
+    FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::id_Term#47
+      ValueList: Term Id#15
+  Object type=Button key=245 LabelKey=0 flags=1 bounds=368,400,392,424
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Customer::billAddressLine1 )
+            | and IsEmpty ( Customer::billAddressCity )
+            | and IsEmpty ( Customer::billAddressState )
+            | and IsEmpty ( Customer::billAddressPostalCode )
+            refs: fn:IsEmpty, Customer::billAddressLine1#13, fn:and, Customer::billAddressCity#14, Customer::billAddressState#16, Customer::billAddressPostalCode#17
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open Map ( address )”; Parameter: List (
+          | 	Customer::billAddressLine1 ;
+          | 	Customer::billAddressLine2 ;
+          | 	Customer::billAddressCity ;
+          | 	Customer::billAddressState ;
+          | 	Customer::billAddressPostalCode ;
+          | 	Customer::billAddressCountry
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | List (
+          | 	Customer::billAddressLine1 ;
+          | 	Customer::billAddressLine2 ;
+          | 	Customer::billAddressCity ;
+          | 	Customer::billAddressState ;
+          | 	Customer::billAddressPostalCode ;
+          | 	Customer::billAddressCountry
+          | )
+          refs: fn:List, Customer::billAddressLine1#13, Customer::billAddressLine2#29, Customer::billAddressCity#14, Customer::billAddressState#16, Customer::billAddressPostalCode#17, Customer::billAddressCountry#15
+        Script id=500 name="Open Map ( address )"
+      Image name=a99_locationTriangle.svg
+  Object type=Field key=246 LabelKey=0 flags=260 bounds=264,520,288,672
+    FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::id_TaxCode#42
+      ValueList: TaxCode Id Active#14
+    HideCondition findMode=True
+      Calculation:
+        | not Customer::taxable
+        refs: fn:not, Customer::taxable#5
+  Object type=Button key=247 LabelKey=0 flags=16389 bounds=264,696,288,720
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Customer::id_TaxCode )
+            refs: fn:IsEmpty, Customer::id_TaxCode#42
+        Format: -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | "remove value"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Customer::id_TaxCode; "" ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | ""
+        Field table=Customer id=42 name=id_TaxCode
+      Image name=a32_smallXOutline.svg
+    HideCondition findMode=False
+      Calculation:
+        | not Customer::taxable
+        refs: fn:not, Customer::taxable#5
+  Object type=Button key=248 LabelKey=0 flags=16388 bounds=264,672,288,696
+    ToolTip
+      Calculation:
+        | "edit list in QBO"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: JSONSetElement ( "{}" ; "Entity" ; "TaxCode" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ( "{}" ; "Entity" ; "TaxCode" ; JSONString )
+          refs: fn:JSONSetElement, fn:JSONString
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a72_editOutline.svg
+    HideCondition findMode=False
+      Calculation:
+        | not Customer::taxable
+        refs: fn:not, Customer::taxable#5
+  Object type=Field key=249 LabelKey=0 flags=4 bounds=264,520,288,672
+    FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::id_TaxCode#42
+      ValueList: TaxCode Id#13
+    HideCondition findMode=False
+      Calculation:
+        | not Customer::taxable
+        refs: fn:not, Customer::taxable#5
+  Object type=Button key=250 LabelKey=0 flags=1 bounds=216,832,240,856
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Customer::webAddress )
+            refs: fn:IsEmpty, Customer::webAddress#25
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open ( url )”; Parameter: Customer::webAddress ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | Customer::webAddress
+          refs: Customer::webAddress#25
+        Script id=499 name="Open ( url )"
+      Image name=a70_urlOutline.svg
+  Object type=Button key=251 LabelKey=0 flags=1 bounds=120,832,144,856
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Customer::primaryEmail )
+            refs: fn:IsEmpty, Customer::primaryEmail#12
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Send Email ( to )”; Parameter: Customer::primaryEmail ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | Customer::primaryEmail
+          refs: Customer::primaryEmail#12
+        Script id=504 name="Send Email ( to )"
+      Image name=a63_email.svg
+  Object type=SlideControl key=252 LabelKey=0 flags=1342177540 bounds=90,873,154,1017
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+    SlideControlObj visPanelKey=253 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=253 LabelKey=0 flags=1342177280 bounds=90,873,154,1017
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=254 LabelKey=0 flags=260 bounds=98,881,138,1009
+            Text flags=2 style=button.raised.secondary: "Make Inactive"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Customer::active; not Customer::active ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | not Customer::active
+                  refs: fn:not, Customer::active#11
+                Field table=Customer id=11 name=active
+            HideCondition findMode=True
+              Calculation:
+                | not Customer::active
+                refs: fn:not, Customer::active#11
+          Object type=Button key=255 LabelKey=0 flags=260 bounds=98,881,138,1009
+            Text flags=2 style=button.raised.primary: "Make Active"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Customer::active; not Customer::active ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | not Customer::active
+                  refs: fn:not, Customer::active#11
+                Field table=Customer id=11 name=active
+            HideCondition findMode=True
+              Calculation:
+                | Customer::active
+                refs: Customer::active#11
+  Object type=SlideControl key=256 LabelKey=0 flags=1342177284 bounds=82,873,146,1017
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+    SlideControlObj visPanelKey=257 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=257 LabelKey=0 flags=1342177280 bounds=82,873,146,1017
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=258 LabelKey=0 bounds=98,897,122,969
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Customer::active; True ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | True
+                  refs: fn:True
+                Field table=Customer id=11 name=active
+              Image name=checkbox.svg
+          Object type=Button key=259 LabelKey=0 flags=260 bounds=98,897,122,969
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Customer::active; "" ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | ""
+                Field table=Customer id=11 name=active
+              Image name=checked.svg
+            HideCondition findMode=True
+              Calculation:
+                | Customer::active ≠ 1
+                refs: Customer::active#11
+          Object type=Text key=260 LabelKey=0 bounds=96,928,120,1000
+            Text flags=6 style=text.form.info.left: Active
+          Object type=Button key=261 LabelKey=0 bounds=122,897,146,969
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Customer::active; False ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | False
+                  refs: fn:False
+                Field table=Customer id=11 name=active
+              Image name=checkbox.svg
+          Object type=Button key=262 LabelKey=0 flags=260 bounds=122,897,146,969
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Customer::active; "" ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | ""
+                Field table=Customer id=11 name=active
+              Image name=checked.svg
+            HideCondition findMode=True
+              Calculation:
+                | Customer::active = 1
+                | or
+                | IsEmpty ( Customer::active )
+                refs: Customer::active#11, fn:or, fn:IsEmpty
+          Object type=Text key=263 LabelKey=0 bounds=119,928,143,1000
+            Text flags=6 style=text.form.info.left: Inactive
+  Object type=Button key=264 LabelKey=0 flags=1342177540 bounds=258,881,298,1009
+    Text flags=2 style=button.raised.primary: "New Invoice"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “New Invoice for ( id_Customer )”; Parameter: Customer::id ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | Customer::id
+          refs: Customer::id#1
+        Script id=478 name="New Invoice for ( id_Customer )"
+    HideCondition findMode=True
+      Calculation:
+        | not Customer::active
+        | or
+        | Get ( WindowMode ) = 1 /* Find Mode */
+        refs: fn:not, Customer::active#11, fn:or, fn:Get, fn:WindowMode
+  Object type=Button key=265 LabelKey=0 flags=1342177540 bounds=304,881,344,1009
+    Text flags=2 style=button.raised.secondary: "View Invoices"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=74 name="Go to Related Record"
+        StepText
+          | Go to Related Record [ From table: “Customer_Invoice”; Using layout: “Invoices | Desktop” (Invoice) ]
+          | [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065248 name=Customer_Invoice
+        Layout id=91 name="Invoices | Desktop"
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Field key=266 LabelKey=267 flags=-1073741820 bounds=384,881,496,1009
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Customer::qbo_error#48
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Customer::qbo_error )
+        refs: fn:IsEmpty, Customer::qbo_error#48
+  Object type=Text key=267 LabelKey=0 flags=1073741828 bounds=360,881,384,1009
+    Text flags=6 style=text.form.field.label: "sync error"
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Customer::qbo_error )
+        refs: fn:IsEmpty, Customer::qbo_error#48
+  Object type=Button key=268 LabelKey=0 flags=5 bounds=368,832,392,856
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Customer::shipAddressLine1 )
+            | and IsEmpty ( Customer::shipAddressCity )
+            | and IsEmpty ( Customer::shipAddressState )
+            | and IsEmpty ( Customer::shipAddressPostalCode )
+            refs: fn:IsEmpty, Customer::shipAddressLine1#18, fn:and, Customer::shipAddressCity#19, Customer::shipAddressState#21, Customer::shipAddressPostalCode#22
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open Map ( address )”; Parameter: List (
+          | 	Customer::shipAddressLine1 ;
+          | 	Customer::shipAddressLine2 ;
+          | 	Customer::shipAddressCity ;
+          | 	Customer::shipAddressState ;
+          | 	Customer::shipAddressPostalCode ;
+          | 	Customer::shipAddressCountry
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | List (
+          | 	Customer::shipAddressLine1 ;
+          | 	Customer::shipAddressLine2 ;
+          | 	Customer::shipAddressCity ;
+          | 	Customer::shipAddressState ;
+          | 	Customer::shipAddressPostalCode ;
+          | 	Customer::shipAddressCountry
+          | )
+          refs: fn:List, Customer::shipAddressLine1#18, Customer::shipAddressLine2#30, Customer::shipAddressCity#19, Customer::shipAddressState#21, Customer::shipAddressPostalCode#22, Customer::shipAddressCountry#20
+        Script id=500 name="Open Map ( address )"
+      Image name=a99_locationTriangle.svg
+    HideCondition findMode=False
+      Calculation:
+        | Customer::shipSameAsBilling
+        refs: Customer::shipSameAsBilling#44
+  Object type=Button key=269 LabelKey=0 flags=1342177540 bounds=154,881,194,1009
+    Text flags=2 style=button.raised.primary: "New ESTIMATE"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “New Estimate for ( id_Customer )”; Parameter: Customer::id ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | Customer::id
+          refs: Customer::id#1
+        Script id=533 name="New Estimate for ( id_Customer )"
+    HideCondition findMode=True
+      Calculation:
+        | not Customer::active
+        | or
+        | Get ( WindowMode ) = 1 /* Find Mode */
+        refs: fn:not, Customer::active#11, fn:or, fn:Get, fn:WindowMode
+  Object type=Button key=270 LabelKey=0 flags=1342177540 bounds=200,881,240,1009
+    Text flags=2 style=button.raised.secondary: "View Estimates"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=74 name="Go to Related Record"
+        StepText
+          | Go to Related Record [ From table: “Customer_Estimate”; Using layout: “Estimates | Desktop” (Estimate) ]
+          | [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065249 name=Customer_Estimate
+        Layout id=111 name="Estimates | Desktop"
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find Mode */
+        refs: fn:Get, fn:WindowMode

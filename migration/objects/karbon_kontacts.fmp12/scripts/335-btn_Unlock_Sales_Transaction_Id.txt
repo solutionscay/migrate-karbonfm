@@ -1,0 +1,132 @@
+# script 335: btn: Unlock Sales Transaction ( Id )
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Buttons
+# source: ScriptCatalog/Script[@id=335]
+# steps: 29 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=557 groupCollapsed=False includeInMenu=False
+
+   1    #edit a SalesTransaction
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $Id; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   5    Set Field [ selector::SalesTransactionId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=selector id=13 name=SalesTransactionId
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #cannot edit a sales transaction if its date <= BooksClosedDate
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ Selected_SalesTransaction::date  ≤ System::BookCloseDate ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_SalesTransaction::date#5, System::BookCloseDate#62
+  10    Show Custom Dialog [ Title: "Alert"; Message: "This transaction is locked from edit because its date is on or before the Book Close date of " & System::BookCloseDate & "."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: System::BookCloseDate#62
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  11    Exit Script [  ]
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Lock/Unlock Sales Transaction” from file: “karbon_kontroller”; Parameter: JSONSetElement ( "{}" ; 
+         
+        	[ "Id" ; $Id ; JSONString ];
+        	[ "Lock" ; False ; JSONBoolean ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: fn:JSONSetElement, fn:JSONString, fn:False, fn:JSONBoolean
+        Script id=599 name="Lock/Unlock Sales Transaction" in=karbon_kontroller.fmp12
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $result; Value:Get ( ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  19    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  20    Set Variable [ $message; Value:"Sorry the transaction is not editable" & 
+        "¶¶" & 
+        JSONFormatElements ( $result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements
+        Repetition
+          Calculation:
+            | 1
+        Name: $message
+  21    Set Variable [ $title; Value:"Error!" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $title
+  22    Show Custom Dialog [ Title: $title; Message: $message; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  23    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ Selected_SalesTransaction::InvoiceInd = 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_SalesTransaction::InvoiceInd#73
+  25    Go to Layout [ “Invoice” (Invoice) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=69 name=Invoice
+  26    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Go to Layout [ “SalesReceipt” (SalesReceipt) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=94 name=SalesReceipt
+  28    End If
+        DisableStepCollapsed state=False
+  29    End If
+        DisableStepCollapsed state=False

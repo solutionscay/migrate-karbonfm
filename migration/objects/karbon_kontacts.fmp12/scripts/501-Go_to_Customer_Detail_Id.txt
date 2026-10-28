@@ -1,0 +1,103 @@
+# script 501: Go to Customer Detail {Id}
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Navigation
+# source: ScriptCatalog/Script[@id=501]
+# steps: 27 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=498 groupCollapsed=True includeInMenu=False
+
+   1    #Parameters are optional
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   3    If [ JSON.IsValid ( $parameters ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.IsValid
+   4    Set Variable [ $Id; Value:JSONGetElement ( Get ( ScriptParameter ) ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Go to Layout [ “Customer Detail” (Party_PartyRole_Customer) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=51 name="Customer Detail"
+   8    Adjust Window
+        [ Resize to Fit ]
+        DisableStepCollapsed state=False
+        WindowState value=ResizeToFit
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ IsEmpty ( $Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  11    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ Party_PartyRole_Customer::Id <> $Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party_PartyRole_Customer::Id#1
+  15    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  16    Set Field [ Party_PartyRole_Customer::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=Party_PartyRole_Customer id=1 name=Id
+  17    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  18    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  21    Show Custom Dialog [ Title: "Error"; Message: "The Customer could not be found"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  22    #return user to where they started
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  24    End If
+        DisableStepCollapsed state=False
+  25    End If
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,257 @@
+# table 146: QBOEntity
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=146]
+# fields: 29
+# records: 19
+
+Field id=1 dataType=Text fieldType=Normal name=name
+  Comment: MUST be UpperCamelCase, will be converted to lowercase, as needed
+  AutoEnter allowEditing=True
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=getQBOTimeStamp
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=sendError
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=QBOEntity (inactive):
+      | If ( sendAllowed ; Self ; "" )
+      refs: fn:If, QBOEntity::sendAllowed#16, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=getError
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Time fieldType=Normal name=getDuration
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Number fieldType=Normal name=getRecordCount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Time fieldType=Normal name=sendDuration
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=QBOEntity (inactive):
+      | If ( sendAllowed ; Self ; "" )
+      refs: fn:If, QBOEntity::sendAllowed#16, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Number fieldType=Normal name=sendRecordCount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=send
+  Comment: if True, modified records will be sent to QBO
+  AutoEnter allowEditing=True value=ConstantData overwriteExistingValue=True alwaysEvaluate=True constant=True calculation=True
+    ConstantData: 1
+    Calculation table=QBOEntity:
+      | If ( sendAllowed ; Self ; 0 )
+      refs: fn:If, QBOEntity::sendAllowed#16, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Number fieldType=Normal name=get
+  Comment: if True, records will be download from QBO
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Normal name=sortOrder
+  Comment: determines the order entities will be processed in a sync
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=QBOEntity (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Number fieldType=Normal name=sendAllowed
+  Comment: some entities are read-only, this value will reflect that
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Number fieldType=Normal name=deleteAllowed
+  Comment: some entities can't be deleted, this value will reflect that
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=notes
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=TimeStamp fieldType=Normal name=sendTimeStamp
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Number fieldType=Normal name=getInactive
+  Comment: if True, will get both active and inactive records from QBO (only relevant for name list entities)
+  AutoEnter allowEditing=True value=ConstantData overwriteExistingValue=True constant=True calculation=True
+    ConstantData: 1
+    Calculation table=QBOEntity:
+      | If ( resourceGroup = "name" ; Self ; "" )
+      | 
+      | /**
+      |  * This option is only relevant for name list resources,
+      |  * only store a value if its relevant.
+      |  */
+      refs: fn:If, QBOEntity::resourceGroup#25, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Normal name=resourceGroup
+  Comment: broad category the entity fits into (transaction, name, report, supporting)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Number fieldType=Normal name=getQBOStartPosition
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Text fieldType=Normal name=syncLabel
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Text fieldType=Normal name=namePlural
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=31 dataType=Text fieldType=Normal name=sendErrorCount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=32 dataType=Number fieldType=Normal name=sendSuccessCount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Number fieldType=Normal name=getSkipped
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=34 dataType=Text fieldType=Calculated name=getTimeStamp
+  Calculation table=QBOEntity:
+    | Timestamp.FromISO ( getQBOTimeStamp )
+    refs: cf:Timestamp.FromISO, QBOEntity::getQBOTimeStamp#2
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Calculated name=displaySendError
+  Calculation table=QBOEntity:
+    | Substitute(JSONFormatElements ( QBOEntity::sendError ) ; Char(9) ; "  " )
+    refs: fn:Substitute, fn:JSONFormatElements, QBOEntity::sendError#5, fn:Char
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Text fieldType=Calculated name=displayGetError
+  Calculation table=QBOEntity:
+    | Substitute(JSONFormatElements ( QBOEntity::getError ) ; Char(9) ; "  " )
+    refs: fn:Substitute, fn:JSONFormatElements, QBOEntity::getError#6, fn:Char
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Text fieldType=Calculated name=asJSONForSyncLog
+  Calculation table=QBOEntity:
+    | 
+    | 
+    | Quote(QBOEntity::name) & ":" &
+    | 
+    | Let(
+    | [
+    | json = 
+    | JSONSetElement ( Config(name) ; 
+    | 
+    | ["send.on" ; QBOEntity::send ; JSONBoolean ];
+    | ["send.last.time" ; QBOEntity::sendTimeStamp ; JSONString ];
+    | ["send.last.recordCount" ; sendRecordCount ; JSONString ];
+    | ["send.last.successCount" ; sendSuccessCount ; JSONString ];
+    | ["send.last.duration" ; sendDuration ; JSONString ];
+    | 
+    | ["get.on" ; QBOEntity::get ;JSONBoolean  ];
+    | ["get.last.time" ; QBOEntity::getQBOTimeStamp ; JSONString ];
+    | ["get.last.recordCount" ; getRecordCount ; JSONString ];
+    | ["get.last.duration" ; getDuration ; JSONString ]
+    | 
+    | );
+    | 
+    | json = If ( IsEmpty ( QBOEntity::sendError ); json; JSONSetElement ( json ; "send.last.error" ; QBOEntity::sendError ; "" ) );
+    | json = If ( IsEmpty ( QBOEntity::getError ); json; JSONSetElement ( json ; "get.last.error" ; QBOEntity::getError ; "" ) )
+    | 
+    | ];
+    | 
+    | json
+    | )
+    refs: fn:Quote, QBOEntity::name#1, fn:Let, fn:JSONSetElement, cf:Config, QBOEntity::send#11, fn:JSONBoolean, QBOEntity::sendTimeStamp#19, fn:JSONString, QBOEntity::sendRecordCount#10, QBOEntity::sendSuccessCount#32, QBOEntity::sendDuration#9, QBOEntity::get#12, QBOEntity::getQBOTimeStamp#2, QBOEntity::getRecordCount#8, QBOEntity::getDuration#7, fn:If, fn:IsEmpty, QBOEntity::sendError#5, QBOEntity::getError#6
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=38 dataType=Text fieldType=Calculated name=test
+  Calculation table=QBOEntity:
+    | $$LL_API_Config
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

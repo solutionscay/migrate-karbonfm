@@ -1,0 +1,169 @@
+# script 166: Update Party Cached Data
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party
+# source: ScriptCatalog/Script[@id=166]
+# steps: 48 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=True includeInMenu=False
+
+   1    #Whenever the party detail card is closed, update the cached name in relevant tables
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #2018-01-30 Dave Graham: created
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Party subtypes
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    If [ Party::OrganizationInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party::OrganizationInd#18
+   7    Set Field [ Party::NameCached; Organization::OrganizationName ]
+        DisableStepCollapsed state=False
+        refs: Organization::OrganizationName#19
+        Field table=Party id=19 name=NameCached
+   8    Else If [ Party::PersonInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party::PersonInd#130
+   9    Set Field [ Party::NameCached; Substitute ( List ( Person::FirstName ; Person::LastName ) ; ¶ ; " " ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, fn:List, Person::FirstName#7, Person::LastName#9
+        Field table=Party id=19 name=NameCached
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #Party Role subtypes
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ Party_PartyRole_Customer::ONE and IsEmpty ( Party_PartyRole_Customer::DisplayName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party_PartyRole_Customer::ONE#20, fn:and, fn:IsEmpty, Party_PartyRole_Customer::DisplayName#27
+  15    #Customer: We don't want to update this automatically
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Field [ Party_PartyRole_Customer::DisplayName; Party::NameCached ]
+        DisableStepCollapsed state=False
+        refs: Party::NameCached#19
+        Field table=Party_PartyRole_Customer id=27 name=DisplayName
+  17    End If
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    If [ Party_PartyRole_Vendor::ONE ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party_PartyRole_Vendor::ONE#28
+  20    #Vendor
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ Party_PartyRole_Vendor::NameCached; Party::NameCached ]
+        DisableStepCollapsed state=False
+        refs: Party::NameCached#19
+        Field table=Party_PartyRole_Vendor id=30 name=NameCached
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ Party_PartyRole_Employee::ONE ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party_PartyRole_Employee::ONE#37
+  25    #Employee
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Field [ Party_PartyRole_Employee::NameCached; Party::NameCached ]
+        DisableStepCollapsed state=False
+        refs: Party::NameCached#19
+        Field table=Party_PartyRole_Employee id=20 name=NameCached
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #Primary Email Address
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Field [ selector::ContactMethodId; Party_ContactMethod_NetworkAddress#Email::Id ]
+        DisableStepCollapsed state=False
+        refs: Party_ContactMethod_NetworkAddress#Email::Id#1
+        Field table=selector id=10 name=ContactMethodId
+  31    Set Field [ Party::EmailAddressCached; Selected_NetworkAddress::Address ]
+        DisableStepCollapsed state=False
+        refs: Selected_NetworkAddress::Address#7
+        Field table=Party id=127 name=EmailAddressCached
+  32    Set Field [ Party::EmailAddressIdCached; Selected_NetworkAddress::Id ]
+        DisableStepCollapsed state=False
+        refs: Selected_NetworkAddress::Id#1
+        Field table=Party id=145 name=EmailAddressIdCached
+  33    Set Field [ Party::EmailAddressLabelCached; Selected_NetworkAddress_ContactMethod::Label ]
+        DisableStepCollapsed state=False
+        refs: Selected_NetworkAddress_ContactMethod::Label#47
+        Field table=Party id=133 name=EmailAddressLabelCached
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #Default Phone
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Field [ selector::ContactMethodId; Party_ContactMethod_Phone::Id ]
+        DisableStepCollapsed state=False
+        refs: Party_ContactMethod_Phone::Id#1
+        Field table=selector id=10 name=ContactMethodId
+  38    Set Field [ Party::PhoneNumberCached; Selected_Phone::Number ]
+        DisableStepCollapsed state=False
+        refs: Selected_Phone::Number#8
+        Field table=Party id=125 name=PhoneNumberCached
+  39    Set Field [ Party::PhoneIdCached; Selected_Phone::Id ]
+        DisableStepCollapsed state=False
+        refs: Selected_Phone::Id#1
+        Field table=Party id=147 name=PhoneIdCached
+  40    Set Field [ Party::PhoneLabelCached; Selected_Phone_ContactMethod::Label ]
+        DisableStepCollapsed state=False
+        refs: Selected_Phone_ContactMethod::Label#47
+        Field table=Party id=132 name=PhoneLabelCached
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #Default Address
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Field [ selector::ContactMethodId; Party_ContactMethod_Address::Id ]
+        DisableStepCollapsed state=False
+        refs: Party_ContactMethod_Address::Id#1
+        Field table=selector id=10 name=ContactMethodId
+  44    Set Field [ Party::AddressDisplayCached; Selected_Address::AddressDisplay ]
+        DisableStepCollapsed state=False
+        refs: Selected_Address::AddressDisplay#22
+        Field table=Party id=128 name=AddressDisplayCached
+  45    Set Field [ Party::AddressIdCached; Selected_Address::Id ]
+        DisableStepCollapsed state=False
+        refs: Selected_Address::Id#1
+        Field table=Party id=146 name=AddressIdCached
+  46    Set Field [ Party::AddressLabelCached; Selected_Address_ContactMethod::Label ]
+        DisableStepCollapsed state=False
+        refs: Selected_Address_ContactMethod::Label#47
+        Field table=Party id=131 name=AddressLabelCached
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

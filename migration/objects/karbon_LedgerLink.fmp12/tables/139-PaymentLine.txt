@@ -1,0 +1,97 @@
+# table 139: PaymentLine
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=139]
+# fields: 12
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Invoice_PaymentLine:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=id_Payment
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Number fieldType=Normal name=amount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=id_Invoice
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=id_JournalEntry
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Number fieldType=Normal name=qbo_lineNum
+  Comment: determines the sort order. NOT suitable for display to users due to it's auto-enter value.
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=Invoice_PaymentLine:
+      | /* auto-entering milliseconds ensures new records are sorted after previously entered records */
+      | Get ( CurrentTimeUTCMilliseconds )
+      refs: fn:Get, fn:CurrentTimeUTCMilliseconds
+  Validation type=Always
+    StrictDataType value=Numeric
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=qbo_error
+  Comment: error message returned by QBO when attempting to sync this record
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=id_Customer
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=Invoice_PaymentLine:
+      | Invoice_PaymentLine_Payment::id_Customer
+      refs: Invoice_PaymentLine_Payment::id_Customer#2
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Calculated name=BillTo.C.ID_yes
+  Calculation table=Invoice_PaymentLine:
+    | id_Customer & "_yes"
+    refs: Invoice_PaymentLine::id_Customer#15
+  Storage storeCalculationResults=True autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Date fieldType=Calculated name=TransactionDate
+  Calculation table=Invoice_PaymentLine:
+    | Invoice::date
+    refs: Invoice::date#5
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Calculated name=TransactionDocNumber
+  Calculation table=Invoice_PaymentLine:
+    | Invoice::docNumber
+    refs: Invoice::docNumber#4
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

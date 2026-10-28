@@ -1,0 +1,168 @@
+# script 214: copy over
+# file: karbon_Generator.fmp12
+# source: ScriptCatalog/Script[@id=214]
+# steps: 41 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+
+   1    Close Popover
+        DisableStepCollapsed state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $allFields; Value:Get (ScriptParameter) = "All" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $allFields
+   4    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   5    Freeze Window
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $fileIsOpen; Value:FilterValues ( DatabaseNames ; SCHEMA::fileName ) = SCHEMA::fileName& "¶" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:FilterValues, fn:DatabaseNames, SCHEMA::fileName#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $fileIsOpen
+   8    If [ not $fileIsOpen ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+   9    Show Custom Dialog [ Title: "Whoops"; Message: "Selected File isn't open"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  10    Exit Script [  ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    Set Variable [ $tableExists; Value:FilterValues ( TableNames ( SCHEMA::fileName ) ; SCHEMA::tableName ) = SCHEMA::tableName& "¶" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:FilterValues, fn:TableNames, SCHEMA::fileName#2, SCHEMA::tableName#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $tableExists
+  13    If [ not $tableExists ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  14    Show Custom Dialog [ Title: "Whoops"; Message: "Selected Table Doesn't exist"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  15    Exit Script [  ]
+        DisableStepCollapsed state=False
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Go to Object [ Object Name: "portal_fieldMapItems"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  19    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  20    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    If [ not FieldMapItems::ignore or $allFields ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, FieldMapItems::ignore#11, fn:or
+  22    Set Field [ FieldMapItems::fieldNameForSQl; FieldMapItems::path ]
+        DisableStepCollapsed state=False
+        refs: FieldMapItems::path#3
+        Field table=FieldMapItems id=9 name=fieldNameForSQl
+  23    Set Variable [ $sql; Value:SQLAddColumn ( FieldMap::table ;FieldMapItems::fieldNameForSQl ; "varchar" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQLAddColumn, FieldMap::table#4, FieldMapItems::fieldNameForSQl#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $sql
+  24    Set Variable [ $result; Value:design_x_sql ( $sql ; FieldMap::file ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:design_x_sql, FieldMap::file#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  25    Pause/Resume Script [ Duration (seconds): .2 ]
+        DisableStepCollapsed state=False
+        PauseTime value=ForDuration
+  26    End If
+        DisableStepCollapsed state=False
+  27    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  28    End Loop
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Perform Script [ “btn: Refresh Fields For Selected Table” ]
+        DisableStepCollapsed state=False
+        Script id=62 name="btn: Refresh Fields For Selected Table"
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Go to Object [ Object Name: "portal_fieldMapItems"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  34    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  35    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    If [ not FieldMapItems::ignore or $allFields ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, FieldMapItems::ignore#11, fn:or
+  37    Set Field [ FieldMapItems::fieldName; FieldMapItems::path ]
+        DisableStepCollapsed state=False
+        refs: FieldMapItems::path#3
+        Field table=FieldMapItems id=4 name=fieldName
+  38    Set Field [ FieldMapItems::ignore; "" ]
+        DisableStepCollapsed state=False
+        Field table=FieldMapItems id=11 name=ignore
+  39    End If
+        DisableStepCollapsed state=False
+  40    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  41    End Loop
+        DisableStepCollapsed state=False

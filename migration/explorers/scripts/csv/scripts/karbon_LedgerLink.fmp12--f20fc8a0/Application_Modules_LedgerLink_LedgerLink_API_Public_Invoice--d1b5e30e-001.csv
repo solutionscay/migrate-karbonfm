@@ -1,0 +1,24 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_LedgerLink.fmp12/scripts/456-Send_Invoice_FmId.txt,c28309ee2ddb9805dcdf7ef8c573a51a2704eb74bd086085abedca2ee9f5006c,scripts,karbon_LedgerLink.fmp12,456,Send Invoice ( FmId ),integration,external-adapter,tier1,"Sends one invoice to QuickBooks Online: refuses an invoice without a customer, sends the customer first when it has no QBO id, sends each line item that has no QBO id, sends the invoice, refreshes it from QBO to get tax totals back, then sends each attachment that is flagged to send. ","Invoice::id#1 (step 47)
+AttachableRef::AttachmentId#8 (step 82)
+AttachableRef::EntityId#7 (step 82)
+Attachable::qbo_send#20 (step 89)
+Attachable::Id#1 (step 89)
+by name: Config(""Invoice.fields.customerId""), Config(""Invoice.fields.fmId""), Config(""Invoice.fields.line.itemId""), Config(""Invoice.fields.line.parentId"") (ExecuteSQL via cf:SQL.GetColumn steps 22, 47)",none,"karbon_LedgerLink.fmp12/scripts/233 step 19
+karbon_LedgerLink.fmp12/scripts/611 step 32
+karbon_LedgerLink.fmp12/scripts/587 step 38
+karbon_LedgerLink.fmp12/scripts/592 step 57
+karbon_LedgerLink.fmp12/scripts/302 step 70
+karbon_LedgerLink.fmp12/scripts/586 step 78
+karbon_LedgerLink.fmp12/scripts/662 step 91","objects/karbon_LedgerLink.fmp12/layouts/97-Invoice_Desktop.txt
+objects/karbon_kontacts.fmp12/scripts/214-Send_Invoice_to_QBO_FMId.txt","ExecuteSQL (via cf:SQL.GetColumn) step 22
+ExecuteSQL (via cf:SQL.GetColumn) step 47
+ExecuteSQL (via cf:SQL.GetColumn) step 82
+ExecuteSQL (via cf:SQL.GetColumn) step 89","The Customer lookup uses Karbon's override script 611 (the standard QBO.LookupQBOId call is disabled at step 30). The script ends after the attachments loop without an Exit Script, so on success it returns nothing. Step 73 shows an error dialog (UI inside an API script)."
+karbon_LedgerLink.fmp12/scripts/586-Refresh_Invoice_From_QBO_fmId.txt,dad72e22e0a24dc5cea75af180d058e8a8794421aa8c9af30ac87dc2334ffa19,scripts,karbon_LedgerLink.fmp12,586,Refresh Invoice From QBO ( fmId ) ,integration,external-adapter,tier2,Pulls the QuickBooks version of one invoice back into FileMaker through 'Pull QBO Entity Into FM' and shows any error. ,none,none,"karbon_LedgerLink.fmp12/scripts/233 step 13
+karbon_LedgerLink.fmp12/scripts/596 step 16",objects/karbon_LedgerLink.fmp12/scripts/456-Send_Invoice_FmId.txt,none,none
+karbon_LedgerLink.fmp12/scripts/634-Delete_Invoice_FmId.txt,e0d683b339ca854f528476c5a553b564af73da5cfffe8cee63e3b834ac42d6fb,scripts,karbon_LedgerLink.fmp12,634,Delete Invoice ( FmId ),integration,external-adapter,tier1,"Deletes an invoice in QuickBooks Online: connects to the FileMaker record, looks up its QBO id, calls the QBO delete, and on success clears the invoice's QBO fields through _Commit Record with an empty record. On a QBO error the open record is reverted. ",none,"delete: QBO Invoice (via script 635 'Delete QBO Entity', step 30, by QBOId)
+Invoice qbo_id cleared by name: record ""{}"" committed through script 179 '_Commit Record' (step 40)","karbon_LedgerLink.fmp12/scripts/290 step 21
+karbon_LedgerLink.fmp12/scripts/635 step 30
+karbon_LedgerLink.fmp12/scripts/179 step 40",objects/karbon_LedgerLink.fmp12/scripts/610-Delete_Invoice.txt,none,"Comment at step 48: 'other fields to clear happen in calling script', so the caller finishes the cleanup. The script has no final Exit Script. Step 19 (Call Key Fields, Build Config) is disabled here, so the Config() map must already be built by the caller."
+karbon_LedgerLink.fmp12/scripts/662-Send_Attachable_to_QBO_FmId.txt,5610007044b8e6e79bf4d466b3105ed1757ff7806dfe70c9fccfb692697ca69e,scripts,karbon_LedgerLink.fmp12,662,Send Attachable to QBO (FmId),integration,external-adapter,tier2,Sends one attachment record (a file) to QuickBooks Online through 'Send FMData To QBO' with entity Attachable. ,none,none,karbon_LedgerLink.fmp12/scripts/302 step 20,objects/karbon_LedgerLink.fmp12/scripts/456-Send_Invoice_FmId.txt,none,none

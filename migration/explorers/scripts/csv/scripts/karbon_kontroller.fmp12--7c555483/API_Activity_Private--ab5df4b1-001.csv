@@ -1,0 +1,93 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/377-Create_Activity.txt,8dcf6eccbed36aba6fe3418201224773670a8e5e6a6bef56ca4a791e112c28f5,scripts,karbon_kontroller.fmp12,377,_Create Activity,data-change,server-domain,tier1,"API operation that creates an Activity (task, call, event and so on) from a JSON payload inside a transaction. Validates ActivityTypeId, saves its core fields, optional linked entity and message, adds the current user as creator party (role 50) and as completer (role 51) when CompletedInd is set, then creates the parties. Returns the new Activity Id or an error.","DBTransactions::ActivityId#58 (step 109)
+meta#data::CurrentUserId#3 (step 126)
+User::PartyId#12 (steps 127, 132)
+Activity::Id#1 (steps 187, 209)","DBTransactions::ActivityId#58 (step 110, current record)
+Activity::ONE#6 (step 113, new record)
+DBTransactions::UserId#64 (step 126, current record)
+Activity::ActivityGroupId#191 (step 155, related via Activity)
+Activity::ActivityParentId#46 (step 156, related via Activity)
+Activity::ActivityPurposeId#99 (step 157, related via Activity)
+Activity::ActivityTypeId#100 (step 158, related via Activity)
+Activity::DateDisplay#56 (step 159, related via Activity)
+Activity::Subject#22 (step 160, related via Activity)
+Activity::TimeDisplay#76 (step 161, related via Activity)
+ActivityEntity::EntityId#17 (step 167, related via ActivityEntity (creates record))
+ActivityEntity::EntityTypeId#16 (step 168, related via ActivityEntity)
+ActivityEntity::ActivityId#15 (step 169, related via ActivityEntity)
+ActivityMessage::Message#12 (step 176, related via ActivityMessage (creates record))
+ActivityParty records (created by script 418, step 189)","karbon_kontroller.fmp12/scripts/28 (step 50)
+karbon_kontroller.fmp12/scripts/418 (step 189)
+karbon_kontroller.fmp12/scripts/29 (step 216)
+karbon_kontroller.fmp12/scripts/31 (step 217)","objects/karbon_kontroller.fmp12/scripts/389-Create_EmailMessage_data.txt
+objects/karbon_kontroller.fmp12/scripts/390-Create_Note_data.txt
+objects/karbon_kontroller.fmp12/scripts/391-Create_Task_data.txt
+objects/karbon_kontroller.fmp12/scripts/392-Create_Event.txt
+objects/karbon_kontroller.fmp12/scripts/421-Create_Discussion_v2.txt
+objects/karbon_kontroller.fmp12/scripts/545-Create_Meeting_data.txt
+objects/karbon_kontroller.fmp12/scripts/641-Create_Call_data.txt
+objects/karbon_kontroller.fmp12/scripts/726-Create_Chat_Activity_json.txt",none,"Setting Activity::ONE (step 113) creates the Activity through the DBTransactions relationship (cascadeCreate assumed; check relationships). $Id and Date/Time are defaulted from the host timestamp. Validation requires only ActivityTypeId (Subject check commented out 2018-07-21). Step 133 uses $ActivityId, never set in this script, so the creator party gets an empty ActivityId (the party array is re-linked by script 418 with Activity::Id). Developer comment: only one linked entity is supported. Error.* and JSON.* are custom functions (see functions explorer)."
+karbon_kontroller.fmp12/scripts/392-Create_Event.txt,c47279c2ccedefc516df15f1196136e392dafe36077136e00ec9dc1e3bebd1f5,scripts,karbon_kontroller.fmp12,392,_Create Event,data-change,server-domain,tier1,"API operation that creates an Event (or Meeting when MeetingInd is true) from a JSON payload inside a transaction. Creates the Event record with dates, times, location and address, sets Activity::EventInd, then calls _Create Activity with activity type 6 (meeting) or 4 (event), the creator as party role 50 and the invited party as role 60. Returns the Activity Id or an error.","DBTransactions::ActivityId#58 (step 94)
+Activity::Id#1 (step 155)","DBTransactions::ActivityId#58 (step 95, current record (or new Get(UUID) at step 97))
+Activity::EventInd#90 (step 101, related via Activity)
+Event::ONE#6 (step 104, new record)
+Event::AddressId#193 (step 109, related via Event)
+Event::EndDate#189 (step 112, related via Event)
+Event::EndTime#77 (step 113, related via Event)
+Event::Location#192 (step 114, related via Event)
+Event::StartDate#56 (step 115, related via Event)
+Event::StartTime#76 (step 116, related via Event)
+Meeting::ONE#7 (step 121, new record (only when MeetingInd))
+Activity and ActivityParty records (created through _Create Activity, step 141)","karbon_kontroller.fmp12/scripts/28 (step 43)
+karbon_kontroller.fmp12/scripts/377 (step 141)
+karbon_kontroller.fmp12/scripts/29 (step 162)
+karbon_kontroller.fmp12/scripts/31 (step 163)",none found,none,"Header documents Event.Date and Event.PartyId optional, but validation requires Subject, StartDate and CreatorId. The If/Else at steps 94-98 sets ActivityId to $Id only when it differs from the current value and otherwise to a new UUID, so a repeated or empty $Id yields a new UUID; confirm the intent. The nested _Create Activity opens its own transaction (script 28) inside this one. The Invited party is added even when PartyId is empty."
+karbon_kontroller.fmp12/scripts/541-Edit_Event.txt,1e677dfcce36a65ef7cfc3a17397d8fe00c5715900ee2194afb17d5fa1b6955b,scripts,karbon_kontroller.fmp12,541,_Edit Event,data-change,server-domain,tier1,"API operation that edits an existing Event from a JSON payload inside a transaction. Updates only the Event and Activity fields present in the JSON, then calls _Edit Activity with the plucked values and activity type 1 (Email). Returns the Event Id or an error.","DBTransactions::ActivityId#58 (step 100)
+Activity::Id#1 (step 161)
+Event::Id#1 (step 176)","DBTransactions::ActivityId#58 (step 101, current record)
+Event::ONE#6 (step 104, record found in step 101)
+Activity::ActivityTypeId#100 (step 114, related via Activity)
+Event::AddressId#193 (step 117, related via Event)
+Activity::CompletionAccountName_deprecated#118 (step 120, related via Activity)
+Activity::CompletionTimestamp_deprecated#117 (step 123, related via Activity)
+Activity::DateDisplay#56 (step 126, related via Activity)
+Event::EndDate#189 (step 129, related via Event)
+Event::EndTime#77 (step 132, related via Event)
+Event::Location#192 (step 135, related via Event)
+Event::StartDate#56 (step 138, related via Event)
+Event::StartTime#76 (step 141, related via Event)
+Activity::Subject#22 (step 144, related via Activity)
+Activity::TemplateId#195 (step 147, related via Activity)
+Activity::TimeDisplay#76 (step 150, related via Activity)","karbon_kontroller.fmp12/scripts/28 (step 46)
+karbon_kontroller.fmp12/scripts/542 (step 162)
+karbon_kontroller.fmp12/scripts/29 (step 183)
+karbon_kontroller.fmp12/scripts/31 (step 184)",none found,none,"$ActivityTypeId (step 114) and $Date (step 126) are never set in this script, so those fields are blanked if the JSON carries ActivityTypeId or Date. Step 165 tests $error, not $result, so an error returned by _Edit Activity is ignored. Step 159 always sends ActivityTypeId 1 (Email) to _Edit Activity, which would change an event to an email; confirm. Validation requires StartDate although the edit is partial."
+karbon_kontroller.fmp12/scripts/542-Edit_Activity.txt,0d7b27223f6874b935772023848fa6f0039e1b9598de184202d0c4243f9d730b,scripts,karbon_kontroller.fmp12,542,_Edit Activity,data-change,server-domain,tier1,"API operation that edits an Activity from a JSON payload inside a transaction. Updates only the fields present in the JSON, saves an ActivityMessage, and unless ActivityPartySkip is set, creates the new ActivityParty records (script 418) and then deletes the ones that existed before. Returns the Activity Id or an error.","DBTransactions::ActivityId#58 (step 101)
+ActivityParty#ByActivity::Id#23 (step 163)
+Activity::Id#1 (steps 170, 213)","DBTransactions::ActivityId#58 (step 102, current record)
+Activity::ONE#6 (step 105, record found in step 102)
+Activity::ActivityGroupId#191 (step 115, related via Activity)
+ActivityMessage::Message#12 (step 120, related via ActivityMessage (can create record))
+Activity::ActivityParentId#46 (step 126, related via Activity)
+Activity::ActivityPurposeId#99 (step 129, related via Activity)
+Activity::ActivityTypeId#100 (step 132, related via Activity)
+Activity::AlertInd#107 (step 135, related via Activity)
+Activity::CompletionAccountName_deprecated#118 (step 138, related via Activity)
+Activity::CompletionTimestamp_deprecated#117 (step 141, related via Activity)
+Activity::DateDisplay#56 (step 144, related via Activity)
+Activity::Subject#22 (step 147, related via Activity)
+Activity::TemplateId#195 (step 150, related via Activity)
+Activity::TimeDisplay#76 (step 153, related via Activity)
+DBTransactions::ActivityPartyId#59 (step 193, current record)
+delete: ActivityParty (Delete First Portal Row, via script 33 step 195, portal row; one per previously existing party)
+ActivityParty records created by script 418 (step 170)","karbon_kontroller.fmp12/scripts/28 (step 46)
+karbon_kontroller.fmp12/scripts/418 (step 170)
+karbon_kontroller.fmp12/scripts/33 (step 195)
+karbon_kontroller.fmp12/scripts/29 (step 220)
+karbon_kontroller.fmp12/scripts/31 (step 221)","objects/karbon_kontroller.fmp12/scripts/422-Create_ActivityComment.txt
+objects/karbon_kontroller.fmp12/scripts/522-Edit_EmailMessage_data.txt
+objects/karbon_kontroller.fmp12/scripts/541-Edit_Event.txt
+objects/karbon_kontroller.fmp12/scripts/543-Edit_Note_data__deprecated.txt
+objects/karbon_kontroller.fmp12/scripts/544-Edit_Task_data__deprecated.txt
+objects/karbon_kontroller.fmp12/scripts/546-Edit_Meeting_data.txt
+objects/karbon_kontroller.fmp12/scripts/739-Edit_Discussion.txt",none,"When the JSON contains CompletedInd, AlertInd is cleared (step 135) but CompletedInd itself is not stored here; the completed state may come from the party role added by the caller. The existing parties are listed before the new ones are created (step 163), so only the old ones are deleted. A party update replaces the whole party set. Needs a check that script 418 handles ids already present."

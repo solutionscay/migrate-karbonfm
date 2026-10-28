@@ -1,0 +1,102 @@
+# script 165: Create Customer
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party
+# source: ScriptCatalog/Script[@id=165]
+# steps: 23 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=True includeInMenu=False
+
+   1    #2018-01-30 Dave Graham: created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   4    Perform Script [ “_wip_Create Customer V3 { data }” from file: “karbon_kontroller”; Parameter: $parameters ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=229 name="_wip_Create Customer V3 { data }" in=karbon_kontroller.fmp12
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   7    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   8    Set Variable [ $errorMessage; Value:JSONGetElement ( $result ; "errorMessage" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $errorMessage
+   9    Show Custom Dialog [ Title: "Error"; Message: "An error occurred: " & $errorMessage & "."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  10    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  11    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $Id; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  15    Go to Layout [ “Customer Detail” (Party_PartyRole_Customer) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=51 name="Customer Detail"
+  16    Set Field [ Party_PartyRole_Customer::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=Party_PartyRole_Customer id=1 name=Id
+  17    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    End If
+        DisableStepCollapsed state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

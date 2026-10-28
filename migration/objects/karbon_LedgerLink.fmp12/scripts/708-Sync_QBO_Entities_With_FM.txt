@@ -1,0 +1,345 @@
+# script 708: _Sync QBO Entities With FM
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink Sync API / Private
+# source: ScriptCatalog/Script[@id=708]
+# steps: 93 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=149 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Performs a Sync
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #proxy2 add
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # /#
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $Entities; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entities
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Field [ QBO::syncLabel; "Initializing" ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=42 name=syncLabel
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $License; Value:GetValue(
+        
+          SQL.GetColumn ( Config::License ; Config::One ; 1 );
+          1
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue, cf:SQL.GetColumn, Config::License#22, Config::One#20
+        Name: $License
+  13    If [ IsEmpty ( $License ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  14    Exit Script [ Result: QBO.Error ( "You can't sync without a license" ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:QBO.Error
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “_Initialize” ]
+        DisableStepCollapsed state=False
+        Script id=54 name=_Initialize
+  18    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  19    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  20    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  21    End If
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Field [ QBOEntity::syncLabel; "Starting Sync" ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity id=29 name=syncLabel
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Go to Layout [ “LedgerLink Processing...” (QBO) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=32 name="LedgerLink Processing..."
+  26    Pause/Resume Script [ Duration (seconds): .5 ]
+        DisableStepCollapsed state=False
+        PauseTime value=ForDuration
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $Entity; Value:GetValue($Entities ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  33    Exit Loop If [  IsEmpty ( $Entity ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Field [ QBO::selectedEntityName; $Entity ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=7 name=selectedEntityName
+  37    Set Variable [ $Send; Value:QBOEntity_selected::send ]
+        DisableStepCollapsed state=False
+        Value
+          refs: QBOEntity_selected::send#11
+        Repetition
+          Calculation:
+            | 1
+        Name: $Send
+  38    If [ $send ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Perform Script [ “_Push FM Changes to QBO ( Entity )”; Parameter: $Entity ]
+        DisableStepCollapsed state=False
+        Script id=152 name="_Push FM Changes to QBO ( Entity )"
+  40    Set Variable [ $pushResult; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $pushResult
+  41    If [ Error.IsError ( $pushResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  42    If [ JSONGetElement ( $pushResult; "code" )= 401 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  43    Set Variable [ $AuthenticationError; Value:$pushResult ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $AuthenticationError
+  44    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  45    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $sendError; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $sendError
+  47    End If
+        DisableStepCollapsed state=False
+  48    End If
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    End If
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Field [ QBOEntity_selected::getSkipped; 0 ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=33 name=getSkipped
+  53    Set Variable [ $Get; Value:QBOEntity_selected::get ]
+        DisableStepCollapsed state=False
+        Value
+          refs: QBOEntity_selected::get#12
+        Repetition
+          Calculation:
+            | 1
+        Name: $Get
+  54    If [ $Get ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    If [ $atleastOneSendError ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #not getting called now tg 10/03/19
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Set Field [ QBOEntity_selected::getSkipped; 1 ]
+        DisableStepCollapsed state=False
+        Field table=QBOEntity_selected id=33 name=getSkipped
+  58    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Perform Script [ “_Pull QBO Changes Into FM ( Entity )”; Parameter: $Entity ]
+        DisableStepCollapsed state=False
+        Script id=151 name="_Pull QBO Changes Into FM ( Entity )"
+  60    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  61    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  62    If [ JSONGetElement ( $result; "code" )= 401 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  63    Set Variable [ $AuthenticationError; Value:$result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $AuthenticationError
+  64    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  65    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $errorOnGet; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $errorOnGet
+  67    End If
+        DisableStepCollapsed state=False
+  68    End If
+        DisableStepCollapsed state=False
+  69    End If
+        DisableStepCollapsed state=False
+  70    End If
+        DisableStepCollapsed state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Set Variable [ $n; Value:1 + $n ]
+        DisableStepCollapsed state=False
+        Name: $n
+  73    End Loop
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Set Field [ QBO::syncLabel; "Initializing" ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=42 name=syncLabel
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    If [ $AuthenticationError ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Exit Script [ Result: $AuthenticationError ]
+        DisableStepCollapsed state=False
+  81    End If
+        DisableStepCollapsed state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    If [ $errorOnGet or $sendError ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  84    Set Variable [ $data; Value:JSONSetElement ( "";
+        "message";
+        "There was at least one error during the sync. Click on the yellow exclamation marks on the Sync Log for more information." ;
+        JSONString
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  85    Exit Script [ Result: Error ("-2"; "Checking Sync For Errors" ; $data) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error
+  86    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    Exit Script [ Result: Error ( 0; "" ; "") ]
+        DisableStepCollapsed state=False
+        refs: cf:Error
+  88    End If
+        DisableStepCollapsed state=False
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    Exit Script [  ]
+        DisableStepCollapsed state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False

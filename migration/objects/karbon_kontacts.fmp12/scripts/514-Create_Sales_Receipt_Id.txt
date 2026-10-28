@@ -1,0 +1,105 @@
+# script 514: Create Sales Receipt ( Id )
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Public
+# source: ScriptCatalog/Script[@id=514]
+# steps: 17 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=553 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $CustomerId; Value:Get ( ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerId
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $SalesReceipt; Value:JSONSetElement ( "{}" ; 
+        
+        	[ "id_Customer" ; $CustomerId; JSONString ];
+        	[ "date" ; Get( CurrentDate ); JSONString ];
+        
+        	[ "billAddressCity" ; Party_ContactMethod#Billing_Address::City ; JSONString ];
+        	[ "billAddressCountry" ; Party_ContactMethod#Billing_Address::Country ; JSONString ];
+        	[ "billAddressLine1" ; Party_ContactMethod#Billing_Address::AddressLine1 ; JSONString ];
+        	[ "billAddressLine2" ; Party_ContactMethod#Billing_Address::AddressLine2 ; JSONString ];
+        	[ "billAddressPostalCode" ; Party_ContactMethod#Billing_Address::PostalCode ; JSONString ];
+        	[ "billAddressState" ; Party_ContactMethod#Billing_Address::StateProvince ; JSONString ];
+        
+        
+        	[ "privateNote" ; "" ; JSONString ];
+        
+        	[ "shipAddressCity" ; Party_ContactMethod#Shipping_Address::City ; JSONString ];
+        	[ "shipAddressCountry" ; Party_ContactMethod#Shipping_Address::Country; JSONString ];
+        	[ "shipAddressLine1" ; Party_ContactMethod#Shipping_Address::AddressLine1 ; JSONString ];
+        	[ "shipAddressLine2" ; Party_ContactMethod#Shipping_Address::AddressLine2 ; JSONString ];
+        	[ "shipAddressPostalCode" ; Party_ContactMethod#Shipping_Address::PostalCode ; JSONString ];
+        	[ "shipAddressState" ; Party_ContactMethod#Shipping_Address::StateProvince ; JSONString ];
+        
+        	[ "shipDate" ; Get( CurrentDate ) ; JSONString ];
+        	[ "shipMethod" ; "" ; JSONString ];
+        	[ "status" ; "" ; JSONString ];
+        	[ "totalAmt" ; "" ; JSONString ];
+        	[ "taxableSubtotal" ; "" ; JSONString ];
+        	[ "trackingNum" ; "" ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Get, fn:CurrentDate, Party_ContactMethod#Billing_Address::City#10, Party_ContactMethod#Billing_Address::Country#13, Party_ContactMethod#Billing_Address::AddressLine1#7, Party_ContactMethod#Billing_Address::AddressLine2#8, Party_ContactMethod#Billing_Address::PostalCode#12, Party_ContactMethod#Billing_Address::StateProvince#11, Party_ContactMethod#Shipping_Address::City#10, Party_ContactMethod#Shipping_Address::Country#13, Party_ContactMethod#Shipping_Address::AddressLine1#7, Party_ContactMethod#Shipping_Address::AddressLine2#8, Party_ContactMethod#Shipping_Address::PostalCode#12, Party_ContactMethod#Shipping_Address::StateProvince#11
+        Name: $SalesReceipt
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Perform Script [ “Create or Update SalesReceipt ( { SalesReceipt } )” from file: “karbon_kontroller”; Parameter: $SalesReceipt ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=428 name="Create or Update SalesReceipt ( { SalesReceipt } )" in=karbon_kontroller.fmp12
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $result; Value:Get ( ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   9    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  10    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $SalesReceiptId; Value:JSONGetElement (  $result; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesReceiptId
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Display Sales Transaction in a New Window( Id )”; Parameter: $SalesReceiptId ]
+        DisableStepCollapsed state=False
+        Script id=224 name="Display Sales Transaction in a New Window( Id )"
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False

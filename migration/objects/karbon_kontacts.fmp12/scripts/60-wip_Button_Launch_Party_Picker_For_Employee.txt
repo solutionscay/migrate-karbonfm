@@ -1,0 +1,210 @@
+# script 60: #wip Button: Launch Party Picker For Employee
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Employee Picker
+# source: ScriptCatalog/Script[@id=60]
+# steps: 35 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=236 groupCollapsed=False includeInMenu=False
+
+   1    #initialize the new contact handler
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #v3.0 2017-06-20: Added support for v16 (cards, JSON)
+        	- Handles new contact or related contact. Eliminated new contact script
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #v2.0 2016-10-25: Added support for adding multiple related contacts
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Install OnTimer Script [ “#wip Handler: Employee Selection”; Interval: 1 ]
+        DisableStepCollapsed state=False
+        Script id=66 name="#wip Handler: Employee Selection"
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $layoutObjectName; Value:"Button.SelectVendor" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $layoutObjectName
+  12    Set Variable [ $param; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $selectMultiple; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $selectMultiple
+  15    Set Variable [ $partySubtypes; Value:"Supplier" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $partySubtypes
+  16    Set Variable [ $organizationsOnly; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $organizationsOnly
+  17    Set Variable [ $cardTop; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( $layoutObjectName ; "bottom" ) ) ; 
+        
+        	// no starting object; default to 100 points from the top of the current window
+        	Get ( WindowTop ) + 100 ; 
+        
+        	// 10 points below the bottom of the object
+        	GetLayoutObjectAttribute ( $layoutObjectName ; "bottom" ) - Get ( WindowTop ) - 12
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowTop
+        Name: $cardTop
+  18    Set Variable [ $cardLeft; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( $layoutObjectName ; "left" ) ) ; 
+        
+        		// no starting object; default to 100 points from the left of the current window
+        		Get ( WindowLeft ) + 100 ; 
+        
+        		// line it up with the left edge of the employer field
+        		GetLayoutObjectAttribute ( $layoutObjectName ; "left" ) - Get ( WindowLeft )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowLeft
+        Name: $cardLeft
+  19    Set Variable [ $windowTop; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( $layoutObjectName ; "bottom" ) ) ; 
+        
+        	// no starting object; default to 100 points from the top of the current window
+        	Get ( WindowTop ) + 100 ; 
+        
+        	// 10 points below the bottom of the object
+        	GetLayoutObjectAttribute ( $layoutObjectName ; "bottom" ) + 10 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowTop
+        Name: $windowTop
+  20    Set Variable [ $windowLeft; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( $layoutObjectName ; "left" ) ) ; 
+        
+        		// no starting object; default to 100 points from the left of the current window
+        		Get ( WindowLeft ) + 100 ; 
+        
+        		// line it up with the left edge of the employer field
+        		GetLayoutObjectAttribute ( $layoutObjectName ; "left" )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowLeft
+        Name: $windowLeft
+  21    Set Variable [ $windowName; Value:"Contact Search" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowName
+  22    Set Variable [ $placeholderText; Value:"Search for contact..." ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $placeholderText
+  23    Set Variable [ $footerMessage; Value:"Partial matches are okay" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $footerMessage
+  24    Set Variable [ $allowCreate; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $allowCreate
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #call the picker
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $paramOut; Value:JSONSetElement ( "{}" ; 
+        	[ "cardTop" ; $cardTop ; JSONNumber ] ; 
+        	[ "cardLeft" ; $cardLeft ; JSONNumber ] ; 
+        	[ "windowName" ; $windowName ; JSONString ] ; 
+        	[ "windowTop" ; $windowTop ; JSONNumber ] ; 
+        	[ "windowLeft" ; $windowLeft ; JSONNumber ] ; 
+        	[ "selectMultiple" ; $selectMultiple ; JSONBoolean ] ; 
+        	[ "partySubtypes" ; $partySubtypes ; JSONString ] ; 
+        	[ "organizationsOnly" ; $organizationsOnly ; JSONBoolean ] ; 
+        	[ "placeholderText" ; $placeholderText ; JSONString ] ; 
+        	[ "footerMessage" ; $footerMessage ; JSONString ] ; 
+        	[ "allowCreate" ; $allowCreate ; JSONBoolean ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONString, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $paramOut
+  31    Perform Script [ “Show Contact Picker( { top { ; left { ; allowMultiple } } } )” from file: “Picker Module”; Parameter: $paramOut ]
+        DisableStepCollapsed state=False
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Script id=67 name="Show Contact Picker( { top { ; left { ; allowMultiple } } } )" in=Picker_Module.fmp12
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True

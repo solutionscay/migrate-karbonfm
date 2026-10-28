@@ -1,0 +1,63 @@
+# script 758: btn: Mark Task Complete
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Task / Private
+# source: ScriptCatalog/Script[@id=758]
+# steps: 11 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=761 groupCollapsed=False includeInMenu=True
+
+   1    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   2    #set as complete
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $param; Value:JSONSetElement ( "{}" ; 
+        
+        	["Id" ; Task::Id ; JSONString ] ;
+        	["PartyId" ; session::CurrentUserPartyId ; JSONString ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Task::Id#1, fn:JSONString, session::CurrentUserPartyId#63
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+   4    Perform Script [ “Mark Task Complete { data }” from file: “karbon_kontroller”; Parameter: $param ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=690 name="Mark Task Complete { data }" in=karbon_kontroller.fmp12
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   8    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   9    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  10    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False

@@ -1,0 +1,151 @@
+# script 236: Create Project Team from Everhour
+# file: karbon_tester.fmp12
+# folder: Modules / Everhour
+# source: ScriptCatalog/Script[@id=236]
+# steps: 24 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=237 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $TEST_Group; Value:"Everhour" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Group
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $TEST_Subject; Value:"Create Project Team From Everhour" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Subject
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $TEST_Case; Value:"Given an Everhour Team" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Insert Text [ $projectTeam ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "billing": {
+          |     "rate": 13000,
+          |     "type": "flat_rate"
+          |   },
+          |   "budget": {
+          |     "budget": 36000,
+          |     "period": "monthly",
+          |     "type": "time"
+          |   },
+          |   "canSyncTasks": false,
+          |   "client": 32734,
+          |   "createdAt": "2018-02-01",
+          |   "favorite": true,
+          |   "foreign": false,
+          |   "hasWebhook": false,
+          |   "id": "ev:164270035855279",
+          |   "name": "[PWI-MS] PWI Managed Services",
+          |   "status": "open",
+          |   "type": "list",
+          |   "users": [
+          |     37605,
+          |     37776
+          |   ]
+          | }
+        Field: $projectTeam
+  11    Set Variable [ $projectTeam; Value:JSON.Pluck.From ( $projectTeam ) & JSON.Pluck ( 
+        
+        List ( 
+        	JSON.Pluck.Prop ( "id" ; JSONString ; "project_id" ) ; 
+        	JSON.Pluck.Prop ( "users" ; JSONArray ; "user_ids" ) ; 
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $projectTeam
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “<unknown>” from file: “Karbon_kontroller”; Parameter: $projectTeam ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=266 name=<unknown> ref=missing
+  14    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #Basic tests
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  19    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #Team props
+        DisableStepCollapsed state=False
+        Restore state=False
+  22 // Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "Taxable" ; True ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals, fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False

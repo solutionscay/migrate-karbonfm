@@ -1,0 +1,646 @@
+# script 480: Generate API Script - Go #WIP
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=480]
+# steps: 131 (5 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    #2019-09-12 dave@geistinteractive.com - I'm not sure if we want to implement this; it seems to be more trouble than it's worth
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $date; Value:Date.ToISO ( Get ( CurrentDate ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Date.ToISO, fn:Get, fn:CurrentDate
+        Repetition
+          Calculation:
+            | 1
+        Name: $date
+   4    Insert Text [ $AdjustWindow ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | <Step enable="True" id="31" name="Adjust Window">
+          |     <WindowState value="{{WindowState}}"></WindowState>
+          |   </Step>
+        Field: $AdjustWindow
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #Get variable data
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Perform Script [ “Create DocBlock” ]
+        DisableStepCollapsed state=False
+        Script id=257 name="Create DocBlock"
+   8    Set Variable [ $docBlockXml; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $docBlockXml
+   9 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  10 // Perform Script [ “Create Defaults” ]
+        DisableStepCollapsed state=False
+        Script id=460 name="Create Defaults"
+  11 // Set Variable [ $defaultsXml; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $defaultsXml
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “API Validation” ]
+        DisableStepCollapsed state=False
+        Script id=266 name="API Validation"
+  14    Set Variable [ $validationCalculation; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $validationCalculation
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Perform Script [ “API Parse Data Into Variables” ]
+        DisableStepCollapsed state=False
+        Script id=274 name="API Parse Data Into Variables"
+  17    Set Variable [ $stepsVars; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $stepsVars
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “API Set Fields - Create” ]
+        DisableStepCollapsed state=False
+        Script id=279 name="API Set Fields - Create"
+  20    Set Variable [ $stepsFields; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $stepsFields
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #Build XML output
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Insert Calculated Result [ $XML; ScriptStep_Comment ( "/##" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  25    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  26    Insert Calculated Result [ $XML; ScriptStep_Comment ( ApiGenerator::APIName ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment, ApiGenerator::APIName#2
+        Field: $XML
+  27    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  28    Insert Calculated Result [ $XML; $docBlockXml & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field: $XML
+  29    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  30    Insert Calculated Result [ $XML; ScriptStep_Comment ( "@history " & $date & " " & Get ( AccountName ) & " - Created by Generator version " & meta::FileVersion ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment, fn:Get, fn:AccountName, meta::FileVersion#5
+        Field: $XML
+  31    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  32    Insert Calculated Result [ $XML; ScriptStep_Comment ( "#/" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  33    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  34    Insert Calculated Result [ $XML; ScriptStep_Loop & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Loop
+        Field: $XML
+  35    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  36    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  37    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  38    Insert Calculated Result [ $XML; ScriptStep_Comment ( "SETUP" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  39    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  40    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  41    Insert Calculated Result [ $XML; ScriptStep_AllowUserAbort ( "False" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_AllowUserAbort
+        Field: $XML
+  42    Insert Calculated Result [ $XML; ScriptStep_SetErrorCapture ( "True" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_SetErrorCapture
+        Field: $XML
+  43    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  44    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  45    Insert Calculated Result [ $XML; ScriptStep_Comment ( "VALIDATE INCOMING JSON" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  46    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  47    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  48    Insert Calculated Result [ $XML; ScriptStep_Comment ( "This script doesn't require params; create an empty object if one isn't passed." ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  49    Insert Calculated Result [ $XML; ScriptStep_InsertCalculatedResult ( "$json" ; "If ( IsEmpty ( Get ( ScriptParameter ) ) ; \"{}\" ; Get ( ScriptParameter ) )" ; 1 ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_InsertCalculatedResult
+        Field: $XML
+  50    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  51 // Insert Calculated Result [ $XML; $defaultsXml & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field: $XML
+  52 // Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  53    Insert Calculated Result [ $XML; ScriptStep_Comment ( "Validate the JSON" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  54    Insert Calculated Result [ $XML; ScriptStep_InsertCalculatedResult ( "$json" & ""; "JSON.Format( $json ; \"\" )" ; 1 ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_InsertCalculatedResult
+        Field: $XML
+  55    Insert Calculated Result [ $XML; ScriptStep_If ( "Error.IsError ( $json"& " )" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_If
+        Field: $XML
+  56    Insert Calculated Result [ $XML; ScriptStep_InsertCalculatedResult ( "$error"; "$json" & "" ; 1 ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_InsertCalculatedResult
+        Field: $XML
+  57    Insert Calculated Result [ $XML; ScriptStep_ExitLoopIf ( "True" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_ExitLoopIf
+        Field: $XML
+  58    Insert Calculated Result [ $XML; ScriptStep_EndIf & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EndIf
+        Field: $XML
+  59    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  60    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    If [ not IsEmpty ( $validationCalculation ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  63    Insert Calculated Result [ $XML; ScriptStep_Comment ( "Validation rules" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  64    Insert Calculated Result [ $XML; ScriptStep_InsertCalculatedResult ( "$error" ; $ValidationCalculation ; 1 ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_InsertCalculatedResult
+        Field: $XML
+  65    Insert Calculated Result [ $XML; ScriptStep_ExitLoopIf ( "Error.IsError( $error )" )  & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_ExitLoopIf
+        Field: $XML
+  66    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  67    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  68    End If
+        DisableStepCollapsed state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  71    Insert Calculated Result [ $XML; ScriptStep_Comment ( "PARSE JSON INTO VARIABLES" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  72    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  73    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  74    Insert Calculated Result [ $XML; $stepsVars & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field: $XML
+  75    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  76    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  77    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  78    Insert Calculated Result [ $XML; ScriptStep_Comment ( "WINDOW MANAGEMENT" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  79    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  80    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  81    Insert Calculated Result [ $XML; ScriptStep_If ( "$WindowOption = 1 or IsEmpty ( $WindowOption )" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_If
+        Field: $XML
+  82    Insert Calculated Result [ $XML; ScriptStep_Comment ( "Go to layout" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  83    Insert Calculated Result [ $XML; ScriptStep_GoToLayout ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_GoToLayout
+        Field: $XML
+  84    Insert Calculated Result [ $XML; ScriptStep_ElseIf ( "$WindowOption = 2" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_ElseIf
+        Field: $XML
+  85    Insert Calculated Result [ $XML; ScriptStep_Comment ( "Select window" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  86    Insert Calculated Result [ $XML; ScriptStep_SelectWindow ( "$WindowName" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_SelectWindow
+        Field: $XML
+  87    Insert Calculated Result [ $XML; ScriptStep_If ( "Get ( LastError )" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_If
+        Field: $XML
+  88    Insert Calculated Result [ $XML; ScriptStep_InsertCalculatedResult ( "$WindowOption" ; 3 ; 1 ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_InsertCalculatedResult
+        Field: $XML
+  89    Insert Calculated Result [ $XML; ScriptStep_EndIf & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EndIf
+        Field: $XML
+  90    Insert Calculated Result [ $XML; ScriptStep_EndIf & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EndIf
+        Field: $XML
+  91    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  92    Insert Calculated Result [ $XML; ScriptStep_If ( "$WindowOption = 3" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_If
+        Field: $XML
+  93    Insert Calculated Result [ $XML; ScriptStep_Comment ( "Create new window" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  94    Insert Calculated Result [ $XML; Let ( [ 
+        	~distanceFromLeft = "Get ( WindowLeft ) + 22" ; 
+        	~distanceFromTop = "Get ( WindowTop ) + 22" ; 
+        	~layoutName = ApiGenerator::Entity ; 
+        	~windowHeight = $windowHeight ; 
+        	~windowWidth = $windowWidth ; 
+        	~windowName = ""
+        
+        ] ; 
+        
+        ScriptStep_NewWindow ( ~distanceFromLeft ; ~distanceFromTop ; ~layoutName ; ~windowHeight ; ~windowName ; ~windowWidth ) & ¶
+        
+        ) ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: fn:Let, ApiGenerator::Entity#19, cf:ScriptStep_NewWindow
+        Field: $XML
+  95    Insert Calculated Result [ $XML; ScriptStep_EndIf & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EndIf
+        Field: $XML
+  96    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+  97    Insert Calculated Result [ $XML; ScriptStep_If ( "$AdjustWindowOption = 1" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_If
+        Field: $XML
+  98    Insert Calculated Result [ $XML; Substitute ( $AdjustWindow ; "{{WindowState}}" ; "ResizeToFit" ) ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: fn:Substitute
+        Field: $XML
+  99    Insert Calculated Result [ $XML; ScriptStep_ElseIf ( "$AdjustWindowOption = 2" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_ElseIf
+        Field: $XML
+ 100    Insert Calculated Result [ $XML; Substitute ( $AdjustWindow ; "{{WindowState}}" ; "Maximize" ) ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: fn:Substitute
+        Field: $XML
+ 101    Insert Calculated Result [ $XML; ScriptStep_EndIf & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EndIf
+        Field: $XML
+ 102    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 103    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 104    Insert Calculated Result [ $XML; ScriptStep_Comment ( "PERFORM FIND" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 105    Insert Calculated Result [ $XML; ScriptStep_Comment ( "——————————————————————————————————————————————————————————————" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 106    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 107    Insert Calculated Result [ $XML; ScriptStep_If ( "Not IsEmpty ( $Id )" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_If
+        Field: $XML
+ 108    Insert Calculated Result [ $XML; ScriptStep_EnterFindMode ( "off" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EnterFindMode
+        Field: $XML
+ 109    Insert Calculated Result [ $XML; $stepsFields & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field: $XML
+ 110    Insert Calculated Result [ $XML; ScriptStep_PerformFind & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_PerformFind
+        Field: $XML
+ 111    Insert Calculated Result [ $XML; ScriptStep_InsertCalculatedResult ( "$error" ; "Error.Last ( \"performing find\" ; \"\" )" ; 1 ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_InsertCalculatedResult
+        Field: $XML
+ 112    Insert Calculated Result [ $XML; ScriptStep_ExitLoopIf ( "Error.IsError ( $error )" )  & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_ExitLoopIf
+        Field: $XML
+ 113    Insert Calculated Result [ $XML; ScriptStep_EndIf & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EndIf
+        Field: $XML
+ 114    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 115    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 116    Insert Calculated Result [ $XML; ScriptStep_ExitLoopIf ( "True" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_ExitLoopIf
+        Field: $XML
+ 117    Insert Calculated Result [ $XML; ScriptStep_EndLoop & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EndLoop
+        Field: $XML
+ 118    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 119    Insert Calculated Result [ $XML; ScriptStep_Comment ( "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Comment
+        Field: $XML
+ 120    Insert Calculated Result [ $XML; ScriptStep_If ( "Error.IsError( $error )" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_If
+        Field: $XML
+ 121    Insert Calculated Result [ $XML; ScriptStep_ShowCustomDialog ( "Error" ; "The window or layout could not be displayed" ; "OK" ; "" ; "" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_ShowCustomDialog
+        Field: $XML
+ 122    Insert Calculated Result [ $XML; ScriptStep_Else & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_Else
+        Field: $XML
+ 123    Insert Calculated Result [ $XML; ScriptStep_ExitScript ( "$result" ) & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_ExitScript
+        Field: $XML
+ 124    Insert Calculated Result [ $XML; ScriptStep_EndIf & ¶ ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: cf:ScriptStep_EndIf
+        Field: $XML
+ 125    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 127    Set Variable [ $SetClipboard; Value:clip_Set ( $XML ; "ScriptSteps" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_Set
+        Repetition
+          Calculation:
+            | 1
+        Name: $SetClipboard
+ 128    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    Show Custom Dialog [ Title: "Done"; Message: "Your script steps have been created and copied to the clipboard."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+ 130    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

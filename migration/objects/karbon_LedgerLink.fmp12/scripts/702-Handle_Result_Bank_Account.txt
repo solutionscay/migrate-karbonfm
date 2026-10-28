@@ -1,0 +1,65 @@
+# script 702: Handle Result Bank Account
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO Payments / Test
+# source: ScriptCatalog/Script[@id=702]
+# steps: 15 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=687 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #clear timer
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Install OnTimer Script [ “Handle Result Bank Account”; Interval: "" ]
+        DisableStepCollapsed state=False
+        Script id=702 name="Handle Result Bank Account"
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Perform Script [ “Get Bank Account Charge Result” ]
+        DisableStepCollapsed state=False
+        Script id=703 name="Get Bank Account Charge Result"
+   7    Set Variable [ $Result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ $result = "cancelled" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Show Custom Dialog [ Title: "Result"; Message: "Cancelled"; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  12    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Show Custom Dialog [ Title: "Result"; Message: JSONFormatElements($result); Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False

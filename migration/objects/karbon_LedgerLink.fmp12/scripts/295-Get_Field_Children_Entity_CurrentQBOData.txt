@@ -1,0 +1,339 @@
+# script 295: _Get Field Children ( { Entity, CurrentQBOData } )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Private
+# source: ScriptCatalog/Script[@id=295]
+# steps: 76 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=108 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   3    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+   4    Set Variable [ $CurrentQBOData; Value:JSONGetElement ( $params ;  "CurrentQBOData" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #used for shipping and discounts and other special lines
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $LinesAddedByParent; Value:JSONGetElement($CurrentQBOData ; "Line" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $LinesAddedByParent
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #get the parent id from the Sync Field
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $parentSyncFieldName; Value:Config ( $Entity & ".fields.syncId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $parentSyncFieldName
+  11    Set Variable [ $ParentID; Value:GetField($parentSyncFieldName) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetField
+        Repetition
+          Calculation:
+            | 1
+        Name: $ParentID
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #Get the related FileMaker IDs
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $ListOfLineIds; Value:QBO.LookupRelatedLinesFMId ( $Entity ; $ParentId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupRelatedLinesFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $ListOfLineIds
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #loop through those IDs
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  18    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $lineFMId; Value:GetValue($ListOfLineIDs ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineFMId
+  20    Exit Loop If [ IsEmpty ( $lineFMId ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #protection against 504 bug
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Go to Field [ QBO::Lock ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=QBO id=33 name=Lock
+  25    Set Variable [ $lineSyncFieldName; Value:Config ( $Entity & ".fields.line.syncId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineSyncFieldName
+  26    Set Field By Name [ $lineSyncFieldName; $lineFMId ]
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #open the record, this also sets the qbo_id field to $n
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $lineQBOIdField; Value:Config ( $Entity & ".fields.line.qboId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineQBOIdField
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $qbo_id; Value:GetField($lineQBOIdField) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetField
+        Repetition
+          Calculation:
+            | 1
+        Name: $qbo_id
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Field By Name [ $lineQBOIdField; $qbo_id ]
+        DisableStepCollapsed state=False
+  35    Set Variable [ $error; Value:Error.Last ( "opening the line record" ; JSONSetElement( "" ; "config" ; Config($Entity) ; JSONObject )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, fn:JSONSetElement, cf:Config, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  36    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #call the line script
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $lineParams; Value:JSONSetElement("";
+        
+        	["Entity" ; $Entity; JSONString]
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineParams
+  41    Perform Script [ “Call Get Field Lines Scripts ( Entity, CurrenQBOLIneData })”; Parameter: $lineParams ]
+        DisableStepCollapsed state=False
+        Script id=296 name="Call Get Field Lines Scripts ( Entity, CurrenQBOLIneData })"
+  42    Set Variable [ $ModifiedLine; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ModifiedLine
+  43    If [ Error.IsError ( $ModifiedLine ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  44    Exit Script [ Result: $ModifedLine ]
+        DisableStepCollapsed state=False
+  45    End If
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ $Entity <> "Payment" and $Entity <> "Attachable" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and
+  48    Set Variable [ $ModifiedLine; Value:JSONSetElement ($ModifiedLine; 
+        
+        
+        	[ "Id" ; $n ; JSONString ];
+        	[ "LineNum" ; $n ; JSONNumber ]
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $ModifiedLine
+  49    End If
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $EntityType; Value:JSONGetElement ( $ModifiedLine ; "EntityRef.type" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityType
+  52    If [ $EntityType <> "Party" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #add the line to the new Line Array
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Set Variable [ $ModifiedLines; Value:JSONSetElement($ModifiedLines; "[" & $n-1 & "]" ; $ModifiedLine ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Name: $ModifiedLines
+  55    End If
+        DisableStepCollapsed state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Set Variable [ $n; Value:1 + $n ]
+        DisableStepCollapsed state=False
+        Name: $n
+  58    End Loop
+        DisableStepCollapsed state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #if the parent added some of the lines they will get added to the bottom of the array
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    If [ JSON.ArrayLength ( $LinesAddedByParent ; "" ) > 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.ArrayLength
+  63    Set Variable [ $ModifiedLines; Value:JSON.ArrayConcat ( $ModifiedLines ; $LinesAddedByParent ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayConcat
+        Repetition
+          Calculation:
+            | 1
+        Name: $ModifiedLines
+  64    End If
+        DisableStepCollapsed state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #replace the lines
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    If [ $Entity = "Attachable" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $CurrentQBOData; Value:JSONSetElement ( $CurrentQBOData ; "parts.[0].body.AttachableRef" ; $ModifiedLines ; JSONArray ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  70    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Variable [ $CurrentQBOData; Value:JSONSetElement ( $CurrentQBOData ; "Line" ; $ModifiedLines ; JSONArray ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $CurrentQBOData
+  72    End If
+        DisableStepCollapsed state=False
+  73    Exit Script [ Result: $CurrentQBOData ]
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False

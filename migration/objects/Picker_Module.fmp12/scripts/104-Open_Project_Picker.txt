@@ -1,0 +1,132 @@
+# script 104: Open Project Picker
+# file: Picker Module.fmp12
+# folder: Modules / Projects
+# source: ScriptCatalog/Script[@id=104]
+# steps: 16 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=101 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $param; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $selectMultiple; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $selectMultiple
+   5    Set Variable [ $partySubtypes; Value:"Customer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $partySubtypes
+   6    Set Variable [ $organizationsOnly; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $organizationsOnly
+   7    Set Variable [ $cardTop; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( "customerHeader" ; "bottom" ) ) ; 
+        
+        	// no starting object; default to 100 points from the top of the current window
+        	Get ( WindowTop ) + 100 ; 
+        
+        	// 10 points below the bottom of the object
+        	GetLayoutObjectAttribute ( "customerHeader" ; "bottom" ) - Get ( WindowTop ) - 100 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowTop
+        Name: $cardTop
+   8    Set Variable [ $cardLeft; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( "customerHeader" ; "left" ) ) ; 
+        
+        		// no starting object; default to 100 points from the left of the current window
+        		Get ( WindowLeft ) + 100 ; 
+        
+        		// line it up with the left edge of the employer field
+        		GetLayoutObjectAttribute ( "customerHeader" ; "left" ) - Get ( WindowLeft )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowLeft
+        Name: $cardLeft
+   9    Set Variable [ $windowTop; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( "customerHeader" ; "bottom" ) ) ; 
+        
+        	// no starting object; default to 100 points from the top of the current window
+        	Get ( WindowTop ) + 100 ; 
+        
+        	// 10 points below the bottom of the object
+        	GetLayoutObjectAttribute ( "customerHeader" ; "bottom" ) + 10 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowTop
+        Name: $windowTop
+  10    Set Variable [ $windowLeft; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( "customerHeader" ; "left" ) ) ; 
+        
+        		// no starting object; default to 100 points from the left of the current window
+        		Get ( WindowLeft ) + 100 ; 
+        
+        		// line it up with the left edge of the employer field
+        		GetLayoutObjectAttribute ( "customerHeader" ; "left" )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowLeft
+        Name: $windowLeft
+  11    Set Variable [ $windowName; Value:"Customer Search" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowName
+  12    Set Variable [ $placeholderText; Value:"Search for a project..." ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $placeholderText
+  13    Set Variable [ $footerMessage; Value:"Partial matches are okay" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $footerMessage
+  14    Set Variable [ $allowCreate; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $allowCreate
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    New Window [ Style: Card; Name: "Project Picker"; Using layout: “Project Picker” (); Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=21 name="Project Picker"

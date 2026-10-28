@@ -1,0 +1,41 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_LedgerLink.fmp12/scripts/337-Send_Payment_Request.txt,ab056ab3c0a5bf80ea13326f66ab9facc22b88386ae326d665e7baaf5c8f0eeb,scripts,karbon_LedgerLink.fmp12,337,_Send Payment Request,integration,external-adapter,tier1,"Builds and sends a QuickBooks Payments API request: reads the QBO config (sandbox flag, api key, company id, license) and base URL; for path ""/tokens"" goes straight to Intuit (sandbox or production payments host) with no Authorization header so card or bank details never reach the vendor's own server; for other paths prepends /quickbooks/v4/payments to the base URL with license, companyid and sandbox query values and x-apikey and Request-Id (UUID) headers; adds the JSON body and content type for POST; sends via ""HTTP ( {request} )"" and returns the response.",none,none,"karbon_LedgerLink.fmp12/scripts/63 ""QBO Config"" (step 19)
+karbon_LedgerLink.fmp12/scripts/28 ""_OAuth BaseURL"" (step 29)
+karbon_LedgerLink.fmp12/scripts/78 ""HTTP ( {request} )"" (step 56)",objects/karbon_LedgerLink.fmp12/scripts/340-Send_Payment_Request_request.txt,"Perform Script HTTP ( {request} ) (LedgerLink scripts/78, step 56): HTTPS to https://sandbox.api.intuit.com/quickbooks/v4/payments/tokens, the production payments host, or the proxy base URL from ""_OAuth BaseURL"" + /quickbooks/v4/payments","secret: step 26 reads the payments apiKey (and step 28 the license) from ""QBO Config"" (script 63) and step 46 sends the key as header ""x-apikey"" with the license in the query; the target must keep these out of code. Step 22 exits with $error, which is never set (only $config is), so a config failure returns an empty result. The production tokens URL at step 35 reads ""https://api.intuit.com.quickbooks/v4/payments"" ("".com.quickbooks"" with a dot instead of "".com/quickbooks""), which is not a valid host, so production tokenisation would fail (sandbox is correct). Comment at step 8 ""proxy2 replace"" suggests the base URL is swapped for a proxy."
+karbon_LedgerLink.fmp12/scripts/683-btn_Cancel_Credit_Card_Charge.txt,6694ff788b5f854753155288a90068122c8d551889e0515329b51e1a4c719633,scripts,karbon_LedgerLink.fmp12,683,_btn: Cancel Credit Card Charge,data-change,client-ui,tier3,"Cancel button on the card charge window: clears the card fields, sets QBO::CardResult to ""cancelled"" and closes the window.",none,"QBO::CardResult#56 (Set Field step 6, global)","karbon_LedgerLink.fmp12/scripts/684 ""_clear credit card fields"" (step 4)",objects/karbon_LedgerLink.fmp12/layouts/132-ChargeCardWindow.txt,none,"Result string ""cancelled"" is the protocol value read by the caller (not shown here)."
+karbon_LedgerLink.fmp12/scripts/684-clear_credit_card_fields.txt,8c834787dca4a21c3c2144bc1bb560f7bd775829dcde3a9dbc8343aafebbd845,scripts,karbon_LedgerLink.fmp12,684,_clear credit card fields,data-change,client-ui,tier3,"Blanks the card entry globals in QBO (name, street address, city, region, postal code, amount, CVC, expiry month and year, card number) so card details do not stay in memory.",none,"QBO::CardName#57 (Set Field step 1, global)
+QBO::CardStreetAddress#58 (Set Field step 2, global)
+QBO::CardCity#59 (Set Field step 3, global)
+QBO::CardRegion#61 (Set Field step 4, global)
+QBO::CardPostalCode#60 (Set Field step 5, global)
+QBO::CardAmount#55 (Set Field step 7, global)
+QBO::CardCVC#54 (Set Field step 8, global)
+QBO::CardExpMonth#53 (Set Field step 9, global)
+QBO::CardExpYear#52 (Set Field step 10, global)
+QBO::CardNumber#51 (Set Field step 11, global)",none,"objects/karbon_LedgerLink.fmp12/scripts/683-btn_Cancel_Credit_Card_Charge.txt
+objects/karbon_LedgerLink.fmp12/scripts/689-btn_Charge_Card_On_Window.txt",none,"Sensitive payment data (card number, CVC) is handled here; clearing these globals is a required PCI-style cleanup the target must reproduce (do not store card data)."
+karbon_LedgerLink.fmp12/scripts/689-btn_Charge_Card_On_Window.txt,a4b28ec82193de3d660378dda942245d52091080042e4254e498e5fd6507237b,scripts,karbon_LedgerLink.fmp12,689,_btn: Charge Card On Window,integration,external-adapter,tier1,"Charge button on the card window: closes the window, builds a charge JSON from the entered card (name, number, expiry, CVC, address) and amount, clears the card fields, calls ""Charge Card ( {card, amount, currency} )"" and stores the result in QBO::CardResult.","QBO::CardRegion#61
+QBO::CardPostalCode#60
+QBO::CardStreetAddress#58
+QBO::CardExpYear#52
+QBO::CardExpMonth#53
+QBO::CardCVC#54
+QBO::CardName#57
+QBO::CardNumber#51
+QBO::CardAmount#55","QBO::CardResult#56 (Set Field step 13, global)","karbon_LedgerLink.fmp12/scripts/684 ""_clear credit card fields"" (step 8)
+karbon_LedgerLink.fmp12/scripts/682 ""Charge Card ( {card, amount, currency} )"" (step 10)",objects/karbon_LedgerLink.fmp12/layouts/132-ChargeCardWindow.txt,none,"Sensitive payment data: card number and CVC are read from QBO globals (steps 5) and passed in a script parameter to script 682, which tokenises with Intuit (via 337). Step 4 maps ""city"" to QBO::CardRegion (the state), not CardCity, so the city sent is wrong. Currency is not set here. Card fields are cleared before the charge result is known (step 8), so a failed charge needs re-entry."
+karbon_LedgerLink.fmp12/scripts/694-clear_bank_account_fields.txt,b1e72072ab7b54cabe91653380bb9b631485ec271ce72eac88e0abe535bb9009,scripts,karbon_LedgerLink.fmp12,694,_clear bank account fields,data-change,client-ui,tier3,"Blanks the bank account entry globals in QBO (account number, account type, amount, name, phone, routing number).",none,"QBO::BankAccountAccountNumber#64 (Set Field step 1, global)
+QBO::BankAccountAccountType#65 (Set Field step 2, global)
+QBO::BankAccountAmount#67 (Set Field step 3, global)
+QBO::BankAccountName#62 (Set Field step 4, global)
+QBO::BankAccountPhone#66 (Set Field step 5, global)
+QBO::BankAccountRoutingNumber#63 (Set Field step 6, global)",none,"objects/karbon_LedgerLink.fmp12/scripts/695-btn_Cancel_Bank_Account_Debit.txt
+objects/karbon_LedgerLink.fmp12/scripts/700-btn_Charge_Bank_Account_On_Window.txt",none,Sensitive payment data (bank account and routing numbers) is handled here.
+karbon_LedgerLink.fmp12/scripts/695-btn_Cancel_Bank_Account_Debit.txt,0377d09be8207aae912daacfb621da04197a2c405bff80ed31caedceea8190e1,scripts,karbon_LedgerLink.fmp12,695,_btn: Cancel Bank Account Debit,data-change,client-ui,tier3,"Cancel button on the bank debit window: clears the bank account fields, sets QBO::BankAccountResult to ""cancelled"" and closes the window.",none,"QBO::BankAccountResult#68 (Set Field step 6, global)","karbon_LedgerLink.fmp12/scripts/694 ""_clear bank account fields"" (step 4)",objects/karbon_LedgerLink.fmp12/layouts/133-BankAccountCardWindow.txt,none,none
+karbon_LedgerLink.fmp12/scripts/700-btn_Charge_Bank_Account_On_Window.txt,1de193c5f3f5bd881502c5802ee75dfadd87438517c8b6c81c100071337c3e09,scripts,karbon_LedgerLink.fmp12,700,_btn: Charge Bank Account On Window,integration,external-adapter,tier1,"Debit button on the bank account window: closes the window, maps account type Checking to PERSONAL_CHECKING (else PERSONAL_SAVINGS), strips the phone to digits, builds a bank account JSON with the amount and paymentMode WEB, clears the bank fields, calls ""Debit Bank Account"" and stores the result in QBO::BankAccountResult.","QBO::BankAccountAccountType#65
+QBO::BankAccountPhone#66
+QBO::BankAccountAccountNumber#64
+QBO::BankAccountName#62
+QBO::BankAccountRoutingNumber#63
+QBO::BankAccountAmount#67","QBO::BankAccountResult#68 (Set Field step 21, global)","karbon_LedgerLink.fmp12/scripts/694 ""_clear bank account fields"" (step 15)
+karbon_LedgerLink.fmp12/scripts/691 ""Debit Bank Account ( { bankaccount, amount, paymentMode})"" (step 18)",objects/karbon_LedgerLink.fmp12/layouts/133-BankAccountCardWindow.txt,none,"Sensitive payment data: account and routing numbers are read from QBO globals and passed in a script parameter to script 691. Steps 8-10 swap in sample bank values when $debug is true; $debug is never set in this script, so it is dead unless a caller sets it. Steps 14 and 16 (a $debug wrapper around clearing) are disabled, so the fields are always cleared before the debit result is known. paymentMode WEB is hard-coded."

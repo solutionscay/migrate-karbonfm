@@ -1,0 +1,28 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_LedgerLink.fmp12/scripts/241-Sync_QBO_With_FM_No_Dialog.txt,316dc6f43fc52a9e71ff4faaff191427a37a266bd1b86dc54d91faf33fef79c1,scripts,karbon_LedgerLink.fmp12,241,"Sync QBO With FM, No Dialog",orchestration,background-job,tier1,"Runs a full QBO sync (push changed FileMaker data to QuickBooks, then pull changed QuickBooks data) without any dialog. On error it goes to the SyncLog layout and shows the error.",none,"none (the sync writes happen in _Sync QBO With FM, script 243)","karbon_LedgerLink.fmp12/scripts/243 (step 15)
+karbon_LedgerLink.fmp12/scripts/312 (step 22)",none found (name suggests server schedule),none,"Which entities sync is set in ""Sync Config"" (not read). Possibly run by a server schedule; see callers column."
+karbon_LedgerLink.fmp12/scripts/242-Sync_QBO_with_FM_Show_Progress_Card.txt,217c5a51bca7226f84fe72320372cff6cd9c51601abe95f8960a110fc8db81cc,scripts,karbon_LedgerLink.fmp12,242,"Sync QBO with FM, Show Progress Card",orchestration,background-job,tier1,Runs a full QBO sync (push then pull) while showing the QBO progress card window; closes the card when done and shows errors on the SyncLog layout.,none,"none (the sync writes happen in _Sync QBO With FM, script 243)","karbon_LedgerLink.fmp12/scripts/303 (step 15)
+karbon_LedgerLink.fmp12/scripts/243 (step 16)
+karbon_LedgerLink.fmp12/scripts/312 (step 23)","objects/karbon_LedgerLink.fmp12/layouts/105-Bills_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/101-Items_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/114-Purchase_Order_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/99-Invoice_Chart_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/112-Estimate_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/103-Vendors_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/91-Invoices_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/106-Bill_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/97-Invoice_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/100-Customer_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/115-Journal_Entry_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/102-Item_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/104-Vendor_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/113-Purchase_Orders_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/98-Customers_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/35-SyncLog.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/111-Estimates_Desktop.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/29-Dashboard.txt (layout object action)
+objects/karbon_LedgerLink.fmp12/layouts/116-Journal_Entries_Desktop.txt (layout object action)",none,User-triggered variant; progress card is UI only.
+karbon_LedgerLink.fmp12/scripts/283-Reset_All_Last_Time_Stamps.txt,118935c6add84f791f6df535b648ad806089ec0a34127a3286e252acddee61c9,scripts,karbon_LedgerLink.fmp12,283,Reset All Last Time Stamps,data-change,server-domain,tier1,Resets the sync cursors for all QBO entities so the next sync reads everything again: clears getQBOTimeStamp and sets getQBOStartPosition to 1 for every QBOEntity record found on the SyncLog layout.,none,"QBOEntity::getQBOTimeStamp#2 (step 4, found set on entry, Replace Field Contents with empty)
+QBOEntity::getQBOStartPosition#27 (step 5, found set on entry, Replace Field Contents with 1)",none,none found (may be called by name),none,"Replace Field Contents runs on the current found set of the QBO table on the SyncLog layout; the script does not show all records first, so the scope depends on the caller's found set. Needs confirmation that it is all QBOEntity rows."
+karbon_LedgerLink.fmp12/scripts/284-Sync_On_Server.txt,c34eade5bf3e3e0d24ecedd6698098ba0fd3466158e0ff6dee6ee63e7070f113,scripts,karbon_LedgerLink.fmp12,284,Sync On Server,orchestration,background-job,tier1,"Starts the QBO sync on the FileMaker Server without waiting: commits, then runs _Sync QBO With FM through Perform Script on Server.",none,none (the sync writes happen in script 243),"karbon_LedgerLink.fmp12/scripts/243 (step 3, on server, no wait)",none found (name suggests server schedule),Perform Script on Server (step 3),"The result variable is read at step 4 but, because the call does not wait, it is empty. Likely the entry point for a server schedule."
+karbon_LedgerLink.fmp12/scripts/613-Sync_With_Log.txt,20fbee880725302595ffc07110ec2bb4fbccb193d885347841c0a9e22d2a6c9d,scripts,karbon_LedgerLink.fmp12,613,Sync With Log,orchestration,background-job,tier1,"Runs the QBO sync and returns its result JSON with the file name and module name ""LedgerLink"" added, for a caller that logs sync results (for example a sync job calling fmLog).",none,none (the sync writes happen in script 243),karbon_LedgerLink.fmp12/scripts/243 (step 2),none found (name suggests server schedule),none,"The script ends with a Set Variable and does not Exit Script with $result, so the added JSON is returned only if the caller reads it another way. Confirm. See callers column."

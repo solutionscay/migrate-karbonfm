@@ -1,0 +1,41 @@
+# script 29: New Reqest ( Request )
+# file: karbon_Generator.fmp12
+# folder: App Modules / Requests / Private
+# source: ScriptCatalog/Script[@id=29]
+# steps: 8 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Go to Layout [ “Request Details” (Requests) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=1 name="Request Details"
+   3    New Record/Request
+        DisableStepCollapsed state=False
+   4    Set Variable [ $request; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+   5    Perform Script [ “Restore History To Current Request ( request )”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=8 name="Restore History To Current Request ( request )"
+   6    Set Field [ Requests::name; jsonGet($request; "name" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=24 name=name
+   7    Set Field [ Requests::notes; jsonGet($request; "notes" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=25 name=notes
+   8    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False

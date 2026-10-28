@@ -1,0 +1,18 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/623-Create_Activity_Entities.txt,da5523031675d6355066b78253b98d2b88a2c8d6e28f811103622c5fbfed3971,scripts,karbon_kontroller.fmp12,623,Create Activity Entities,data-change,drop-candidate,tier3,"One-time migration (Otto, 2018-10-25): for every Activity with an OpportunityId_DEPRECATED, creates an ActivityEntity record linking the activity to that opportunity (EntityTypeId 13), logging each in DBTransactions. Returns the activity ids. Effect owner would be server-domain (data migration).","f_Activity::OpportunityId_DEPRECATED#200 (find criterion step 40)
+f_Activity::IdList#129
+Activity::Id#1
+Activity::OpportunityId_DEPRECATED#200","DBTransactions::ActivityId#58 (Set Field step 81, current record)
+DBTransactions::ActivityEntityId#115 (Set Field step 82, current record)
+ActivityEntity::ActivityId#15 (Set Field step 84, related via ActivityEntity, new record)
+ActivityEntity::EntityId#17 (Set Field step 88, related via ActivityEntity)
+ActivityEntity::EntityTypeId#16 (Set Field step 89, related via ActivityEntity, constant 13)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 33)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 108)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 109)",none found (in Scripts menu),none,"Filed under ""_OTTO_ / Completed Migration Scripts / 2018-10-25"". The loop starts with $n=0 (step 72), so the first pass uses an empty activity id (GetValue of item 0) and creates a record keyed on an empty id; confirm. The new record is made by setting ActivityEntity fields from the Activity layout context (related via ActivityEntity). Menu script. Needed only to explain legacy data."
+karbon_kontroller.fmp12/scripts/625-Reset_Network_Address_Indicators.txt,b92be6b7c3f60255d943c62e670cb35dc07a99ac167bc8295e47ee1dc88fe110,scripts,karbon_kontroller.fmp12,625,Reset Network Address Indicators,data-change,drop-candidate,tier3,"One-time migration (Otto, 2018-10-25): for every network address sets two indicators. EmailAddressInd is true when the contact method label contains ""email"" (hyphens ignored) or the address has an ""@"" after the first character; WebAddressInd is true when it is not an email and the address contains ""www"" or the label contains ""Web"". Returns the address ids. Effect owner would be server-domain (data migration).","f_NetworkAddress::IdListOf#46
+ContactMethod::Label#47
+NetworkAddress::Address#7","DBTransactions::ContactMethodId#33 (Set Field step 81, current record)
+NetworkAddress::EmailAddressInd#18 (Set Field step 85, related via DBTransactions)
+NetworkAddress::WebAddressInd#19 (Set Field step 89, related via DBTransactions)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 34)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 113)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 114)",none found (in Scripts menu),none,"Filed under ""_OTTO_ / Completed Migration Scripts"". Same $n=0 start as 623 (step 72). The email/web rule is the only place the classification is written down; the target needs it only if the indicators are recomputed. Menu script."

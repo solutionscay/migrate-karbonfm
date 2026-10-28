@@ -1,0 +1,190 @@
+# script 722: Timer: Handle Assign Referring Party
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Opportunity
+# source: ScriptCatalog/Script[@id=722]
+# steps: 45 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=601 groupCollapsed=True includeInMenu=False
+
+   1    #This script is going to wait until the picker is done doing it's thing, and then proceed accordingly
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #SAMPLE RESULT OBJECT: 
+        {
+        	"Result" : 
+        	{
+        		"CreateRecord" : False
+        		"CountPicked" : 2,
+        		"PartyArray" : 
+        		[
+        			{
+        				"Id" : "123",
+        				"Name" : "Dave Graham"
+        			},
+        			{
+        				"Id" : "456",
+        				"Name" : "Lance Brandenberg"
+        			}
+        		]
+        	}
+        }
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Perform Script [ “Contact Handler Common Tests” ]
+        DisableStepCollapsed state=False
+        Script id=63 name="Contact Handler Common Tests"
+   8    Set Variable [ $results; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+   9    If [ Error.IsError ( $results ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  10    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #Init vars
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $createParty; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $createParty
+  16    Set Variable [ $partyCount; Value:JSONGetElement ( $results ; "Result.CountPicked" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyCount
+  17    Set Variable [ $partyArray; Value:JSONGetElement ( $results ; "Result.PartyArray" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyArray
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ Get( ScriptResult ) = -1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:ScriptResult
+  23    #user canceled; exit
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  25    Exit Script [ Result: -1 ]
+        DisableStepCollapsed state=False
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    If [ $partyCount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #a pick was made; destroy timer
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $thisParty; Value:JSONGetElement ( $partyArray ; 0 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisParty
+  35    Set Variable [ $thisPartyId; Value:JSONGetElement ( $thisParty ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPartyId
+  36    Set Variable [ $thisPartyName; Value:JSONGetElement ( $thisParty ; "Name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPartyName
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Field [ Opportunity::ReferringPartyId; $thisPartyId ]
+        DisableStepCollapsed state=False
+        Field table=Opportunity id=65 name=ReferringPartyId
+  39    Set Field [ Opportunity::ReferringPartyNameCached; $thisPartyName ]
+        DisableStepCollapsed state=False
+        Field table=Opportunity id=66 name=ReferringPartyNameCached
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    End If
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False

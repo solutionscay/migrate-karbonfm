@@ -1,0 +1,731 @@
+# script 194: Create or Edit Address { data }
+# file: karbon_kontroller.fmp12
+# folder: API / ContactMethod / Public
+# source: ScriptCatalog/Script[@id=194]
+# steps: 188 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=199 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # Creates an address
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {string} [AddressLine1]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} [AddressLine2]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {string} [AddressLine3]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @param {string} [Comment]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @param {string} [City]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @param {string} [Country]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @param {string} [County]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # @param {string} [Id]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @param {string} [Label]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    # @param {string} PartyId
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    # @param {string} [PostalCode]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    # @param {boolean} [Primary]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    # @param {string} [StateProvince]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    # @param {array} [Purpose] - One or more supported constants: [ "billing","shipping","mailing" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    # @example
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    # // the address is the billing and shipping address
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    # [ "billing", "shipping" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    # @returnSuccess {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    # @returnSuccess {string} Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    # @returnError {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    # @returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    # @history 2018-02-10 Dave Graham: 
+        	- New version makes the address the endpoint instead of the Contact Method
+        	- Fixed a bunch of bugs and clarified optional params
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    # @history 2018-02-04 Dave Graham: Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  43    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  53    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #Validate JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Set Variable [ $data; Value:JSON.Format ( Get (ScriptParameter) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  62    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  63    Set Variable [ $error; Value:$data ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  64    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  65    End If
+        DisableStepCollapsed state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #Validate by rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $error; Value:JSON.Validate.This ( $data ) & JSON.Validate.ApplyRules (
+        	List(
+        		JSON.Validate.Rule.IsRequired ( "PartyId" ) ; 
+        		"" // more rules here
+        )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  70    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Set Variable [ $AddressLine1; Value:JSONGetElement ( $data ;  "AddressLine1" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $AddressLine1
+  78    Set Variable [ $AddressLine2; Value:JSONGetElement ( $data ;  "AddressLine2" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AddressLine2
+  79    Set Variable [ $AddressLine3; Value:JSONGetElement ( $data ;  "AddressLine3" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AddressLine3
+  80    Set Variable [ $Comment; Value:JSONGetElement ( $data ;  "Comment" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Comment
+  81    Set Variable [ $City; Value:JSONGetElement ( $data ;  "City" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $City
+  82    Set Variable [ $Country; Value:JSONGetElement ( $data ;  "Country" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Country
+  83    Set Variable [ $County; Value:JSONGetElement ( $data ;  "County" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $County
+  84    Set Variable [ $Id; Value:JSONGetElement ( $data ;  "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  85    Set Variable [ $Label; Value:JSONGetElement ( $data ;  "Label" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Label
+  86    Set Variable [ $PartyId; Value:JSONGetElement ( $data ;  "PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+  87    Set Variable [ $PostalCode; Value:JSONGetElement ( $data ;  "PostalCode" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PostalCode
+  88    Set Variable [ $Primary; Value:JSONGetElement ( $data ;  "Primary" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Primary
+  89    Set Variable [ $StateProvince; Value:JSONGetElement ( $data ;  "StateProvince" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $StateProvince
+  90    Set Variable [ $Purpose; Value:JSONGetElement ( $data ;  "Purpose" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Purpose
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  97    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    #TRANSACTION PREP
+        DisableStepCollapsed state=False
+        Restore state=False
+ 100    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    #Puts us in create mode with a null, or edit mode with an ID
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    If [ DBTransactions::ContactMethodId <> $Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::ContactMethodId#33
+ 104    Set Field [ DBTransactions::ContactMethodId; $Id ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=33 name=ContactMethodId
+ 105    End If
+        DisableStepCollapsed state=False
+ 106    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #Create new or lock existing
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    Set Field [ Address::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Address id=34 name=ONE
+ 110    Set Variable [ $error; Value:Error.Last( "could not create or lock the address record" ;  "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 111    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 112    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+ 113    End If
+        DisableStepCollapsed state=False
+ 114    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    If [ DBTransactions::PartyId <> $PartyId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: DBTransactions::PartyId#25
+ 117    #Don't set this if we don't need to, or we can lose our link to a party whose creation is in process
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    Set Field [ DBTransactions::PartyId; $PartyId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=25 name=PartyId
+ 119    End If
+        DisableStepCollapsed state=False
+ 120    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 121    #Create result object
+        DisableStepCollapsed state=False
+        Restore state=False
+ 122    Set Variable [ $result; Value:JSONSetElement ( "{}" ; "Id" ; DBTransactions::ContactMethodId ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, DBTransactions::ContactMethodId#33, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 123    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124    #Set fields
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    Set Field [ ContactMethod::AddressInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ContactMethod id=9 name=AddressInd
+ 126    Set Field [ Address::AddressLine1; $AddressLine1 ]
+        DisableStepCollapsed state=False
+        Field table=Address id=7 name=AddressLine1
+ 127    Set Field [ Address::AddressLine2; $AddressLine2 ]
+        DisableStepCollapsed state=False
+        Field table=Address id=8 name=AddressLine2
+ 128    Set Field [ Address::AddressLine3; $AddressLine3 ]
+        DisableStepCollapsed state=False
+        Field table=Address id=9 name=AddressLine3
+ 129    Set Field [ Address::City; $City ]
+        DisableStepCollapsed state=False
+        Field table=Address id=10 name=City
+ 130    Set Field [ Address::Country; $Country ]
+        DisableStepCollapsed state=False
+        Field table=Address id=13 name=Country
+ 131    Set Field [ Address::County; $County ]
+        DisableStepCollapsed state=False
+        Field table=Address id=35 name=County
+ 132    Set Field [ Address::PostalCode; $PostalCode ]
+        DisableStepCollapsed state=False
+        Field table=Address id=12 name=PostalCode
+ 133    Set Field [ Address::PrimaryInd; $Primary ]
+        DisableStepCollapsed state=False
+        Field table=Address id=19 name=PrimaryInd
+ 134    Set Field [ Address::StateProvince; $StateProvince ]
+        DisableStepCollapsed state=False
+        Field table=Address id=11 name=StateProvince
+ 135    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 136    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    #Pluck params for the contact method script
+        DisableStepCollapsed state=False
+        Restore state=False
+ 138    Set Variable [ $params; Value:JSON.Pluck.From ( $data ) & JSON.Pluck ( 
+        
+        	List ( 
+        		JSON.Pluck.Prop ( "Comment" ; JSONString ; "Comment" ) ; 
+        		JSON.Pluck.Prop ( "Label" ; JSONString ; "Label" ) ; 
+        		JSON.Pluck.Prop ( "PartyId" ; JSONString ; "PartyId" ) ; 
+        		JSON.Pluck.Prop ( "Purpose" ; JSONArray ; "Purpose" ) 
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+ 139    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 140    Perform Script [ “Create Contact Method { data }”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=197 name="Create Contact Method { data }"
+ 141    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 142    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 143    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 144    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 145    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 146    #Set primary
+        DisableStepCollapsed state=False
+        Restore state=False
+ 147    If [ $Primary ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 148    #Update cached data on the party record
+        DisableStepCollapsed state=False
+        Restore state=False
+ 149    Set Field [ Party::AddressDisplayCached; Address::AddressDisplay ]
+        DisableStepCollapsed state=False
+        refs: Address::AddressDisplay#22
+        Field table=Party id=128 name=AddressDisplayCached
+ 150    Set Field [ Party::AddressLabelCached; ContactMethod::Label ]
+        DisableStepCollapsed state=False
+        refs: ContactMethod::Label#47
+        Field table=Party id=131 name=AddressLabelCached
+ 151    Set Field [ Party::AddressIdCached; ContactMethod::Id ]
+        DisableStepCollapsed state=False
+        refs: ContactMethod::Id#1
+        Field table=Party id=146 name=AddressIdCached
+ 152    #Make sure this is the only primary address
+        DisableStepCollapsed state=False
+        Restore state=False
+ 153    Set Variable [ $json; Value:JSONSetElement (  ""; 
+         
+        	[ "Id" ; DBTransactions::ContactMethodId ; JSONString ];
+        	[ "PartyId" ; $PartyId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, DBTransactions::ContactMethodId#33, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+ 154    #Warning: the selector can be changed by the following script.
+        DisableStepCollapsed state=False
+        Restore state=False
+ 155    Perform Script [ “Set Primary Address { Id, PartyId }”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=183 name="Set Primary Address { Id, PartyId }"
+ 156    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 157    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 158    End If
+        DisableStepCollapsed state=False
+ 159    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 160    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 161    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 162    Set Variable [ $purposeList; Value:JSONListValues ( $data ; "Purpose" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListValues
+        Repetition
+          Calculation:
+            | 1
+        Name: $purposeList
+ 163    If [ not IsEmpty ( 
+        
+        FilterValues ( $purposeList ; "billing" )
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:FilterValues
+ 164    Set Variable [ $null; Value:Transaction.Storage.Push ( "ContactMethod" ; "BillingAddressIds" ; DBTransactions::ContactMethodId ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Transaction.Storage.Push, DBTransactions::ContactMethodId#33, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+ 165    End If
+        DisableStepCollapsed state=False
+ 166    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 167    If [ not IsEmpty ( 
+        
+        FilterValues ( $purposeList ; "shipping" )
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:FilterValues
+ 168    Set Variable [ $null; Value:Transaction.Storage.Push ( "ContactMethod" ; "ShippingAddressIds" ; DBTransactions::ContactMethodId ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Transaction.Storage.Push, DBTransactions::ContactMethodId#33, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+ 169    End If
+        DisableStepCollapsed state=False
+ 170    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 171    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 172    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 173    End Loop
+        DisableStepCollapsed state=False
+ 174    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 175    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 176    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 177    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 178    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 179    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 180    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 181    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 182    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 183    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 184    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 185    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 186    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 187    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 188    End If
+        DisableStepCollapsed state=False

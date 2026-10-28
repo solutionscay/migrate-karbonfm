@@ -1,0 +1,377 @@
+# script 292: Create Task - Success
+# file: karbon_tester.fmp12
+# folder: Application Module / Tests / Test Components / Activities
+# source: ScriptCatalog/Script[@id=292]
+# steps: 89 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=283 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Script Tested: Create Task
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Expected Result: Success
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Test Group: Activity
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #Subject: Create Task
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #Case: Successfully create a task
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@history 2018-07-30 Admin - Created by Generator
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #SET VARIABLES FOR TEST
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $TEST_Group; Value:"Activity" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Group
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $TEST_Subject; Value:"Create Task" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Subject
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $TEST_Case; Value:"Successfully create a task" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #INITIAL CONDITIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #Get a random party record
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $PartyToId; Value:SQL.GetRandomFieldValue ( User::PartyId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetRandomFieldValue, User::PartyId#12
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyToId
+  29    Set Variable [ $PartyRegardingId; Value:SQL.GetRandomFieldValue ( Party::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetRandomFieldValue, Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyRegardingId
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    If [ IsEmpty ( $PartyRegardingId )
+        or 
+        IsEmpty ( $PartyToId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:or
+  32    Set Variable [ $TEST_result; Value:Assert.InitialStateError ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.InitialStateError
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  33    Exit Script [  ]
+        DisableStepCollapsed state=False
+  34    End If
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #Create a User as Creator
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Perform Script [ “Create User - Standard User” ]
+        DisableStepCollapsed state=False
+        Script id=297 name="Create User - Standard User"
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  42    Set Variable [ $TEST_result; Value:Assert.InitialStateError ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.InitialStateError
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  43    Exit Script [  ]
+        DisableStepCollapsed state=False
+  44    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $CreatorId; Value:JSONGetElement ( $ScriptResult ; "PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreatorId
+  46    Set Variable [ $PartyFromId; Value:$CreatorId ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyFromId
+  47    Set Variable [ $CreatorUserId; Value:JSONGetElement ( $ScriptResult ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CreatorUserId
+  48    If [ IsEmpty ( $CreatorId )
+        or 
+        IsEmpty ( $PartyFromId )
+        or 
+        IsEmpty ( $CreatorUserId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:or
+  49    Set Variable [ $TEST_result; Value:Assert.InitialStateError ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.InitialStateError
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  50    Exit Script [  ]
+        DisableStepCollapsed state=False
+  51    End If
+        DisableStepCollapsed state=False
+  52    End If
+        DisableStepCollapsed state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #RUN SCRIPT
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $Data; Value:JSONSetElement( "" ;
+        [ "CreatorId" ; $CreatorId ; JSONString ];
+        [ "Date" ; Get( CurrentDate ) ; JSONString ];
+        [ "Id" ; "" ; JSONString ];
+        [ "PartyFromId" ; $PartyFromId ; JSONString ];
+        [ "PartyRegardingId" ; $PartyRegardingId ; JSONString ];
+        [ "PartyToId" ; $PartyToId ; JSONString ];
+        [ "Subject" ; "Test Task with Notification for Lance" ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Get, fn:CurrentDate
+        Repetition
+          Calculation:
+            | 1
+        Name: $Data
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Perform Script [ “Create Task { data }” from file: “Karbon_kontroller”; Parameter: $Data ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=391 name="Create Task { data }" in=karbon_kontroller.fmp12
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Set Variable [ $TEST_Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Result
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #ASSERTIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  71    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Set Variable [ $null; Value:Assert.HasProperty ( $TEST_Result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.HasProperty
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #CLEANUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    If [ not Error.IsError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Set Variable [ $Id; Value:JSONGetElement ( $TEST_Result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Set Field [ Deleter::IDsList; List ( Deleter::IDsList; $Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, Deleter::IDsList#1
+        Field table=Deleter id=1 name=IDsList
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    End If
+        DisableStepCollapsed state=False
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #Delete the User now, so we don't interfere with other tests
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    Perform Script [ “Delete User ( Id )” from file: “Karbon_kontroller”; Parameter: JSONSetElement( ""; 
+        	[ "Id"; $CreatorUserId; JSONString ];
+        	[ "DeletePartyInd"; True; JSONBoolean ]
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        refs: fn:JSONSetElement, fn:JSONString, fn:True, fn:JSONBoolean
+        Script id=512 name="Delete User ( Id )" in=karbon_kontroller.fmp12
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False

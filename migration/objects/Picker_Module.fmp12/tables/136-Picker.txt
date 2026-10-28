@@ -1,0 +1,257 @@
+# table 136: Picker
+# file: Picker Module.fmp12
+# source: BaseTableCatalog/BaseTable[@id=136]
+# fields: 34
+# records: 1
+
+Field id=1 dataType=Text fieldType=Normal name=Search_Field
+  Comment: Contacts will be searched according to what is typed into this field.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=Results
+  Comment: A JSON object representing a list of party IDs, an error object, and other details
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Number fieldType=Normal name=_z_Result_Contact_Was_Created_Ind#Deprecated
+  Comment: Set to true if a new contact was created.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=Settings
+  Comment: A JSON object which defines search related parameters
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Number fieldType=Calculated name=Settings_AllowMultipleSelectionsInd
+  Calculation table=Picker:
+    | GetAsBoolean ( JSONGetElement ( Settings ; "selectMultiple" ) )
+    refs: fn:GetAsBoolean, fn:JSONGetElement, Picker::Settings#4
+  Comment: Allow selection of multiple contacts
+  AutoEnter alwaysEvaluate=True
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Number fieldType=Normal name=_z_Result_Error_Code#Deprecated
+  Comment: -1: user canceled, 0: no error
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Calculated name=Settings_OrganizationsOnly
+  Calculation table=Picker:
+    | GetAsBoolean ( JSONGetElement ( Settings ; "organizationsOnly" ) )
+    refs: fn:GetAsBoolean, fn:JSONGetElement, Picker::Settings#4
+  Comment: Restrict search results to organizations only
+  AutoEnter alwaysEvaluate=True
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Number fieldType=Calculated name=Settings_AllowCreate
+  Calculation table=Picker:
+    | GetAsBoolean ( JSONGetElement ( Settings ; "allowCreate" ) )
+    refs: fn:GetAsBoolean, fn:JSONGetElement, Picker::Settings#4
+  Comment: Allows creation of party records when no matching results were found
+  AutoEnter alwaysEvaluate=True
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Calculated name=Settings_PlaceholderText
+  Calculation table=Picker:
+    | JSONGetElement ( Settings ; "placeholderText" )
+    refs: fn:JSONGetElement, Picker::Settings#4
+  Comment: The placeholder text to display in the empty search field
+  AutoEnter alwaysEvaluate=True
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Calculated name=Settings_FooterMessage
+  Calculation table=Picker:
+    | JSONGetElement ( Settings ; "footerMessage" )
+    refs: fn:JSONGetElement, Picker::Settings#4
+  Comment: The text to display in the footer before a search has been attempted
+  AutoEnter alwaysEvaluate=True
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Number fieldType=Calculated name=Settings_PeopleOnly
+  Calculation table=Picker:
+    | GetAsBoolean ( JSONGetElement ( Settings ; "peopleOnly" ) )
+    refs: fn:GetAsBoolean, fn:JSONGetElement, Picker::Settings#4
+  Comment: Restrict search results to only people
+  AutoEnter alwaysEvaluate=True
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=SmartyStreets_AuthId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=SmartyStreets_AuthToken
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Picker (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=AddressRows
+  Comment: A one-line result for each of the suggestions from the API
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Normal name=AddressSuggestions
+  Comment: List of JSON objects which correspond to the address row. The JSON object should contain the full detail for each result.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=FoundCount
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Normal name=GooglePlaces_ApiKey
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Text fieldType=Normal name=AddressServiceProvider
+  Comment: Possible values are: SmartyStreets, Google Places
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Normal name=AddressServiceProviderThisSession
+  Comment: Possible values are: SmartyStreets, Google Places
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Normal name=Results_EmailAddressList
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Picker:
+      | If( IsEmpty ( Results );
+      | 	"";
+      | 	JSON.GetValuesAtPath ( Results ; "EmailAddressId" )
+      | )
+      refs: fn:If, fn:IsEmpty, Picker::Results#2, cf:JSON.GetValuesAtPath
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=28 dataType=Text fieldType=Normal name=Schema_Results
+  Comment: A JSON object representing an array of Fields or Scripts
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Number fieldType=Normal name=Schema_FieldsInd
+  Comment: The user wants to select a table, tableoccurence, and field(s)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Number fieldType=Normal name=Schema_ScriptsInd
+  Comment: The user wants to select script(s)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=31 dataType=Text fieldType=Normal name=Schema_FileArray
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=32 dataType=Text fieldType=Normal name=Schema_TableArray
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Text fieldType=Normal name=Schema_TableOccurenceArray
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=34 dataType=Text fieldType=Normal name=Schema_FieldArray
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Normal name=Schema_ScriptsArray
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Text fieldType=Normal name=Email.Found
+  Comment: A list of JSON objects that was returned from the find routine
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Text fieldType=Normal name=Email.NewEmailAddress
+  Comment: Used to add a new network address for a contact that doesn't have one
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=38 dataType=Text fieldType=Normal name=Email.NewEmailLabel
+  Comment: Used to add a new network address for a contact that doesn't have one
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=Text fieldType=Normal name=Phone.Found
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=Text fieldType=Normal name=Results_PhoneList
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Picker (inactive):
+      | If( IsEmpty ( Results );
+      | 	"";
+      | 	JSON.GetValuesAtPath ( Results ; "EmailAddressId" )
+      | )
+      refs: fn:If, fn:IsEmpty, Picker::Results#2, cf:JSON.GetValuesAtPath
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+

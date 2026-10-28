@@ -1,0 +1,101 @@
+# script 243: Address Handler Common Tests
+# file: karbon_kontacts.fmp12
+# folder: Modules / Picker / Private
+# source: ScriptCatalog/Script[@id=243]
+# steps: 25 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=62 groupCollapsed=False includeInMenu=True
+
+   1    #This script is going to wait until the picker is done doing its thing, and then proceed accordingly
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v2.0 2017-06-21 dmg: updated for v16 compatibility (JSON)
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Get Results” from file: “Picker Module” ]
+        DisableStepCollapsed state=False
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Script id=99 name="Get Results" in=Picker_Module.fmp12
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $results; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+   8    Set Variable [ $selectionWasCanceled; Value:GetAsBoolean ( JSONGetElement ( $results ; "Result.Canceled" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $selectionWasCanceled
+   9    Set Variable [ $addressWasSelected; Value:GetAsBoolean ( JSONGetElement ( $results ; "Result.AddressCount" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $addressWasSelected
+  10    Set Variable [ $createAddress; Value:GetAsBoolean ( JSONGetElement ( $results ; "Result.CreateAddress" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $createAddress
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    If [ Get ( WindowMode ) ≠ 0 and
+        Get ( WindowMode ) ≠ 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:WindowMode, fn:and
+  13    #halt on layout mode
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  15    Else If [ $selectionWasCanceled ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #user canceled
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  18    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  19    Else If [ not $addressWasSelected and not $createAddress ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:and
+  20    #nothing picked
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  22    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Exit Script [ Result: $results ]
+        DisableStepCollapsed state=False

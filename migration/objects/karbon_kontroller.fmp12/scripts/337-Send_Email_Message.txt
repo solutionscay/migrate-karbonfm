@@ -1,0 +1,834 @@
+# script 337: _Send Email Message
+# file: karbon_kontroller.fmp12
+# folder: API / EmailMessage / Private
+# source: ScriptCatalog/Script[@id=337]
+# steps: 181 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=708 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Send Email Message { data }
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@desc Transports an email to an SMTP server; nothing is stored
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {object} EmailMessage
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {string} [EmailMessage.Cc]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {string} [EmailMessage.From] - Leave blank to inherit from sender
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@param {string} EmailMessage.Message
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@param {string} EmailMessage.Password - optional if using system SMTP settings
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@param {string} EmailMessage.SenderEmailAddress - optional if using system SMTP settings
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@param {string} [EmailMessage.SenderFullName] - The full name portion of the sender's email address; optional if using system SMTP settings
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@param {string} EmailMessage.SenderUserName - The name that you use to log in to the mail server; optional if using system SMTP settings
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@param {string} EmailMessage.SmtpServer - optional if using system SMTP settings or UserId
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@param {string} [EmailMessage.SmtpServerAuthentication] - optional if using system SMTP settings or UserId
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@param {string} [EmailMessage.SmtpServerEncryptionType] - optional if using system SMTP settings or UserId
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@param {number} EmailMessage.SmtpServerPort - optional if using system SMTP settings or UserId
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@param {string} EmailMessage.Subject
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #@param {string} EmailMessage.To
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #@param {string} [EmailMessage.UserId] - Retrieve SMTP options from user profile
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #@param {boolean} [EmailMessage.UseSystemSmtpSettings] - True if you want to use the default system email account
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #@returnSuccess {boolean} result.Sent - was the message successfully sent?
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #@history 2019-02-26 dave@geistinteractive.com - Pulls some values (e.g., SmtpServer) from system if not present in user profile
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #@history 2018-07-21 dave@geistinteractive.com - Optionally pulls SMTP info from user profile or system
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #@history 2018-04-18 dave@geistinteractive.com - Created by Generator
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  43    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $Transaction.Payload; Value:JSONSetElement ( "" ; 
+        
+        	["scriptParameter" ; Get(ScriptParameter) ; JSONObject ];
+        	["scriptName" ; Get(ScriptName) ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:ScriptParameter, fn:JSONObject, fn:ScriptName, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Transaction.Payload
+  50    If [ not IsEmpty ( JSONGetElement ( $Transaction.Payload ; "scriptParameter.Password" ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:JSONGetElement
+  51    #Make sure we aren't storing passwords in the transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $Transaction.Payload; Value:JSONSetElement ( $Transaction.Payload ; "scriptParameter.Password" ; "<removed>" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Transaction.Payload
+  53    End If
+        DisableStepCollapsed state=False
+  54    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: $Transaction.Payload ]
+        DisableStepCollapsed state=False
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  57    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $EmailMessage; Value:JSON.Format ( Get ( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailMessage
+  65    If [ Error.IsError ( $EmailMessage ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  66    Set Variable [ $error; Value:$EmailMessage ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  67    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  68    End If
+        DisableStepCollapsed state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #SMTP OPTIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    If [ JSONGetElement ( $EmailMessage ; "UseSystemSmtpSettings" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #Get SMTP options from system settings
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Perform Script [ “Get System” ]
+        DisableStepCollapsed state=False
+        Script id=502 name="Get System"
+  78    Set Variable [ $System; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $System
+  79    Set Variable [ $Defaults; Value:JSON.Pluck.From ( $System ) & JSON.Pluck ( 
+        	List ( 
+        		JSON.Pluck.Prop ( "SystemEmailSmtpServerAuthentication" ; JSONString ; "SmtpServerAuthentication" ) ; 
+        		JSON.Pluck.Prop ( "SystemEmailAccountPassword" ; JSONString ; "Password" ) ; 
+        		JSON.Pluck.Prop ( "SystemEmailAddress" ; JSONString ; "SenderEmailAddress" ) ; 
+        		JSON.Pluck.Prop ( "SystemEmailFullName" ; JSONString ; "SenderFullName" ) ; 
+        		JSON.Pluck.Prop ( "SystemEmailSmtpServer" ; JSONString ; "SmtpServer" ) ; 
+        		JSON.Pluck.Prop ( "SystemEmailSmtpServerEncryptionType" ; JSONString ; "SmtpServerEncryptionType" ) ; 
+        		JSON.Pluck.Prop ( "SystemEmailSmtpServerPort" ; JSONString ; "SmtpServerPort" ) ; 
+        		JSON.Pluck.Prop ( "SystemEmailUserName" ; JSONString ; "SenderUserName" ) 	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Pluck.From, cf:JSON.Pluck, fn:List, cf:JSON.Pluck.Prop, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Defaults
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Else If [ JSONGetElement ( $EmailMessage ; "UserId" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #Get SMTP options from user profile
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Set Field [ DBTransactions::UserId; JSONGetElement ( $EmailMessage ; "UserId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=DBTransactions id=64 name=UserId
+  85    Set Variable [ $SmtpServer; Value:If ( IsEmpty ( User::SmtpServer ) ; 
+        	System::SystemEmailSmtpServer ; 
+        	User::SmtpServer
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, User::SmtpServer#114, System::SystemEmailSmtpServer#48
+        Repetition
+          Calculation:
+            | 1
+        Name: $SmtpServer
+  86    Set Variable [ $SmtpServerAuthentication; Value:If ( IsEmpty ( User::SmtpServerAuthentication ) ; 
+        	System::SystemEmailSmtpServerAuthentication ; 
+        	User::SmtpServerAuthentication
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, User::SmtpServerAuthentication#115, System::SystemEmailSmtpServerAuthentication#51
+        Repetition
+          Calculation:
+            | 1
+        Name: $SmtpServerAuthentication
+  87    Set Variable [ $SmtpServerEncryptionType; Value:If ( IsEmpty ( User::SmtpServerEncryptionType ) ; 
+        	System::SystemEmailSmtpServerEncryptionType ; 
+        	User::SmtpServerEncryptionType
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, User::SmtpServerEncryptionType#116, System::SystemEmailSmtpServerEncryptionType#50
+        Repetition
+          Calculation:
+            | 1
+        Name: $SmtpServerEncryptionType
+  88    Set Variable [ $SmtpServerPort; Value:If ( IsEmpty ( User::SmtpServerPort ) ; 
+        	System::SystemEmailSmtpServerPort ; 
+        	User::SmtpServerPort
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, User::SmtpServerPort#117, System::SystemEmailSmtpServerPort#49
+        Repetition
+          Calculation:
+            | 1
+        Name: $SmtpServerPort
+  89    Set Variable [ $Defaults; Value:JSONSetElement ( "{}" ; 
+        	// Options that must come from user profile
+        	[ "SenderEmailAddress" ; User::SmtpEmailAddress ; JSONString ];
+        	[ "SmtpFullName" ; User::SmtpFullName ; JSONString ];
+        	[ "Password" ; User::SmtpPassword ; JSONString ];
+        	[ "SenderUserName" ; User::SmtpUserName ; JSONString ]; 
+        
+        	// Options that can inherit from system
+        	[ "SmtpServer" ; $SmtpServer ; JSONString ];
+        	[ "SmtpServerAuthentication" ; $SmtpServerAuthentication ; JSONString ];
+        	[ "SmtpServerEncryptionType" ; $SmtpServerEncryptionType ; JSONString ];
+        	[ "SmtpServerPort" ; $SmtpServerPort ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, User::SmtpEmailAddress#111, fn:JSONString, User::SmtpFullName#112, User::SmtpPassword#118, User::SmtpUserName#113
+        Repetition
+          Calculation:
+            | 1
+        Name: $Defaults
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    End If
+        DisableStepCollapsed state=False
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #Make sure our EmailMessage parameter is still valid after applying defaults
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    If [ not IsEmpty ( $Defaults ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  95    Set Variable [ $EmailMessage; Value:JSON.Merge ( $Defaults ; $EmailMessage ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Merge
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailMessage
+  96    If [ Error.IsError ( $EmailMessage ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  97    Set Variable [ $error; Value:$EmailMessage ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  98    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  99    End If
+        DisableStepCollapsed state=False
+ 100    End If
+        DisableStepCollapsed state=False
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    Set Variable [ $error; Value:JSON.Validate.This ( $EmailMessage ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "Message" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "Password" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "SenderEmailAddress" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "SenderUserName" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "SmtpServer" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "SmtpServerPort" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "Subject" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "To" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 104    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    Set Variable [ $Attachments; Value:JSONGetElement ( $EmailMessage ; "Attachments" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Attachments
+ 114    Set Variable [ $Bcc; Value:JSONGetElement ( $EmailMessage ; "Bcc" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Bcc
+ 115    Set Variable [ $Cc; Value:JSONGetElement ( $EmailMessage ; "Cc" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Cc
+ 116    Set Variable [ $From; Value:JSONGetElement ( $EmailMessage ; "From" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $From
+ 117    Set Variable [ $Message; Value:JSONGetElement ( $EmailMessage ; "Message" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Message
+ 118    Set Variable [ $Password; Value:JSONGetElement ( $EmailMessage ; "Password" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Password
+ 119    Set Variable [ $SenderEmailAddress; Value:JSONGetElement ( $EmailMessage ; "SenderEmailAddress" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SenderEmailAddress
+ 120    Set Variable [ $SenderFullName; Value:JSONGetElement ( $EmailMessage ; "SenderFullName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SenderFullName
+ 121    Set Variable [ $SenderUserName; Value:JSONGetElement ( $EmailMessage ; "SenderUserName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SenderUserName
+ 122    Set Variable [ $SmtpServer; Value:JSONGetElement ( $EmailMessage ; "SmtpServer" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SmtpServer
+ 123    Set Variable [ $SmtpServerAuthentication; Value:JSONGetElement ( $EmailMessage ; "SmtpServerAuthentication" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SmtpServerAuthentication
+ 124    Set Variable [ $SmtpServerEncryptionType; Value:JSONGetElement ( $EmailMessage ; "SmtpServerEncryptionType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SmtpServerEncryptionType
+ 125    Set Variable [ $SmtpServerPort; Value:JSONGetElement ( $EmailMessage ; "SmtpServerPort" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SmtpServerPort
+ 126    Set Variable [ $Subject; Value:JSONGetElement ( $EmailMessage ; "Subject" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Subject
+ 127    Set Variable [ $To; Value:JSONGetElement ( $EmailMessage ; "To" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $To
+ 128    Set Variable [ $UseSystemSmtpSettings; Value:JSONGetElement ( $EmailMessage ; "UseSystemSmtpSettings" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $UseSystemSmtpSettings
+ 129    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 130    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 131    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 132    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+ 133    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 134    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 135    Set Variable [ $From; Value:Quote ( $SenderFullName ) & " <" & $SenderEmailAddress & ">" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $From
+ 136    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 137    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 138    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 139    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 140    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 141    #CREATE MESSAGE OBJECT
+        DisableStepCollapsed state=False
+        Restore state=False
+ 142    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 143    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 144    Set Variable [ $emailMessage; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 145    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "Attachments" ; $Attachments ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 146    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "Bcc" ; $Bcc ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 147    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "Cc" ; $Cc ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 148    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "Message" ; $Message ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 149    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "SenderEmailAddress" ; $SenderEmailAddress ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 150    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "SenderFullName" ; $SenderFullName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 151    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "SenderUserName" ; $SenderUserName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 152    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "Subject" ; $Subject ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 153    Set Variable [ $emailMessage; Value:JSONSetElement ( $emailMessage ; "To" ; $To ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $emailMessage
+ 154    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 155    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 156    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 157    #SEND EMAIL
+        DisableStepCollapsed state=False
+        Restore state=False
+ 158    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 159    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 160    Send Mail [ Send via SMTP Server; To: $To; CC: $Cc; BCC: $Bcc; Subject: $Subject; Message: $Message; Attachments: “$Attachments”; Name: Quote( $SenderFullName ); Email Address: $SenderEmailAddress; SMTP Server: $SmtpServer; Port: $SmtpServerPort; Use TLS; Authentication Type: Plain Password; User Name: $SenderUserName; Password: $Password ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Attachment
+          UniversalPathList: $Attachments
+        To UseFoundSet=False
+        Cc UseFoundSet=False
+        Bcc UseFoundSet=False
+        SMTPNameDescription
+          refs: fn:Quote
+        MultipleEmails state=False
+        SendViaSMTP state=True
+        SendViaOAuthAuthentication state=False
+        SMTPEncryptionType type=SMTPEncryptionTLS
+        SMTPAuthenticationType type=SMTPAuthenticationPlain
+        OAuthProvider type=OAuthProviderGoogle
+ 161    Set Variable [ $error; Value:Error.Last ( "sending mail via SMTP" ; $emailMessage ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 162    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 163    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+ 164    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 165    Set Variable [ $result; Value:JSONSetElement( "{}" ; 
+        	[ "Sent" ; True ; JSONBoolean ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 166    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 167    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+ 168    End Loop
+        DisableStepCollapsed state=False
+ 169    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 170    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 171    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 172    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 173    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 174    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+ 175    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 176    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 177    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+ 178    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+ 179    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 180    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 181    Exit Script [ Result: Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult

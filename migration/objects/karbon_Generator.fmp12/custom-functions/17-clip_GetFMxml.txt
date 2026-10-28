@@ -1,0 +1,35 @@
+# custom function 17: clip_GetFMxml
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=17]
+
+CustomFunction id=17 functionArity=0 visible=True parameters="" name=clip_GetFMxml
+  Calculation:
+    | Let(
+    | [
+    | formats = <Function Missing>;
+    | expression = "Left( item ; 4 ) = \"dyn.\"" ;
+    | format = FilterValuesByExpression ( formats ; expression );
+    | 
+    | xml = <Function Missing> ( format );
+    | 
+    | 
+    | result = 
+    | If(   Get (SystemPlatform) = 1  ;  // Mac only support for PrittyPrint at this time
+    |    Let(
+    |    [
+    |    path  = "/Volumes" & Get ( TemporaryPath ) & "tidy.xml" ;
+    |    fileWriteError = <Function Missing>(path ; xml; "");
+    |    tidyCommand = "tidy -xml -i -m -utf8 --literal-attributes 1 -wrap 0 '" & path & "'" ;
+    |    tidyTheFile = <Function Missing> ( tidyCommand ; 1000 )
+    |    ];
+    |    <Function Missing>(path)
+    |    ) ;
+    |   xml
+    |   )
+    | 
+    | ];
+    | 
+    | result
+    | 
+    | )
+    refs: fn:Let, cf:FilterValuesByExpression, fn:If, fn:Get, fn:SystemPlatform, fn:TemporaryPath

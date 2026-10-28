@@ -1,0 +1,211 @@
+# script 358: Run TestLine using Script
+# file: karbon_Generator.fmp12
+# folder: Test Engine (UI) / Private
+# source: ScriptCatalog/Script[@id=358]
+# steps: 47 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=367 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #Runs a test
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Freeze Window
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Go to Related Record [ From table: “Selected_TestLine”; Using layout: “Test_TestLine” (Test_TestLine) ]
+        [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065158 name=Selected_TestLine
+        Layout id=74 name=Test_TestLine
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $file; Value:Test_TestLine::FileName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Test_TestLine::FileName#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $file
+   8    Set Variable [ $script; Value:Test_TestLine::ScriptName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Test_TestLine::ScriptName#17
+        Repetition
+          Calculation:
+            | 1
+        Name: $script
+   9    Set Variable [ $param; Value:Test_TestLine_JSNObject::JSONObjectAsText ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Test_TestLine_JSNObject::JSONObjectAsText#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ IsEmpty ( $script ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  12    Show Custom Dialog [ Title: "Whoops!"; Message: "You need to enter a script to run in the field provided"; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  13    Exit Script [  ]
+        DisableStepCollapsed state=False
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #local url
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $host; Value:Get( HostIPAddress ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:HostIPAddress
+        Repetition
+          Calculation:
+            | 1
+        Name: $host
+  18    Set Variable [ $url; Value:"fmp://" & $host & "/" & $file & "?script=" & $script & "&param=" & $param ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #hosted url
+        DisableStepCollapsed state=False
+        Restore state=False
+  21 // Set Variable [ $url; Value:Let ( 
+        [
+        
+        url = Get ( FilePath )
+        
+        
+        ];
+        
+        url & "?script=" & $script
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Get, fn:FilePath
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Open URL [ $url ]
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $error; Value:Get (LastError) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LastError
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    If [ $error = 104 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Show Custom Dialog [ Title: "Error: " & $error; Message: "There is no script named " & Quote($script) & " in this file."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:Quote
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Else If [ $error > 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Show Custom Dialog [ Title: "Error: " & $error; Message: "There was a problem.  The test script probably didn't run"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #The script ran, pass back the result
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Perform Script [ “Check Test Result for Selected TestLine”; Parameter: Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Script id=363 name="Check Test Result for Selected TestLine"
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    End If
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,85 @@
+# custom function 17: JSON.Merge
+# file: karbon_kontroller.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=17]
+
+CustomFunction id=17 functionArity=2 visible=True parameters=target;source name=JSON.Merge
+  Calculation:
+    | /**
+    |  *
+    |  * performs a deep merge on two JSONObjects
+    |  *
+    |  * @param {object} target the object to merge into
+    |  * @param {object} source the object to merge into
+    |  *
+    |  * @module fm-json-additions
+    |  * @see https://github.com/geistinteractive/fm-json-additions
+    |  *
+    |  * @history 2018-09-07 fixed issue merging object into null value, dave@geistinteractive.com
+    |  * @history 2018-08-04 fixed GH#19, dave@geistinteractive.com
+    |  * @history 2018-02-11 deep merge support, dave@geistinteractive.com
+    |  * @history 2017–05-15 fixed gh# 1, todd@geistinteractive.com
+    |  * @history 2017–04-04 created, todd@geistinteractive.com
+    |  *
+    |  */
+    | 
+    | 
+    | Let( [
+    | 	sourceKeys = JSONListKeys ( source ; "" ) ;
+    | 	targetKeys = JSONListKeys ( target ; "" )
+    | ] ;
+    | 	Case( 
+    | 
+    | 		// exit on error
+    | 		Left( sourceKeys ; 1 ) = "?" ; 
+    | 			sourceKeys & " In Source." ;
+    | 
+    | 		Left( targetKeys ; 1 ) = "?" ; 
+    | 			targetKeys  & " In Target." ;
+    | 			
+    | 		Left(  JSONGetElement ( source ; "" ) ;1 ) = "[" ; 
+    | 			"? * Array in Source. Must be an object" ;
+    | 
+    | 		// look for the last recursion and exit
+    | 		ValueCount( sourceKeys ) < 1  ; 
+    | 			target ; // done
+    | 
+    | 
+    | 		Let( [
+    | 			// merge this rounds key into the target
+    | 			thisKey = GetValue( sourceKeys ; 1 ) ;
+    | 			thisValue = JSONGetElement( source ; thisKey ) ;
+    | 			
+    | 			// The value of the matching object in the target, if present
+    | 			targetValue = JSONGetElement( target ; thisKey ) ;
+    | 			firstChar = Left( thisValue ; 1 ) ;
+    | 			needToCheckForNumber = Filter( firstChar ; "0123456789" ) = firstChar ; 
+    | 			JSONType = If( 
+    | 				( needToCheckForNumber and GetAsText( thisValue ) <> GetAsNumber( thisValue ) ) or  
+    | 				firstChar = "\""or  
+    | 				firstChar = "¶" ; 
+    | 					JSONString ; 
+    | 					""
+    | 			 ) ;
+    | 
+    | 			thisValueOut = If ( Left ( thisValue ; 1 ) = "{" ; // this is an object
+    | 
+    | 				// merge this object and return the result
+    | 				Let ( targetValue = If ( targetValue = "" ; "{}" ; targetValue ) ; // if object doesn't exist in target, create empty
+    | 					JSON.Merge ( targetValue ; thisValue ) 
+    | 				) ;  
+    | 					
+    | 				thisValue
+    | 
+    | 			 ) ; 
+    | 
+    | 			newTarget = JSONSetElement ( target ; thisKey ; thisValueOut ; JSONType ) ;
+    | 
+    | 			// remove this rounds key from the source
+    | 			newSource = JSONDeleteElement ( source ; thisKey )
+    | 		] ; 
+    | 			// repeat
+    | 			JSON.Merge( newTarget ; newSource ) 
+    | 		 ) 
+    | 	 )
+    |  )
+    refs: fn:Let, fn:JSONListKeys, fn:Case, fn:Left, fn:JSONGetElement, fn:ValueCount, fn:GetValue, fn:Filter, fn:If, fn:and, fn:GetAsText, fn:GetAsNumber, fn:or, fn:JSONString, cf:JSON.Merge, fn:JSONSetElement, fn:JSONDeleteElement

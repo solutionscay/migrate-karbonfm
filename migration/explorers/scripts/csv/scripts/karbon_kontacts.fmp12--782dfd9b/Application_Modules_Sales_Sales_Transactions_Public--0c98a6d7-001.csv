@@ -1,0 +1,36 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/224-Display_Sales_Transaction_in_a_New_Window_Id.txt,2d45c9ddf46156e87622f3065434a3a845d2b0fe708e8c9ffe1a53c09a40e1ca,scripts,karbon_kontacts.fmp12,224,Display Sales Transaction in a New Window( Id ),navigation,client-ui,tier3,Opens a sales transaction in a new window: sets selector::SalesTransactionId from the parameter and opens the invoice layout (view-only when the transaction is locked) or the sales receipt layout (view-only when locked) according to whether the transaction is an invoice.,"Selected_SalesTransaction::InvoiceInd#73
+Selected_SalesTransaction::LockedInd#80","selector::SalesTransactionId#13 (Set Field step 9, global)",none,"objects/karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+objects/karbon_kontacts.fmp12/layouts/84-Sales_List.txt
+objects/karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt
+objects/karbon_kontacts.fmp12/scripts/514-Create_Sales_Receipt_Id.txt
+objects/karbon_kontacts.fmp12/scripts/272-Create_Invoice_Customer_Id.txt
+objects/karbon_kontacts.fmp12/scripts/697-btn_View_Task_from_Dashboard.txt",none,"Steps 18-28 (refresh the transaction from QBO before showing it when it has a qbo_id and is not ""Needs to Send"") are disabled, so the data shown is the local copy. Parameter is the bare Id string, not JSON."
+karbon_kontacts.fmp12/scripts/272-Create_Invoice_Customer_Id.txt,5624bbc789569c52b53cbb900bacffaa22b321a37aa66d2e62f25d9e58f96042,scripts,karbon_kontacts.fmp12,272,Create Invoice (Customer Id),orchestration,server-domain,tier2,"Creates an invoice for a customer: builds an invoice JSON with the customer id, today's date and the billing and shipping address of the party (from Party_ContactMethod billing and shipping addresses), calls ""Create or Update Invoice { invoice }"" in karbon_kontroller, and opens the created invoice in a new window.","Party_ContactMethod#Billing_Address::City#10
+Party_ContactMethod#Billing_Address::Country#13
+Party_ContactMethod#Billing_Address::AddressLine1#7
+Party_ContactMethod#Billing_Address::AddressLine2#8
+Party_ContactMethod#Billing_Address::PostalCode#12
+Party_ContactMethod#Billing_Address::StateProvince#11
+Party_ContactMethod#Shipping_Address::City#10
+Party_ContactMethod#Shipping_Address::Country#13
+Party_ContactMethod#Shipping_Address::AddressLine1#7
+Party_ContactMethod#Shipping_Address::AddressLine2#8
+Party_ContactMethod#Shipping_Address::PostalCode#12
+Party_ContactMethod#Shipping_Address::StateProvince#11",none,"karbon_kontroller.fmp12/scripts/395 ""Create or Update Invoice { invoice }"" (step 12) [other file: karbon_kontroller]
+karbon_kontacts.fmp12/scripts/224 ""Display Sales Transaction in a New Window( Id )"" (step 21)","objects/karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+objects/karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt",none,"Step 9 (an earlier JSON with only id_Customer) is disabled. Addresses come from the current party context (relationship on the layout the button runs from), not from the customer id. Error result exits with -2 without showing a dialog."
+karbon_kontacts.fmp12/scripts/514-Create_Sales_Receipt_Id.txt,8a23936806bf9f7dc467eaf5be16fdd0414477ae23758a0808bb6d4420cd3d34,scripts,karbon_kontacts.fmp12,514,Create Sales Receipt ( Id ),orchestration,server-domain,tier2,"Creates a sales receipt for a customer: builds a receipt JSON with the customer id, today's date and ship date, the party's billing and shipping addresses and empty totals, status, shipMethod and tracking number, calls ""Create or Update SalesReceipt"" in karbon_kontroller, and opens the created receipt in a new window.","Party_ContactMethod#Billing_Address::City#10
+Party_ContactMethod#Billing_Address::Country#13
+Party_ContactMethod#Billing_Address::AddressLine1#7
+Party_ContactMethod#Billing_Address::AddressLine2#8
+Party_ContactMethod#Billing_Address::PostalCode#12
+Party_ContactMethod#Billing_Address::StateProvince#11
+Party_ContactMethod#Shipping_Address::City#10
+Party_ContactMethod#Shipping_Address::Country#13
+Party_ContactMethod#Shipping_Address::AddressLine1#7
+Party_ContactMethod#Shipping_Address::AddressLine2#8
+Party_ContactMethod#Shipping_Address::PostalCode#12
+Party_ContactMethod#Shipping_Address::StateProvince#11",none,"karbon_kontroller.fmp12/scripts/428 ""Create or Update SalesReceipt ( { SalesReceipt } )"" (step 6) [other file: karbon_kontroller]
+karbon_kontacts.fmp12/scripts/224 ""Display Sales Transaction in a New Window( Id )"" (step 15)","objects/karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+objects/karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt",none,"Sends empty strings for status, totalAmt, taxableSubtotal, shipMethod and trackingNum; the receipt is created and populated by karbon_kontroller script 428. Error result exits with -2 without showing a dialog."

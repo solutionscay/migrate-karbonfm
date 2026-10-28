@@ -1,0 +1,39 @@
+# custom function 37: JSON.Pluck.Prop
+# file: Picker Module.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=37]
+
+CustomFunction id=37 functionArity=3 visible=True parameters=PropToPluck;JSONType;As name=JSON.Pluck.Prop
+  Calculation:
+    | /**
+    |  * =====================================
+    |  *
+    |  * Plucks the prop from the source JSON and puts in the new JSON
+    |  * 
+    |  * @param {string} PropToPluck the name of the prop to pluck from the souce JSON
+    |  * @param {number} [JSONType], JSONType, use the provided constants, defaults to "" which means it will guess
+    |  * @param {string} [As=PropToPluck] an optional name to use instead of the original name defaults to PropToPluck
+    |  *  
+    |  * @module fm-json-additions
+    |  * @see https://github.com/geistinteractive/fm-json-additions
+    |  *
+    |  * @history 2017-09-01 created, todd@geistinteractive.com
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | If(
+    | JSON.ContainsProperty ( $JSON.Pluck.From ; PropToPluck );
+    | 
+    | 
+    | Let(
+    | [
+    | value  = JSONGetElement($JSON.Pluck.From ; PropToPluck );
+    | As = If( IsEmpty (As) ; PropToPluck ; As);
+    | $JSON.Pluck.Result = JSONSetElement($JSON.Pluck.Result; As ; value ; JSONType )
+    | ];
+    | ""
+    | )
+    | 
+    | 
+    | )
+    refs: fn:If, cf:JSON.ContainsProperty, fn:Let, fn:JSONGetElement, fn:IsEmpty, fn:JSONSetElement

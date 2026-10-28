@@ -1,0 +1,98 @@
+# custom function 5: jsonGet
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=5]
+
+CustomFunction id=5 functionArity=2 visible=True parameters=json;keyOrIndexOrPath name=jsonGet
+  Calculation:
+    | /**
+    |  * =====================================
+    |  * jsonGet ( json ; keyOrIndexOrPath )
+    |  *
+    |  * PURPOSE:
+    |  *	a convenience function that handles the most common JSONPath cases
+    |  *	Works with JSON Objects and JSON Arrays
+    |  *
+    |  * RETURNS:
+    |  *	the value specfied by the keyOrIndex
+    |  *
+    |  * PARAMETERS:
+    |  *	json = the json string
+    |  *	keyOrIndex = use a "key" for objects, and an "index" for number
+    |  *
+    |  * DEPENDENCIES:
+    |  *	BaseElements Plugin version 3.0 or greater
+    |  *
+    |  * HISTORY:
+    |  *	MODIFIED on 2016-OCT-21 todd@geistinteteractive.com fixes Issue #35
+    |  *	MODIFIED on 2015-APR-21 Daniel Smith, dansmith65@gmail.com
+    |  *		save error message to $json.error and clear the variable if no error
+    |  *		return "?" on error
+    |  *	MODIFIED on 2015-FEB-08 Todd Geist, todd@geistinteractive.com
+    |  *		changed parameter name to "keyOrIndexOrPath"
+    |  *	CREATED on 2015-JAN-06 Todd Geist, todd@geistinteractive.com
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | Let ( [
+    | 	json = <Function Missing> ( json ; "$" ) ;  // normalize the json
+    | 	start = Left ( json ; 1 ) ;
+    | 	end = Right ( json ; 1 ) ;
+    | 	pathStartsWithArray = Left(keyOrIndexOrPath;1) = "[";
+    | 	type = 
+    | 		Case (
+    | 				( start = "[" ) and ( end = "]" ) ;
+    | 				"array" ;
+    | 				
+    | 				( start = "{" ) and ( end = "}" ) ;
+    | 				"object" ;
+    | 				
+    | 				"other"
+    | 		)
+    | 	;
+    | 	keyOrIndexOrPath = If ( type = "array" and not pathStartsWithArray ;
+    | 		GetAsNumber ( keyOrIndexOrPath ) ;
+    | 		keyOrIndexOrPath
+    | 	) ;
+    | 	path = "$" & Case ( 
+    |  				type = "array" and not pathStartsWithArray ; "[" & keyOrIndexOrPath & "]" ; 
+    | 				type = "array" and pathStartsWithArray ; keyOrIndexOrPath ;
+    | 				"." & keyOrIndexOrPath
+    | 	) ;
+    | 	result = 
+    | 		Case (
+    | 			json = "?" ;
+    | 			"?" ;
+    | 			
+    | 			type = "array" and IsEmpty ( keyOrIndexOrPath ) ;
+    | 			"" ;
+    | 			
+    | 			type = "other" ;
+    | 			"" ;
+    | 			
+    | 			<Function Missing> ( json ; path )
+    | 		)
+    | 	;
+    | 	didNotExist = If ( result = "?" and <Function Missing> ≠ "?" ;
+    | 		IsEmpty ( FilterValues (
+    | 			jsonGetKeyList ( json ) ;
+    | 			keyOrIndexOrPath
+    | 		) )
+    | 	) ;
+    | 	$json.error =
+    | 		Case (
+    | 			result <> "?" ;
+    | 			"" ;
+    | 			
+    | 			didNotExist ;
+    | 			Quote ( keyOrIndexOrPath ) & " did not exist" ;
+    | 			
+    | 			<Function Missing> = "?" ;
+    | 			"BaseElements plugin is not available" ;
+    | 			
+    | 			Substitute ( <Function Missing> ; Char ( 10 ) ; "¶" )
+    | 		)
+    | ] ;
+    | 	If ( didNotExist ; "" ; result )
+    | )
+    refs: fn:Let, fn:Left, fn:Right, fn:Case, fn:and, fn:If, fn:not, fn:GetAsNumber, fn:IsEmpty, fn:FilterValues, cf:jsonGetKeyList, fn:Quote, fn:Substitute, fn:Char

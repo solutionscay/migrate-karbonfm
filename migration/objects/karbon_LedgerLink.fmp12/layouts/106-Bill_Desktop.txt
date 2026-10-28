@@ -1,0 +1,834 @@
+# layout 106: Bill | Desktop
+# file: karbon_LedgerLink.fmp12
+# folder: Application / Desktop
+# source: LayoutCatalog/Layout[@id=106]
+# objects: 100
+# theme: LedgerLink PC
+# folder group: id=88 groupCollapsed=True includeInMenu=False
+
+Layout width=1024 quickFind=True includeInMenu=True id=106 name="Bill | Desktop"
+  Table id=1065155 name=Bill
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnRecordCommit id=104 triggerFlags=1(browse)
+      Script id=536 name="Bill OnCommit Trigger"
+      TriggerText: "Bill OnCommit Trigger"
+    Trigger event=OnModeExit id=107 triggerFlags=2(find)
+      Script id=491 name="Exit Find Mode Trigger"
+      TriggerText: "Exit Find Mode Trigger"
+  Object type=Button key=10 LabelKey=0 bounds=0,0,39,42
+    Text flags=2 style=button.nav
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Display Main Nav” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=463 name="Display Main Nav"
+      Image name=a3_list.svg
+  Object type=Text key=39 LabelKey=0 bounds=0,42,39,170
+    Text flags=2 style=text.header.title.left: Bill
+  Object type=Field key=40 LabelKey=0 bounds=104,24,128,280
+    FieldObj numOfReps=1 flags=658468 inputMode=0 keyboardType=1 displayType=1(drop-down-list) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Bill_Vendor::displayName#15
+      PlaceholderText findMode=True
+        Calculation:
+          | "Vendor"
+  Object type=PopoverButton key=41 LabelKey=0 flags=260 bounds=104,24,128,280
+    Text flags=6
+    PopoverButtonObj buttonFlags=0 key=42 iconSize=14 displayType=0
+      Object type=Popover key=42 LabelKey=0 bounds=139,5,524,365
+        ScriptTriggers
+          Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+            Script id=513 name="Select Vendor for Bill On Popover Open"
+            TriggerText: "Select Vendor for Bill On Popover Open"
+          Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+            Script id=514 name="Select Vendor for Bill On Popover Close"
+            TriggerText: "Select Vendor for Bill On Popover Close"
+        TitleCalc
+          Calculation:
+            | "Popover"
+        PopoverObj flags=2 position=1 key=41
+          Object type=SlideControl key=43 LabelKey=0 bounds=152,8,520,360
+            SlideControlObj visPanelKey=44 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+              Object type=SlidePanel key=44 LabelKey=0 bounds=152,8,520,360
+                SlidePanelObj slidePanelFlagSet=0
+                  Object type=Portal key=45 LabelKey=0 name=portal.vendor_all bounds=210,16,512,352
+                    PortalObj portalFlags=409 numOfRows=10 initialRow=1
+                      TableAliasKey: Bill_Vendor~all
+                      FieldList
+                        FieldReference id=15 name=displayName repetition=1 UUID=""
+                          TableOccurrenceReference id=1065223 name=Bill_Vendor~all UUID=""
+                      SortList BlanksLast=False Maintain=True value=True
+                        Sort type=Ascending
+                          PrimaryField
+                            Field table=Bill_Vendor~all id=15 name=displayName
+                      FilterCalc enable=True
+                        Calculation:
+                          | IsEmpty ( GLOBAL::FILTER )
+                          | or
+                          | PatternCount ( Bill_Vendor~all::displayName ; GLOBAL::FILTER )
+                          refs: fn:IsEmpty, GLOBAL::FILTER#1, fn:or, fn:PatternCount, Bill_Vendor~all::displayName#15
+                      Object type=Button key=47 LabelKey=0 bounds=211,17,241,351
+                        Text flags=2 style=button.row
+                        ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                          Step enable=True id=1 name="Perform Script"
+                            StepText: Perform Script [ “Select Vendor for Bill” ]
+                            DisableStepCollapsed state=False
+                            CurrentScript value=Pause
+                            Script id=516 name="Select Vendor for Bill"
+                      Object type=Text key=150 LabelKey=0 bounds=218,29,235,194
+                        Text flags=8 tableViewVisibility=0: <<Bill_Vendor~all::displayName>>
+                          FieldList quickFind=True
+                            Field table=Bill_Vendor~all id=15 name=displayName
+                  Object type=Field key=48 LabelKey=0 bounds=160,16,184,270
+                    ScriptTriggers
+                      Trigger event=OnObjectModify id=3 triggerFlags=1(browse)
+                        Script id=515 name="Select Vendor for Bill: Filter"
+                        TriggerText: "Select Vendor for Bill: Filter"
+                    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+                      Field: GLOBAL::FILTER#1
+                  Object type=Button key=49 LabelKey=0 bounds=160,280,184,352
+                    Text flags=2: Add
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=4
+                      Step enable=True id=145 name="Go to Object"
+                        StepText: Go to Object [ Object Name: "field.newVendorName"; Repetition: 1 ]
+                        DisableStepCollapsed state=False
+                        ObjectName
+                          Calculation:
+                            | "field.newVendorName"
+                        Repetition
+                          Calculation:
+                            | 1
+                      Image name=a15_smallAdd.svg
+              Object type=SlidePanel key=50 LabelKey=0 bounds=152,8,520,360
+                SlidePanelObj slidePanelFlagSet=0
+                  Object type=Field key=51 LabelKey=0 name=field.newVendorName bounds=224,24,248,344
+                    FieldObj numOfReps=1 flags=32 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+                      Field: GLOBAL::FILTER#1
+                  Object type=Button key=52 LabelKey=0 bounds=280,264,312,344
+                    Text flags=2 style=button.raised.primary: Save
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                      Step enable=True id=1 name="Perform Script"
+                        StepText: Perform Script [ “Add Vendor From Bill” ]
+                        DisableStepCollapsed state=False
+                        CurrentScript value=Pause
+                        Script id=517 name="Add Vendor From Bill"
+                  Object type=Button key=53 LabelKey=0 bounds=280,160,312,248
+                    Text flags=2 style=button.flat.secondary: Cancel
+                    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+                      Step enable=True id=169 name="Close Popover"
+                        StepText: Close Popover
+                        DisableStepCollapsed state=False
+                  Object type=Text key=54 LabelKey=0 bounds=200,25,224,149
+                    Text flags=2 style=text.form.field.label: Name
+                  Object type=Text key=55 LabelKey=0 bounds=158,24,183,276
+                    Text flags=2 style=text.form.section: "New Vendor"
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Field key=56 LabelKey=0 bounds=216,24,240,152
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill_Vendor::billAddressCity#3
+      PlaceholderText findMode=True
+        Calculation:
+          | "City"
+  Object type=Field key=57 LabelKey=0 bounds=240,152,264,280
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill_Vendor::billAddressCountry#4
+      PlaceholderText findMode=True
+        Calculation:
+          | "Country"
+  Object type=Field key=58 LabelKey=0 bounds=168,24,192,256
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill_Vendor::billAddressLine1#5
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Field key=59 LabelKey=0 bounds=240,24,264,152
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill_Vendor::billAddressPostalCode#7
+      PlaceholderText findMode=True
+        Calculation:
+          | "ZIP"
+  Object type=Field key=60 LabelKey=0 bounds=216,152,240,280
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill_Vendor::billAddressState#8
+      PlaceholderText findMode=True
+        Calculation:
+          | "State"
+  Object type=Field key=61 LabelKey=0 bounds=168,480,192,600
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill::TxnDate#5
+      Display: date format=7 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"
+  Object type=Field key=62 LabelKey=0 bounds=168,296,192,416
+    FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill::id_Term#37
+      ValueList: Term Id Active#16
+  Object type=Button key=64 LabelKey=0 flags=1342193925 bounds=0,928,40,1024
+    ConditionalFormatting
+      Item id=0 flags=1
+        Condition op=0
+          Calculation:
+            | Bill::qbo_send
+            refs: Bill::qbo_send#10
+        Format: -fm-underline: underline; -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | Case (
+        | 	IsEmpty ( Bill::qbo_Id ) ;
+        | 	"New record hasn't been sent to QBO yet." ;
+        | 
+        | 	Bill::qbo_send ;
+        | 	"Record has been changed and needs to be sent to QBO."
+        | )
+        refs: fn:Case, fn:IsEmpty, Bill::qbo_Id#8, Bill::qbo_send#10
+    Text flags=6 style=button.nav: Sync
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Sync QBO with FM, Show Progress Card” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=242 name="Sync QBO with FM, Show Progress Card"
+      Image name=a125_sync.svg
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+  Object type=Text key=66 LabelKey=0 flags=1342177540 bounds=43,776,77,1000
+    Text flags=14 tableViewVisibility=0: "<<balance>> DUE"
+      Display: number flags=3598 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      FieldList quickFind=False
+        Field table=Bill id=40 name=balance
+    HideCondition findMode=True
+      Calculation:
+        | Bill::balance ≤ 0
+        | or
+        | IsEmpty (Bill::qbo_Id )
+        | or
+        | Bill::deleted
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: Bill::balance#40, fn:or, fn:IsEmpty, Bill::qbo_Id#8, Bill::deleted#19, fn:Get, fn:WindowMode
+  Object type=Text key=67 LabelKey=0 flags=1342177540 bounds=43,776,80,1000
+    Text flags=6 style=text.header.title.right: PAID
+    HideCondition findMode=True
+      Calculation:
+        | Bill::balance ≠ 0
+        | or
+        | IsEmpty ( Bill::qbo_Id )
+        | or
+        | Bill::deleted
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: Bill::balance#40, fn:or, fn:IsEmpty, Bill::qbo_Id#8, Bill::deleted#19, fn:Get, fn:WindowMode
+  Object type=Button key=68 LabelKey=0 flags=16388 bounds=104,280,128,312
+    ToolTip
+      Calculation:
+        | "go to Vendor"
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=74 name="Go to Related Record"
+        StepText: Go to Related Record [ From table: “Bill_Vendor”; Using layout: “Vendor | Desktop” (Vendor) ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065241 name=Bill_Vendor
+        Layout id=104 name="Vendor | Desktop"
+      Image name=a121_revert.svg
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Bill::id_Vendor )
+        refs: fn:IsEmpty, Bill::id_Vendor#6
+  Object type=Field key=70 LabelKey=0 bounds=192,24,216,280
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill_Vendor::billAddressLine2#6
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Text key=71 LabelKey=0 bounds=144,24,168,280
+    Text flags=6 style=text.form.field.label: "Mailing address"
+  Object type=Text key=72 LabelKey=0 bounds=144,296,168,416
+    Text flags=6 style=text.form.field.label: Terms
+  Object type=Text key=73 LabelKey=0 bounds=144,480,168,600
+    Text flags=6 style=text.form.field.label: "Bill date"
+  Object type=Field key=74 LabelKey=0 bounds=168,616,192,736
+    FieldObj numOfReps=1 flags=558112 inputMode=0 keyboardType=1 displayType=6(drop-down-calendar) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill::DueDate#3
+      Display: date format=7 monthStyle=0 dayStyle=0 separator=/ elements=3,6,1,8 separators="|, | |, |"
+  Object type=Text key=75 LabelKey=0 bounds=144,616,168,736
+    Text flags=6 style=text.form.field.label: "Due date"
+  Object type=Field key=76 LabelKey=0 flags=4 bounds=48,24,72,280
+    FieldObj numOfReps=1 flags=1179680 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=edit.view.left
+      Field: Bill::docNumber#21
+      PlaceholderText findMode=True
+        Calculation:
+          | "Bill No."
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+  Object type=Button key=77 LabelKey=0 flags=1342177540 bounds=0,784,40,928
+    Text flags=6 style=button.nav: "Open in QBO"
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "Bill" ; JSONString];
+          | 	[ "QBOId" ;  Bill::qbo_Id ; JSONString ]
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "Bill" ; JSONString];
+          | 	[ "QBOId" ;  Bill::qbo_Id ; JSONString ]
+          | )
+          refs: fn:JSONSetElement, fn:JSONString, Bill::qbo_Id#8
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a11_share.svg
+    HideCondition findMode=True
+      Calculation:
+        | IsEmpty ( Bill::qbo_Id)
+        | or
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:IsEmpty, Bill::qbo_Id#8, fn:or, fn:Get, fn:WindowMode
+  Object type=Rect key=85 LabelKey=0 flags=1073741824 style=shape.form.portalHeader bounds=280,24,304,1000
+  Object type=Portal key=94 LabelKey=0 flags=1073741824 bounds=304,24,423,1000
+    PortalObj portalFlags=277 numOfRows=3 initialRow=1
+      TableAliasKey: BillLine_AccountBasedExpenseLineDetail
+      FieldList
+        Field table=BillLine_AccountBasedExpenseLineDetail id=9 name=description
+        Field table=BillLine_AccountBasedExpenseLineDetail id=1 name=id_ExpenseAccount
+        Field table=BillLine_AccountBasedExpenseLineDetail id=21 name=amount
+      Object type=Text key=95 LabelKey=0 bounds=312,24,336,64
+        Text flags=14 tableViewVisibility=0 style=text.list.field.center: {{RecordNumber}}
+          FieldList quickFind=False
+      Object type=Field key=96 LabelKey=0 flags=1073741824 bounds=312,304,336,680
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: BillLine_AccountBasedExpenseLineDetail::description#9
+      Object type=Field key=100 LabelKey=0 bounds=312,64,336,272
+        FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount#1
+          ValueList: Accounts Expense Id#10
+      Object type=Button key=101 LabelKey=0 flags=1342177284 bounds=305,960,343,999
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=104 name="Delete Portal Row"
+            StepText: Delete Portal Row
+            NoInteract state=False
+            DisableStepCollapsed state=False
+          Image name=a25_trash.svg
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( BillLine_AccountBasedExpenseLineDetail::id )
+            refs: fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::id#10
+      Object type=Button key=103 LabelKey=0 flags=16385 bounds=312,272,336,296
+        ConditionalFormatting
+          Item id=0 flags=129
+            Condition op=0
+              Calculation:
+                | IsEmpty ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount )
+                refs: fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount#1
+            Format: -fm-icon-color: rgba(0%,0%,0%,0);
+        ToolTip
+          Calculation:
+            | "remove value"
+        Text flags=6 style=button.field
+        ButtonObj buttonFlags=0 iconSize=14 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount; "" ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | ""
+            Field table=BillLine_AccountBasedExpenseLineDetail id=1 name=id_ExpenseAccount
+          Image name=a32_smallXOutline.svg
+      Object type=Field key=146 LabelKey=0 flags=1342177284 bounds=312,688,336,768
+        ScriptTriggers
+          Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+            Script id=538 name="BillItem Amount OnObjectExit Trigger"
+              Calculation:
+                | BillLine_AccountBasedExpenseLineDetail::detailType
+                refs: BillLine_AccountBasedExpenseLineDetail::detailType#37
+            TriggerText: "BillItem Amount OnObjectExit Trigger"; Parameter: BillLine_AccountBasedExpenseLineDetail::detailType
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: BillLine_AccountBasedExpenseLineDetail::amount#21
+          Display: number flags=16392 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount )
+            | 
+            | /* if an item is not selected, assume this is a description-only line */
+            refs: fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount#1
+      Object type=Button key=147 LabelKey=0 flags=1342177540 bounds=305,870,343,910
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_AccountBasedExpenseLineDetail::taxable; not BillLine_AccountBasedExpenseLineDetail::taxable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not BillLine_AccountBasedExpenseLineDetail::taxable
+              refs: fn:not, BillLine_AccountBasedExpenseLineDetail::taxable#34
+            Field table=BillLine_AccountBasedExpenseLineDetail id=34 name=taxable
+          Image name=checked.svg
+        HideCondition findMode=True
+          Calculation:
+            | not BillLine_AccountBasedExpenseLineDetail::taxable or
+            | (
+            | 	IsEmpty ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: fn:not, BillLine_AccountBasedExpenseLineDetail::taxable#34, fn:or, fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount#1, fn:and, fn:Get, fn:WindowMode
+      Object type=Button key=175 LabelKey=0 flags=1342177540 bounds=305,809,343,849
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_AccountBasedExpenseLineDetail::billable; not BillLine_AccountBasedExpenseLineDetail::billable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not BillLine_AccountBasedExpenseLineDetail::billable
+              refs: fn:not, BillLine_AccountBasedExpenseLineDetail::billable#29
+            Field table=BillLine_AccountBasedExpenseLineDetail id=29 name=billable
+          Image name=checked.svg
+        HideCondition findMode=True
+          Calculation:
+            | not BillLine_AccountBasedExpenseLineDetail::billable
+            | or
+            | (
+            | 	IsEmpty ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: fn:not, BillLine_AccountBasedExpenseLineDetail::billable#29, fn:or, fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount#1, fn:and, fn:Get, fn:WindowMode
+      Object type=Button key=179 LabelKey=0 flags=1342177540 bounds=305,870,343,910
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_AccountBasedExpenseLineDetail::taxable; not BillLine_AccountBasedExpenseLineDetail::taxable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not BillLine_AccountBasedExpenseLineDetail::taxable
+              refs: fn:not, BillLine_AccountBasedExpenseLineDetail::taxable#34
+            Field table=BillLine_AccountBasedExpenseLineDetail id=34 name=taxable
+          Image name=checkbox.svg
+        HideCondition findMode=True
+          Calculation:
+            | BillLine_AccountBasedExpenseLineDetail::taxable or
+            | (
+            | 	IsEmpty ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: BillLine_AccountBasedExpenseLineDetail::taxable#34, fn:or, fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount#1, fn:and, fn:Get, fn:WindowMode
+      Object type=Button key=183 LabelKey=0 flags=1342177540 bounds=305,809,343,849
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_AccountBasedExpenseLineDetail::billable; not BillLine_AccountBasedExpenseLineDetail::billable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not BillLine_AccountBasedExpenseLineDetail::billable
+              refs: fn:not, BillLine_AccountBasedExpenseLineDetail::billable#29
+            Field table=BillLine_AccountBasedExpenseLineDetail id=29 name=billable
+          Image name=checkbox.svg
+        HideCondition findMode=True
+          Calculation:
+            | BillLine_AccountBasedExpenseLineDetail::billable
+            | or
+            | (
+            | 	IsEmpty ( BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: BillLine_AccountBasedExpenseLineDetail::billable#29, fn:or, fn:IsEmpty, BillLine_AccountBasedExpenseLineDetail::id_ExpenseAccount#1, fn:and, fn:Get, fn:WindowMode
+  Object type=Text key=106 LabelKey=0 bounds=280,64,304,272
+    Text flags=6 style=text.form.portal.label.left: ACCOUNT
+  Object type=Text key=107 LabelKey=0 flags=1073741824 bounds=280,304,304,680
+    Text flags=6 style=text.form.portal.label.left: DESCRIPTION
+  Object type=Text key=108 LabelKey=0 flags=1342177280 bounds=280,688,304,768
+    Text flags=6 style=text.form.portal.label.right: AMOUNT
+  Object type=Text key=109 LabelKey=0 flags=1342177280 bounds=280,788,304,860
+    Text flags=6 style=text.form.portal.label.right: BILLABLE
+  Object type=Text key=110 LabelKey=0 flags=1342177280 bounds=280,870,304,910
+    Text flags=6 style=text.form.portal.label.right: TAX
+  Object type=Button key=118 LabelKey=0 flags=16385 bounds=168,440,192,464
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Bill::id_Term )
+            refs: fn:IsEmpty, Bill::id_Term#37
+        Format: -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | "remove value"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Bill::id_Term; "" ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | ""
+        Field table=Bill id=37 name=id_Term
+      Image name=a32_smallXOutline.svg
+  Object type=Button key=119 LabelKey=0 flags=16384 bounds=168,416,192,440
+    ToolTip
+      Calculation:
+        | "edit list in QBO"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: "Term" ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | "Term"
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a72_editOutline.svg
+  Object type=Field key=121 LabelKey=122 flags=1073741828 bounds=168,768,264,1000
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Bill::qbo_error#12
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Bill::qbo_error )
+        refs: fn:IsEmpty, Bill::qbo_error#12
+  Object type=Text key=122 LabelKey=0 flags=1073741828 bounds=144,768,168,856
+    Text flags=6 style=text.form.field.label: "sync error"
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( Bill::qbo_error )
+        refs: fn:IsEmpty, Bill::qbo_error#12
+  Object type=Button key=123 LabelKey=0 flags=1 bounds=168,256,192,280
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Bill_Vendor::billAddressLine1 )
+            | and IsEmpty ( Bill_Vendor::billAddressCity )
+            | and IsEmpty ( Bill_Vendor::billAddressState )
+            | and IsEmpty ( Bill_Vendor::billAddressPostalCode )
+            refs: fn:IsEmpty, Bill_Vendor::billAddressLine1#5, fn:and, Bill_Vendor::billAddressCity#3, Bill_Vendor::billAddressState#8, Bill_Vendor::billAddressPostalCode#7
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open Map ( address )”; Parameter: List (
+          | 	Bill_Vendor::billAddressLine1 ;
+          | 	Bill_Vendor::billAddressLine2 ;
+          | 	Bill_Vendor::billAddressCity ;
+          | 	Bill_Vendor::billAddressState ;
+          | 	Bill_Vendor::billAddressPostalCode ;
+          | 	Bill_Vendor::billAddressCountry
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | List (
+          | 	Bill_Vendor::billAddressLine1 ;
+          | 	Bill_Vendor::billAddressLine2 ;
+          | 	Bill_Vendor::billAddressCity ;
+          | 	Bill_Vendor::billAddressState ;
+          | 	Bill_Vendor::billAddressPostalCode ;
+          | 	Bill_Vendor::billAddressCountry
+          | )
+          refs: fn:List, Bill_Vendor::billAddressLine1#5, Bill_Vendor::billAddressLine2#6, Bill_Vendor::billAddressCity#3, Bill_Vendor::billAddressState#8, Bill_Vendor::billAddressPostalCode#7, Bill_Vendor::billAddressCountry#4
+        Script id=500 name="Open Map ( address )"
+      Image name=a99_locationTriangle.svg
+  Object type=Field key=135 LabelKey=0 flags=4 bounds=168,296,192,416
+    FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill::id_Term#37
+      ValueList: Term Id#15
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+  Object type=Rect key=154 LabelKey=0 flags=1073741824 style=shape.form.portalHeader bounds=476,24,500,1000
+  Object type=Portal key=155 LabelKey=0 flags=-1073741824 bounds=500,24,619,1000
+    PortalObj portalFlags=277 numOfRows=3 initialRow=1
+      TableAliasKey: BillLine_ItemBasedExpenseType
+      FieldList
+        Field table=BillLine_ItemBasedExpenseType id=9 name=description
+        Field table=BillLine_ItemBasedExpenseType id=12 name=id_Item
+        Field table=BillLine_ItemBasedExpenseType id=22 name=qty
+        Field table=BillLine_ItemBasedExpenseType id=23 name=unitPrice
+        Field table=BillLine_ItemBasedExpenseType id=21 name=amount
+      Object type=Text key=156 LabelKey=0 bounds=508,24,532,64
+        Text flags=14 tableViewVisibility=0 style=text.list.field.center: {{RecordNumber}}
+          FieldList quickFind=False
+      Object type=Field key=157 LabelKey=0 flags=1073741824 bounds=508,304,532,556
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: BillLine_ItemBasedExpenseType::description#9
+      Object type=Field key=158 LabelKey=0 bounds=508,64,532,272
+        FieldObj numOfReps=1 flags=32816 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+          Field: BillLine_ItemBasedExpenseType::id_Item#12
+          ValueList: Item Id Active#21
+      Object type=Button key=159 LabelKey=0 flags=1342177284 bounds=501,960,539,999
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=104 name="Delete Portal Row"
+            StepText: Delete Portal Row
+            NoInteract state=False
+            DisableStepCollapsed state=False
+          Image name=a25_trash.svg
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( BillLine_ItemBasedExpenseType::id )
+            refs: fn:IsEmpty, BillLine_ItemBasedExpenseType::id#10
+      Object type=Button key=160 LabelKey=0 flags=16385 bounds=508,272,532,296
+        ConditionalFormatting
+          Item id=0 flags=129
+            Condition op=0
+              Calculation:
+                | IsEmpty ( BillLine_ItemBasedExpenseType::id_Item )
+                refs: fn:IsEmpty, BillLine_ItemBasedExpenseType::id_Item#12
+            Format: -fm-icon-color: rgba(0%,0%,0%,0);
+        ToolTip
+          Calculation:
+            | "remove value"
+        Text flags=6 style=button.field
+        ButtonObj buttonFlags=0 iconSize=14 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_ItemBasedExpenseType::id_Item; "" ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | ""
+            Field table=BillLine_ItemBasedExpenseType id=12 name=id_Item
+          Image name=a32_smallXOutline.svg
+      Object type=Button key=163 LabelKey=0 flags=1342177540 bounds=501,870,539,910
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_ItemBasedExpenseType::taxable; not BillLine_ItemBasedExpenseType::taxable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not BillLine_ItemBasedExpenseType::taxable
+              refs: fn:not, BillLine_ItemBasedExpenseType::taxable#34
+            Field table=BillLine_ItemBasedExpenseType id=34 name=taxable
+          Image name=checked.svg
+        HideCondition findMode=True
+          Calculation:
+            | not BillLine_ItemBasedExpenseType::taxable or
+            | (
+            | 	IsEmpty ( BillLine_ItemBasedExpenseType::id_Item )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: fn:not, BillLine_ItemBasedExpenseType::taxable#34, fn:or, fn:IsEmpty, BillLine_ItemBasedExpenseType::id_Item#12, fn:and, fn:Get, fn:WindowMode
+      Object type=Button key=164 LabelKey=0 flags=1342177540 bounds=501,809,539,849
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_ItemBasedExpenseType::billable; not BillLine_ItemBasedExpenseType::billable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not BillLine_ItemBasedExpenseType::billable
+              refs: fn:not, BillLine_ItemBasedExpenseType::billable#29
+            Field table=BillLine_ItemBasedExpenseType id=29 name=billable
+          Image name=checked.svg
+        HideCondition findMode=True
+          Calculation:
+            | not BillLine_ItemBasedExpenseType::billable
+            | or
+            | (
+            | 	IsEmpty ( BillLine_ItemBasedExpenseType::id_Item )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: fn:not, BillLine_ItemBasedExpenseType::billable#29, fn:or, fn:IsEmpty, BillLine_ItemBasedExpenseType::id_Item#12, fn:and, fn:Get, fn:WindowMode
+      Object type=Field key=173 LabelKey=0 flags=1342177280 bounds=508,564,532,613
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: BillLine_ItemBasedExpenseType::qty#22
+          Display: number flags=16392 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      Object type=Field key=174 LabelKey=0 flags=1342177280 bounds=508,621,532,688
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: BillLine_ItemBasedExpenseType::unitPrice#23
+          Display: number flags=16392 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      Object type=Field key=176 LabelKey=0 flags=1342177284 bounds=508,692,532,788
+        ScriptTriggers
+          Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+            Script id=538 name="BillItem Amount OnObjectExit Trigger"
+              Calculation:
+                | BillLine_AccountBasedExpenseLineDetail::detailType
+                refs: BillLine_AccountBasedExpenseLineDetail::detailType#37
+            TriggerText: "BillItem Amount OnObjectExit Trigger"; Parameter: BillLine_AccountBasedExpenseLineDetail::detailType
+        FieldObj numOfReps=1 flags=32800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.default.right
+          Field: BillLine_ItemBasedExpenseType::amount#21
+          Display: number flags=16392 negativeStyle=0 currencySymbol=# thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+        HideCondition findMode=False
+          Calculation:
+            | IsEmpty ( BillLine_ItemBasedExpenseType::id_Item )
+            | 
+            | /* if an item is not selected, assume this is a description-only line */
+            refs: fn:IsEmpty, BillLine_ItemBasedExpenseType::id_Item#12
+      Object type=Button key=180 LabelKey=0 flags=1342177540 bounds=501,870,539,910
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_ItemBasedExpenseType::taxable; not BillLine_ItemBasedExpenseType::taxable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not BillLine_ItemBasedExpenseType::taxable
+              refs: fn:not, BillLine_ItemBasedExpenseType::taxable#34
+            Field table=BillLine_ItemBasedExpenseType id=34 name=taxable
+          Image name=checkbox.svg
+        HideCondition findMode=True
+          Calculation:
+            | BillLine_ItemBasedExpenseType::taxable
+            | or
+            | (
+            | 	IsEmpty ( BillLine_ItemBasedExpenseType::id_Item )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: BillLine_ItemBasedExpenseType::taxable#34, fn:or, fn:IsEmpty, BillLine_ItemBasedExpenseType::id_Item#12, fn:and, fn:Get, fn:WindowMode
+      Object type=Button key=182 LabelKey=0 flags=1342177540 bounds=501,809,539,849
+        Text flags=6
+        ButtonObj buttonFlags=0 iconSize=16 displayType=1
+          Step enable=True id=76 name="Set Field"
+            StepText: Set Field [ BillLine_ItemBasedExpenseType::billable; not BillLine_ItemBasedExpenseType::billable ]
+            DisableStepCollapsed state=False
+            Calculation:
+              | not BillLine_ItemBasedExpenseType::billable
+              refs: fn:not, BillLine_ItemBasedExpenseType::billable#29
+            Field table=BillLine_ItemBasedExpenseType id=29 name=billable
+          Image name=checkbox.svg
+        HideCondition findMode=True
+          Calculation:
+            | BillLine_ItemBasedExpenseType::billable
+            | or
+            | (
+            | 	IsEmpty ( BillLine_ItemBasedExpenseType::id_Item )
+            | 	/* if an item is not selected, assume this is a description-only line */
+            | 	and
+            | 	Get ( WindowMode ) ≠ 1  /* Find Mode */
+            | )
+            refs: BillLine_ItemBasedExpenseType::billable#29, fn:or, fn:IsEmpty, BillLine_ItemBasedExpenseType::id_Item#12, fn:and, fn:Get, fn:WindowMode
+  Object type=Text key=165 LabelKey=0 bounds=476,64,500,272
+    Text flags=6 style=text.form.portal.label.left: PRODUCT/SERVICE
+  Object type=Text key=166 LabelKey=0 flags=1073741824 bounds=476,304,500,565
+    Text flags=6 style=text.form.portal.label.left: DESCRIPTION
+  Object type=Text key=167 LabelKey=0 flags=1342177280 bounds=476,708,500,788
+    Text flags=6 style=text.form.portal.label.right: AMOUNT
+  Object type=Text key=168 LabelKey=0 flags=1342177280 bounds=476,788,500,860
+    Text flags=6 style=text.form.portal.label.right: BILLABLE
+  Object type=Text key=169 LabelKey=0 flags=1342177280 bounds=476,870,500,910
+    Text flags=6 style=text.form.portal.label.right: TAX
+  Object type=Text key=171 LabelKey=0 flags=1342177280 bounds=476,624,500,688
+    Text flags=6 style=text.form.portal.label.right: RATE
+  Object type=Text key=172 LabelKey=0 flags=1342177280 bounds=476,566,500,606
+    Text flags=6 style=text.form.portal.label.right: QTY
+  Object type=Field key=161 LabelKey=0 bounds=508,64,532,272
+    FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: BillLine_ItemBasedExpenseType::id_Item#12
+      ValueList: Item Id#20
+  Object type=Field key=184 LabelKey=0 flags=-268435456 bounds=681,871,705,991
+    FieldObj numOfReps=1 flags=1081396 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.right
+      Field: Bill::totalTax#42
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=186 LabelKey=0 flags=-268435456 bounds=745,759,769,863
+    Text flags=6 style=text.form.field.label.right: "Balance due"
+  Object type=Field key=187 LabelKey=188 flags=-268435456 bounds=713,871,737,991
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=edit.view.right
+      Field: Bill::totalAmt#30
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=188 LabelKey=0 flags=-268435456 bounds=713,759,737,863
+    Text flags=6 style=text.form.field.label.right: Total
+  Object type=Field key=189 LabelKey=190 flags=-268435452 bounds=681,871,705,991
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.right
+      Field: Bill::totalTax#42
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+    HideCondition findMode=False
+      Calculation:
+        | BillLine::summaryTotalAmountTaxable = 0
+        refs: BillLine::summaryTotalAmountTaxable#36
+  Object type=Text key=190 LabelKey=0 flags=-268435456 bounds=657,639,681,863
+    Text flags=14 tableViewVisibility=0 style=text.form.field.label.right: "Taxable subtotal <<taxableSubtotal>>"
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+      FieldList quickFind=False
+        Field table=Bill id=41 name=taxableSubtotal
+  Object type=Field key=191 LabelKey=192 flags=-268435456 bounds=633,871,657,991
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.view.right
+      Field: Bill::subtotal#43
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=192 LabelKey=0 flags=-268435456 bounds=633,727,657,863
+    Text flags=6 style=text.form.field.label.right: Subtotal
+  Object type=PopoverButton key=196 LabelKey=0 flags=-268435196 bounds=745,879,769,1015
+    Text flags=2
+    PopoverButtonObj buttonFlags=0 key=197 iconSize=16 displayType=1
+      Image name=a53_info.svg
+      Object type=Popover key=197 LabelKey=0 bounds=617,807,734,1087
+        PopoverObj flags=2 position=3 key=196
+          Object type=Text key=198 LabelKey=0 bounds=633,823,721,1075
+            Text flags=2: "This record has been changed in FileMaker; this value might not be accurate. Sync with QBO to remove this message."
+    HideCondition findMode=True
+      Calculation:
+        | not ( Bill::qbo_send and not IsEmpty ( Bill::qbo_Id ) )
+        | or
+        | Get ( WindowMode ) = 1 /* Find mode */
+        refs: fn:not, Bill::qbo_send#10, fn:and, fn:IsEmpty, Bill::qbo_Id#8, fn:or, fn:Get, fn:WindowMode
+  Object type=Button key=200 LabelKey=0 flags=-268419071 bounds=681,1208,705,1232
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Bill::id_TaxCode )
+            refs: fn:IsEmpty, Bill::id_TaxCode#47
+        Format: -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | "remove value"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Bill::id_TaxCode; "" ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | ""
+        Field table=Bill id=47 name=id_TaxCode
+      Image name=a32_smallXOutline.svg
+  Object type=Button key=201 LabelKey=0 flags=-268419072 bounds=681,1184,705,1208
+    ToolTip
+      Calculation:
+        | "edit list in QBO"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: "TaxCode" ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | "TaxCode"
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a72_editOutline.svg
+  Object type=Field key=202 LabelKey=0 flags=-268435456 bounds=681,1040,705,1184
+    FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Bill::id_TaxCode#47
+      ValueList: TaxCode Id#13
+  Object type=Field key=204 LabelKey=0 flags=-268435456 bounds=745,871,769,991
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=edit.view.right
+      Field: Bill::balance#40
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No
+  Object type=Text key=206 LabelKey=0 flags=-268435456 bounds=681,759,705,863
+    Text flags=6 style=text.form.field.label.right: "Total Tax"
+  Object type=Text key=207 LabelKey=0 bounds=636,1040,667,1259
+    Text flags=2: "If not using AST"
+  Object type=Field key=113 LabelKey=0 flags=-268435328 bounds=20,2670,37,2745
+    FieldObj numOfReps=1 flags=32768 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=2 quickFind=0 pictFormat=0 style=text.form.field.label.right
+      Field: Bill::taxableSubtotal#41
+      Display: number flags=19980 negativeStyle=0 currencySymbol=$ thousandsSep=, decimalPoint=. negativeColor=#DD000000 decimalDigits=2 trueString=Yes falseString=No

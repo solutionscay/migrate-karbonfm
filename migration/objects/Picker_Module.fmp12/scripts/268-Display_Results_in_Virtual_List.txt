@@ -1,0 +1,151 @@
+# script 268: _Display Results in Virtual List
+# file: Picker Module.fmp12
+# folder: Modules / Phone Picker
+# source: ScriptCatalog/Script[@id=268]
+# steps: 36 (2 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=265 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2019-05-02 dave@geistinteractive.com - split the display function from the search function
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2019-04-02 barbara@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ $$scriptTriggersAreDisabled ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@history 2019-05-22 dave@geistinteractive.com - this should get set by the calling script (i.e., Find, Open Picker)
+        DisableStepCollapsed state=False
+        Restore state=False
+   9 // Set Variable [ $Results; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Results
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $FoundCount; Value:ValueCount ( Picker::Phone.Found ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount, Picker::Phone.Found#39
+        Repetition
+          Calculation:
+            | 1
+        Name: $FoundCount
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Go to Layout [ “Phone Picker” (VIRTUALLISTS_Rows) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=49 name="Phone Picker"
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Show All Records
+        DisableStepCollapsed state=False
+  17    Go to Record/Request/Page [ $FoundCount + 1 ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    If [ not Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:Get, fn:LastError
+  20    Omit Multiple Records [ 9999999999999 ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  21    End If
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Sort Records [ Keep records in sorted order; Specified Sort Order: VIRTUALLISTS_Rows::Phone.ClientInd; descending
+        VIRTUALLISTS_Rows::Phone.PartyName; ascending
+        VIRTUALLISTS_Rows::Phone.Number; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Descending
+            PrimaryField
+              Field table=VIRTUALLISTS_Rows id=37 name=Phone.ClientInd
+          Sort type=Ascending
+            PrimaryField
+              Field table=VIRTUALLISTS_Rows id=43 name=Phone.PartyName
+          Sort type=Ascending
+            PrimaryField
+              Field table=VIRTUALLISTS_Rows id=40 name=Phone.Number
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #@history 2019-05-22 dave@geistinteractive.com - shouldn't need to resize window anymore
+        DisableStepCollapsed state=False
+        Restore state=False
+  28 // Move/Resize Window [ Current Window; Height: 570 ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $$PickerSearchStatus; Value:"Found " & Get( FoundCount ) & " phone(s)" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:FoundCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $$PickerSearchStatus
+  31    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Go to Field [ Picker::Search_Field ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False

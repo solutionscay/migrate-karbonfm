@@ -1,0 +1,151 @@
+# script 683: Button: Create Meeting From Opportunity
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Meeting
+# source: ScriptCatalog/Script[@id=683]
+# steps: 30 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=681 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-10-24 dave@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ Opportunity_Party::OrganizationInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Opportunity_Party::OrganizationInd#18
+   4    #Default to the first related person at this company
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $PartyId; Value:Opportunity_Party_PartyRelation_Person::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Opportunity_Party_PartyRelation_Person::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+   6    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #If this opportunity is linked to a person, use the party ID associated with the opportunity
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $PartyId; Value:Opportunity::PartyId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Opportunity::PartyId#55
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+   9    End If
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Opportunity::Id ; JSONString ]  ;
+        	[ "EntityTypeId" ; 13 ; JSONNumber ]  ;
+        	[ "Location" ; $Location ; JSONString ]  ;
+        	[ "PartyId" ; $PartyId ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Opportunity::Id#1, fn:JSONString, fn:JSONNumber
+        Name: $json
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Perform Script [ “Create Meeting { data }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=545 name="Create Meeting { data }" in=karbon_kontroller.fmp12
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  17    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  18    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  19    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $Id; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $DisplayPartyIds; Value:Let ([
+        
+        relatedContacts = List ( Opportunity_Party_PartyRelation::PartyIdTo) ; 
+        salesperson = Opportunity::SalespersonId	; 
+        referringParty = Opportunity::ReferringPartyId  ;
+        
+        
+        displayPartyIds = List ( relatedContacts ; salesperson ; referringParty )
+        
+        ];
+        
+        displayPartyIds
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:List, Opportunity_Party_PartyRelation::PartyIdTo#6, Opportunity::SalespersonId#56, Opportunity::ReferringPartyId#65
+        Repetition
+          Calculation:
+            | 1
+        Name: $DisplayPartyIds
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Perform Script [ “Open Activity { Id }”; Parameter: JSONSetElement ( "{}" ; 
+        
+        [ "Id" ; $Id ; JSONString ] ;
+        [ "DisplayPartyIds" ; $DisplayPartyIds ; JSONString ] 
+        
+         ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Script id=291 name="Open Activity { Id }"
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

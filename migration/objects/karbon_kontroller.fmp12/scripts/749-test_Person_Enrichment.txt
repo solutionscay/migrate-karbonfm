@@ -1,0 +1,148 @@
+# script 749: test Person Enrichment
+# file: karbon_kontroller.fmp12
+# folder: Modules / Full Contact / Public
+# source: ScriptCatalog/Script[@id=749]
+# steps: 29 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=742 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Insert Calculated Result [ $json; "{}" ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $json
+   4    Insert Calculated Result [ $emailList; List ( "bart@fullcontact.com" ; "bart.lorang@fullcontact.com" ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:List
+        Field: $emailList
+   5    Insert Calculated Result [ $json; JSONSetElement ( $json ; "emails" ;$emailList ; JSONString) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+   6    Insert Calculated Result [ $json; JSONSetElement ( $json ; "addressLine1" ; "123 Main Street" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+   7    Insert Calculated Result [ $json; JSONSetElement ( $json ; "addressLine2" ; "Unit 2" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+   8    Insert Calculated Result [ $json; JSONSetElement ( $json ; "city" ; "Denver" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+   9    Insert Calculated Result [ $json; JSONSetElement ( $json ; "postalCode" ; "80203" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  10    Insert Calculated Result [ $json; JSONSetElement ( $json ; "region" ; "Colorado" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  11    Insert Calculated Result [ $json; JSONSetElement ( $json ; "regionCode" ; "CO" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  12    Insert Calculated Result [ $json; JSONSetElement ( $json ; "family" ; "Lorang" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  13    Insert Calculated Result [ $json; JSONSetElement ( $json ; "full" ; "Bart Lorang" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  14    Insert Calculated Result [ $json; JSONSetElement ( $json ; "given" ; "Bart" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  15    Insert Calculated Result [ $phoneList; List ( "+17202227799"; "+13035551234" ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:List
+        Field: $phoneList
+  16    Insert Calculated Result [ $json; JSONSetElement ( $json ; "phones" ; $phoneList ; JSONString) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  17 // Insert Calculated Result [ $json; JSONSetElement ( $json ; "profiles" ; "" ; JSONArray ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONArray
+        Field: $json
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “FullContact Person Enrich”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=746 name="FullContact Person Enrich"
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Insert Calculated Result [ $result; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $result
+  22    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  23    Insert Calculated Result [ $error; $result ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $error
+  24    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  25    End If
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Show Custom Dialog [ Title: "Result"; Message: JSONFormatElements ( $result ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False

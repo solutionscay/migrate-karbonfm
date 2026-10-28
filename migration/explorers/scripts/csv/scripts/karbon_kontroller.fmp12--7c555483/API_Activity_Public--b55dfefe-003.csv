@@ -1,0 +1,95 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/690-Mark_Task_Complete_data.txt,ebc03794579e4c7141274ed203ac853130daa0f58bc4fea097a39cb2671baa1e,scripts,karbon_kontroller.fmp12,690,Mark Task Complete { data },data-change,server-domain,tier1,"Marks a Task activity complete for a party: sets CompletedInd, completion timestamp and cached completer name, clears the activity alert flag, and creates a ""completed by"" ActivityParty (role 51). Wrapped in the generator transaction pattern (Start/Save/End Transaction) with JSON param validation (Id, PartyId required).","DBTransactions::ActivityId#58 (selector)
+DBTransactions::PartyId#25 (selector)
+Party::Id#1
+Party::NameCached#19","DBTransactions::ActivityId#58 (step 82, global)
+DBTransactions::PartyId#25 (step 91, global)
+Task::CompletedInd#29 (step 85, current record, set to 1)
+Activity::DateDisplay#56 (step 101, current record)
+Activity::AlertInd#107 (step 102, current record, set False)
+Task::CompletedByCached#27 (step 103, current record)
+Task::CompletionTimestamp#26 (step 104, current record)","karbon_kontroller.fmp12/scripts/28 (step 35)
+karbon_kontroller.fmp12/scripts/376 (step 108)
+karbon_kontroller.fmp12/scripts/29 (step 129)
+karbon_kontroller.fmp12/scripts/31 (step 130)","objects/karbon_kontacts.fmp12/scripts/758-btn_Mark_Task_Complete.txt (step 4)
+objects/karbon_tester.fmp12/scripts/345-Mark_Task_Complete_-_Success.txt (step 55)",none,Task record is created/locked through the DBTransactions selector (Task::CompletedInd set via relationship); confirm the transaction wrapper scripts 28/29/31 semantics. Script 376 passes ActivityPartyRoleId 51 (CompletedBy).
+karbon_kontroller.fmp12/scripts/691-Mark_Task_Incomplete_data.txt,2379c9afd89b9b4a412528e22eff038cbb40cab0429c23371daf771a8958db86,scripts,karbon_kontroller.fmp12,691,Mark Task Incomplete { data },data-change,server-domain,tier1,"Reverts a Task to incomplete: clears completed flag, completer and timestamp, resets Activity DateDisplay (due date or creation date) and sets AlertInd True, then deletes the previous completion ActivityParty. Transaction pattern with JSON validation (Id, ActivityPartyId required).","DBTransactions::ActivityId#58 (selector)
+DBTransactions::ActivityPartyId#59 (selector)
+Task::DueDate#25
+Activity::CreationTimestamp#181","DBTransactions::ActivityId#58 (step 82, global)
+DBTransactions::ActivityPartyId#59 (step 92, global)
+Task::ONE#20 (step 85, current record, set 1 to create/lock)
+ActivityParty::ONE#62 (step 94, current record, set 1 to create/lock)
+Activity::DateDisplay#56 (step 102, current record)
+Activity::AlertInd#107 (step 103, current record, set True)
+Task::CompletedByCached#27 (step 104, current record, cleared)
+Task::CompletionTimestamp#26 (step 105, current record, cleared)
+Task::CompletedInd#29 (step 106, current record, cleared)
+delete: ActivityParty (via script 638 Delete ActivityParty { Id }, step 109, record by ActivityPartyId)","karbon_kontroller.fmp12/scripts/28 (step 35)
+karbon_kontroller.fmp12/scripts/638 (step 109)
+karbon_kontroller.fmp12/scripts/29 (step 130)
+karbon_kontroller.fmp12/scripts/31 (step 131)",objects/karbon_kontacts.fmp12/scripts/759-btn_Mark_Task_Incomplete.txt (step 7),none,ActivityParty delete happens inside script 638; not read here. Task::ONE and ActivityParty::ONE writes rely on cascadeCreate through DBTransactions relationships.
+karbon_kontroller.fmp12/scripts/725-Find_Chat_Activity_by_Phone_PhoneNumber.txt,ecd10a221fb446c54a9e44f05e932fb0f8628aa7f6c09782ba9ae9c844197cf3,scripts,karbon_kontroller.fmp12,725,Find Chat Activity by Phone ( PhoneNumber),find-query,server-query,tier2,Finds the Chat activity whose phone list ends with the given phone number and returns its ChatId and Phone as JSON. Runs a find on f_Chat; error 401 (no records) is treated as a non-error.,"f_Chat::PhoneList#28 (find criterion step 58, ""*"" & $Phone)
+f_Chat::Id#6
+f_Chat::PhoneList#28",none,none,"objects/karbon_kontroller.fmp12/scripts/728-Create_Chat_Message_json.txt (step 86)
+objects/karbon_kontacts.fmp12/scripts/832-Handler_Phone_Selection.txt (step 44)",none,"On 401 (no match) the script falls through to the Else branch and returns JSON built from an empty f_Chat record (ChatId and Phone empty); it does not return an error. Confirm intended no-match result. If $Phone is empty, step 34 sets $error but later steps still run a find only if error check passes (exit at 37)."
+karbon_kontroller.fmp12/scripts/726-Create_Chat_Activity_json.txt,422ac9b71bad8ed7cea383d4a55d656bff705d7597af14afc791d0fbffa76c4d,scripts,karbon_kontroller.fmp12,726,Create Chat Activity { json },data-change,server-domain,tier1,"Creates a Chat (SMS) activity for a phone number: optionally normalizes the phone to E.164 via a Phone Lookup (Twilio), creates a base Activity of type 9 via _Create Activity with a party link when a PartyId is given, then creates the Chat subtype row and stores PhoneList. Returns Chat Id and Phone. Transaction pattern.","DBTransactions::PartyId#25 (selector)
+Party::Id#1
+Party::NameCached#19
+Chat::Id#6
+Chat::PhoneList#28","DBTransactions::PartyId#25 (step 82, global)
+Chat::ONE#15 (step 136, new record via relationship)
+Chat::PhoneList#28 (step 145, current record)
+Activity::ChatInd#202 (step 146, current record, set 1)
+Activity::ActivityTypeId#100 (step 147, current record, set 9 sms)","karbon_kontroller.fmp12/scripts/28 (step 37)
+karbon_kontroller.fmp12/scripts/533 (step 102)
+karbon_kontroller.fmp12/scripts/377 (step 126)
+karbon_kontroller.fmp12/scripts/29 (step 161)
+karbon_kontroller.fmp12/scripts/31 (step 162)","objects/karbon_kontroller.fmp12/scripts/728-Create_Chat_Message_json.txt (step 121)
+objects/karbon_kontacts.fmp12/scripts/832-Handler_Phone_Selection.txt (step 65)",Phone Lookup (script 533) at step 102 - Twilio number formatting per comment,"Step 95 builds $json from undefined variables ($ActivityId, $Comments, ...) that is then overwritten/unused - looks like dead generator boilerplate. Step 101 passes $CountryCode which is never set. Phone Lookup script 533 (Twilio) not read here."
+karbon_kontroller.fmp12/scripts/728-Create_Chat_Message_json.txt,b7e565ebc020149a2b28756899e02d6f4e78c860df50796995cda050e56faa85,scripts,karbon_kontroller.fmp12,728,Create Chat Message { json },integration,server-domain,tier1,"Creates a Chat message. Finds or creates the Chat activity for the phone (matching a Party by phone via DBTransactions), sends a one-time consent SMS if the phone has no ChatConsent row, downloads any MMS media URLs (following the Twilio redirect) into File records attached to the message, sets incoming/outgoing flags and, for outgoing, calls Send SMS Message. Updates the Activity date/time/subject from the latest message.","DBTransactions::PhoneNumber#121 (selector)
+DBTransactions::ActivityId#58 (selector)
+Phone#byPhoneNumber_ContactMethod::PartyId#33
+ChatConsent::Phone#9
+ActivityParty#ByActivity::PartyId#7
+ChatMessage::Id#11
+ChatMessage::DeliveredTimestamp#19
+Chat::Id#6","DBTransactions::PhoneNumber#121 (step 102, global)
+DBTransactions::PhoneNumber#121 (step 138, global)
+ChatConsent::ONE#7 (step 144, new record via relationship)
+DBTransactions::ChatMessageId#117 (step 168, global, cleared)
+ChatMessage::ONE#17 (step 170, new record via relationship)
+DBTransactions::ActivityId#58 (step 183, global)
+ChatMessage::ActivityId#6 (step 199, current record)
+ChatMessage::Message#12 (step 200, current record)
+ChatMessage::DeliveredTimestamp#19 (step 246, current record)
+ChatMessage::IncomingInd#21 (step 247, current record)
+ChatMessage::StatusReceivedInd#27 (step 248, current record)
+ChatMessage::OutgoingInd#22 (step 254, current record)
+Activity::DateDisplay#56 (step 271 or 274, current record)
+Activity::TimeDisplay#76 (step 272 or 275, current record)
+Activity::Subject#22 (step 277, current record)","karbon_kontroller.fmp12/scripts/28 (step 42)
+karbon_kontroller.fmp12/scripts/725 (step 86)
+karbon_kontroller.fmp12/scripts/726 (step 121)
+karbon_kontroller.fmp12/scripts/728 (step 151, recursive: consent message)
+karbon_kontroller.fmp12/scripts/617 (step 226)
+karbon_kontroller.fmp12/scripts/729 (step 258)
+karbon_kontroller.fmp12/scripts/29 (step 292)
+karbon_kontroller.fmp12/scripts/31 (step 293)",objects/karbon_kontacts.fmp12/scripts/827-Trigger_Send_Chat_Message.txt (step 32),"Insert from URL (step 213, cURL -D to read redirect headers of media URL, SSL verify off)
+New Window / Close Window around script 725 (steps 85, 87)
+SMS send via script 729 (step 258)","Consent message text is hard-coded (""Welcome to Karbon. Reply STOP...""). Step 99 tests $ContactId which is never set; step 188 tests $Party (never set, probably meant $PartyId). Redirect header parsed by fixed line position (GetValue 7) - brittle. Insert from URL has VerifySSLCertificates off."
+karbon_kontroller.fmp12/scripts/731-Update_Chat_Message_Status_json.txt,a0a62c3aee4fd8ad5bab7fdf3cd60a1450628d6b82a6e484b6ff7ac89281a90b,scripts,karbon_kontroller.fmp12,731,Update Chat Message Status { json },data-change,server-domain,tier1,"Webhook-style status update for an SMS ChatMessage found by provider message id: sets the matching status indicator (queued, sent, delivered, failed, undelivered); on delivered also sets DeliveredTimestamp and the parent Activity date/time. Retries up to 10 times (2s pause) on record lock. Transaction pattern; JSON validation is disabled.","DBTransactions::ProviderMessageId#122 (selector)
+ChatMessage#ProviderMessageId::Id#11
+ChatMessage#ProviderMessageId::ActivityId#6","DBTransactions::ProviderMessageId#122 (step 74, global)
+ChatMessage#ProviderMessageId::ONE#17 (step 89, current record, lock/create)
+ChatMessage#ProviderMessageId::StatusQueuedInd#26 (step 112, current record)
+ChatMessage#ProviderMessageId::StatusSentInd#28 (step 114, current record)
+ChatMessage#ProviderMessageId::StatusDeliveredInd#24 (step 116, current record)
+ChatMessage#ProviderMessageId::DeliveredTimestamp#19 (step 117, current record)
+DBTransactions::ActivityId#58 (step 120, global)
+Activity::DateDisplay#56 (step 121, current record)
+Activity::TimeDisplay#76 (step 122, current record)
+ChatMessage#ProviderMessageId::StatusFailedInd#25 (step 124, current record)
+ChatMessage#ProviderMessageId::StatusUndeliveredInd#29 (step 126, current record)","karbon_kontroller.fmp12/scripts/28 (step 36)
+karbon_kontroller.fmp12/scripts/29 (step 146)
+karbon_kontroller.fmp12/scripts/31 (step 147)",none found (in Scripts menu),none,"Validation rules (steps 49-50) are disabled, so missing/invalid Status only falls to step 128 BadRequest. Timestamp is written unparsed to DeliveredTimestamp; format expected from caller unknown. Likely invoked by an inbound Twilio status webhook (not in DDR)."

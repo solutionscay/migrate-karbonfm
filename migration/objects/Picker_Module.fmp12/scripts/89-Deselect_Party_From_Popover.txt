@@ -1,0 +1,64 @@
+# script 89: Deselect Party From Popover
+# file: Picker Module.fmp12
+# folder: Modules / Contact Picker (Contacts Sample File) / Private
+# source: ScriptCatalog/Script[@id=89]
+# steps: 18 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=13 groupCollapsed=False includeInMenu=False
+
+   1    #v2.0 2017-06-20 dmg: updated for v16 (JSON)
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v1.0 2016-03-16 dmg: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Remove the index from the array
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Field [ Picker::Results; JSONDeleteElement ( Picker::Results ; "Result.PartyArray[" & Get ( ActivePortalRowNumber ) - 1 & "]" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONDeleteElement, Picker::Results#2, fn:Get, fn:ActivePortalRowNumber
+        Field table=Picker id=2 name=Results
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #Update the result count
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $newCount; Value:JSONGetElement ( Picker::Results ; "Result.CountPicked" ) - 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Results#2
+        Name: $newCount
+   9    Set Field [ VIRTUALLISTS::foundCount; $newCount ]
+        DisableStepCollapsed state=False
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  10    Set Field [ Picker::Results; JSONSetElement ( Picker::Results ; "Result.CountPicked" ; $newCount ; JSONNumber ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, Picker::Results#2, fn:JSONNumber
+        Field table=Picker id=2 name=Results
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ $newCount < 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #No selection is left, adjust layout
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Go To Correct Layout” ]
+        DisableStepCollapsed state=False
+        Script id=79 name="Go To Correct Layout"
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

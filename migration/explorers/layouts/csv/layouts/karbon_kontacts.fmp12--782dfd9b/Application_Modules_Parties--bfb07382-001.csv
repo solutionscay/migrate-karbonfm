@@ -1,0 +1,262 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+karbon_kontacts.fmp12/layouts/47-Parties.txt,f0f4080c45a8f9ff0ae883b3de064d1ac3e56ea4c89bfdf9c537dc5034b1f075,layouts,karbon_kontacts.fmp12,47,Parties,list,"Party (base Party, karbon_data.fmp12)","key 40 field Person::EmployerName | hidden when Party::OrganizationInd is true (rule not applied in Find mode)
+key 49 field Party::Photo | hidden when Party::OrganizationInd is true or in Find mode
+key 50 field Party::Photo | hidden when Party::PersonInd is true or in Find mode
+key 120 text “DEV” | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)
+key 137 button (icon) | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)
+key 139 text “Showing {{FoundCount}} of {{TotalRecordCount}} Records” | hidden when the found set equals all records (nothing is narrowed) (rule not applied in Find mode)
+key 140 button “Show All” | hidden when the found set equals all records (nothing is narrowed) (rule not applied in Find mode)","key 125 button (icon) | when BrowserNav.SaveNavHistory is evaluated (side effect only: it records the visited layout in the $$BrowserNav history; the item has no Format) | none
+key 144 field Globals::RecordNav | when the typed record number (field value) differs from the current record number | style","key 144 field Globals::RecordNav | OnObjectEnter | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""Open""
+key 144 field Globals::RecordNav | OnObjectExit | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""exit""
+key 153 popover [pop.Find 2] | OnObjectEnter | id 248 “Trigger: Set Up QuickFind Popover” | clears the QuickFind global (with triggers disabled) and focuses the QuickFind field
+key 154 field Globals::QuickFind | OnObjectSave | id 250 “Perform QuickFind” | runs Perform Quick Find on the QuickFind field; shows a no-records dialog on error, else closes the popover","key 38 (icon) | Perform Script [ “Go to Contacts Detail {Id}” ] (script id 502) | param JSON {Id: Party::Id}
+key 138 (icon) | no step
+key 89 (icon) | no step
+key 90 (icon) | no step
+key 119 (icon) | Perform Script [ “Display Main Nav” ] (script id 105)
+key 125 (icon) | Perform Script [ “Browser Nav (forward or backward)” ] (script id 466) | param ""Backward""
+key 126 (icon) | Perform Script [ “Browser Nav (forward or backward)” ] (script id 466) | param ""Forward""
+key 137 (icon) | Perform Script [ “Add Pending Change to Build File” ] (script id 524)
+key 140 Show All | Show All Records
+key 141 {{RecordNumber}} | no step
+key 142 {{RecordNumber}} | no step
+key 143 {{RecordNumber}} | no step
+key 146 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""prev""
+key 147 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""next""
+key 149 calc If ( /* Find mode requests*/ Get (… | Perform Script [ “Record Nav” ] (script id 382) | param ""ToggleFoundSet""
+key 151 (icon) | Perform Script [ “btn: Open Create Party Card - All Contacts” ] (script id 619)
+key 152 (icon) | opens popover ""Find Opportunities""
+key 155 Show All | Perform Script [ “Close Find Popover and Show All” ] (script id 251)
+key 156 Advanced Find | Perform Script [ “Button: Go to Advanced Find Layout ( EntityName )” ] (script id 804) | param ""contact""
+key 157 (icon) | Perform Script [ “Get Help” ] (script id 478)","key 125 | name of the previous layout in the browser-style history (BrowserNav.Tooltip), or ""Nowhere to go…""
+key 126 | name of the next layout in the browser-style history (BrowserNav.Tooltip), or ""Nowhere to go…""",none,none,page,
+karbon_kontacts.fmp12/layouts/49-Contact_Card.txt,44b5933b4b1cf74d30a7ccd86eb02d4224181502d3024ddd0bdb70cce24669a9,layouts,karbon_kontacts.fmp12,49,Contact Card,dialog,"Party (base Party, karbon_data.fmp12)","key 256 popoverbutton Address Popover | hidden when always (constant 1)
+key 282 popoverbutton Internet Popover | hidden when always (constant 1)
+key 245 popoverbutton Phone Popover | hidden when always (constant 1)
+key 65 text “Hidden Slide Control” | hidden when always (constant True)
+key 182 popoverbutton PhoneDeleteButton | hidden when Party_ContactMethod::Id is empty (rule not applied in Find mode)
+key 180 button PhoneFaxIndicatorButton | hidden when Party_ContactMethod::Id is empty (rule not applied in Find mode)
+key 179 button PhoneVoiceIndicatorButton | hidden when Party_ContactMethod::Id is empty (rule not applied in Find mode)
+key 195 button PhoneSmsIndicatorButton | hidden when Party_ContactMethod::Id is empty (rule not applied in Find mode)
+key 191 button (icon) | hidden when the calculation is a quoted text string (a commented-out expression), not a boolean; it does not clearly hide anything (confirm) (rule not applied in Find mode)
+key 317 button (icon) | hidden when in Find mode","key 165 button (icon) | when Party_ContactMethod_Phone::PrimaryInd is true | style
+key 180 button PhoneFaxIndicatorButton | when Party_ContactMethod_Phone::FaxInd is false/empty | style
+key 179 button PhoneVoiceIndicatorButton | when Party_ContactMethod_Phone::VoiceInd is false/empty | style
+key 195 button PhoneSmsIndicatorButton | when Party_ContactMethod_Phone::SmsInd is false/empty | style
+key 166 button (icon) | when Party_ContactMethod_NetworkAddress::PrimaryInd is true | style
+key 191 button (icon) | when Party_ContactMethod::_BillingIndCached is false/empty | style
+key 167 button (icon) | when Party_ContactMethod_Address::PrimaryInd is true | style
+key 192 button (icon) | when Party_ContactMethod::_BillingIndCached is true | style
+key 193 button (icon) | when Party_ContactMethod::_ShippingIndCached is true | style
+key 194 button (icon) | when Party_ContactMethod::_MailingIndCached is true | style","layout | OnRecordLoad | id 160 “Show Person or Org Slide” | focuses the organization name or first name field depending on whether the Party is an organization
+layout | OnLayoutExit | id 166 “Update Party Cached Data” | on closing the card, refreshes the cached Party name (organization name or first and last name)
+key 251 field UtilityContactMethod::Phone | OnObjectSave | id 520 “Format Phone Number” | formats the phone number in the active field, via Twilio phone lookup when configured
+key 40 field Party_ContactMethod_Phone::Number | OnObjectSave | id 520 “Format Phone Number” | formats the phone number in the active field, via Twilio phone lookup when configured
+key 195 button PhoneSmsIndicatorButton | OnObjectKeystroke | id 188 “Test” | test script: goes to the next field","key 256 Address Popover | opens popover ""Address""
+key 264 Save | Perform Script [ “Save Contact Method - Address” ] (script id 433)
+key 265 Cancel | Close Popover
+key 226 Address Lookup… | Perform Script [ “Button: Launch Address Picker from Contact Card” ] (script id 240)
+key 282 Internet Popover | opens popover ""Add Network Address""
+key 290 Save | Perform Script [ “Save Contact Method - Network Address” ] (script id 435)
+key 291 Cancel | Close Popover
+key 245 Phone Popover | opens popover ""Add Phone""
+key 253 Save | Perform Script [ “Save Contact Method - Phone” ] (script id 431)
+key 254 Cancel | Close Popover
+key 66 (icon) | Close Window [ Current Window ]
+key 165 (icon) | Perform Script [ “Button: Set Primary Phone” ] (script id 174)
+key 182 PhoneDeleteButton | opens popover ""Popover""
+key 184 Delete | Perform Script [ “Button: Delete Phone” ] (script id 202)
+key 180 Indicates that this is a fax phone | Perform Script [ “Set Fax Indicator” ] (script id 179)
+key 179 Indicates that this is a voice phone | Perform Script [ “Set Voice Indicator” ] (script id 178)
+key 195 Indicates that this is a phone that can send/receive SMS me… | Perform Script [ “Set SMS Indicator” ] (script id 187)
+key 324 (icon) | Perform Script [ “Open Network Address Popover { json }” ] (script id 434) | param JSON {Id: Party_ContactMethod::Id, Label: Party_ContactMethod::Label, Address: Party_ContactMethod_NetworkAddress::Address}
+key 323 (icon) | no step
+key 166 (icon) | Perform Script [ “Button: Set Primary Network Address” ] (script id 180)
+key 185 (icon) | opens popover ""Popover""
+key 187 Delete | Perform Script [ “Button: Delete Network Address” ] (script id 203)
+key 191 Indicates that this is a billing email | Perform Script [ “Toggle Contact Method Purpose { ContactMethodPurposeTypeId, ContactMethodId }” ] (script id 183) | param JSON {ContactMethodId: Party_ContactMethod::Id, ContactMethodPurposeTypeId: 1, RefreshPortalName: NetworkAddressesPortal}
+key 317 (icon) | Perform Script [ “Edit Address Popover” ] (script id 516)
+key 167 (icon) | Perform Script [ “Button: Set Primary Address” ] (script id 181)
+key 188 (icon) | opens popover ""Popover""
+key 190 Delete | Perform Script [ “Button: Delete Address” ] (script id 199)
+key 192 Indicates that this is a billing address | Perform Script [ “Toggle Contact Method Purpose { ContactMethodPurposeTypeId, ContactMethodId }” ] (script id 183) | param JSON {ContactMethodId: Party_ContactMethod::Id, ContactMethodPurposeTypeId: 1, RefreshPortalName: AddressesPortal}
+key 193 Indicates that this is a shipping address | Perform Script [ “Toggle Contact Method Purpose { ContactMethodPurposeTypeId, ContactMethodId }” ] (script id 183) | param JSON {ContactMethodId: Party_ContactMethod::Id, ContactMethodPurposeTypeId: 2, RefreshPortalName: AddressesPortal}
+key 194 Indicates that this is a mailing address | Perform Script [ “Toggle Contact Method Purpose { ContactMethodPurposeTypeId, ContactMethodId }” ] (script id 183) | param JSON {ContactMethodId: Party_ContactMethod::Id, ContactMethodPurposeTypeId: 3, RefreshPortalName: AddressesPortal}
+key 255 Add… | Perform Script [ “Open Phone Popover” ] (script id 428)
+key 292 Add… | Perform Script [ “Open Network Address Popover { json }” ] (script id 434)
+key 298 Add… | Perform Script [ “Open Address Popover” ] (script id 432)","key 180 | Indicates that this is a fax phone
+key 179 | Indicates that this is a voice phone
+key 195 | Indicates that this is a phone that can send/receive SMS messages
+key 191 | Indicates that this is a billing email
+key 192 | Indicates that this is a billing address
+key 193 | Indicates that this is a shipping address
+key 194 | Indicates that this is a mailing address","key 38 | Party_ContactMethod | sort none | filter only phone contact methods
+key 44 | Party_ContactMethod | sort none | filter only network address (internet) contact methods
+key 49 | Party_ContactMethod | sort none | filter only postal address contact methods","PhoneLabels
+Country
+AddressLabels
+NetworkAddressLabels",modal,"Phone SMS indicator k195 runs script ""Test"" (go to next field) on keystroke, probably a dev leftover; one hide rule (k?) is a quoted text string instead of an expression."
+karbon_kontacts.fmp12/layouts/50-Party_Detail.txt,6dbf220c7c0b9a08064410e360444e7579192269e41343d1f79c4ed9d2602cf4,layouts,karbon_kontacts.fmp12,50,Party Detail,form,"Party (base Party, karbon_data.fmp12)","key 746 text “DEV” | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)
+key 298 button “Edit…” | hidden when in Find mode
+key 300 field Party::Photo | hidden when Party::OrganizationInd is true or in Find mode
+key 301 field Party::Photo | hidden when Party::PersonInd is true or in Find mode
+key 314 field Person::JobTitle | hidden when Person::ONE is false/empty or in Find mode
+key 315 field Party::Department | hidden when in Find mode
+key 748 button (icon) | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)
+key 827 rect [ActivityAlertInd] | hidden when Party_ActivityParty_Activity::AlertInd is false/empty (rule not applied in Find mode)
+key 828 buttonbar | hidden when Party_ActivityParty_Activity::CommentCountCached is false/empty (rule not applied in Find mode)
+key 821 button (icon) | hidden when the activity is not a Note (ActivityTypeId <> 2) (rule not applied in Find mode)
+key 822 button (icon) | hidden when the activity is not a Email (ActivityTypeId <> 1) (rule not applied in Find mode)
+key 823 button (icon) | hidden when the activity is not a Meeting (ActivityTypeId <> 6) (rule not applied in Find mode)
+key 824 button (icon) | hidden when the activity is not a Call (ActivityTypeId <> 8) (rule not applied in Find mode)
+key 825 button (icon) | hidden when the activity is not a Task (ActivityTypeId <> 3) (rule not applied in Find mode)
+key 564 button “Add Contact” | hidden when Party::PersonInd is true (rule not applied in Find mode)
+key 758 button “Add Organization” | hidden when Party::OrganizationInd is true (rule not applied in Find mode)
+key 759 text “Layered buttons” | hidden when always (constant 1) (rule not applied in Find mode)
+key 867 field Party_PartyRelation_Party::Photo | hidden when Party_PartyRelation_Party::OrganizationInd is true or in Find mode
+key 868 field Party_PartyRelation_Party::Photo | hidden when Party_PartyRelation_Party::PersonInd is true or in Find mode
+key 562 button (icon) | hidden when Party_PartyRelation::CurrentInd is false/empty (rule not applied in Find mode)
+key 898 button (icon) | hidden when Party_PartyRelation::CurrentInd is true (rule not applied in Find mode)
+key 882 buttonbar | hidden when Party_FileAttachment::Id is empty or in Preview mode","key 736 button (icon) | when BrowserNav.SaveNavHistory is evaluated (side effect only: it records the visited layout in the $$BrowserNav history; the item has no Format) | none
+key 740 field Globals::RecordNav | when the typed record number (field value) differs from the current record number | style","layout | OnRecordLoad | id 417 “Party Detail - On Record Load” | clears selector::ActivityId when a Party record loads
+key 740 field Globals::RecordNav | OnObjectEnter | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""Open""
+key 740 field Globals::RecordNav | OnObjectExit | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""exit""
+key 890 popover [FindPopover] | OnObjectEnter | id 248 “Trigger: Set Up QuickFind Popover” | clears the QuickFind global (with triggers disabled) and focuses the QuickFind field
+key 891 field Globals::QuickFind | OnObjectSave | id 250 “Perform QuickFind” | runs Perform Quick Find on the QuickFind field; shows a no-records dialog on error, else closes the popover","key 734 (icon) | Perform Script [ “Display Main Nav” ] (script id 105)
+key 736 (icon) | Perform Script [ “Browser Nav (forward or backward)” ] (script id 466) | param ""Backward""
+key 737 (icon) | Perform Script [ “Browser Nav (forward or backward)” ] (script id 466) | param ""Forward""
+key 763 {{RecordNumber}} | no step
+key 738 {{RecordNumber}} | no step
+key 739 {{RecordNumber}} | no step
+key 742 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""prev""
+key 743 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""next""
+key 745 calc If ( /* Find mode requests*/ Get (… | Perform Script [ “Record Nav” ] (script id 382) | param ""ToggleFoundSet""
+key 295 (icon) | no step
+key 296 (icon) | no step
+key 297 (icon) | no step
+key 298 Edit… | Perform Script [ “Open Party Info Card { Id }” ] (script id 163) | param JSON {Id: Party::Id}
+key 594 Discuss | Perform Script [ “Open Discussion from Contact” ] (script id 850)
+key 748 (icon) | Perform Script [ “Add Pending Change to Build File” ] (script id 524)
+key 757 List View | Go to Layout [ “Parties” (Party) ] (layout id 47)
+key 787 (icon) | Perform Script [ “Open Activity { Id }” ] (script id 291) | param JSON {Id: the clicked activity id, DisplayPartyIds: this person, related persons and the activity party ids}
+key 829 calc Count ( Party_ActivityParty_Activi… | no step
+key 821 (icon) | no step
+key 822 (icon) | no step
+key 823 (icon) | no step
+key 824 (icon) | no step
+key 825 (icon) | no step
+key 778 calc ""Email"" | Perform Script [ “Button: Create Email Message From Party” ] (script id 770)
+key 779 calc ""Meeting"" | Perform Script [ “Button: Create Meeting From Party” ] (script id 771)
+key 780 calc ""Call"" | Perform Script [ “Button: Create Call from Party” ] (script id 706)
+key 781 calc ""Task"" | Perform Script [ “btn: Create Task From Party” ] (script id 772)
+key 782 calc ""Note"" | Perform Script [ “Button: Create Note from Party” ] (script id 669)
+key 564 Add Contact | Perform Script [ “btn: Add Related Person to Organization” ] (script id 424)
+key 758 Add Organization | Perform Script [ “btn: Add Related Organization to Person” ] (script id 656)
+key 861 (icon) | Perform Script [ “Open Party Info Card { Id }” ] (script id 163) | param JSON {Id: Party_PartyRelation_Party::Id}
+key 869 (icon) | no step
+key 870 (icon) | no step
+key 872 (icon) | no step
+key 562 (icon) | Perform Script [ “btn: End Party Relation from Party” ] (script id 423)
+key 898 (icon) | Perform Script [ “btn: Restore Party Relation from Party” ] (script id 855)
+key 802 (icon) | Perform Script [ “btn: Download and Open File from Party” ] (script id 647) | param Party_FileAttachment_File::FileName (field value)
+key 883 (icon) | opens popover ""Popover""
+key 885 delete | Perform Script [ “btn: Delete FileAttachment from Party” ] (script id 648)
+key 805 Attach… | Perform Script [ “btn: Add New File as FileAttachment to Party” ] (script id 644)
+key 888 (icon) | Perform Script [ “btn: Open Create Party Card - All Contacts” ] (script id 619)
+key 889 (icon) | opens popover ""Find Opportunities""
+key 892 Show All | Perform Script [ “Close Find Popover and Show All” ] (script id 251)
+key 893 Advanced Find | Perform Script [ “Button: Go to Advanced Find Layout ( EntityName )” ] (script id 804) | param ""contact""
+key 894 (icon) | Perform Script [ “Get Help” ] (script id 478)","key 736 | name of the previous layout in the browser-style history (BrowserNav.Tooltip), or ""Nowhere to go…""
+key 737 | name of the next layout in the browser-style history (BrowserNav.Tooltip), or ""Nowhere to go…""","key 786 | Party_ActivityParty_Activity | sort Descending Party_ActivityParty_Activity::DateDisplay, Descending Party_ActivityParty_Activity::TimeDisplay | filter only activities that are not discussions
+key 860 | Party_PartyRelation_Party | sort none | none
+key 565 | Party_PartyRole | sort none | none
+key 801 | Party_FileAttachment_File | sort none | none",none,page,
+karbon_kontacts.fmp12/layouts/124-Card_-_UtilityParty.txt,a414c05b75d7c3c488130ba332fafb30c2177fa1a462737b62beabd8f95e510f,layouts,karbon_kontacts.fmp12,124,Card - UtilityParty,dialog,"UtilityParty (base UtilityParty, karbon_kontacts.fmp12)","key 168 rrect | hidden when $$showingRequiredFields is false/empty or UtilityParty::OrganizationName is not empty (rule not applied in Find mode)
+key 22 button “Skip” | hidden when UtilityParty::SkipPersonInd is true or UtilityParty::PersonPrescribedInd is true (rule not applied in Find mode)
+key 255 field UtilityParty::FullContactOrgKeepLocation | hidden when UtilityParty::FullContactOrgAddressFull is empty (rule not applied in Find mode)
+key 259 field UtilityParty::FullContactOrgKeepLinkedIn | hidden when UtilityParty::FullContactOrgLinkedInURL is empty (rule not applied in Find mode)
+key 270 field UtilityParty::FullContactOrgKeepLogo | hidden when UtilityParty::FullContactOrgLogo is empty (rule not applied in Find mode)
+key 271 field UtilityParty::FullContactOrgKeepPhone | hidden when UtilityParty::FullContactOrgPhone is empty (rule not applied in Find mode)
+key 273 field UtilityParty::FullContactOrgKeepTwitter | hidden when UtilityParty::FullContactOrgTwitter is empty (rule not applied in Find mode)
+key 274 field UtilityParty::FullContactOrgKeepFacebook | hidden when UtilityParty::FullContactOrgFacebook is empty (rule not applied in Find mode)
+key 275 field UtilityParty::FullContactOrgKeepBio | hidden when UtilityParty::FullContactOrgBio is empty (rule not applied in Find mode)
+key 280 field UtilityParty::FullContactPersonKeepGender | hidden when UtilityParty::FullContactOrgAddressFull is not empty (rule not applied in Find mode)
+key 281 field UtilityParty::FullContactPersonKeepLinkedIn | hidden when UtilityParty::FullContactOrgLinkedInURL is not empty (rule not applied in Find mode)
+key 282 field UtilityParty::FullContactPersonKeepAvatar | hidden when UtilityParty::FullContactOrgLogo is not empty (rule not applied in Find mode)
+key 283 field UtilityParty::FullContactPersonKeepPhone | hidden when UtilityParty::FullContactOrgPhone is not empty (rule not applied in Find mode)
+key 285 field UtilityParty::FullContactPersonKeepTwitter | hidden when UtilityParty::FullContactOrgTwitter is not empty (rule not applied in Find mode)
+key 286 field UtilityParty::FullContactPersonKeepFacebook | hidden when UtilityParty::FullContactOrgFacebook is not empty (rule not applied in Find mode)
+key 287 field UtilityParty::FullContactPersonKeepBio | hidden when UtilityParty::FullContactOrgBio is not empty (rule not applied in Find mode)
+key 288 button “Back” | hidden when UtilityParty::SkipPersonInd is true or UtilityParty::PersonPrescribedInd is true (rule not applied in Find mode)
+key 169 rrect | hidden when $$showingRequiredFields is false/empty or UtilityParty::PersonLastName is not empty (rule not applied in Find mode)
+key 170 rrect | hidden when $$showingRequiredFields is false/empty or UtilityParty::PersonFirstName is not empty (rule not applied in Find mode)
+key 125 button “Back” | hidden when UtilityParty::OrganizationPrescribedInd is true (rule not applied in Find mode)
+key 167 button “Skip” | hidden when UtilityParty::OrganizationPrescribedInd is true (rule not applied in Find mode)
+key 127 button “Back” | hidden when UtilityParty::SkipOrganizationInd is true (rule not applied in Find mode)
+key 179 field UtilityParty::FullContactPersonKeepGender | hidden when UtilityParty::FullContactPersonGender is empty (rule not applied in Find mode)
+key 184 field UtilityParty::FullContactPersonKeepLinkedIn | hidden when UtilityParty::FullContactPersonLinkedInURL is empty (rule not applied in Find mode)
+key 224 field UtilityParty::FullContactPersonKeepAvatar | hidden when UtilityParty::FullContactPersonAvatar is empty (rule not applied in Find mode)
+key 225 field UtilityParty::FullContactPersonKeepPhone | hidden when UtilityParty::FullContactPersonPhone is empty (rule not applied in Find mode)
+key 226 field UtilityParty::FullContactPersonKeepJobTitle | hidden when UtilityParty::FullContactPersonJobTitle is empty (rule not applied in Find mode)
+key 227 field UtilityParty::FullContactPersonKeepTwitter | hidden when UtilityParty::FullContactPersonTwitter is empty (rule not applied in Find mode)
+key 228 field UtilityParty::FullContactPersonKeepFacebook | hidden when UtilityParty::FullContactPersonFacebookURL is empty (rule not applied in Find mode)
+key 229 field UtilityParty::FullContactPersonKeepBio | hidden when UtilityParty::FullContactPersonBio is empty (rule not applied in Find mode)
+key 237 field UtilityParty::FullContactPersonKeepGender | hidden when UtilityParty::FullContactPersonGender is not empty (rule not applied in Find mode)
+key 238 field UtilityParty::FullContactPersonKeepLinkedIn | hidden when UtilityParty::FullContactPersonLinkedInURL is not empty (rule not applied in Find mode)
+key 239 field UtilityParty::FullContactPersonKeepAvatar | hidden when UtilityParty::FullContactPersonAvatar is not empty (rule not applied in Find mode)
+key 240 field UtilityParty::FullContactPersonKeepPhone | hidden when UtilityParty::FullContactPersonPhone is not empty (rule not applied in Find mode)
+key 241 field UtilityParty::FullContactPersonKeepJobTitle | hidden when UtilityParty::FullContactPersonJobTitle is not empty (rule not applied in Find mode)
+key 242 field UtilityParty::FullContactPersonKeepTwitter | hidden when UtilityParty::FullContactPersonTwitter is not empty (rule not applied in Find mode)
+key 243 field UtilityParty::FullContactPersonKeepFacebook | hidden when UtilityParty::FullContactPersonFacebookURL is not empty (rule not applied in Find mode)
+key 244 field UtilityParty::FullContactPersonKeepBio | hidden when UtilityParty::FullContactPersonBio is not empty (rule not applied in Find mode)
+key 247 button “Back” | hidden when UtilityParty::SkipPersonInd is true or UtilityParty::PersonPrescribedInd is true (rule not applied in Find mode)
+key 129 button “Back” | hidden when UtilityParty::SkipPersonInd is false/empty (rule not applied in Find mode)
+key 130 button “Back” | hidden when UtilityParty::SkipPersonInd is true or UtilityParty::PersonPrescribedInd is true (rule not applied in Find mode)",none,"key 21 field UtilityParty::OrgPhone | OnObjectSave | id 520 “Format Phone Number” | formats the phone number in the active field, via Twilio phone lookup when configured
+key 91 field UtilityParty::PersonPhone | OnObjectSave | id 520 “Format Phone Number” | formats the phone number in the active field, via Twilio phone lookup when configured","key 5 Continue | Perform Script [ “Search for Duplicate Organizations” ] (script id 388)
+key 22 Skip | Perform Script [ “Skip Org” ] (script id 398)
+key 160 Lookup… | Perform Script [ “Button: Launch Address Picker from New Contact Wizard” ] (script id 630)
+key 131 SelectExistingOrgButton | opens popover ""Popover""
+key 69 Use | Perform Script [ “Select Existing Organization” ] (script id 390)
+key 68 None of the Above Match | Perform Script [ “No Org Matches” ] (script id 399)
+key 124 Back | Perform Script [ “Go to Start” ] (script id 402) | param JSON {TargetSlideNumber: 1}
+key 256 Continue | Perform Script [ “Accept FullContact Org Match” ] (script id 871)
+key 278 select all | Perform Script [ “FullContact Org Select All” ] (script id 869)
+key 288 Back | Perform Script [ “Go to Start” ] (script id 402)
+key 291 Ignore this Match | Perform Script [ “Ignore FullContact Org Match” ] (script id 870)
+key 66 Continue | Perform Script [ “Go to Person Info Slide” ] (script id 400)
+key 67 Back | Perform Script [ “Go to Start” ] (script id 402) | param JSON {TargetSlideNumber: 1}
+key 70 Continue | Perform Script [ “Search for Duplicate People” ] (script id 389)
+key 125 Back | Perform Script [ “Back from Contact Info” ] (script id 621) | param JSON {TargetSlideNumber: 1}
+key 167 Skip | Perform Script [ “Skip Contact Info” ] (script id 654)
+key 149 (icon) | opens popover ""Popover""
+key 152 Use | Perform Script [ “Select Existing Person” ] (script id 392)
+key 78 None of the Above Match | Perform Script [ “No Person Matches” ] (script id 401)
+key 127 Back | Perform Script [ “Go to Start” ] (script id 402)
+key 181 Continue | Perform Script [ “Go to Summary” ] (script id 409)
+key 232 select all | Perform Script [ “FullContact Person Select All” ] (script id 866)
+key 247 Back | Perform Script [ “Go to Person Info Slide” ] (script id 400)
+key 81 Submit | Perform Script [ “Create Parties” ] (script id 393)
+key 129 Back | Perform Script [ “Go to Start” ] (script id 402)
+key 130 Back | Perform Script [ “Go to Person Info Slide” ] (script id 400)
+key 117 (icon) | Close Window [ Current Window ]","key 264 | the object's own content (the field value, shown in full)
+key 270 | Keep Logo
+key 224 | Keep Avatar
+key 239 | Keep Avatar","key 26 | Selected_Party#partyList | sort none | none
+key 75 | Selected_Party#partyList | sort none | none",Boolean,modal,New-contact wizard with FullContact org/person match panels; confirm the FullContact integration is still in use.
+karbon_kontacts.fmp12/layouts/177-Party_Find.txt,e36890e9fad843357bfa251c54bf5ac392a75fbd5869ed799a2ff648aef0f38d,layouts,karbon_kontacts.fmp12,177,Party Find,utility,"Party (base Party, karbon_data.fmp12)","key 815 rect [Col-3] | hidden when always (constant 1)
+key 816 rect [Col-2] | hidden when always (constant 1)
+key 814 rect [Col-1] | hidden when always (constant 1)
+key 433 text “DEV” | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)
+key 809 buttonbar | hidden when always (constant 1) (rule not applied in Find mode)",key 757 field Globals::RecordNav | when the typed record number (field value) differs from the current record number | style,"layout | OnModeExit | id 803 “Trigger: Return From Advanced Find” | returns to the layout the user came from after an Advanced Find (when triggers are allowed)
+key 757 field Globals::RecordNav | OnObjectEnter | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""Open""
+key 757 field Globals::RecordNav | OnObjectExit | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""exit""","key 755 {{RecordNumber}} | no step
+key 756 {{RecordNumber}} | no step
+key 759 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""prev""
+key 760 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""next""
+key 810 Create new find request | New Record/Request
+key 811 Delete find request | Delete Record/Request [ No dialog ]
+key 812 Perform find | Perform Find [  ]
+key 813 Cancel find | Enter Browse Mode","key 810 | Create new find request
+key 811 | Delete find request
+key 812 | Perform find
+key 813 | Cancel find",none,none,page,Advanced-find form; its button bar is shown only in Find mode (constant hide rule with findMode=False). Confirm migration as a search form.

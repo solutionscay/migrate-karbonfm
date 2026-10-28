@@ -1,0 +1,26 @@
+# custom function 60: QBO.LookupRelatedLinesFMId
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=60]
+
+CustomFunction id=60 functionArity=2 visible=True parameters=Entity;ParentId name=QBO.LookupRelatedLinesFMId
+  Calculation:
+    | Let(
+    | [
+    | 
+    | lineFMId = Config(Entity & ".fields.line.fmId"); 
+    | lineParentId = Config(Entity & ".fields.line.parentId"); 
+    | lineNumberField = Config(Entity & ".fields.line.lineNumber") ;
+    | 
+    | OrderBy  =   "ORDER BY " & SQL.GetFieldName ( lineNumberField );
+    | 
+    | sql = List(
+    |    SQL.GetColumnStatement ( lineFMId ; lineParentId ; "?" );
+    |    OrderBy
+    | )
+    | 
+    | ];
+    | 
+    |     ExecuteSQL ( sql ; "" ; "" ; ParentId )
+    | 
+    | )
+    refs: fn:Let, cf:Config, cf:SQL.GetFieldName, fn:List, cf:SQL.GetColumnStatement, fn:ExecuteSQL

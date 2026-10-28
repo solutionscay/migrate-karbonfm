@@ -1,0 +1,26 @@
+# custom function 62: AddDollarFormat
+# file: karbon_kontacts.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=62]
+
+CustomFunction id=62 functionArity=1 visible=True parameters=Number name=AddDollarFormat
+  Calculation:
+    | Let ( [
+    | Amount = Round ( Abs ( Number ) ; 2 ) ;
+    | A = Int ( Amount ) ;
+    | L = Length ( A ) ;
+    | R = If ( Amount ≠ A ; Left ( amount - A & "000" ; 3 ) ; ".00" )
+    | ] ;
+    | Case ( Number < 0 ; "-" ) &
+    | "$" &
+    | Case (
+    | L=9 ; Left(A;3) &","& Middle(A;4;3) &","& Right(A;3) ;
+    | L=8 ; Left(A;2) &","& Middle(A;3;3) &","& Right(A;3) ;
+    | L=7 ; Left(A;1) &","& Middle(A;2;3) &","& Right(A;3) ;
+    | L=6 ; Left(A;3) &","& Right(A;3) ;
+    | L=5 ; Left(A;2) &","& Right(A;3) ;
+    | L=4 ; Left(A;1) &","& Right(A;3) ;
+    | A 
+    | ) //end Case
+    | & R
+    | ) //end Let
+    refs: fn:Let, fn:Round, fn:Abs, fn:Int, fn:Length, fn:If, fn:Left, fn:Case, fn:Middle, fn:Right

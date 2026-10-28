@@ -1,0 +1,434 @@
+# script 682: Get Active Opportunities Status Value
+# file: karbon_kontroller.fmp12
+# folder: API / Opportunity
+# source: ScriptCatalog/Script[@id=682]
+# steps: 117 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=600 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Get Active Opportunities Status Value
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} Opportunity
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {number} [Opportunity.ActiveInd=1]
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returnSuccess {string} result.Name
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnSuccess {number} result.New
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnSuccess {number} result.Working
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnSuccess {number} result.ProposalSent
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@history 2018-11-07 jeremy@geistinteractive.com - Created by Generator version 2.5.1
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  28    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $scriptParameter; Value:If ( IsEmpty ( Get(ScriptParameter )) ; "{}" ; Get(ScriptParameter)) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $scriptParameter
+  35    #Set default values
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $Defaults; Value:JSONSetElement ( $Defaults ; "ActiveInd" ; 1 ; JSONNumber ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Name: $Defaults
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $json; Value:JSON.Merge ( $Defaults ; $scriptParameter  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Merge
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $json; Value:JSON.Format( $json ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    If [ Error.IsError ( $json ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  44    Exit Script [ Result: $json ]
+        DisableStepCollapsed state=False
+  45    End If
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $error; Value:JSON.Validate.This ( $json ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "ActiveInd" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  52    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  53    End If
+        DisableStepCollapsed state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $ActiveInd; Value:JSONGetElement ( $json ; "ActiveInd" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActiveInd
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #START QUERY
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  75    Go to Layout [ “f_Opportunity” (f_Opportunity) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=35 name=f_Opportunity
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Set Field [ f_Opportunity::ActiveInd; $ActiveInd ]
+        DisableStepCollapsed state=False
+        Field table=f_Opportunity id=59 name=ActiveInd
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #PERFORM FIND
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    Set Variable [ $error; Value:Error.Last ( "while finding record" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  94    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  95    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  96    End If
+        DisableStepCollapsed state=False
+  97    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    Sort Records [ Keep records in sorted order; Specified Sort Order: f_Opportunity::StatusCached; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=f_Opportunity id=50 name=StatusCached
+  99    Set Variable [ $result; Value:JSONSetElement ( "";"name" ; "Opportunities" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+ 102    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    Set Variable [ $amount; Value:GetSummary ( f_Opportunity::ValueTotal ; f_Opportunity::StatusCached ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetSummary, f_Opportunity::ValueTotal#63, f_Opportunity::StatusCached#50
+        Repetition
+          Calculation:
+            | 1
+        Name: $amount
+ 104    Set Variable [ $result; Value:Let ([
+        _key = Substitute ( f_Opportunity::StatusCached ; " " ; "" );
+        _v = JSONGetElement ( $result ; _key )
+        
+        ];
+        
+        
+        JSONSetElement ( $result ;_key ; $amount ; JSONNumber )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Substitute, f_Opportunity::StatusCached#50, fn:JSONGetElement, fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 105    Set Variable [ $nextRecordNumber; Value:Get(RecordNumber) + GetSummary ( f_Opportunity::Count ; f_Opportunity::StatusCached ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:RecordNumber, fn:GetSummary, f_Opportunity::Count#68, f_Opportunity::StatusCached#50
+        Repetition
+          Calculation:
+            | 1
+        Name: $nextRecordNumber
+ 106    Exit Loop If [ $nextRecordNumber > Get(FoundCount) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:FoundCount
+ 107    Go to Record/Request/Page [ $nextRecordNumber ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+ 108    End Loop
+        DisableStepCollapsed state=False
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    Set Variable [ $result; Value:"[" & $result & "]" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 111    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+ 113    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 114    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 115    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 117    End If
+        DisableStepCollapsed state=False

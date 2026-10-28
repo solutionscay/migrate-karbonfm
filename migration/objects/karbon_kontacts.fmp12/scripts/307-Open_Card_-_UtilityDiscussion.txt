@@ -1,0 +1,88 @@
+# script 307: Open Card - UtilityDiscussion
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / DiscussionUtility
+# source: ScriptCatalog/Script[@id=307]
+# steps: 18 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=311 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $error; Value:JSON.Validate.This ( $data ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "EntityId" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "EntityType" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "Title" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   9    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Field [ UtilityDiscussion::Date; JSONGetElement( $data ; "Date" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityDiscussion id=6 name=Date
+  13    Set Field [ UtilityDiscussion::EntityId; JSONGetElement( $data ; "EntityId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityDiscussion id=7 name=EntityId
+  14    Set Field [ UtilityDiscussion::EntityTypeId; JSONGetElement( $data ; "EntityTypeId" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityDiscussion id=8 name=EntityTypeId
+  15    Set Field [ UtilityDiscussion::Notes; JSONGetElement( $data ; "Notes" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityDiscussion id=9 name=Notes
+  16    Set Field [ UtilityDiscussion::Title; JSONGetElement( $data ; "Title" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityDiscussion id=10 name=Title
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    New Window [ Style: Card; Using layout: “Card - Discussion Utility_deprecated” (UtilityDiscussion); Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Layout id=100 name="Card - Discussion Utility_deprecated"

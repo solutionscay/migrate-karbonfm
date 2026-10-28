@@ -1,0 +1,67 @@
+# custom function 8: JSON.Merge
+# file: karbon_tester.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=8]
+
+CustomFunction id=8 functionArity=2 visible=True parameters=target;source name=JSON.Merge
+  Calculation:
+    | /**
+    |  * =====================================
+    |  * jsonMerge ( target ; source )
+    |  *
+    |  * PURPOSE:
+    |  *	performs a shallow merge on two JSONObjects
+    |  *
+    |  * RETURNS:
+    |  *	the Object
+    |  *
+    |  * PARAMETERS:
+    |  *	target = the object to merge into
+    |  *	source = the object to get properties to merge into the target
+    |  *
+    |  * DEPENDENCIES:
+    |  *	FileMaker 16
+    |  *
+    |  * HISTORY:
+    |  *	CREATED on 2017-APR-04 Todd Geist, todd@geistinteractive.com
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | 
+    | Let(
+    | [
+    | 
+    | sourceKeys = JSONListKeys ( source ; "" );
+    | targetKeys = JSONListKeys ( target ; "" )
+    | 
+    | ];
+    | Case(
+    | 
+    | 	//look for error ans exit
+    | 	Left(sourceKeys; 1) = "?" ; sourceKeys & " In Source.";
+    | 	Left(targetKeys; 1) = "?" ; targetKeys  & " In Target." ;
+    | 	Left(  JSONGetElement (source ; "" )  ;1) = "[" ; "? * Array in Source. Must be an object" ;
+    | 
+    | 	// look for the last recusion  and exit
+    | 	ValueCount(sourceKeys) < 1  ; target ; // done
+    | 
+    |  
+    | 	Let(
+    | 	[
+    | 
+    |        // merge this rounds key into the target
+    | 	thisKey = GetValue(sourceKeys ; 1 );
+    | 	thisValue = JSONGetElement( source; thisKey );
+    |         newTarget = JSONSetElement ( target ; thisKey ; thisValue ; "" );
+    | 
+    | 	// remove this rounds key from the source
+    | 	newSource = JSONDeleteElement ( source ; thisKey )
+    | 	]; 
+    | 
+    | 	// repeat
+    | 	JSON.Merge(newTarget ; newSource )
+    |        ) 
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:JSONListKeys, fn:Case, fn:Left, fn:JSONGetElement, fn:ValueCount, fn:GetValue, fn:JSONSetElement, fn:JSONDeleteElement, cf:JSON.Merge

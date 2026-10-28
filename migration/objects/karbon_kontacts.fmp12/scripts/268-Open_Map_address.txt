@@ -1,0 +1,58 @@
+# script 268: Open Map ( address )
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Shared Utilities / Maps
+# source: ScriptCatalog/Script[@id=268]
+# steps: 10 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=562 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $address; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ not IsEmpty ( $address )
+        and
+        /* the address contains at least 5 letters and numbers */
+        Length ( Filter ( $address ; "abcdefghijklmnopqrstuvwxyz0123456789" ) ) ≥ 5 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:and, fn:Length, fn:Filter
+   5    Set Variable [ $url; Value:"https://www.google.com/maps/search/"
+        & GetAsURLEncoded (
+        	Substitute ( $address ;
+        		[ "¶" ; " " ] ;
+        		[ "  " ; " " ]
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsURLEncoded, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+   6    Open URL [ $url ]
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Exit Script [  ]
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False

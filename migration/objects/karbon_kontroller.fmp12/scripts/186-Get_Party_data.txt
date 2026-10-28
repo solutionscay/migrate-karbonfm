@@ -1,0 +1,374 @@
+# script 186: Get Party { data }
+# file: karbon_kontroller.fmp12
+# folder: API / Party
+# source: ScriptCatalog/Script[@id=186]
+# steps: 95 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Searches for a Party and returns a multikey of PartyId
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object}
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} Name
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {boolean} FullWordSearch - If true, search based on the full word. The default is to search on shortened words (example: Gei Int instead of Geist Interactive)
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {number} NumberOfDigitsPerWord
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {boolean} OrganizationInd
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @param {boolean} PersonInd
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnSuccess {string} Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @returnSuccess {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @returnError {Null}
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    # @returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    # @history 2018-10-29 dave@geistinteractive.com - Changed SearchPerWord to FullWordSearch. We were getting way too many false positives.
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #--- [ SETUP ] ---------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  24    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  25    Set Variable [ $data; Value:JSON.Format ( Get (ScriptParameter) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  26    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  27    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #--- [ SETUP END ] -----------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #validate
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $error; Value:JSON.Validate.This ( $data ) & 
+        JSON.Validate.ApplyRules (
+        List(
+        
+        
+        JSON.Validate.Rule.IsRequired ( "Name" );
+        ""
+        
+        
+        )) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  34    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  35    Exit Script [ Result:  $error ]
+        DisableStepCollapsed state=False
+  36    End If
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $Name; Value:JSONGetElement ( $data ;  "Name"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Name
+  40    Set Variable [ $SearchPerWord; Value:JSONGetElement ( $data ;  "SearchPerWord"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SearchPerWord
+  41    Set Variable [ $NumberOfDigitsPerWord; Value:JSONGetElement ( $data ;  "NumberOfDigitsPerWord"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $NumberOfDigitsPerWord
+  42    Set Variable [ $NumberOfDigitsPerWord; Value:If ( IsEmpty( $NumberOfDigitsPerWord ); 12; $NumberOfDigitsPerWord ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty
+        Name: $NumberOfDigitsPerWord
+  43    Set Variable [ $OrganizationInd; Value:JSONGetElement ( $data ; "OrganizationInd" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $OrganizationInd
+  44    Set Variable [ $PersonInd; Value:JSONGetElement ( $data ; "PersonInd" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PersonInd
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  47    Go to Layout [ “f_Party” (f_Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=19 name=f_Party
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #TRANSFORM NAME
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    If [ $FullWordSearch ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #Don't transform the $Name
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #Default behavior: shorten each word in the $Name to produce more results
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $i; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  60    Set Variable [ $WordCount; Value:WordCount ( $Name ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:WordCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $WordCount
+  61    Set Variable [ $Name; Value:Substitute ( $Name ; " " ; ¶ ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $Name
+  62    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Exit Loop If [ $i > $WordCount ]
+        DisableStepCollapsed state=False
+  64    Set Variable [ $ThisWord; Value:GetValue( $Name; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisWord
+  65    #Create/update list of shortened words
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $WordList; Value:List ( $WordList ; 
+        	Left( $ThisWord; $NumberOfDigitsPerWord ) 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Left
+        Repetition
+          Calculation:
+            | 1
+        Name: $WordList
+  67    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  68    End Loop
+        DisableStepCollapsed state=False
+  69    Set Variable [ $Name; Value:Substitute ( $WordList ; ¶ ; " " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $Name
+  70    End If
+        DisableStepCollapsed state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #SET FIND CRITERIA
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Set Field [ f_Party::NameCached; $Name ]
+        DisableStepCollapsed state=False
+        Field table=f_Party id=19 name=NameCached
+  78    Set Field [ f_Party::OrganizationInd; $OrganizationInd ]
+        DisableStepCollapsed state=False
+        Field table=f_Party id=18 name=OrganizationInd
+  79    Set Field [ f_Party::PersonInd; $PersonInd ]
+        DisableStepCollapsed state=False
+        Field table=f_Party id=130 name=PersonInd
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Set Variable [ $error; Value:Error.Last ( "Searching for Party" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  86    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  87    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  88    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    Set Variable [ $result; Value:JSONSetElement ( "{}" ; 
+        	[ "IdList" ; f_Party::IdList ; JSONString ] ; 
+        	[ "Count" ; Get ( FoundCount ) ; JSONNumber ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, f_Party::IdList#86, fn:JSONString, fn:Get, fn:FoundCount, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  90    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  91    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  92    End If
+        DisableStepCollapsed state=False
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False

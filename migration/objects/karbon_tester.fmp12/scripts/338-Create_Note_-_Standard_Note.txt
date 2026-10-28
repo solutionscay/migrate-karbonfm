@@ -1,0 +1,80 @@
+# script 338: Create Note - Standard Note
+# file: karbon_tester.fmp12
+# folder: Application Module / Tests / Initial Conditions
+# source: ScriptCatalog/Script[@id=338]
+# steps: 17 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=295 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $Data; Value:JSONSetElement( "" ;
+        	[ "ActivityMessage" ; "Test Message" ; JSONString ];
+        	[ "CreatorId" ; $CreatorId ; JSONString ];
+        	[ "Date" ; Get( CurrentDate ) ; JSONString ];
+        	[ "Id" ; "" ; JSONString ];
+        	[ "RegardingId" ; $RegardingId ; JSONString ];
+        	[ "Subject" ; "Test Subject" ; JSONString ];
+        	[ "Time" ; Get( CurrentTime ) ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Get, fn:CurrentDate, fn:CurrentTime
+        Repetition
+          Calculation:
+            | 1
+        Name: $Data
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “Create Note { data }” from file: “Karbon_kontroller”; Parameter: $Data ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=390 name="Create Note { data }" in=karbon_kontroller.fmp12
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $error; Value:$ScriptResult ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  11    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Exit Script [ Result: $ScriptResult ]
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    End If
+        DisableStepCollapsed state=False

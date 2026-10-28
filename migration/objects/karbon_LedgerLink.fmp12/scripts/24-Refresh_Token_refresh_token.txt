@@ -1,0 +1,144 @@
+# script 24: Refresh Token ( refresh_token )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO GI OAuth2  / Public
+# source: ScriptCatalog/Script[@id=24]
+# steps: 29 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=70 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   4    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $refreshToken; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $refreshToken
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Perform Script [ “On Get Config” ]
+        DisableStepCollapsed state=False
+        Script id=639 name="On Get Config"
+  10    Set Variable [ $config; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $config
+  11    Set Variable [ $sandbox; Value:JSONGetElement ( $config ;  "sandbox"  ) = 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $sandbox
+  12    Set Variable [ $refreshToken; Value:JSONGetElement ( $config; "refresh_token" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $refreshToken
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $license; Value:JSONGetElement ( $config ;  "license"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $license
+  15    Set Variable [ $companyId; Value:JSONGetElement ( $config ;  "companyId"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $companyId
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “_OAuth BaseURL” ]
+        DisableStepCollapsed state=False
+        Script id=28 name="_OAuth BaseURL"
+  18    Set Variable [ $url; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  19    Set Variable [ $url; Value:$url & "/refresh?refreshToken="  & $refreshToken 
+        
+        & "&license="   & $license 
+        & "&companyId=" & $companyId
+        
+        &
+        
+        Case(
+          $sandbox ; "&sandbox=1";
+          ""
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case
+        Name: $url
+  20    Insert from URL [ $response; $url; cURL options: "--connect-timeout 60 --max-time 300" ]
+        [ Select; No dialog ]
+        NoInteract state=True
+        DontEncodeURL state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        VerifySSLCertificates state=False
+        Field: $response
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ GetAsBoolean( JSONGetElement ( $response ; "success" ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:GetAsBoolean, fn:JSONGetElement
+  24    Perform Script [ “<unknown>”; Parameter: $response ]
+        DisableStepCollapsed state=False
+        Script id=139 name=<unknown> ref=missing
+  25    Exit Script [ Result: Error ( 0 ; ""; "") ]
+        DisableStepCollapsed state=False
+        refs: cf:Error
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Exit Script [ Result: QBO.Error.UnAuthorized ( "refreshing token" ; $response ) ]
+        DisableStepCollapsed state=False
+        refs: cf:QBO.Error.UnAuthorized
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False

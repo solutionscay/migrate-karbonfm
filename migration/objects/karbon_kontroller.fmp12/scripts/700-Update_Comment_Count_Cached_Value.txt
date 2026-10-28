@@ -1,0 +1,356 @@
+# script 700: Update Comment Count Cached Value
+# file: karbon_kontroller.fmp12
+# folder: _OTTO_ / Completed Migration Scripts / 2019-02-08 v0.10.1
+# source: ScriptCatalog/Script[@id=700]
+# steps: 104 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=703 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Updates the count of related comments that's cached on the activity record (Discussions only)
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {none}
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returnSuccess {boolean} result.Succeeded - true if successful
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnSuccess {number} result.RecordsUpdated
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@history 2019-02-06 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  28    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #GET ACTIVITY IDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #find all discussion activities
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Go to Layout [ “f_Activity” (f_Activity) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=25 name=f_Activity
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  40    Set Field [ f_Activity::DiscussionInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=f_Activity id=205 name=DiscussionInd
+  41    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $errorCode; Value:Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LastError
+        Repetition
+          Calculation:
+            | 1
+        Name: $errorCode
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $result; Value:JSONSetElement( "{}"; 
+        	[ "Succeeded" ; True ; JSONBoolean ] ; 
+        	[ "RecordsUpdated" ; Get ( FoundCount ) ; JSONNumber ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean, fn:Get, fn:FoundCount, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    If [ $errorCode = 401 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #no records found; we'll exit with the result (i.e., zero records updated)
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Else If [ $errorCode ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #exit with an actual error
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Variable [ $error; Value:Error ( $errorCode ; "error while finding activities to update" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  51    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  52    End If
+        DisableStepCollapsed state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Set Variable [ $ActivityIds; Value:f_Activity::IdList ]
+        DisableStepCollapsed state=False
+        Value
+          refs: f_Activity::IdList#129
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityIds
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #START TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  64    Exit Loop If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #UPDATE CACHE
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  72    Set Variable [ $end; Value:ValueCount ( $ActivityIds ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Set Field [ DBTransactions::ActivityId; GetValue ( $ActivityIds ; $n ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetValue
+        Field table=DBTransactions id=58 name=ActivityId
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    Set Field [ Activity::CommentCountCached; Count ( ActivityComment#byActivityId::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Count, ActivityComment#byActivityId::Id#6
+        Field table=Activity id=207 name=CommentCountCached
+  80    Set Variable [ $error; Value:Error.Last ( "updating cache" ; Activity::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last, Activity::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  81    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  84    End Loop
+        DisableStepCollapsed state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  87    End Loop
+        DisableStepCollapsed state=False
+  88    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  92    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    Perform Script [ “Save Transaction Result ( {result} )”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=29 name="Save Transaction Result ( {result} )"
+  97    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 100    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 101    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 102    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 104    End If
+        DisableStepCollapsed state=False

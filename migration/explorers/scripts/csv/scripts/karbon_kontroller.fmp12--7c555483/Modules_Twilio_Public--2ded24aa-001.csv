@@ -1,0 +1,31 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/533-Phone_Lookup.txt,ff53c0928dbe193d09993f4e7a5ff1db3061779c72433ce42ee6c3c6dba23cf0,scripts,karbon_kontroller.fmp12,533,Phone Lookup,integration,external-adapter,tier2,"Looks up a phone number with the Twilio Lookup API (PhoneNumber required, optional CountryCode and Format ""National format"" or ""E.164 standard format"", default national). Sends a GET to lookups.twilio.com through ""_Authenticate and Send Request"" (535) and returns the phone number in the requested format. Free lookup only. Runs inside the Start Transaction / Save Transaction Result / End Transaction wrapper (scripts 28, 29, 31); the DBTransactions record carries the keys and setting a ""ONE"" field on the related record locks or creates it.",none,none,"karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 37)
+karbon_kontroller.fmp12/scripts/535 (""_Authenticate and Send Request { RequestJSON }"", step 81)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 111)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 112)","objects/karbon_kontacts.fmp12/scripts/520-Format_Phone_Number.txt (step 11)
+objects/karbon_kontacts.fmp12/scripts/832-Handler_Phone_Selection.txt (step 30)
+objects/karbon_kontacts.fmp12/scripts/865-Search_for_FullContact_Person_Match.txt (step 27)
+objects/karbon_kontroller.fmp12/scripts/726-Create_Chat_Activity_json.txt (step 102)
+objects/karbon_tester.fmp12/scripts/341-Format_National_Phone_Number_Twilio_-_Success.txt (step 40)
+objects/karbon_tester.fmp12/scripts/342-Format_E.164_Phone_Number_Twilio_-_Success.txt (step 40)
+objects/karbon_tester.fmp12/scripts/343-Format_National_Phone_Number_Twilio_-_Failure.txt (step 40)",none,"Step 75 is a TODO (""validate Twilio is configured""). Credentials are added inside script 535 (not in this share); check there for where the Twilio credentials are kept. Step 90 is a disabled sample result."
+karbon_kontroller.fmp12/scripts/729-Send_SMS_Message_json.txt,6af9d5ec58d3d57e2e9a04731e60d8e9c622407bae91bfa66f32a9bc77a4e92a,scripts,karbon_kontroller.fmp12,729,Send SMS Message { json },integration,external-adapter,tier2,"Sends an SMS: loads the ChatMessage and its Chat record by ActivityMessageId, takes the message text and the phone list, builds the Twilio form body (To, From from the system setting, Body, all URL-encoded) and POSTs to api.twilio.com Messages.json with the account SID and auth token as basic auth, through ""HTTP ( {request} )"" (345). On HTTP code 400 sets StatusFailedInd, otherwise StatusAcceptedInd and the Twilio message sid in ExternalMessageId. Returns the Chat Id. Runs inside the Start Transaction / Save Transaction Result / End Transaction wrapper (scripts 28, 29, 31); the DBTransactions record carries the keys and setting a ""ONE"" field on the related record locks or creates it.","ChatMessage::ActivityId#6
+ChatMessage::Message#12
+Chat::PhoneList#28
+System#cartesian::TwilioSMSFromPhoneNumber#74
+System#cartesian::TwilioAccountSid#68
+System#cartesian::TwilioAuthToken#69
+DBTransactions::ChatMessageId#117
+DBTransactions::ActivityId#58
+Chat::Id#6","DBTransactions::ChatMessageId#117 (Set Field step 76, current record)
+ChatMessage::ONE#17 (Set Field step 79, related via DBTransactions, locks the record)
+DBTransactions::ActivityId#58 (Set Field step 86, current record)
+Chat::ONE#15 (Set Field step 89, related via DBTransactions, locks the record)
+ChatMessage::StatusFailedInd#25 (Set Field step 122, related via ChatMessage)
+ChatMessage::StatusAcceptedInd#23 (Set Field step 125, related via ChatMessage)
+ChatMessage::ExternalMessageId#20 (Set Field step 126, related via ChatMessage)","karbon_kontroller.fmp12/scripts/28 (""Start Transaction ( TransactionPayload )"", step 36)
+karbon_kontroller.fmp12/scripts/345 (""HTTP ( {request} )"", step 111)
+karbon_kontroller.fmp12/scripts/29 (""Save Transaction Result ( {result} )"", step 142)
+karbon_kontroller.fmp12/scripts/31 (""End Transaction ( {error}  )"", step 143)","objects/karbon_kontroller.fmp12/scripts/728-Create_Chat_Message_json.txt (step 258)
+objects/karbon_kontroller.fmp12/scripts/730-Test_Send_SMS_Message.txt (step 4)",Twilio Messages API POST through script 345 (step 111),"secret: step 110 builds the request with System#cartesian::TwilioAccountSid and TwilioAuthToken (stored in a field, plain), and the From number in TwilioSMSFromPhoneNumber. Step 104 is a disabled version with a hard-coded From number. Step 119: only code 400 is treated as failure; other 4xx/5xx codes are counted as accepted. Steps 7-8 (Body and To in the header) are disabled and the test script 730 still passes Body and To."
+karbon_kontroller.fmp12/scripts/730-Test_Send_SMS_Message.txt,37675a1371d897e4c75ccad6eb4d2949d0ad35ead42cc3a52024be2d697f2e12,scripts,karbon_kontroller.fmp12,730,_Test: Send SMS Message,utility,drop-candidate,tier3,"Developer test: builds an SMS JSON with a fixed Body and a hard-coded phone number, calls ""Send SMS Message { json }"" (729) and shows an error dialog (exit -2) when it returns an error. Effect owner would be background-job (a test of the SMS sender).",none,none,"karbon_kontroller.fmp12/scripts/729 (""Send SMS Message { json }"", step 4)",none found (in Scripts menu),none,"The test passes Body and To but 729 now requires ActivityMessageId and reads the text from the ChatMessage, so the test would fail validation. Contains a hard-coded phone number (not copied here). Menu script."

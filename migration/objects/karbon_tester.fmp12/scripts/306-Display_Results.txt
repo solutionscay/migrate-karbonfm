@@ -1,0 +1,173 @@
+# script 306: Display Results
+# file: karbon_tester.fmp12
+# folder: Test Module Backup
+# source: ScriptCatalog/Script[@id=306]
+# steps: 38 (3 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=304 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Go to Layout [ “Test” (Test) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=2 name=Test
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $Tests; Value:$$Tests ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Tests
+   6 // Set Variable [ $Tests; Value:JSON.Filter ( $Tests; "Passed===false" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Filter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Tests
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8 // Set Variable [ $Tests; Value:JSONFormatElements ( $Tests ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements
+        Repetition
+          Calculation:
+            | 1
+        Name: $Tests
+   9 // Set Variable [ $Tests; Value:Substitute( $Tests ; "	" ; "  ") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $Tests
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Show All Records
+        DisableStepCollapsed state=False
+  13    If [ Get(TotalRecordCount) <> 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:TotalRecordCount
+  14    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  15    New Record/Request
+        DisableStepCollapsed state=False
+  16    End If
+        DisableStepCollapsed state=False
+  17    If [ IsEmpty ( $$DELETEKEY ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  18    Set Variable [ $$DELETEKEY; Value:Get(UUID) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:UUID
+        Repetition
+          Calculation:
+            | 1
+        Name: $$DELETEKEY
+  19    End If
+        DisableStepCollapsed state=False
+  20    Set Field [ Test::DeleterKey; $$DELETEKEY ]
+        DisableStepCollapsed state=False
+        Field table=Test id=6 name=DeleterKey
+  21    Set Field [ Deleter::IDsList; $$TEST_IDS_TO_DELETE ]
+        DisableStepCollapsed state=False
+        Field table=Deleter id=1 name=IDsList
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ Get(WindowName) = "XCardX" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:WindowName
+  24    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  25    End If
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $$vl_Data; Value:$tests ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$vl_Data
+  28    Set Variable [ $n; Value:JSON.ArrayLength ( $$vl_data ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Go to Layout [ “TestResults” (Rows) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=6 name=TestResults
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Show All Records
+        DisableStepCollapsed state=False
+  34    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  35    Omit Multiple Records [ $n ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  36    Show Omitted Only
+        DisableStepCollapsed state=False
+  37    Sort Records [ Keep records in sorted order; Specified Sort Order: Rows::Group; ascending
+        Rows::Subject; ascending
+        Rows::Case; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=Rows id=3 name=Group
+          Sort type=Ascending
+            PrimaryField
+              Field table=Rows id=4 name=Subject
+          Sort type=Ascending
+            PrimaryField
+              Field table=Rows id=5 name=Case
+  38    Set Variable [ $$Tests; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$Tests

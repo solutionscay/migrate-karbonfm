@@ -1,0 +1,73 @@
+# script 620: OnTimer: Handle Create Party From All Contacts
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party
+# source: ScriptCatalog/Script[@id=620]
+# steps: 17 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #Kill the timer
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ not IsEmpty ( UtilityParty::OrganizationId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, UtilityParty::OrganizationId#20
+   6    Set Variable [ $Id; Value:UtilityParty::OrganizationId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::OrganizationId#20
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   7    Else If [ not IsEmpty ( UtilityParty::PersonId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, UtilityParty::PersonId#21
+   8    Set Variable [ $Id; Value:UtilityParty::PersonId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::PersonId#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   9    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #error
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $json; Value:JSONSetElement ( "{}" ; "Id" ; $Id ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Go to Contacts Detail {Id}”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=502 name="Go to Contacts Detail {Id}"
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,158 @@
+# script 357: Run Test ( Id )
+# file: karbon_Generator.fmp12
+# folder: Test Engine (UI) / Public
+# source: ScriptCatalog/Script[@id=357]
+# steps: 36 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=365 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #Runs a test
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $Id; Value:JSONGetElement ( $data ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Go to Layout [ “Test Detail” (Test) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=69 name="Test Detail"
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $TestLineList; Value:List( Test_TestLine::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Test_TestLine::Id#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineList
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $TestLineListCount; Value:ValueCount( $TestLineList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineListCount
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Go to Related Record [ From table: “Test_TestLine”; Using layout: “Test_TestLine” (Test_TestLine) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        Name
+          Calculation:
+            | "Running Tests..."
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Table id=1065145 name=Test_TestLine
+        Layout id=74 name=Test_TestLine
+  15 // New Window [ Style: Card; Name: "Running Test..."; Using layout: “Test_TestLine” (Test_TestLine); Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=74 name=Test_TestLine
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #Loop through LineType
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  20    Exit Loop If [ $i > $TestLineListCount ]
+        DisableStepCollapsed state=False
+  21    Set Variable [ $ThisTestLine; Value:GetValue ( $TestLineList ; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTestLine
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Field [ SELECTOR::TestLineId; $ThisTestLine ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=18 name=TestLineId
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Perform Script [ “Run TestLine using Script” ]
+        DisableStepCollapsed state=False
+        Script id=358 name="Run TestLine using Script"
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  28    End Loop
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Field [ Test::LastResultTimestamp; Get( CurrentHostTimestamp ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:CurrentHostTimestamp
+        Field table=Test id=20 name=LastResultTimestamp
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False

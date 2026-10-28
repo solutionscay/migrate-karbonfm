@@ -1,0 +1,43 @@
+# script 500: Go to Customer List { Id} 
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Navigation
+# source: ScriptCatalog/Script[@id=500]
+# steps: 8 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=498 groupCollapsed=True includeInMenu=False
+
+   1    #Parameters are optional
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   3    If [ JSON.IsValid ( $parameters ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.IsValid
+   4    Set Variable [ $Id; Value:JSONGetElement ( Get ( ScriptParameter ) ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Go to Layout [ “Customers” (Party_PartyRole_Customer) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=40 name=Customers

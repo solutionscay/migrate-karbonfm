@@ -1,0 +1,161 @@
+# script 351: Button: Add Party Email Address to Email Message ( To|Cc|Bcc, EmailAddress )
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=351]
+# steps: 33 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #validate
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ IsEmpty ( Selected_NetworkAddress::Address ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_NetworkAddress::Address#7
+   4    Beep
+        DisableStepCollapsed state=False
+   5    Show Custom Dialog [ Title: "Error"; Message: "The contact is missing an email address."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   6    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $ActivityPartyRole; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyRole
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $ActivityPartyRoleId; Value:Case ( 
+        	$ActivityPartyRole = "To" ; 
+        		55 ; 
+        	$ActivityPartyRole = "Cc" ; 
+        		56 ; 
+        	$ActivityPartyRole = "Bcc" ; 
+        		57 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyRoleId
+  13    Set Variable [ $EmailAddressFormatted; Value:Selected_NetworkAddress::AddressAndNameOut ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_NetworkAddress::AddressAndNameOut#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailAddressFormatted
+  14    If [ IsEmpty ( $EmailAddressFormatted ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  15    Set Variable [ $EmailAddressFormatted; Value:Quote ( Selected_NetworkAddress_ContactMethod_Party::NameCached ) & " <" & Selected_NetworkAddress::Address & ">" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Quote, Selected_NetworkAddress_ContactMethod_Party::NameCached#19, Selected_NetworkAddress::Address#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailAddressFormatted
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $json; Value:JSONSetElement (  ""; 
+         
+        	[ "ActivityId" ; Activity::Id ; JSONString ];
+        	[ "ActivityPartyRoleId" ; $ActivityPartyRoleId ; JSONNumber ];
+        	[ "ActivityPartyRoleName" ; $ActivityPartyRole ; JSONString ];
+        	[ "ContactMethodId" ; Selected_NetworkAddress::Id ; JSONString ];
+        	[ "EmailAddress" ; Selected_NetworkAddress::Address ; JSONString ];
+        	[ "EmailAddressFormatted" ; $EmailAddressFormatted ; JSONString ];
+        	[ "PartyId" ; Selected_NetworkAddress_ContactMethod::PartyId ; JSONString ] ; 
+        	[ "PartyName" ; Selected_NetworkAddress_ContactMethod_Party::NameCached ; JSONString ]  
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Activity::Id#1, fn:JSONString, fn:JSONNumber, Selected_NetworkAddress::Id#1, Selected_NetworkAddress::Address#7, Selected_NetworkAddress_ContactMethod::PartyId#33, Selected_NetworkAddress_ContactMethod_Party::NameCached#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “Create ActivityParty { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=376 name="Create ActivityParty { json }" in=karbon_kontroller.fmp12
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  23    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  24    If [ JSONGetElement ( $result ; "reason" ) = "duplicate" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  25    Show Custom Dialog [ Title: "Error"; Message: "This email address has already been added."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  26    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  30    End If
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

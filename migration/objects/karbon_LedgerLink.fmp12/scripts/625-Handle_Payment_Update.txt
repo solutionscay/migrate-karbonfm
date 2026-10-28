@@ -1,0 +1,107 @@
+# script 625: Handle Payment Update
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Karbon Overrides
+# source: ScriptCatalog/Script[@id=625]
+# steps: 25 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=605 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $data; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $Payment; Value:JSONGetElement ( $data ; "Record" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Payment
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #Nothing before 1/1/2015
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $Date; Value:JSON.Types.GetDateFromISO ( $Payment; "TxnDate" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Types.GetDateFromISO
+        Repetition
+          Calculation:
+            | 1
+        Name: $Date
+  13    Set Variable [ $Limit; Value:Date(1;1;2015) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Date
+        Name: $Limit
+  14    If [ $Date<$Limit ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Exit Script [ Result: Error(0;"";"") ]
+        DisableStepCollapsed state=False
+        refs: cf:Error
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “Handle Changed or New QBO Payment ( {QBO Payment} )” from file: “DataSourceControllerFile”; Parameter: $Payment ]
+        DisableStepCollapsed state=False
+        FileReference id=7 name=DataSourceControllerFile
+          UniversalPathList
+            | file:karbon_kontroller
+            | $$DataSourceControllerFile
+        Script id=401 name="Handle Changed or New QBO Payment ( {QBO Payment} )" ref=external
+  21    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False

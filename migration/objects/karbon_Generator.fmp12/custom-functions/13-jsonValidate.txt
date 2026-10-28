@@ -1,0 +1,48 @@
+# custom function 13: jsonValidate
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=13]
+
+CustomFunction id=13 functionArity=1 visible=True parameters=json name=jsonValidate
+  Calculation:
+    | /**
+    |  * =====================================
+    |  * jsonValidate ( json )
+    |  *
+    |  * PURPOSE:
+    |  *	validates a JSON String
+    |  *
+    |  * RETURNS:
+    |  *	1 if valid, "?" if invalid.
+    |  *
+    |  * PARAMETERS:
+    |  *	json = the json string to validate
+    |  *
+    |  * DEPENDENCIES:
+    |  *	BaseElements Plugin version 3.0 or greater
+    |  *
+    |  * HISTORY:
+    |  *	MODIFIED on 2015-APR-21 Todd Geist, todd@geistinteractive.com
+    |  *		return "?" on error and the actual Error is set into $json.error
+    |  *	MODIFIED on 2015-APR-19 Todd Geist, todd@geistinteractive.com
+    |  *	CREATED on 2015-JAN-08 Todd Geist, todd@geistinteractive.com
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | Let ( [
+    | 	json = <Function Missing> ( json ; "$" ) ;
+    | 	$json.error =
+    | 		Case (
+    | 			<Function Missing> = "?" ;
+    | 			"BaseElements plugin is not available" ;
+    | 			
+    | 			json = "?" ;
+    | 			Substitute ( <Function Missing> ; Char ( 10 ) ; "¶" ) ;
+    | 		
+    | 			/* else: clear the error */
+    | 			""
+    | 		)
+    | ] ;
+    | 	If ( json = "?" ; json ; 1 )
+    | )
+    refs: fn:Let, fn:Case, fn:Substitute, fn:Char, fn:If

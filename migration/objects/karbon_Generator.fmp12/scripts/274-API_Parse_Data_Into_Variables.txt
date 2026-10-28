@@ -1,0 +1,203 @@
+# script 274: API Parse Data Into Variables
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=274]
+# steps: 46 (2 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-09-11 dave@geistinteractive.com - We're using the generic $ScriptParameter instead of the entity name. It helps when we copy/paste code snippets from one script to another to have common variable names.
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Create Set Variable script steps
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $entity; Value:"json" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+   9 // Set Variable [ $entity; Value:ApiGenerator::Entity ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::Entity#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+  10    Set Variable [ $template; Value:"JSONGetElement ( $<<entity>> ; \"<<name>>\" )" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $template
+  11    Set Variable [ $dateTemplate; Value:"GetAsDate ( JSONGetElement ( $<<entity>> ; \"<<name>>\" ) )" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $dateTemplate
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  14    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Loop If [ IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ApiGeneratorLine::Id#1
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $name; Value:Substitute ( 
+        	ApiGeneratorLine::JsonPathIn ; 
+        	[ ApiGenerator::Entity & "/" ; "" ] ;
+        	[ "/" ; "." ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, ApiGeneratorLine::JsonPathIn#27, ApiGenerator::Entity#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  19 // Set Variable [ $name; Value:ApiGeneratorLine::JsonPropertyName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    If [ ApiGenerator::Entity = $name and ApiGeneratorLine::type = "object" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGenerator::Entity#19, fn:and, ApiGeneratorLine::type#23
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #Don't create root-level object
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Else If [ ApiGeneratorLine::FmpParam ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::FmpParam#29
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #Init
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #Build a list of Set Variable steps
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ ApiGeneratorLine::FmpDataType = "date" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::FmpDataType#28
+  31    Set Variable [ $varString; Value:Substitute ( $dateTemplate ; 
+        	[ "<<entity>>" ; $entity ] ;  
+        	[ "<<name>>" ; $name ] 
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $varString
+  32    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $varString; Value:Substitute ( $template ; 
+        	[ "<<entity>>" ; $entity ] ;  
+        	[ "<<name>>" ; $name ] 
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $varString
+  34    End If
+        DisableStepCollapsed state=False
+  35    Set Variable [ $varString; Value:ScriptStep_InsertCalculatedResult ( "$" & $name ; $varString ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult
+        Name: $varString
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $stepsVars; Value:List( $stepsVars ; $varString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $stepsVars
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    End If
+        DisableStepCollapsed state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  42    End Loop
+        DisableStepCollapsed state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Exit Script [ Result: $stepsVars ]
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False

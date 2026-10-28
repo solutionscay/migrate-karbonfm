@@ -1,0 +1,120 @@
+# script 626: deprecated_btn: Add Existing File as FileAttachment to SalesTransaction
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Buttons
+# source: ScriptCatalog/Script[@id=626]
+# steps: 25 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=557 groupCollapsed=False includeInMenu=False
+
+   1    #decided not to support this UI - 15-Oct-2018 bcooney
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #adds existing File as Attachment record to SalesTransaction
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   5    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $AttachmentId; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $AttachmentId
+  10    Set Variable [ $EntityId; Value:SalesTransaction::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityId
+  11    Set Variable [ $EntityType; Value:Get ( LayoutTableName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LayoutTableName
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityType
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "AttachmentId" ; $AttachmentId ; JSONString ];
+        	[ "EntityId" ; $EntityId ; JSONString ];
+        	[ "EntityType" ; $EntityType ; JSONString ];
+        	[ "IncludeOnSend" ; True; JSONBoolean ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Perform Script [ “Create FileAttachment { data } v1” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=551 name="Create FileAttachment { data } v1" in=karbon_kontroller.fmp12
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  21    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  22    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False

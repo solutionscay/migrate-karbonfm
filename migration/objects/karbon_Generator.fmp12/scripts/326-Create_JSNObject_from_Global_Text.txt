@@ -1,0 +1,83 @@
+# script 326: Create JSNObject from Global Text
+# file: karbon_Generator.fmp12
+# folder: App Modules / JSONObjects / Public
+# source: ScriptCatalog/Script[@id=326]
+# steps: 17 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=284 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ <unknown> from file: “karbon_Generator_Kontroller” (file not open); Parameter: JSONSetElement ( "{}" ; 
+        [ "JSONAsText" ; GLOBALS::JSONText_Create ; JSONObject ];
+        [ "SimpleName" ; GLOBALS::JSONText_Name ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=karbon_Generator_Kontroller
+          UniversalPathList: file:karbon_Generator_Kontroller
+        refs: fn:JSONSetElement, GLOBALS::JSONText_Create#17, fn:JSONObject, GLOBALS::JSONText_Name#18, fn:JSONString
+        Script id=257 ref=external
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  10    Show Custom Dialog [ Title: "Error"; Message: $result; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  11    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $Id; Value:JSONGetElement ( $Result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  15    Set Field [ JSNObject::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=JSNObject id=3 name=Id
+  16    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    End If
+        DisableStepCollapsed state=False

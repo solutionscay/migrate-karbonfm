@@ -1,0 +1,244 @@
+# script 839: Deposit :: Field Map :: Set
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Transactions
+# source: ScriptCatalog/Script[@id=839]
+# steps: 64 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=246 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # This script is responsible for saving the data from QBO into a FileMaker Record
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # context QBO Layout, related to the target record
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # Returning "skip" as the script result will Skip this record and revert any changes
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} json the record just pulled from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  11    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  12    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ 0 //some test ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #Exiting with "skip" at any point in this script will revert all changes
+        this lets you decide right now if you want to accept this data back into FileMaker.
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Script [ Result: "skip" ]
+        DisableStepCollapsed state=False
+  17    End If
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $Id; Value:JSONGetElement( $json ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $DepartmentRef.value; Value:JSONGetElement ( $json ; "DepartmentRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DepartmentRef.value
+  28    Set Variable [ $DepositToAccountRef.value; Value:JSONGetElement ( $json ; "DepositToAccountRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DepositToAccountRef.value
+  29    Set Variable [ $TotalAmt; Value:JSONGetElement ( $json ; "TotalAmt" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TotalAmt
+  30    Set Variable [ $TxnDate; Value:JSONGetElement ( $json ; "TxnDate" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TxnDate
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $TxnDate; Value:Date.FromISO ( $TxnDate ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Date.FromISO
+        Repetition
+          Calculation:
+            | 1
+        Name: $TxnDate
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Variable [ $DepartmentRef.value; Value:QBO.LookupFMId ( "Department" ; $DepartmentRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $DepartmentRef.value
+  44    Set Variable [ $DepositToAccountRef.value; Value:QBO.LookupFMId ( "Account" ; $DepositToAccountRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $DepositToAccountRef.value
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Set Field [ qbo_Deposit::id_Department; $DepartmentRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_Deposit id=14 name=id_Department
+  54    Set Field [ qbo_Deposit::id_Account; $DepositToAccountRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_Deposit id=13 name=id_Account
+  55    Set Field [ qbo_Deposit::amount; $TotalAmt ]
+        DisableStepCollapsed state=False
+        Field table=qbo_Deposit id=11 name=amount
+  56    Set Field [ qbo_Deposit::date; $TxnDate ]
+        DisableStepCollapsed state=False
+        Field table=qbo_Deposit id=12 name=date
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False

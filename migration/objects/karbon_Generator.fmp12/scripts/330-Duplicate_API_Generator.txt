@@ -1,0 +1,296 @@
+# script 330: Duplicate API Generator
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / UI
+# source: ScriptCatalog/Script[@id=330]
+# steps: 78 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=298 groupCollapsed=False includeInMenu=True
+
+   1    #Capture the primary key of the source API
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $id_source_API; Value:ApiGenerator::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $id_source_API
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Get the primary keys for the child records
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $ids_children; Value:List ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ApiGeneratorLine::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $ids_children
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #Start the transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Field [ SELECTOR::ApiGeneratorId; $id_source_API ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=11 name=ApiGeneratorId
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # Create a new record and copy desired fields from source to destination
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # Magic key method : Set the parent side to nothing and create a new record by setting fields in the destination
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # The primary key will pop back into the transaction global field
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Field [ SELECTOR::ApiGeneratorId_duplicate; "" ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=15 name=ApiGeneratorId_duplicate
+  16    Set Field [ Selected_ApiGenerator_duplicate::APIName; Selected_ApiGenerator::APIName & " Copy" ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGenerator::APIName#2
+        Field table=Selected_ApiGenerator_duplicate id=2 name=APIName
+  17    #TODO: More Error trapping
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Field [ Selected_ApiGenerator_duplicate::Entity; Selected_ApiGenerator::Entity ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGenerator::Entity#19
+        Field table=Selected_ApiGenerator_duplicate id=19 name=Entity
+  19    Set Field [ Selected_ApiGenerator_duplicate::APIType; Selected_ApiGenerator::APIType ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGenerator::APIType#18
+        Field table=Selected_ApiGenerator_duplicate id=18 name=APIType
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    # Get the new primary key
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $id_duplicate; Value:Selected_ApiGenerator_duplicate::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_ApiGenerator_duplicate::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $id_duplicate
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    # Now duplicate the child records using only the primary keys
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $n; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  27    Set Variable [ $child_count; Value:ValueCount ( $ids_children) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $child_count
+  28    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Exit Loop If [ Let ( $n = $n + 1 ; $n > $child_count ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Let
+  30    # Get access to the item
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Field [ SELECTOR::ApiGeneratorLineId; GetValue ( $ids_children ; $n ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetValue
+        Field table=SELECTOR id=13 name=ApiGeneratorLineId
+  32    # Set global to nothing so we can create a new record.
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Field [ SELECTOR::ApiGeneratorLineId_duplicate; "" ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=16 name=ApiGeneratorLineId_duplicate
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35 // #refresh joins?
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Perform Script [ “Refresh xJoins” ]
+        DisableStepCollapsed state=False
+        Script id=33 name="Refresh xJoins"
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    # Copy contents over
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Field [ Selected_ApiGeneratorLine_duplicate::ChildSchemaId; Selected_ApiGeneratorLine::ChildSchemaId ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::ChildSchemaId#36
+        Field table=Selected_ApiGeneratorLine_duplicate id=36 name=ChildSchemaId
+  40    Set Field [ Selected_ApiGeneratorLine_duplicate::default; Selected_ApiGeneratorLine::default ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::default#20
+        Field table=Selected_ApiGeneratorLine_duplicate id=20 name=default
+  41    Set Field [ Selected_ApiGeneratorLine_duplicate::description; Selected_ApiGeneratorLine::description ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::description#22
+        Field table=Selected_ApiGeneratorLine_duplicate id=22 name=description
+  42    Set Field [ Selected_ApiGeneratorLine_duplicate::FmpDataType; Selected_ApiGeneratorLine::FmpDataType ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::FmpDataType#28
+        Field table=Selected_ApiGeneratorLine_duplicate id=28 name=FmpDataType
+  43    Set Field [ Selected_ApiGeneratorLine_duplicate::FmpFieldId; Selected_ApiGeneratorLine::FmpFieldId ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::FmpFieldId#25
+        Field table=Selected_ApiGeneratorLine_duplicate id=25 name=FmpFieldId
+  44    Set Field [ Selected_ApiGeneratorLine_duplicate::FmpFieldName; Selected_ApiGeneratorLine::FmpFieldName ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::FmpFieldName#4
+        Field table=Selected_ApiGeneratorLine_duplicate id=4 name=FmpFieldName
+  45    Set Field [ Selected_ApiGeneratorLine_duplicate::FmpIgnore; Selected_ApiGeneratorLine::FmpIgnore ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::FmpIgnore#11
+        Field table=Selected_ApiGeneratorLine_duplicate id=11 name=FmpIgnore
+  46    Set Field [ Selected_ApiGeneratorLine_duplicate::FmpParam; Selected_ApiGeneratorLine::FmpParam ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::FmpParam#29
+        Field table=Selected_ApiGeneratorLine_duplicate id=29 name=FmpParam
+  47    Set Field [ Selected_ApiGeneratorLine_duplicate::FmpPath; Selected_ApiGeneratorLine::FmpPath ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::FmpPath#30
+        Field table=Selected_ApiGeneratorLine_duplicate id=30 name=FmpPath
+  48    Set Field [ Selected_ApiGeneratorLine_duplicate::FmpTableName; Selected_ApiGeneratorLine::FmpTableName ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::FmpTableName#10
+        Field table=Selected_ApiGeneratorLine_duplicate id=10 name=FmpTableName
+  49    Set Field [ Selected_ApiGeneratorLine_duplicate::IsNumeric; Selected_ApiGeneratorLine::IsNumeric ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::IsNumeric#38
+        Field table=Selected_ApiGeneratorLine_duplicate id=38 name=IsNumeric
+  50    Set Field [ Selected_ApiGeneratorLine_duplicate::IsOneOf; Selected_ApiGeneratorLine::IsOneOf ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::IsOneOf#37
+        Field table=Selected_ApiGeneratorLine_duplicate id=37 name=IsOneOf
+  51    Set Field [ Selected_ApiGeneratorLine_duplicate::IsOnlyOneOf; Selected_ApiGeneratorLine::IsOnlyOneOf ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::IsOnlyOneOf#39
+        Field table=Selected_ApiGeneratorLine_duplicate id=39 name=IsOnlyOneOf
+  52    Set Field [ Selected_ApiGeneratorLine_duplicate::JsonPathIn; Selected_ApiGeneratorLine::JsonPathIn ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::JsonPathIn#27
+        Field table=Selected_ApiGeneratorLine_duplicate id=27 name=JsonPathIn
+  53    Set Field [ Selected_ApiGeneratorLine_duplicate::JsonPathOut; Selected_ApiGeneratorLine::JsonPathOut ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::JsonPathOut#26
+        Field table=Selected_ApiGeneratorLine_duplicate id=26 name=JsonPathOut
+  54    Set Field [ Selected_ApiGeneratorLine_duplicate::JsonPropertyName; Selected_ApiGeneratorLine::JsonPropertyName ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::JsonPropertyName#21
+        Field table=Selected_ApiGeneratorLine_duplicate id=21 name=JsonPropertyName
+  55    Set Field [ Selected_ApiGeneratorLine_duplicate::ParentObjectId; Selected_ApiGeneratorLine::ParentObjectId ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::ParentObjectId#32
+        Field table=Selected_ApiGeneratorLine_duplicate id=32 name=ParentObjectId
+  56    Set Field [ Selected_ApiGeneratorLine_duplicate::PluckInd; Selected_ApiGeneratorLine::PluckInd ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::PluckInd#42
+        Field table=Selected_ApiGeneratorLine_duplicate id=42 name=PluckInd
+  57    Set Field [ Selected_ApiGeneratorLine_duplicate::readOnly; Selected_ApiGeneratorLine::readOnly ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::readOnly#24
+        Field table=Selected_ApiGeneratorLine_duplicate id=24 name=readOnly
+  58    Set Field [ Selected_ApiGeneratorLine_duplicate::required; Selected_ApiGeneratorLine::required ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::required#19
+        Field table=Selected_ApiGeneratorLine_duplicate id=19 name=required
+  59    Set Field [ Selected_ApiGeneratorLine_duplicate::TestData; Selected_ApiGeneratorLine::TestData ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::TestData#40
+        Field table=Selected_ApiGeneratorLine_duplicate id=40 name=TestData
+  60    Set Field [ Selected_ApiGeneratorLine_duplicate::type; Selected_ApiGeneratorLine::type ]
+        DisableStepCollapsed state=False
+        refs: Selected_ApiGeneratorLine::type#23
+        Field table=Selected_ApiGeneratorLine_duplicate id=23 name=type
+  61    # Associate with the new parent record
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Field [ Selected_ApiGeneratorLine_duplicate::ApiGeneratorId; $id_duplicate ]
+        DisableStepCollapsed state=False
+        Field table=Selected_ApiGeneratorLine_duplicate id=2 name=ApiGeneratorId
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    End Loop
+        DisableStepCollapsed state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    # If no errors then commit, else revert
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  68    Revert Record/Request
+        NoInteract state=False
+        DisableStepCollapsed state=False
+  69    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  70    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  72    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  73    # After all is done we might want to go to the new record but usually it will need to be found
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  75    Set Field [ ApiGenerator::id; $id_duplicate ]
+        DisableStepCollapsed state=False
+        Field table=ApiGenerator id=1 name=id
+  76    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Show Custom Dialog [ Title: "Success!"; Message: "Your API has been duplicated. ??"; Default Button: “OK”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=False: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  78    End If
+        DisableStepCollapsed state=False

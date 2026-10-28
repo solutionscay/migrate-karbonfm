@@ -1,0 +1,65 @@
+# script 79: Find Record and Read Package from Disk ( generator )
+# file: karbon_Generator.fmp12
+# folder: App Modules / Generators / Private
+# source: ScriptCatalog/Script[@id=79]
+# steps: 16 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=127 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $packageName; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $packageName
+   4    If [ IsEmpty ( $packageName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   5    Exit Script [  ]
+        DisableStepCollapsed state=False
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Perform Find [ Specified Find Requests: Find Records; Criteria: Generators::name: “==$packageName” ]
+        [ Restore ]
+        DisableStepCollapsed state=False
+        Restore state=True
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=Generators id=1 name=name
+              Text: ==$packageName
+  10    If [ Get(LastError) <> 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  11    New Record/Request
+        DisableStepCollapsed state=False
+  12    Set Field [ Generators::name; $packageName ]
+        DisableStepCollapsed state=False
+        Field table=Generators id=1 name=name
+  13    End If
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “Read This Package From Disk” ]
+        DisableStepCollapsed state=False
+        Script id=80 name="Read This Package From Disk"
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False

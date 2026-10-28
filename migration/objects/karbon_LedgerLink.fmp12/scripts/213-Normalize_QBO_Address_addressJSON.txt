@@ -1,0 +1,315 @@
+# script 213: Normalize QBO Address (addressJSON)
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO / Public
+# source: ScriptCatalog/Script[@id=213]
+# steps: 76 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=58 groupCollapsed=False includeInMenu=False
+
+   1    ########################################################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #PURPOSE:
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #	Extract City, Sate, and Zip from line#, if necessary.
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #PARAMETERS: (json format)
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #	addressJSON | address object, as returned from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #NOTE:
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #	Some records in QBO don't populate the city, state, and zip fields.
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #	In my testing, new records I create DO have these fields populated, unless I manually enter an address on an Invoice.
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #	This script assumes the last line of the address contains this info, but it could potentially contain other info
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #	like country, or user-entered data. This script will produce unexpected results in those cases.
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #REVISIONS:
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #2016-DEC-15 Daniel Smith dan@filemaker.consulting
+        	- improve detection of city, state, and zip in address lines
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #2017-Sept-08 todd@geistineractive.com
+        	- move to native JSON functions
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    ########################################################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $address; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+  20    If [ IsEmpty( $address ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  21    Exit Script [ Result: $address ]
+        DisableStepCollapsed state=False
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #extract current city, state, and zip values
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $city; Value:JSONGetElement($address; "City") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $city
+  27    Set Variable [ $state; Value:JSONGetElement($address; "CountrySubDivisionCode") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $state
+  28    Set Variable [ $postalCode; Value:JSONGetElement($address; "PostalCode") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $postalCode
+  29    #if they already exist, this script doesn't need to do anything
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ not IsEmpty ($city & $state & $postalCode ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  31    Exit Script [ Result: $address ]
+        DisableStepCollapsed state=False
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #extract lines, which likely contain city, state, and zip in the last non-empty value
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $i; Value:5 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $i
+  37    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $cityStateZip; Value:JSONGetElement($address; "Line" & $i) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $cityStateZip
+  39    If [ not IsEmpty ( $cityStateZip ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  40    If [ PatternCount ( $cityStateZip ; "," )
+        and
+        PatternCount ( $cityStateZip ; " " )
+        and
+        not IsEmpty ( Filter ( $cityStateZip ; "0123456789" ) )
+        
+        /**
+         * only process the address line as city, state zip if
+         * it contains a comma, space, and numbers
+         */ ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:PatternCount, fn:and, fn:not, fn:IsEmpty, fn:Filter
+  41    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  42    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #last line did not appear to be a cityStateZip
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Exit Script [ Result: $address ]
+        DisableStepCollapsed state=False
+  45    End If
+        DisableStepCollapsed state=False
+  46    End If
+        DisableStepCollapsed state=False
+  47    Set Variable [ $i; Value:$i - 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  48    If [ $i = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #cityStateZip not found
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Exit Script [ Result: $address ]
+        DisableStepCollapsed state=False
+  51    End If
+        DisableStepCollapsed state=False
+  52    End Loop
+        DisableStepCollapsed state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #separate city from state and zip by existence of a comma
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $split; Value:Substitute ( $cityStateZip ; ","; "¶" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $split
+  57    Set Variable [ $city; Value:GetValue( $split ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $city
+  58    Set Variable [ $stateZip; Value:GetValue( $split ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $stateZip
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #separate state and zip
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Variable [ $postalCode; Value:RightWords($stateZip; 1) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:RightWords
+        Name: $postalCode
+  63    Set Variable [ $state; Value:Trim ( Substitute ( $stateZip ; $postalCode ; "" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Trim, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $state
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #add extracted values back into the original addressJSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    If [ not IsEmpty ( $city )
+        and not IsEmpty ( $state )
+        and not IsEmpty ( $postalCode ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:and
+  68    Set Variable [ $address; Value:JSONSetElement($address ; "City"; $city ; JSONString) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+  69    Set Variable [ $address; Value:JSONSetElement($address ; "CountrySubDivisionCode"; $state; JSONString) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+  70    Set Variable [ $address; Value:JSONSetElement($address ; "PostalCode"; $postalCode; JSONString) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+  71    Set Variable [ $address; Value:JSONDeleteElement ($address ; "Line" & $i)
+        
+        /**
+         * Remove the contents of the line that contained city, state, and zip.
+         * This prevents the city, state, and zip from existing both on a line and in
+         * separate fields which would cause them to be displayed twice in QBO.
+         */ ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $address
+  72    End If
+        DisableStepCollapsed state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Exit Script [ Result: $address ]
+        DisableStepCollapsed state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False

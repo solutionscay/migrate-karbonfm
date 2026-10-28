@@ -1,0 +1,66 @@
+# script 733: LoadData
+# file: karbon_kontacts.fmp12
+# folder: Modules / Web Viewer Bridge
+# source: ScriptCatalog/Script[@id=733]
+# steps: 13 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=729 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Get Active Opportunities Status Value” from file: “karbon_kontroller” ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=682 name="Get Active Opportunities Status Value" in=karbon_kontroller.fmp12
+   6    Set Variable [ $data; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   7 // Insert Text [ $data ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: [{"New":1006507,"Proposalsent":500000,"Working":0,"name":"Opportunities"}]
+        Field: $data
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $options; Value:JSONSetElement ( "" ;
+        
+        ["function" ; "loadData" ; JSONString ];
+        ["parameter.data" ; $data ; JSONArray]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $options
+  11    Perform Script [ “Execute JavaScript On Example WebViewer”; Parameter: $options ]
+        DisableStepCollapsed state=False
+        Script id=738 name="Execute JavaScript On Example WebViewer"
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Exit Script [ Result: Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult

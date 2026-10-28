@@ -1,0 +1,46 @@
+# custom function 27: design_TableData
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=27]
+
+CustomFunction id=27 functionArity=2 visible=True parameters=tableName;databaseName name=design_TableData
+  Calculation:
+    | Let(
+    | [
+    | 
+    | sql = "SELECT * FROM FileMaker_Tables WHERE Upper(TableName)='"& Upper( tableName ) & "'" ;
+    | 
+    | tableData = design_x_sql ( sql ; databaseName );
+    | split = Substitute( tableData ; "|" ; "¶" );
+    | tableName = GetValue ( split ; 1 ) ;
+    | tableID = GetValue ( split ; 2 ) ;
+    | baseTableName = GetValue ( split ; 3 ) ;
+    | baseFileName = GetValue ( split ; 4 ) ;
+    | modCount = GetValue ( split ; 5 ) ;
+    | 
+    | let = 
+    | "$tableName = " & Quote( tableName ) & ";¶" &
+    | "$tableID = " & tableID & ";¶" &
+    | "$baseTableName = " & Quote( baseTableName ) & ";¶" &
+    | "$baseFileName = " & Quote( baseFileName ) & ";¶" &
+    | "$modCount = " & modCount 
+    | 
+    | 
+    | ];
+    | 
+    | 
+    | let
+    | 
+    | )
+    | 
+    | 
+    | 
+    | 
+    | 
+    | /*
+    | 1. TableName
+    | 2. TableID
+    | 3. BaseTableName
+    | 4. BaseFileName
+    | 5. ModCount
+    | */
+    refs: fn:Let, fn:Upper, cf:design_x_sql, fn:Substitute, fn:GetValue, fn:Quote

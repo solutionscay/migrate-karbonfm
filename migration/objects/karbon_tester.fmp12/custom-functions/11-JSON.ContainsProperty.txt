@@ -1,0 +1,51 @@
+# custom function 11: JSON.ContainsProperty
+# file: karbon_tester.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=11]
+
+CustomFunction id=11 functionArity=2 visible=True parameters=json;name name=JSON.ContainsProperty
+  Calculation:
+    | /**
+    |  * =====================================
+    |  * JSONContainsProperty ( json ; path )
+    |  *
+    |  * RETURNS:
+    |  *	an array containing only the values that pass the test
+    |  *
+    |  * PARAMETERS:
+    |  *	json = a valid JSON object
+    |  *	name = the property to test (can be in form body.path.item)
+    |  *
+    |  * DEPENDENCIES:
+    |  *	FileMaker 16 or Later
+    |  *
+    |  * NOTES:
+    |  *
+    |  *
+    |  * FAMILY:
+    |  *	JSON - Extensions to the Native JSON Functions
+    |  * 
+    |  * HISTORY:
+    |  * 	Amended, 2017-05-16, john@e-rwu.com, added path depth, gh #3
+    |  *	Created, 2017-04-09, todd@geistinteractive.com
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | 
+    | Case ( PatternCount ( name ; "." ) > 0 and Length ( name ) > 3 ; 
+    | 
+    | 	JSON.ContainsProperty ( JSONGetElement ( json ; GetValue ( Substitute ( name ; "." ; ¶ ) ; 1 ) ) ; Middle ( name ; Position ( name ; "." ; 1 ; 1 ) + 1 ; Length ( name ) ) )
+    | 
+    | ;
+    | 
+    | Let ( [
+    | 
+    | 	keys = JSONListKeys ( json ; "" )
+    | 
+    | ] ;
+    | 
+    | 	not IsEmpty ( FilterValues ( name ; keys ) )
+    | 
+    | )
+    | )
+    refs: fn:Case, fn:PatternCount, fn:and, fn:Length, cf:JSON.ContainsProperty, fn:JSONGetElement, fn:GetValue, fn:Substitute, fn:Middle, fn:Position, fn:Let, fn:JSONListKeys, fn:not, fn:IsEmpty, fn:FilterValues

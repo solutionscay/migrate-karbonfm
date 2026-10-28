@@ -1,0 +1,672 @@
+# layout 104: Vendor | Desktop
+# file: karbon_LedgerLink.fmp12
+# folder: Application / Desktop
+# source: LayoutCatalog/Layout[@id=104]
+# objects: 78
+# theme: LedgerLink PC
+# folder group: id=88 groupCollapsed=True includeInMenu=False
+
+Layout width=1024 quickFind=True includeInMenu=True id=104 name="Vendor | Desktop"
+  Table id=1065126 name=Vendor
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnModeExit id=107 triggerFlags=2(find)
+      Script id=491 name="Exit Find Mode Trigger"
+      TriggerText: "Exit Find Mode Trigger"
+  Object type=Button key=10 LabelKey=0 bounds=0,0,39,42
+    Text flags=2
+    ButtonObj buttonFlags=0 iconSize=22 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Display Main Nav” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=463 name="Display Main Nav"
+      Image name=a3_list.svg
+  Object type=Text key=39 LabelKey=0 bounds=0,42,39,170
+    Text flags=2 style=text.header.title.left: Vendor
+  Object type=Text key=159 LabelKey=0 flags=-1073741824 bounds=626,1036,643,1079
+    Text flags=4: expand
+  Object type=Button key=160 LabelKey=0 flags=1342193925 bounds=0,928,40,1024
+    ConditionalFormatting
+      Item id=0 flags=1
+        Condition op=0
+          Calculation:
+            | Vendor::qbo_send
+            refs: Vendor::qbo_send#32
+        Format: -fm-underline: underline; -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | Case (
+        | 	IsEmpty ( Vendor::qbo_id ) ;
+        | 	"New record hasn't been sent to QBO yet." ;
+        | 
+        | 	Vendor::qbo_send ;
+        | 	"Record has been changed and needs to be sent to QBO."
+        | )
+        refs: fn:Case, fn:IsEmpty, Vendor::qbo_id#31, Vendor::qbo_send#32
+    Text flags=6 style=button.nav: Sync
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Sync QBO with FM, Show Progress Card” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=242 name="Sync QBO with FM, Show Progress Card"
+      Image name=a125_sync.svg
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+  Object type=Text key=196 LabelKey=0 flags=260 bounds=41,24,81,640
+    Text flags=14 tableViewVisibility=0 style=text.header.title.left: <<displayName>>
+      FieldList quickFind=False
+        Field table=Vendor id=15 name=displayName
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Button key=208 LabelKey=0 flags=1342177540 bounds=0,784,40,928
+    Text flags=6 style=button.nav: "Open in QBO"
+    ButtonObj buttonFlags=0 iconSize=20 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "Vendor" ; JSONString];
+          | 	[ "QBOId" ;   Vendor::qbo_id ; JSONString ]
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ("" ; 
+          | 
+          | 	[ "Entity" ; "Vendor" ; JSONString];
+          | 	[ "QBOId" ;   Vendor::qbo_id ; JSONString ]
+          | )
+          refs: fn:JSONSetElement, fn:JSONString, Vendor::qbo_id#31
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a11_share.svg
+    HideCondition findMode=True
+      Calculation:
+        | IsEmpty ( Vendor::qbo_id )
+        | or
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:IsEmpty, Vendor::qbo_id#31, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=242 LabelKey=0 flags=260 bounds=280,24,304,424
+    FieldObj numOfReps=1 flags=1081380 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=edit.disabled.left
+      Field: Customer::printOnCheckName#10
+    HideCondition findMode=True
+      Calculation:
+        | not Customer::printOnCheckAsDisplayName
+        | or
+        | Get ( WindowMode ) = 1  /* Find Mode */
+        refs: fn:not, Customer::printOnCheckAsDisplayName#43, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=243 LabelKey=0 bounds=184,24,208,424
+    FieldObj numOfReps=1 flags=1048608 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Vendor::companyName#9
+  Object type=Field key=244 LabelKey=245 bounds=136,76,160,172
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::contactGivenName#11
+  Object type=Text key=245 LabelKey=0 bounds=109,76,133,172
+    Text flags=6 style=text.form.field.label: "First name"
+  Object type=Field key=246 LabelKey=0 bounds=232,24,256,424
+    ScriptTriggers
+      Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+        Script id=502 name="Return Parameter"
+          Calculation:
+            | /**
+            |  * Create the values to display in the value DYNAMICVALUELIST
+            |  * by combining the name/company fields in different ways.
+            |  */
+            | 
+            | Let ( [
+            | 	$$DYNAMICVALUELIST = List (
+            | 	/* full
+            | 		NOTE: this should be the same as the displayName field's auto-enter calculation
+            | 	*/
+            | 		Substitute ( List (
+            | 			
+            | 			Vendor::contactGivenName ;
+            | 			Vendor::contactMiddleName ;
+            | 			Vendor::contactFamilyName ;
+            | 		) ;  "¶"; " " ) ;
+            | 		
+            | 	/* first last */
+            | 		Substitute ( List (
+            | 			Vendor::contactGivenName ;
+            | 			Vendor::contactFamilyName ;
+            | 		) ;  "¶"; " " ) ;
+            | 		
+            | 	/* last, first */
+            | 		If ( not IsEmpty ( Vendor::contactFamilyName ) and not IsEmpty ( Vendor::contactGivenName ) ;
+            | 			Substitute ( List (
+            | 				Vendor::contactFamilyName & ",";
+            | 				Vendor::contactGivenName ;
+            | 			) ;  "¶"; " " )
+            | 		) ;
+            | 		
+            | 	/* company */
+            | 		Vendor::companyName
+            | 	)
+            | ] ;
+            | 	""
+            | )
+            refs: fn:Let, fn:List, fn:Substitute, Vendor::contactGivenName#11, Vendor::contactMiddleName#12, Vendor::contactFamilyName#10, fn:If, fn:not, fn:IsEmpty, fn:and, Vendor::companyName#9
+        TriggerText
+          | "Return Parameter"; Parameter: /**
+          |  * Create the values to display in the value DYNAMICVALUELIST
+          |  * by combining the name/company fields in different ways.
+          |  */
+          | 
+          | Let ( [
+          | 	$$DYNAMICVALUELIST = List (
+          | 	/* full
+          | 		NOTE: this should be the same as the displayName field's auto-enter calculation
+          | 	*/
+          | 		Substitute ( List (
+          | 			
+          | 			Vendor::contactGivenName ;
+          | 			Vendor::contactMiddleName ;
+          | 			Vendor::contactFamilyName ;
+          | 		) ;  "¶"; " " ) ;
+          | 		
+          | 	/* first last */
+          | 		Substitute ( List (
+          | 			Vendor::contactGivenName ;
+          | 			Vendor::contactFamilyName ;
+          | 		) ;  "¶"; " " ) ;
+          | 		
+          | 	/* last, first */
+          | 		If ( not IsEmpty ( Vendor::contactFamilyName ) and not IsEmpty ( Vendor::contactGivenName ) ;
+          | 			Substitute ( List (
+          | 				Vendor::contactFamilyName & ",";
+          | 				Vendor::contactGivenName ;
+          | 			) ;  "¶"; " " )
+          | 		) ;
+          | 		
+          | 	/* company */
+          | 		Vendor::companyName
+          | 	)
+          | ] ;
+          | 	""
+          | )
+    FieldObj numOfReps=1 flags=525344 inputMode=0 keyboardType=1 displayType=1(drop-down-list) tableViewVisibility=0 quickFind=1 pictFormat=5
+      Field: Vendor::displayName#15
+      ValueList: DYNAMICVALUELIST#22
+  Object type=Field key=247 LabelKey=0 bounds=184,592,208,720
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::mobilePhone#21
+  Object type=Field key=248 LabelKey=0 flags=-2147483648 bounds=520,24,664,856
+    FieldObj numOfReps=1 flags=1343776 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::Notes#51
+  Object type=Field key=249 LabelKey=0 bounds=184,456,208,584
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::primaryPhone#24
+  Object type=Field key=250 LabelKey=0 flags=260 bounds=280,24,304,424
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::printOnCheckName#26
+    HideCondition findMode=True
+      Calculation:
+        | Vendor::printOnCheckAsDisplayName
+        | and
+        | Get ( WindowMode ) ≠ 1  /* Find Mode */
+        refs: Vendor::printOnCheckAsDisplayName#25, fn:and, fn:Get, fn:WindowMode
+  Object type=Text key=253 LabelKey=0 bounds=256,24,280,128
+    Text flags=6 style=text.form.field.label: "Print on check as"
+  Object type=Field key=254 LabelKey=0 bounds=432,24,456,224
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::billAddressCity#3
+      PlaceholderText findMode=True
+        Calculation:
+          | "City"
+  Object type=Field key=255 LabelKey=0 bounds=456,224,480,424
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::billAddressCountry#4
+      PlaceholderText findMode=True
+        Calculation:
+          | "Country"
+  Object type=Field key=256 LabelKey=0 bounds=384,24,408,400
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::billAddressLine1#5
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Field key=257 LabelKey=0 bounds=456,24,480,224
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::billAddressPostalCode#7
+      PlaceholderText findMode=True
+        Calculation:
+          | "ZIP"
+  Object type=Field key=258 LabelKey=0 bounds=432,224,456,424
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::billAddressState#8
+      PlaceholderText findMode=True
+        Calculation:
+          | "State"
+  Object type=Field key=259 LabelKey=0 bounds=408,24,432,424
+    FieldObj numOfReps=1 flags=1212448 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::billAddressLine2#6
+      PlaceholderText findMode=True
+        Calculation:
+          | "Street"
+  Object type=Text key=260 LabelKey=0 bounds=360,24,384,424
+    Text flags=6 style=text.form.field.label: "Billing Address"
+  Object type=Button key=267 LabelKey=0 flags=260 bounds=256,128,280,256
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Vendor::printOnCheckAsDisplayName; True ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | True
+          refs: fn:True
+        Field table=Vendor id=25 name=printOnCheckAsDisplayName
+      Image name=checkbox.svg
+    HideCondition findMode=True
+      Calculation:
+        | Vendor::printOnCheckAsDisplayName
+        refs: Vendor::printOnCheckAsDisplayName#25
+  Object type=Button key=268 LabelKey=0 flags=260 bounds=256,128,280,256
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Vendor::printOnCheckAsDisplayName; False ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | False
+          refs: fn:False
+        Field table=Vendor id=25 name=printOnCheckAsDisplayName
+      Image name=checked.svg
+    HideCondition findMode=True
+      Calculation:
+        | not Vendor::printOnCheckAsDisplayName
+        refs: fn:not, Vendor::printOnCheckAsDisplayName#25
+  Object type=Field key=269 LabelKey=270 bounds=136,180,160,260
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::contactMiddleName#12
+  Object type=Text key=270 LabelKey=0 bounds=109,180,133,260
+    Text flags=6 style=text.form.field.label: "Middle name"
+  Object type=Field key=271 LabelKey=272 bounds=136,268,160,364
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::contactFamilyName#10
+  Object type=Text key=272 LabelKey=0 bounds=109,268,133,364
+    Text flags=6 style=text.form.field.label: "Last name"
+  Object type=Text key=273 LabelKey=0 bounds=160,24,184,152
+    Text flags=6 style=text.form.field.label: Company
+  Object type=Text key=274 LabelKey=0 bounds=208,24,233,152
+    Text flags=6 style=text.form.field.label: "Display name"
+  Object type=Text key=275 LabelKey=0 bounds=256,153,280,273
+    Text flags=6 style=text.form.info.left: "Use display name"
+  Object type=Field key=276 LabelKey=277 bounds=136,456,160,832
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::primaryEmail#23
+  Object type=Text key=277 LabelKey=0 bounds=109,456,133,584
+    Text flags=6 style=text.form.field.label: Email
+  Object type=Text key=278 LabelKey=0 bounds=160,456,184,584
+    Text flags=6 style=text.form.field.label: Phone
+  Object type=Text key=279 LabelKey=0 bounds=160,592,184,720
+    Text flags=6 style=text.form.field.label: Mobile
+  Object type=Field key=280 LabelKey=281 bounds=184,728,208,856
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::alternatePhone#2
+  Object type=Text key=281 LabelKey=0 bounds=160,728,184,856
+    Text flags=6 style=text.form.field.label: Other
+  Object type=Field key=282 LabelKey=283 bounds=232,456,256,832
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::webAddress#42
+  Object type=Text key=283 LabelKey=0 bounds=208,456,232,584
+    Text flags=6 style=text.form.field.label: Website
+  Object type=Text key=287 LabelKey=0 bounds=496,24,520,424
+    Text flags=6 style=text.form.field.label: Notes
+  Object type=SlideControl key=299 LabelKey=0 flags=1342177540 bounds=104,872,168,1016
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find */
+        refs: fn:Get, fn:WindowMode
+    SlideControlObj visPanelKey=300 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=300 LabelKey=0 flags=1342177280 bounds=104,872,168,1016
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=301 LabelKey=0 flags=260 bounds=112,880,152,1008
+            Text flags=2 style=button.raised.secondary: "Make Inactive"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Vendor::active; not Vendor::active ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | not Vendor::active
+                  refs: fn:not, Vendor::active#1
+                Field table=Vendor id=1 name=active
+            HideCondition findMode=True
+              Calculation:
+                | not Vendor::active
+                refs: fn:not, Vendor::active#1
+          Object type=Button key=302 LabelKey=0 flags=260 bounds=112,880,152,1008
+            Text flags=2 style=button.raised.primary: "Make Active"
+            ButtonObj buttonFlags=0 iconSize=14 displayType=0
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Vendor::active; not Vendor::active ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | not Vendor::active
+                  refs: fn:not, Vendor::active#1
+                Field table=Vendor id=1 name=active
+            HideCondition findMode=True
+              Calculation:
+                | Vendor::active
+                refs: Vendor::active#1
+  Object type=SlideControl key=303 LabelKey=0 flags=1342177284 bounds=96,872,160,1016
+    HideCondition findMode=False
+      Calculation:
+        | True
+        refs: fn:True
+    SlideControlObj visPanelKey=304 visPanelIndex=0 dotSize=9 slideFlagSet=3 style=slide.hidden
+      Object type=SlidePanel key=304 LabelKey=0 flags=1342177280 bounds=96,872,160,1016
+        SlidePanelObj slidePanelFlagSet=0
+          Object type=Button key=305 LabelKey=0 bounds=112,896,136,968
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Vendor::active; True ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | True
+                  refs: fn:True
+                Field table=Vendor id=1 name=active
+              Image name=checkbox.svg
+          Object type=Button key=306 LabelKey=0 flags=260 bounds=112,896,136,968
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Vendor::active; True ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | True
+                  refs: fn:True
+                Field table=Vendor id=1 name=active
+              Image name=checked.svg
+            HideCondition findMode=True
+              Calculation:
+                | Vendor::active ≠ 1
+                refs: Vendor::active#1
+          Object type=Button key=308 LabelKey=0 bounds=136,896,160,968
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Vendor::active; False ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | False
+                  refs: fn:False
+                Field table=Vendor id=1 name=active
+              Image name=checkbox.svg
+          Object type=Button key=309 LabelKey=0 flags=260 bounds=136,896,160,968
+            Text flags=6
+            ButtonObj buttonFlags=0 iconSize=16 displayType=1
+              Step enable=True id=76 name="Set Field"
+                StepText: Set Field [ Vendor::active; "" ]
+                DisableStepCollapsed state=False
+                Calculation:
+                  | ""
+                Field table=Vendor id=1 name=active
+              Image name=checked.svg
+            HideCondition findMode=True
+              Calculation:
+                | Vendor::active = 1
+                | or
+                | IsEmpty ( Vendor::active )
+                refs: Vendor::active#1, fn:or, fn:IsEmpty
+          Object type=Text key=307 LabelKey=0 bounds=109,920,133,992
+            Text flags=6 style=text.form.info.left: Active
+          Object type=Text key=310 LabelKey=0 bounds=135,913,159,985
+            Text flags=6 style=text.form.info.left: Inactive
+  Object type=Button key=315 LabelKey=0 flags=1 bounds=384,400,408,424
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Vendor::billAddressLine1 )
+            | and IsEmpty ( Vendor::billAddressCity )
+            | and IsEmpty ( Vendor::billAddressState )
+            | and IsEmpty ( Vendor::billAddressPostalCode )
+            refs: fn:IsEmpty, Vendor::billAddressLine1#5, fn:and, Vendor::billAddressCity#3, Vendor::billAddressState#8, Vendor::billAddressPostalCode#7
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText
+          | Perform Script [ “Open Map ( address )”; Parameter: List (
+          | 	Vendor::billAddressLine1 ;
+          | 	Vendor::billAddressLine2 ;
+          | 	Vendor::billAddressCity ;
+          | 	Vendor::billAddressState ;
+          | 	Vendor::billAddressPostalCode ;
+          | 	Vendor::billAddressCountry
+          | ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | List (
+          | 	Vendor::billAddressLine1 ;
+          | 	Vendor::billAddressLine2 ;
+          | 	Vendor::billAddressCity ;
+          | 	Vendor::billAddressState ;
+          | 	Vendor::billAddressPostalCode ;
+          | 	Vendor::billAddressCountry
+          | )
+          refs: fn:List, Vendor::billAddressLine1#5, Vendor::billAddressLine2#6, Vendor::billAddressCity#3, Vendor::billAddressState#8, Vendor::billAddressPostalCode#7, Vendor::billAddressCountry#4
+        Script id=500 name="Open Map ( address )"
+      Image name=a99_locationTriangle.svg
+  Object type=Button key=317 LabelKey=0 flags=1 bounds=232,832,256,856
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Vendor::webAddress )
+            refs: fn:IsEmpty, Vendor::webAddress#42
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open ( url )”; Parameter: Vendor::webAddress ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | Vendor::webAddress
+          refs: Vendor::webAddress#42
+        Script id=499 name="Open ( url )"
+      Image name=a70_urlOutline.svg
+  Object type=Button key=318 LabelKey=0 flags=1 bounds=136,832,160,856
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Vendor::primaryEmail )
+            refs: fn:IsEmpty, Vendor::primaryEmail#23
+        Format: -fm-icon-color: rgba(86.6667%,86.6667%,86.6667%,1);
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Send Email ( to )”; Parameter: Vendor::primaryEmail ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | Vendor::primaryEmail
+          refs: Vendor::primaryEmail#23
+        Script id=504 name="Send Email ( to )"
+      Image name=a63_email.svg
+  Object type=Text key=321 LabelKey=0 flags=1342177540 bounds=40,896,80,1008
+    Text flags=6 style=text.header.title.right: Inactive
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find mode */
+        | or
+        | Vendor::active
+        refs: fn:Get, fn:WindowMode, fn:or, Vendor::active#1
+  Object type=Field key=322 LabelKey=323 bounds=136,376,160,424
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::contactSuffix#13
+  Object type=Text key=323 LabelKey=0 bounds=109,376,133,424
+    Text flags=6 style=text.form.field.label: Suffix
+  Object type=Field key=324 LabelKey=325 bounds=136,24,160,72
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::contactTitle#14
+  Object type=Text key=325 LabelKey=0 bounds=109,24,133,72
+    Text flags=6 style=text.form.field.label: Title
+  Object type=Text key=328 LabelKey=0 bounds=256,456,280,584
+    Text flags=6 style=text.form.field.label: Terms
+  Object type=Button key=329 LabelKey=0 flags=16385 bounds=280,632,304,656
+    ConditionalFormatting
+      Item id=0 flags=129
+        Condition op=0
+          Calculation:
+            | IsEmpty ( Vendor::id_Term )
+            refs: fn:IsEmpty, Vendor::id_Term#50
+        Format: -fm-icon-color: rgba(0%,0%,0%,0);
+    ToolTip
+      Calculation:
+        | "remove value"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Vendor::id_Term; "" ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | ""
+        Field table=Vendor id=50 name=id_Term
+      Image name=a32_smallXOutline.svg
+  Object type=Button key=330 LabelKey=0 flags=16384 bounds=280,608,304,632
+    ToolTip
+      Calculation:
+        | "edit list in QBO"
+    Text flags=6 style=button.field
+    ButtonObj buttonFlags=0 iconSize=12 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open in QB ( {entity , qbo_id} )”; Parameter: JSONSetElement ( "{}" ; "Entity" ; "Term" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ( "{}" ; "Entity" ; "Term" ; JSONString )
+          refs: fn:JSONSetElement, fn:JSONString
+        Script id=501 name="Open in QB ( {entity , qbo_id} )"
+      Image name=a72_editOutline.svg
+  Object type=Field key=331 LabelKey=0 bounds=280,456,304,608
+    FieldObj numOfReps=1 flags=32804 inputMode=0 keyboardType=1 displayType=2(pop-up-menu) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::id_Term#50
+      ValueList: Term Id#15
+  Object type=Field key=332 LabelKey=333 bounds=328,456,352,584
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::qbo_Balance#27
+  Object type=Text key=333 LabelKey=0 bounds=304,456,328,584
+    Text flags=6 style=text.form.field.label: "Opening Balance"
+  Object type=Field key=336 LabelKey=337 bounds=376,456,400,720
+    FieldObj numOfReps=1 flags=1081376 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::acctNum#45
+  Object type=Text key=337 LabelKey=0 bounds=352,456,376,584
+    Text flags=6 style=text.form.field.label: "Account no."
+  Object type=Field key=338 LabelKey=339 bounds=432,456,456,720
+    FieldObj numOfReps=1 flags=32820 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Vendor::taxIdentifer#43
+  Object type=Text key=339 LabelKey=0 bounds=407,456,431,584
+    Text flags=6 style=text.form.field.label: "Business ID No."
+  Object type=Text key=340 LabelKey=0 bounds=456,488,480,720
+    Text flags=6 style=text.form.field.label: "Track payments for 1099"
+  Object type=Button key=341 LabelKey=0 flags=260 bounds=456,456,480,480
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Vendor::Vendor1099; False ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | False
+          refs: fn:False
+        Field table=Vendor id=44 name=Vendor1099
+      Image name=checked.svg
+    HideCondition findMode=True
+      Calculation:
+        | not Vendor::Vendor1099
+        refs: fn:not, Vendor::Vendor1099#44
+  Object type=Button key=342 LabelKey=0 flags=260 bounds=456,456,480,480
+    Text flags=6
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=76 name="Set Field"
+        StepText: Set Field [ Vendor::Vendor1099; True ]
+        DisableStepCollapsed state=False
+        Calculation:
+          | True
+          refs: fn:True
+        Field table=Vendor id=44 name=Vendor1099
+      Image name=checkbox.svg
+    HideCondition findMode=True
+      Calculation:
+        | Vendor::Vendor1099
+        refs: Vendor::Vendor1099#44
+  Object type=Button key=343 LabelKey=0 flags=1342177540 bounds=297,880,337,1008
+    Text flags=2 style=button.raised.primary: "New Bill"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “New Bill for ( id_Vendor )”; Parameter: Vendor::id ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | Vendor::id
+          refs: Vendor::id#18
+        Script id=537 name="New Bill for ( id_Vendor )"
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Button key=344 LabelKey=0 flags=1342177540 bounds=343,880,383,1008
+    Text flags=2 style=button.raised.secondary: "View Bills"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=74 name="Go to Related Record"
+        StepText
+          | Go to Related Record [ From table: “Vendor_Bill”; Using layout: “Bills | Desktop” (Bill) ]
+          | [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065247 name=Vendor_Bill
+        Layout id=105 name="Bills | Desktop"
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Button key=345 LabelKey=0 flags=1342177540 bounds=196,880,236,1008
+    Text flags=2 style=button.raised.primary: "New PO"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “New PO for ( id_Vendor )”; Parameter: Vendor::id ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | Vendor::id
+          refs: Vendor::id#18
+        Script id=556 name="New PO for ( id_Vendor )"
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find Mode */
+        refs: fn:Get, fn:WindowMode
+  Object type=Button key=346 LabelKey=0 flags=1342177540 bounds=242,880,282,1008
+    Text flags=2 style=button.raised.secondary: "View POs"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=0
+      Step enable=True id=74 name="Go to Related Record"
+        StepText
+          | Go to Related Record [ From table: “Vendor_PurchaseOrder”; Using layout: “Purchase Orders | Desktop” (PurchaseOrder) ]
+          | [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065250 name=Vendor_PurchaseOrder
+        Layout id=113 name="Purchase Orders | Desktop"
+    HideCondition findMode=True
+      Calculation:
+        | Get ( WindowMode ) = 1 /* Find Mode */
+        refs: fn:Get, fn:WindowMode

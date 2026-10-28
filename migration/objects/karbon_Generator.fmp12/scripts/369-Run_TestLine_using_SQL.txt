@@ -1,0 +1,118 @@
+# script 369: Run TestLine using SQL
+# file: karbon_Generator.fmp12
+# folder: Test Engine (UI) / Private
+# source: ScriptCatalog/Script[@id=369]
+# steps: 23 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=367 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #Runs a test
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $FileName; Value:Selected_TestLine::FileName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::FileName#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   6    Set Variable [ $TableName; Value:Selected_TestLine::SQL_TableName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_TableName#14
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableName
+   7    Set Variable [ $FieldName; Value:Selected_TestLine::SQL_Field ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_Field#25
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldName
+   8    Set Variable [ $FieldValue; Value:Selected_TestLine::SQL_FieldValue ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_FieldValue#13
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldValue
+   9    Set Variable [ $FieldValueFromResult; Value:JSONGetElement ( Test_TestLine#ActualTest::LastResult ; Selected_TestLine::SQL_GetFromResultKey ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Test_TestLine#ActualTest::LastResult#20, Selected_TestLine::SQL_GetFromResultKey#26
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldValueFromResult
+  10    Set Variable [ $FieldValue; Value:If ( Selected_TestLine::SQL_GetFromResultInd; $FieldValuefromResult; $FieldValue ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, Selected_TestLine::SQL_GetFromResultInd#24
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldValue
+  11    Set Variable [ $FieldReturn; Value:Selected_TestLine::SQL_FieldReturn ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_TestLine::SQL_FieldReturn#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldReturn
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $sqlStatement; Value:"SELECT " & $FieldReturn & " FROM " & $TableName & " WHERE " & $FieldName & " = '" & $FieldValue & "'" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $sqlStatement
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $Result; Value:<Function Missing> ( $sqlStatement; "," ; ¶ ; $FileName ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #The script ran, pass back the result
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “Check Test Result for Selected TestLine”; Parameter: $Result ]
+        DisableStepCollapsed state=False
+        Script id=363 name="Check Test Result for Selected TestLine"
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False

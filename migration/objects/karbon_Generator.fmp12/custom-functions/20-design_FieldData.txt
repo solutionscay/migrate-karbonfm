@@ -1,0 +1,46 @@
+# custom function 20: design_FieldData
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=20]
+
+CustomFunction id=20 functionArity=2 visible=True parameters=fieldName;databaseName name=design_FieldData
+  Calculation:
+    | 
+    | Let(
+    | [
+    | fieldNameSplit = Substitute( Upper(fieldName) ; "::" ; "¶") ; 
+    | sqlTableName = GetValue( fieldNameSplit ; 1 );
+    | sqlFieldName = GetValue( fieldNameSplit ; 2 );
+    | 
+    | 
+    | fieldType = FieldType( databaseName ; fieldName);
+    | fieldTypeSplit = Substitute(  fieldType ; " " ; "¶" );
+    | fieldClass = GetValue ( fieldTypeSplit ; 1) ; 
+    | fmType = GetValue ( fieldTypeSplit ; 2) ; 
+    | indexed = GetValue ( fieldTypeSplit ; 3) = "Indexed"; 
+    | numberOfRepetitions = GetValue ( fieldTypeSplit ; 4) ; 
+    | 
+    | sql = "SELECT FieldType, ModCount FROM FileMaker_Fields WHERE UPPER(FieldName)='" & sqlFieldName& "' AND Upper(TableName)='" & sqlTableName  & "'";
+    | 
+    | fieldData = GetValue( design_x_sql ( sql ; databaseName ); 1);
+    | splitFieldData = Substitute( fieldData ; "|" ; "¶" );
+    | sqlType  = GetValue ( splitFieldData ; 1 );
+    | modCount = GetValue ( splitFieldData ; 2 );
+    | fieldComment = FieldComment ( databaseName ; fieldName );
+    | 
+    | let = 
+    | 
+    | "$class = " & Quote( fieldClass ) & ";¶" &
+    | "$type = " & Quote( fmType ) & ";¶" &
+    | "$indexed = " &indexed  & ";¶" & 
+    | "$numberOfRepetitions = " & numberOfRepetitions & ";¶" & 
+    | "$sqlType = " & Quote( sqlType ) & ";¶" &
+    | "$modCount = " & modCount & ";¶" &
+    | "$comment = " & Quote(fieldComment)
+    | 
+    | ];
+    | 
+    | let 
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:Substitute, fn:Upper, fn:GetValue, fn:FieldType, cf:design_x_sql, fn:FieldComment, fn:Quote

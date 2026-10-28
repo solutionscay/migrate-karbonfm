@@ -1,0 +1,190 @@
+# script 357: Reset Rows Table, If Necessary
+# file: karbon_Build.fmp12
+# folder: Modules / Virtual List
+# source: ScriptCatalog/Script[@id=357]
+# steps: 53 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=353 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #how many records do you want.  It's unlikely you need more than 1000
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $numberOfRecordsWanted; Value:1000 ]
+        DisableStepCollapsed state=False
+        Name: $numberOfRecordsWanted
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Go to Layout [ “VirtualListRows” (VirtualListRows) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=30 name=VirtualListRows
+  10    Show All Records
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #check record count
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $notEnoughRecords; Value:Get (TotalRecordCount) < $numberOfRecordsWanted ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:TotalRecordCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $notEnoughRecords
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #check sequence
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Sort Records [ Keep records in sorted order; Specified Sort Order: VirtualListRows::n; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=VirtualListRows id=1 name=n
+  21    Go to Record/Request/Page
+        [ Last ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  22    Set Variable [ $sequenceIsOff; Value:VirtualListRows::n <> Get (RecordNumber) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: VirtualListRows::n#1, fn:Get, fn:RecordNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $sequenceIsOff
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #can we exit?
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $everythingIsOK; Value:not (
+        $sequenceIsOff
+        or 
+        $notEnoughRecords
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:or
+        Repetition
+          Calculation:
+            | 1
+        Name: $everythingIsOK
+  29    If [ $everythingIsOK ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Exit Script [  ]
+        DisableStepCollapsed state=False
+  31    End If
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Freeze Window
+        DisableStepCollapsed state=False
+  36    #something is messed up, so delete and start over.
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #reset the serial number
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Next Serial Value [ VirtualListRows::n; 1 ]
+        DisableStepCollapsed state=False
+        Field table=VirtualListRows id=1 name=n
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #create the number of records you want
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    New Record/Request
+        DisableStepCollapsed state=False
+  49    Exit Loop If [ Get (RecordNumber) >=$numberOfRecordsWanted ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:RecordNumber
+  50    End Loop
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout

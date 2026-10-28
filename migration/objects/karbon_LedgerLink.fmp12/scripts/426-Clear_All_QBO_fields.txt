@@ -1,0 +1,261 @@
+# script 426: Clear All QBO fields
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Private
+# source: ScriptCatalog/Script[@id=426]
+# steps: 60 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=108 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #clear all qbo_ field values in Client tables
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Allow User Abort [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   5    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #qbo_ fields
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $fieldList; Value:List ( 
+        "qbo_id" ;
+        "qbo_error" ;
+        "qbo_LastUpdated" ;
+        "qbo_lineNum"
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldList
+   9    Set Variable [ $fieldCount; Value:ValueCount ($fieldList) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldCount
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #Client tables layout names
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $valueList; Value:List ( 
+        "qbo_CustomerMO" ;
+        "qbo_VendorMO" ;
+        "qbo_InvoiceMO" ;
+        "qbo_InvoiceItemMO" ;
+        "qbo_PaymentMO" ;
+        "qbo_PaymentLineMO" ;
+        "PyblIt.bt" ;
+        "COGitems.bt" 
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $valueList
+  14    Set Variable [ $i; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $i
+  15    Set Variable [ $itemCount; Value:ValueCount ($valueList) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $itemCount
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #loop thru QBO tables
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Exit Loop If [ Let ( 
+        
+        $i = $i + 1 ;
+        
+        $i > $itemCount 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Let
+  21    Set Variable [ $value; Value:GetValue ( $valueList ; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $value
+  22    Go to Layout [ $value ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=LayoutNameByCalc
+        Layout id=0 name="" ref=none
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #find records with a qbo_ value
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $f; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $f
+  26    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  27    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #set qbo_ fields
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Exit Loop If [ Let ( 
+        
+        $f = $f + 1 ;
+        
+        $f > $fieldCount 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Let
+  30    Set Variable [ $fieldName; Value:Get(LayoutTableName) & "::" & GetValue ( $fieldList ; $f ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LayoutTableName, fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldName
+  31    Set Field By Name [ $fieldName; "*" ]
+        DisableStepCollapsed state=False
+  32    New Record/Request
+        DisableStepCollapsed state=False
+  33    End Loop
+        DisableStepCollapsed state=False
+  34    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    If [ Get(FoundCount ) <> 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  37    Set Variable [ $f; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $f
+  38    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #clear qbo_ fields
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Exit Loop If [ Let ( 
+        
+        $f = $f + 1 ;
+        
+        $f > $fieldCount 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Let
+  41    Set Variable [ $fieldName; Value:Get(LayoutTableName) & "::" & GetValue ( $fieldList ; $f ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LayoutTableName, fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldName
+  42    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  43    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Field By Name [ $fieldName; "" ]
+        DisableStepCollapsed state=False
+  45    If [ Get(LastError) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  46    Go to Record/Request/Page
+        [ Next ]
+        NoInteract state=False
+        Exit state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  47    If [ Get(LastError) <> 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  48    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  49    End If
+        DisableStepCollapsed state=False
+  50    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  52    End If
+        DisableStepCollapsed state=False
+  53    End Loop
+        DisableStepCollapsed state=False
+  54    End Loop
+        DisableStepCollapsed state=False
+  55    End If
+        DisableStepCollapsed state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    End Loop
+        DisableStepCollapsed state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Exit Script [  ]
+        DisableStepCollapsed state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False

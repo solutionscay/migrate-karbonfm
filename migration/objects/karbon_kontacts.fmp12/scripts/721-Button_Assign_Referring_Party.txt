@@ -1,0 +1,176 @@
+# script 721: Button: Assign Referring Party
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Opportunity
+# source: ScriptCatalog/Script[@id=721]
+# steps: 26 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=601 groupCollapsed=True includeInMenu=False
+
+   1    #@history 2018-11-02 dave@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Install OnTimer Script [ “Timer: Handle Assign Referring Party”; Interval: 1 ]
+        DisableStepCollapsed state=False
+        Script id=722 name="Timer: Handle Assign Referring Party"
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $layoutObjectName; Value:"ReferredByParty" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $layoutObjectName
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $selectMultiple; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $selectMultiple
+   9    Set Variable [ $partySubtypes; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $partySubtypes
+  10    Set Variable [ $organizationsOnly; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $organizationsOnly
+  11    Set Variable [ $cardTop; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( $layoutObjectName ; "bottom" ) ) ; 
+        
+        	// no starting object; default to 100 points from the top of the current window
+        	Get ( WindowTop ) + 100 ; 
+        
+        	// 10 points below the bottom of the object
+        	GetLayoutObjectAttribute ( $layoutObjectName ; "bottom" ) - Get ( WindowTop ) - 12
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowTop
+        Name: $cardTop
+  12    Set Variable [ $cardLeft; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( $layoutObjectName ; "left" ) ) ; 
+        
+        		// no starting object; default to 100 points from the left of the current window
+        		Get ( WindowLeft ) + 100 ; 
+        
+        		// line it up with the left edge of the employer field
+        		GetLayoutObjectAttribute ( $layoutObjectName ; "left" ) - Get ( WindowLeft )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowLeft
+        Name: $cardLeft
+  13    Set Variable [ $windowTop; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( $layoutObjectName ; "bottom" ) ) ; 
+        
+        	// no starting object; default to 100 points from the top of the current window
+        	Get ( WindowTop ) + 100 ; 
+        
+        	// 10 points below the bottom of the object
+        	GetLayoutObjectAttribute ( $layoutObjectName ; "bottom" ) + 10 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowTop
+        Name: $windowTop
+  14    Set Variable [ $windowLeft; Value:If ( 
+        	IsEmpty ( GetLayoutObjectAttribute ( $layoutObjectName ; "left" ) ) ; 
+        
+        		// no starting object; default to 100 points from the left of the current window
+        		Get ( WindowLeft ) + 100 ; 
+        
+        		// line it up with the left edge of the employer field
+        		GetLayoutObjectAttribute ( $layoutObjectName ; "left" )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:GetLayoutObjectAttribute, fn:Get, fn:WindowLeft
+        Name: $windowLeft
+  15    Set Variable [ $windowName; Value:"Contact Search" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowName
+  16    Set Variable [ $placeholderText; Value:"Search for contact..." ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $placeholderText
+  17    Set Variable [ $footerMessage; Value:"Partial matches are okay" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $footerMessage
+  18    Set Variable [ $allowCreate; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $allowCreate
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #call the picker
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $paramOut; Value:JSONSetElement ( "{}" ; 
+        	[ "cardTop" ; $cardTop ; JSONNumber ] ; 
+        	[ "cardLeft" ; $cardLeft ; JSONNumber ] ; 
+        	[ "windowName" ; $windowName ; JSONString ] ; 
+        	[ "windowTop" ; $windowTop ; JSONNumber ] ; 
+        	[ "windowLeft" ; $windowLeft ; JSONNumber ] ; 
+        	[ "selectMultiple" ; $selectMultiple ; JSONBoolean ] ; 
+        	[ "partySubtypes" ; $partySubtypes ; JSONString ] ; 
+        	[ "organizationsOnly" ; $organizationsOnly ; JSONBoolean ] ; 
+        	[ "placeholderText" ; $placeholderText ; JSONString ] ; 
+        	[ "footerMessage" ; $footerMessage ; JSONString ] ; 
+        	[ "allowCreate" ; $allowCreate ; JSONBoolean ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONString, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $paramOut
+  23    Perform Script [ “Show Contact Picker( { top { ; left { ; allowMultiple } } } )” from file: “Picker Module”; Parameter: $paramOut ]
+        DisableStepCollapsed state=False
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Script id=67 name="Show Contact Picker( { top { ; left { ; allowMultiple } } } )" in=Picker_Module.fmp12
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False

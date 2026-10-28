@@ -1,0 +1,149 @@
+# script 431: Save Contact Method - Phone
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Contact Methods / Popover Edits
+# source: ScriptCatalog/Script[@id=431]
+# steps: 27 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=429 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $Comment ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Comment
+   4    Set Variable [ $CountryCode ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $CountryCode
+   5    Set Variable [ $Extension; Value:UtilityContactMethod::Extension ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::Extension#14
+        Repetition
+          Calculation:
+            | 1
+        Name: $Extension
+   6    Set Variable [ $Label; Value:UtilityContactMethod::Label ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::Label#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $Label
+   7    Set Variable [ $Number; Value:UtilityContactMethod::Phone ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityContactMethod::Phone#13
+        Repetition
+          Calculation:
+            | 1
+        Name: $Number
+   8    Set Variable [ $PartyId; Value:Party::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Party::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyId
+   9    Set Variable [ $Primary ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Primary
+  10    Set Variable [ $Type ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Type
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $phone; Value:JSONSetElement (  ""; 
+         
+        	[ "Comment" ; $Comment ; JSONString ];
+        	[ "CountryCode" ; $CountryCode ; JSONNumber ];
+        	[ "Extension" ; $Extension ; JSONString ];
+        	[ "Label" ; $Label ; JSONString ];
+        	[ "Number" ; $Number ; JSONString ];
+        	[ "PartyId" ; $PartyId ; JSONString ];
+        	[ "Primary" ; $Primary ; JSONBoolean ];
+        	[ "Type" ; $Type ; JSONArray ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONNumber, fn:JSONBoolean, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $phone
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Close Popover
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Create Phone { data }” from file: “karbon_kontroller”; Parameter: $phone ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=206 name="Create Phone { data }" in=karbon_kontroller.fmp12
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  24    #Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Show Custom Dialog [ Title: "Error"; Message: "This Phone was not created."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False

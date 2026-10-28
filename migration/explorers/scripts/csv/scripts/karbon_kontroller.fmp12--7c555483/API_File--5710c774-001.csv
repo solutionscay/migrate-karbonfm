@@ -1,0 +1,80 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/551-Create_FileAttachment_data_v1.txt,cec3430c0ef7cebe7ace66b8720c3ae1a7a59fcdac7d033efd4c2e9476c80357,scripts,karbon_kontroller.fmp12,551,Create FileAttachment { data } v1,data-change,drop-candidate,tier3,"Version 1 of FileAttachment creation: creates a FileAttachment row linking an attachment File to an entity, and flags the File for QuickBooks Online send when the system uses QBO. Its effect would belong to server-domain; version 2 (script 616) replaces it.","DBTransactions::FileAttachmentId#104
+DBTransactions::FileId#103
+FileAttachment::Id#1
+System::UsingQBOInd#64","DBTransactions::FileAttachmentId#104 (step 85, current record)
+FileAttachment::ONE#13 (step 88, related via FileAttachment (creates record))
+FileAttachment::AttachmentId#8 (step 98, record created in step 88)
+FileAttachment::EntityId#7 (step 99, record created in step 88)
+FileAttachment::EntityType#6 (step 100, record created in step 88)
+FileAttachment::IncludeOnSend#9 (step 101, record created in step 88)
+DBTransactions::FileId#103 (step 110, current record)
+File::qbo_send#20 (step 119, related via File)","karbon_kontroller.fmp12/scripts/28 (step 35)
+karbon_kontroller.fmp12/scripts/29 (step 135)
+karbon_kontroller.fmp12/scripts/31 (step 136)","objects/karbon_kontroller.fmp12/scripts/552-Create_File_data_v1.txt (step 138)
+objects/karbon_kontacts.fmp12/scripts/626-deprecated_btn_Add_Existing_File_as_FileAttachment_to_SalesT.txt (step 16)
+objects/karbon_kontacts.fmp12/scripts/639-OnTimer_Handle_Add_Existing_File_as_FileAttachment_DEPRECATE.txt (step 17)",none,"Callers are script 552 (v1, itself without callers) and two scripts named deprecated (626, 639), so the whole v1 chain looks dead; confirm. $Id (step 84) is never set and $EntityType (step 68) is read from a key the payload does not carry (the required key is EntityTypeId), so EntityType is stored empty. qbo_send meaning (flag read by the QBO sync) is not in this file."
+karbon_kontroller.fmp12/scripts/552-Create_File_data_v1.txt,994b63bcb6a6ef317f394d5482d93e1368939d7c67e5ed5d73742ee56ead397d,scripts,karbon_kontroller.fmp12,552,Create File { data } v1,data-change,drop-candidate,tier3,"Version 1 of File creation: decodes a base64 container into the File row, copies category, content type, file name, note and tag, then calls Create FileAttachment v1 for each attachment in the payload. Its effect would belong to server-domain; version 2 (script 617) replaces it.","DBTransactions::FileId#103
+File::Id#1","DBTransactions::FileId#103 (step 92, current record)
+File::ONE#25 (step 95, related via File (creates record))
+File::Category#11 (step 107, record created in step 95)
+File::Container#17 (step 108, record created in step 95)
+File::ContentType#10 (step 109, record created in step 95)
+File::FileName#6 (step 110, record created in step 95)
+File::Note#7 (step 111, record created in step 95)
+File::Tag#12 (step 114, record created in step 95)
+File::Thumbnail#24 (step 116, record created in step 95)","karbon_kontroller.fmp12/scripts/28 (step 40)
+karbon_kontroller.fmp12/scripts/551 (step 138)
+karbon_kontroller.fmp12/scripts/29 (step 162)
+karbon_kontroller.fmp12/scripts/31 (step 163)",none found,none,"No caller found. The Category enum check (step 61) reads $Category before it is parsed (step 69), so it never rejects. $Id (step 91) is never set and $Thumbnail (step 116) is never assigned. Disabled steps 112-117 show qbo and download-URI fields that were once set."
+karbon_kontroller.fmp12/scripts/612-Delete_FileAttachment_data.txt,b8889bf3e8d8dfdfe8a1cf104f5b58ae859157749f21953218bfba13b2787d52,scripts,karbon_kontroller.fmp12,612,Delete FileAttachment { data },data-change,server-domain,tier2,"Deletes a FileAttachment link by Id inside a transaction. It also flags the parent File for QuickBooks Online send (qbo_send) so the attachment is removed in QBO, then deletes the row via Delete First Portal Row on FileAttachmentPortal (script 33). Returns {Result:true}.","DBTransactions::FileAttachmentId#104
+DBTransactions::FileId#103","DBTransactions::FileAttachmentId#104 (step 72, current record)
+FileAttachment::ONE#13 (step 75, related via FileAttachment (creates or locks record))
+DBTransactions::FileId#103 (step 81, current record)
+File::ONE#25 (step 83, related via File (creates or locks record))
+File::qbo_send#20 (step 87, related via File)
+delete: FileAttachment (Delete First Portal Row via script 33, portal object ""FileAttachmentPortal"", step 92, portal row)","karbon_kontroller.fmp12/scripts/28 (step 34)
+karbon_kontroller.fmp12/scripts/33 (step 92)
+karbon_kontroller.fmp12/scripts/29 (step 111)
+karbon_kontroller.fmp12/scripts/31 (step 112)","objects/karbon_kontacts.fmp12/scripts/637-btn_Delete_FileAttachment_from_Opportunity.txt (step 5)
+objects/karbon_kontacts.fmp12/scripts/627-btn_Delete_FileAttachment_from_SalesTransaction.txt (step 4)
+objects/karbon_kontacts.fmp12/scripts/648-btn_Delete_FileAttachment_from_Party.txt (step 6)",none,Delete First Portal Row (script 33) was not read in this share. The step 79 comment says the qbo_send flag deletes the attachment in QBO; the process that acts on the flag is not in this file.
+karbon_kontroller.fmp12/scripts/616-Create_FileAttachment_data_v2.txt,b6dc386ffeb39aca9a67bf2d927c78f3d8399e446832ef8ea31df72b607ecd08,scripts,karbon_kontroller.fmp12,616,Create FileAttachment { data } v2,data-change,server-domain,tier2,"Version 2 of FileAttachment creation: validates a payload, looks up the entity type name from EntityTypeId, and creates the FileAttachment link between an attachment File and an entity. When the system uses QuickBooks Online it flags the File for QBO send, and for entity type 12 (SalesTransaction) flags the sales transaction too.","DBTransactions::FileAttachmentId#104
+DBTransactions::FileId#103
+DBTransactions::SalesTransactionId#93
+EntityType::Id#6
+EntityType::Name#15
+FileAttachment::Id#1
+System::UsingQBOInd#64
+EntityType::Name#15 (via cf:SQL.GetColumn, step 75)","DBTransactions::FileAttachmentId#104 (step 84, current record)
+FileAttachment::ONE#13 (step 87, related via FileAttachment (creates record))
+FileAttachment::AttachmentId#8 (step 97, record created in step 87)
+FileAttachment::EntityId#7 (step 98, record created in step 87)
+FileAttachment::EntityTypeId#14 (step 99, record created in step 87)
+FileAttachment::EntityType#6 (step 100, record created in step 87)
+FileAttachment::IncludeOnSend#9 (step 101, record created in step 87)
+DBTransactions::SalesTransactionId#93 (step 113, current record)
+SalesTransaction::qbo_send#3 (step 117, related via SalesTransaction)
+DBTransactions::FileId#103 (step 128, current record)
+File::qbo_send#20 (step 132, related via File)","karbon_kontroller.fmp12/scripts/28 (step 35)
+karbon_kontroller.fmp12/scripts/29 (step 152)
+karbon_kontroller.fmp12/scripts/31 (step 153)",objects/karbon_kontroller.fmp12/scripts/617-Create_File_data_v2.txt (step 179),none,"$Id (step 84) is never set, so the connect-to-record step writes empty. Entity type 12 = SalesTransaction is hard-coded in a comment (step 110). The entity name comes from SQL.GetColumn on EntityType, an ExecuteSQL-style custom function (step 75). The process that sends flagged records to QBO is not in this file. The script is in the Scripts menu (includeInMenu=True)."
+karbon_kontroller.fmp12/scripts/617-Create_File_data_v2.txt,65d836bccd48ba7a3850597fff58017005bc613da7585b30d021d3780f98ae9d,scripts,karbon_kontroller.fmp12,617,Create File { data } v2,data-change,server-domain,tier1,"Version 2 of File creation: validates the payload, loads the file content from a server path or a URL, works out size, extension, content type, category (Image or Document) and an image thumbnail, rejects files over 20 MB, creates the File row, then calls Create FileAttachment v2 for each attachment in the payload.","DBTransactions::FileId#103
+File::Id#1","DBTransactions::FileId#103 (step 133, current record)
+File::ONE#25 (step 136, related via File (creates record))
+File::Category#11 (step 148, record created in step 136)
+File::Container#17 (step 149, record created in step 136)
+File::ContentType#10 (step 150, record created in step 136)
+File::Extension#30 (step 151, record created in step 136)
+File::FileName#6 (step 152, record created in step 136)
+File::FileSize#27 (step 153, record created in step 136)
+File::Note#7 (step 154, record created in step 136)
+File::Tag#12 (step 155, record created in step 136)
+File::Thumbnail#24 (step 157, record created in step 136)","karbon_kontroller.fmp12/scripts/28 (step 45)
+karbon_kontroller.fmp12/scripts/616 (step 179)
+karbon_kontroller.fmp12/scripts/29 (step 203)
+karbon_kontroller.fmp12/scripts/31 (step 204)","objects/karbon_kontroller.fmp12/scripts/728-Create_Chat_Message_json.txt (step 226)
+objects/karbon_kontacts.fmp12/scripts/701-Button_Add_Activity_Attachment_v2.txt (step 30)
+objects/karbon_kontacts.fmp12/scripts/642-Add_File_json.txt (step 81)
+objects/karbon_kontacts.fmp12/scripts/725-Button_Add_Activity_Attachment_v1.txt (step 30)","Insert File (step 94, $FilePath into $Container)
+Insert from URL (step 98, $FileAccessUri into $Container, SSL verify off)","Insert File reads from a path supplied by the caller ($FilePath, step 94) and Insert from URL fetches a caller-supplied URL with SSL verification off (step 98); both need an allowlist in the target. After the URL fetch the error is stored (step 99) but not tested, so a failed fetch falls through with an empty container. $Id (step 132) is never set. The 20 MB limit is 20480 KB (step 108). Content type map covers nine extensions only; others stay empty."

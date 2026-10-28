@@ -1,0 +1,233 @@
+# script 243: Create Timesheet
+# file: karbon_tester.fmp12
+# folder: Modules / ZeitGeist
+# source: ScriptCatalog/Script[@id=243]
+# steps: 49 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=228 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $TEST_Group; Value:"Timesheet" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Group
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $TEST_Subject; Value:"Create" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Subject
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $TEST_Case; Value:"Create timesheet given EmployeeId and Dates" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $DateFrom; Value:Date ( 3; 25; 2018) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Date
+        Name: $DateFrom
+  13    Set Variable [ $DateThru; Value:Date ( 3; 31; 2018) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Date
+        Name: $DateThru
+  14    Set Variable [ $EmployeePartyId; Value:Get ( UUID) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:UUID
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmployeePartyId
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Timesheet; Value:JSONSetElement (  ""; 
+         
+        	[ "DateFrom" ; $DateFrom ; JSONString ];
+        	[ "DateThru" ; $DateThru ; JSONString ];
+        	[ "EmployeePartyId" ; $EmployeePartyId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $Timesheet
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “<unknown>” from file: “Karbon_kontroller”; Parameter: $Timesheet ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=279 name=<unknown> ref=missing
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ not Error.IsError ( $TEST_result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  24    #Get the Id of the record we just created
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $Id; Value:JSONGetElement ( $TEST_result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #log the id for deletion
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $_; Value:Test.LogIDsToDelete ( $Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Test.LogIDsToDelete
+        Repetition
+          Calculation:
+            | 1
+        Name: $_
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #Get full JSON result
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Perform Script [ “<unknown>” from file: “Karbon_kontroller”; Parameter: $Id ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=362 name=<unknown> ref=missing
+  32    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    End If
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #Basic tests
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  39    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #Detailed tests
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $null; Value:Assert.HasProperty ( $TEST_Result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.HasProperty
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  43 // Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "Comments" ; "This is a test company record" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  44 // Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "OrganizationName" ; "ACME, Inc." ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Exit Script [ Result: JSONGetElement ( $TEST_result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False

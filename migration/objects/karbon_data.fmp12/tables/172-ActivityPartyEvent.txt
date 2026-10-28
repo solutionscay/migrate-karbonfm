@@ -1,0 +1,73 @@
+# table 172: ActivityPartyEvent
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=172]
+# fields: 9
+# records: 0
+
+Field id=23 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=32 dataType=Text fieldType=Normal name=Rsvp
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Number fieldType=Normal name=AttendedInd
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Normal name=Comments
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ActivityPartyEvent:
+      | CleanText ( Self  )
+      refs: cf:CleanText, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=56 dataType=Text fieldType=Summary name=IdList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=23 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=62 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=ActivityPartyEvent:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=72 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=ActivityPartyEvent (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=73 dataType=Number fieldType=Normal name=RsvpInd
+  Comment: Returns true if the party is expected
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=74 dataType=Number fieldType=Summary name=CountRSVP
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=Total
+    SummaryField
+      Field id=73 name=RsvpInd
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+

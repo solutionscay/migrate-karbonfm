@@ -1,0 +1,34 @@
+# script 659: Open Card - Attachable List
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Attachables
+# source: ScriptCatalog/Script[@id=659]
+# steps: 4 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=657 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    New Window [ Style: Card; Name: "Files"; Using layout: “Attachable Card List” (Attachable); Height: Get ( WindowContentHeight ) -120; Width: 320; Top: 80; Left: Get ( WindowWidth ) - 320; Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: No; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Height
+          refs: fn:Get, fn:WindowContentHeight
+        DistanceFromLeft
+          refs: fn:Get, fn:WindowWidth
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3221225488
+        Layout id=128 name="Attachable Card List"
+   3    Sort Records [ Keep records in sorted order; Specified Sort Order: Attachable::CreationTimestamp; descending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Descending
+            PrimaryField
+              Field table=Attachable id=2 name=CreationTimestamp
+   4    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First

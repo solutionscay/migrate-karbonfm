@@ -1,0 +1,214 @@
+# table 150: ApiGeneratorLine
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=150]
+# fields: 28
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ApiGeneratorLine:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=ApiGeneratorId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=FmpFieldName
+  Comment: The name of the FileMaker field that this property applies to, if any.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=FmpTableName
+  Comment: The name of the FileMaker field that this property applies to, if any.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=FmpIgnore
+  Comment: True if we aren't going to use this field anywhere in the API
+  AutoEnter allowEditing=True constant=False
+    (inactive) ConstantData: 1
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Number fieldType=Normal name=required
+  Comment: True if this is a required parameter
+  AutoEnter allowEditing=True constant=False
+    (inactive) ConstantData: 1
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=default
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Normal name=JsonPropertyName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=description
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Normal name=type
+  Comment: The JSON data type (e.g., string, number)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Number fieldType=Normal name=readOnly
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Number fieldType=Normal name=FmpFieldId
+  Comment: The FileMaker field ID
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Normal name=JsonPathOut
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ApiGeneratorLine:
+      | If ( PluckInd ; 
+      | 	JsonPropertyName 
+      | )
+      refs: fn:If, ApiGeneratorLine::PluckInd#42, ApiGeneratorLine::JsonPropertyName#21
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Normal name=JsonPathIn
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ApiGeneratorLine:
+      | ApiGenerator::Entity & "/" & JsonPropertyName
+      refs: ApiGenerator::Entity#19, ApiGeneratorLine::JsonPropertyName#21
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=28 dataType=Text fieldType=Normal name=FmpDataType
+  Comment: The FileMaker field type (e.g., text, number)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Number fieldType=Normal name=FmpParam
+  Comment: True to create an @param comment for the API
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Text fieldType=Normal name=FmpPath
+  Comment: The fully qualified field reference in FileMaker format (i.e., table::field)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=32 dataType=Text fieldType=Normal name=ParentObjectId
+  Comment: The ID of this object's parent
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Text fieldType=Calculated name=SchemaId
+  Calculation table=ApiGeneratorLine:
+    | Substitute ( 
+    | 	List ( 
+    | 		ApiGeneratorLine_ApiGeneratorLine#parent::JsonPropertyName ; 
+    | 		Id
+    | 	) ; 
+    | 	"¶" ; 
+    | 	"/"
+    | )
+    refs: fn:Substitute, fn:List, ApiGeneratorLine_ApiGeneratorLine#parent::JsonPropertyName#21, ApiGeneratorLine::Id#1
+  Comment: The full path to this object
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=34 dataType=Number fieldType=Normal name=selected
+  Comment: True if this property is selected in the portal. Used for batch actions.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Text fieldType=Normal name=ChildSchemaId
+  Comment: Used to add a an existing schema as a property
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Number fieldType=Normal name=IsOneOf
+  Comment: If true, the array must match at least one of the related enum values, including null.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=38 dataType=Number fieldType=Normal name=IsNumeric
+  Comment: If true, the value must be a number
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=Number fieldType=Normal name=IsOnlyOneOf
+  Comment: If true, the array must only match one of the related enum values, including null.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=Text fieldType=Normal name=TestData
+  Comment: Used to create default data objects for testing
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=41 dataType=Number fieldType=Calculated name=IsObject
+  Calculation table=ApiGeneratorLine:
+    | type = "object"
+    refs: ApiGeneratorLine::type#23
+  Storage storeCalculationResults=True index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=42 dataType=Number fieldType=Normal name=PluckInd
+  Comment: True if this property is going to be plucked. Useful when this API is calling another API.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=43 dataType=Number fieldType=Normal name=FmpResult
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

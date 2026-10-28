@@ -1,0 +1,58 @@
+# script 848: btn: End Party Relationship from Opportunity_deprecated
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Opportunity
+# source: ScriptCatalog/Script[@id=848]
+# steps: 7 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=601 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #This script relies on the context of the Opportunity_Party_Partyrelation portal
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $Param; Value:Let([
+        
+        From = JSONSetElement ( "" ; 
+        	[ "PartyId" ; Opportunity::PartyId ; JSONString ]
+        );
+        
+        To = JSONSetElement ( "" ; 
+        	[ "PartyId" ; Opportunity_Party_PartyRelation::PartyIdTo ; JSONString ]
+        )
+        
+        ];
+        
+        JSONSetElement ( "" ; 
+        	[ "CurrentInd" ; False ; JSONBoolean ];
+        	[ "ThruDate" ; Get( CurrentDate ) ; JSONString ];
+        	[ "PartyFrom" ; From ; JSONObject ];
+        	[ "PartyTo" ; To ; JSONObject ]
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:JSONSetElement, Opportunity::PartyId#55, fn:JSONString, Opportunity_Party_PartyRelation::PartyIdTo#6, fn:False, fn:JSONBoolean, fn:Get, fn:CurrentDate, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $Param
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Edit Party Relation { data }” from file: “karbon_kontroller”; Parameter: $param ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=508 name="Edit Party Relation { data }" in=karbon_kontroller.fmp12
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False

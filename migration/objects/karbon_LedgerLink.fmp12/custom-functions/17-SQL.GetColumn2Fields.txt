@@ -1,0 +1,34 @@
+# custom function 17: SQL.GetColumn2Fields
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=17]
+
+CustomFunction id=17 functionArity=5 visible=True parameters=columnField;whereField;whereValue;whereField2;whereValue2 name=SQL.GetColumn2Fields
+  Calculation:
+    | Let(
+    | [
+    | sql = SQL.GetColumnStatement (columnField; whereField ; "?" ) ;
+    | 
+    | sql = List(
+    | "SELECT ''|| " & SQL.GetFieldName ( columnField ) ;
+    | "FROM " & SQL.GetTableName ( whereField ) ;
+    | "WHERE " & SQL.GetFieldName ( whereField ) & "=?" ;
+    | "AND" ; 
+    | SQL.GetFieldName ( whereField2 ) & "=?" 
+    | )
+    | 
+    | 
+    | 
+    | 
+    | ];
+    | 
+    | 
+    | ExecuteSQL (
+    | 
+    | sql ; 
+    | 
+    | "" ;"" ; whereValue; whereValue2
+    | 
+    | ) 
+    | 
+    | )
+    refs: fn:Let, cf:SQL.GetColumnStatement, fn:List, cf:SQL.GetFieldName, cf:SQL.GetTableName, fn:ExecuteSQL

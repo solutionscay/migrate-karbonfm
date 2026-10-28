@@ -1,0 +1,159 @@
+# script 448: Override Get FM Ids to send to QBO (Entity)
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Overrides
+# source: ScriptCatalog/Script[@id=448]
+# steps: 44 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=451 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Override the method the LedgerLink Sync engine uses to find records to send to qbo
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # so you can decide exactly how to find those records to send.
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # Create Else IF Branches for the Entities you want to use Overrides for
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # See Example Below
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {string} Entity the qbo Entity you want to override the behavior for
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @return {string} list of ids to send
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Entity; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    # make as a many Else If branches as you need
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Else If [ $Entity = "XXX" // Change XXX to the Name of the entity you want to override ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #call your own logic to find record IDs
+        DisableStepCollapsed state=False
+        Restore state=False
+  23 // Perform Script [ <unknown> ]
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #set the list into this variable
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $LIstOfRecordIDs; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $LIstOfRecordIDs
+  27    ##DONOTSHIP without clearing the other custom handlers
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Else If [ $Entity = "Invoice" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #call your own logic to find record IDs
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Perform Script [ “List of Invoice FMIds to Send” from file: “DataSourceControllerFile” ]
+        DisableStepCollapsed state=False
+        FileReference id=7 name=DataSourceControllerFile
+          UniversalPathList
+            | file:karbon_kontroller
+            | $$DataSourceControllerFile
+        Script id=417 name="List of Invoice FMIds to Send" ref=external
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #set the list into this variable
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $LIstOfRecordIDs; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $LIstOfRecordIDs
+  35    ##DONOTSHIP without clearing the other custom handlers
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    # DEFAULT - DO NOT CHANGE
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $LIstOfRecordIDs; Value:"UseDefaultMethod" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $LIstOfRecordIDs
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  44    Exit Script [ Result: $LIstOfRecordIDs ]
+        DisableStepCollapsed state=False

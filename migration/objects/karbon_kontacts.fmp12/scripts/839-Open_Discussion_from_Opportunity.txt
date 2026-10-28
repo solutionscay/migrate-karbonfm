@@ -1,0 +1,47 @@
+# script 839: Open Discussion from Opportunity
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion
+# source: ScriptCatalog/Script[@id=839]
+# steps: 3 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=305 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $params; Value:Let ([
+        
+        relatedContacts = List ( Opportunity_Party_PartyRelation::PartyIdTo) ; 
+        salesperson = Opportunity::SalespersonId	; 
+        referringParty = Opportunity::ReferringPartyId  ;
+        employeepartyIds = Let ([
+        
+        	columnField = Party_PartyRole::PartyId  ;
+        	whereField = Party_PartyRole::EmployeeInd ;
+        	whereValue = 1 ;
+        	whereField2 = Party_PartyRole::CurrentInd ;
+        	whereValue2 = 1 
+        
+        	];
+        	SQL.GetColumn2Fields ( columnField ; whereField ; whereValue ; whereField2 ; whereValue2 )
+        	)  ; 
+        
+        displayPartyIds = List ( relatedContacts ; salesperson ; referringParty )
+        
+        ];
+        
+        
+        JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Opportunity::Id ; JSONString ];
+        	[ "EntityTypeId" ; 13 ; JSONNumber ]; //Opportunity
+        	[ "Title" ; Opportunity_Party::NameCached ; JSONString ] ;
+        	[ "DisplayPartyIds" ; displayPartyIds ; JSONString ]
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:List, Opportunity_Party_PartyRelation::PartyIdTo#6, Opportunity::SalespersonId#56, Opportunity::ReferringPartyId#65, Party_PartyRole::PartyId#45, Party_PartyRole::EmployeeInd#43, Party_PartyRole::CurrentInd#22, cf:SQL.GetColumn2Fields, fn:JSONSetElement, Opportunity::Id#1, fn:JSONString, fn:JSONNumber, Opportunity_Party::NameCached#19
+        Name: $params
+   3    Perform Script [ “Open Discussion in New Window { data } v2”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=313 name="Open Discussion in New Window { data } v2"

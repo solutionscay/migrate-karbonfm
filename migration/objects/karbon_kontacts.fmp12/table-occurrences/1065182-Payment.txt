@@ -1,0 +1,45 @@
+# table occurrence 1065182: Payment
+# file: karbon_kontacts.fmp12
+# source: RelationshipGraph/TableList/Table[@id=1065182]
+# base table: karbon_data.fmp12/tables/179-Payment.txt
+
+Table id=1065182 color=#787878 baseTableId=179 baseTable=Payment name=Payment
+  FileReference id=2 name=karbon_data
+
+relationships: 3
+
+Relationship id=81
+  LeftTable cascadeCreate=True cascadeDelete=True name=Payment_PaymentLine to=1065183 base=karbon_data.fmp12/tables/180-PaymentLine.txt
+    SortList BlanksLast=False Maintain=True value=False
+  RightTable cascadeCreate=False cascadeDelete=False name=Payment to=1065182 base=karbon_data.fmp12/tables/179-Payment.txt
+    SortList BlanksLast=False Maintain=True value=False
+  JoinPredicateList
+    JoinPredicate type=Equal
+      LeftField
+        Field table=Payment_PaymentLine id=2 name=id_Payment
+      RightField
+        Field table=Payment id=1 name=id
+
+Relationship id=84
+  LeftTable cascadeCreate=False cascadeDelete=False name=Payment_Customer to=1065185 base=karbon_data.fmp12/tables/140-Customer.txt
+    SortList BlanksLast=False Maintain=True value=False
+  RightTable cascadeCreate=False cascadeDelete=False name=Payment to=1065182 base=karbon_data.fmp12/tables/179-Payment.txt
+    SortList BlanksLast=False Maintain=True value=False
+  JoinPredicateList
+    JoinPredicate type=Equal
+      LeftField
+        Field table=Payment_Customer id=1 name=Id
+      RightField
+        Field table=Payment id=2 name=id_Customer
+
+Relationship id=175
+  LeftTable cascadeCreate=False cascadeDelete=False name=connector to=1065090 base=karbon_kontacts.fmp12/tables/130-connector.txt
+    SortList BlanksLast=False Maintain=True value=False
+  RightTable cascadeCreate=False cascadeDelete=False name=Payment to=1065182 base=karbon_data.fmp12/tables/179-Payment.txt
+    SortList BlanksLast=False Maintain=True value=False
+  JoinPredicateList
+    JoinPredicate type=CartesianProduct
+      LeftField
+        Field table=connector id=10 name=z_xJoin
+      RightField
+        Field table=Payment id=24 name=z_xJoin

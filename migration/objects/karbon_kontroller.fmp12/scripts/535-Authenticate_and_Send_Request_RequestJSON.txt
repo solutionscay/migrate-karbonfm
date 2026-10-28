@@ -1,0 +1,124 @@
+# script 535: _Authenticate and Send Request { RequestJSON }
+# file: karbon_kontroller.fmp12
+# folder: Modules / Twilio / Private
+# source: ScriptCatalog/Script[@id=535]
+# steps: 28 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=538 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-08-12 dave@geistinteractive.com - applies authentication properties and sends the request
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $RequestJSON; Value:JSON.Format ( Get ( ScriptParameter ) ; "validating parameters" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $RequestJSON
+   4    If [ Error.IsError ( $RequestJSON ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   5    Exit Script [ Result: $RequestJSON ]
+        DisableStepCollapsed state=False
+   6    End If
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $requestJSON; Value:JSONSetElement ( $RequestJSON ; "auth.user" ; System#cartesian::TwilioAccountSid ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, System#cartesian::TwilioAccountSid#68, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  10    Set Variable [ $requestJSON; Value:JSONSetElement ( $RequestJSON ; "auth.password" ; System#cartesian::TwilioAuthToken ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, System#cartesian::TwilioAuthToken#69, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Perform Script [ “HTTP ( {request} )”; Parameter: $requestJSON ]
+        DisableStepCollapsed state=False
+        Script id=345 name="HTTP ( {request} )"
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $response; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $body; Value:JSONGetElement ( $response ; "body"  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    If [ IsEmpty ( $body ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  19    Set Variable [ $error; Value:Custom.Error ( "HTTP error" ; $response ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Custom.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  20    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  21    End If
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24 // Set Variable [ $body; Value:JSONGetElement($response; "body") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Exit Script [ Result: $body ]
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False

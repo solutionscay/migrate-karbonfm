@@ -1,0 +1,51 @@
+# table 181: SalesReceipt
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=181]
+# fields: 5
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=SalesReceipt (inactive):
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+    StrictValidation value=True
+    ErrorMessage: Invoice id must exist and be unique.
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=67 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=SalesReceipt:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=71 dataType=Text fieldType=Normal name=id_AccountDeposit
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=75 dataType=Text fieldType=Normal name=paymentRefNum
+  Comment: max 21 characters
+  AutoEnter allowEditing=True
+  Validation message=True maxLength=True type=OnlyDuringDataEntry
+    MaxDataLength value=21
+    ErrorMessage: Exceeded max 21 characters
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=76 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=SalesReceipt (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+

@@ -1,0 +1,309 @@
+# script 373: _Create Change Log Markdown File.bak
+# file: karbon_Build.fmp12
+# folder: API / Private
+# source: ScriptCatalog/Script[@id=373]
+# steps: 72 (5 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=339 groupCollapsed=False includeInMenu=False
+
+   1    #@history 2019-09-24 dave@geistinteractive.com - Saved a copy before refactoring
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #Creates a change log file in Markdown format
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@returnSuccess - n/a
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnError - n/a
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@history 2018-08-14 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #Templates
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Insert Text [ $md ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | # {AppName} Change Log
+          | 
+          | {CreationTimestamp}
+          | 
+          | {AppBuildVersion}
+        Field: $md
+  18    Insert Text [ $fileTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: **{{FileName}}** (v {{FileVersion}}
+        Field: $fileTemplate
+  19    Insert Text [ $changeTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: * [{{Type}}]  {{Description}}
+        Field: $changeTemplate
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $md; Value:Substitute ( $md ; 
+        	[ "{AppName}" ; Tx_Application::Name ] ; 
+        	[ "{CreationTimestamp}" ; Tx_AppBuild::CreationTimestamp ] ; 
+        	[ "{AppBuildVersion}" ; Tx_AppBuild::Version ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, Tx_Application::Name#6, Tx_AppBuild::CreationTimestamp#2, Tx_AppBuild::Version#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $md
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23 // #Go to file build records
+        DisableStepCollapsed state=False
+        Restore state=False
+  24 // Go to Related Record [ From table: “Tx_AppBuild_FileBuild”; Using layout: “FileBuild” (FileBuild) ]
+        [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065182 name=Tx_AppBuild_FileBuild
+        Layout id=23 name=FileBuild
+  25 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  26 // #Sort by file name
+        DisableStepCollapsed state=False
+        Restore state=False
+  27 // Sort Records [ Keep records in sorted order; Specified Sort Order: FileBuild_File::FileName; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=FileBuild_File id=6 name=FileName
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Insert Calculated Result [ $FileBuildIds; List ( Tx_AppBuild_FileBuild::Id ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:List, Tx_AppBuild_FileBuild::Id#1
+        Field: $FileBuildIds
+  30    Insert Calculated Result [ $fileIndex; 1 ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $fileIndex
+  31    Insert Calculated Result [ $fileCount; ValueCount ( $FileBuildIds ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:ValueCount
+        Field: $fileCount
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #Loop through each file in the app build
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Insert Calculated Result [ $md; Substitute ( $fileTemplate ; 
+        	[ "{{FileName}}" ; GetNthRecord ( Tx_AppBuild_FileBuild::FileNameOut ; $fileIndex ) ] ; 
+        	[ "{{FileVersion}}" ; GetNthRecord ( Tx_AppBuild_FileBuild::Version ; $fileIndex ) ] 
+        ) ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, fn:GetNthRecord, Tx_AppBuild_FileBuild::FileNameOut#10, Tx_AppBuild_FileBuild::Version#7
+        Field: $md
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Field [ DBTransactions::FileId; GetNthRecord ( Tx_AppBuild_FileBuild::FileId ; $fileIndex ) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetNthRecord, Tx_AppBuild_FileBuild::FileId#6
+        Field table=DBTransactions id=73 name=FileId
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Insert Calculated Result [ $changeIndex; 1 ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $changeIndex
+  41    Insert Calculated Result [ $changeCount; ValueCount ( $FileBuildIds ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:ValueCount
+        Field: $changeCount
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #Loop through each change in the file build
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Insert Calculated Result [ $md; Substitute ( $changeTemplate ; 
+        	[ "{{Type}}" ; GetNthRecord ( Tx_Change#appBuildAndFile::Type ; $changeIndex ) ] ; 
+        	[ "{{Description}}" ; GetNthRecord ( Tx_Change#appBuildAndFile::Description ; $changeIndex ) ] 
+        ) ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, fn:GetNthRecord, Tx_Change#appBuildAndFile::Type#12, Tx_Change#appBuildAndFile::Description#10
+        Field: $md
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Insert Calculated Result [ $changeIndex; $changeIndex + 1 ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $changeIndex
+  49    Exit Loop If [ $changeIndex > $changeCount ]
+        DisableStepCollapsed state=False
+  50    End Loop
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Insert Calculated Result [ $fileIndex; $fileIndex + 1 ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $fileIndex
+  53    Exit Loop If [ $fileIndex > $fileCount ]
+        DisableStepCollapsed state=False
+  54    End Loop
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Set Field [ VirtualList::Data; $md ]
+        DisableStepCollapsed state=False
+        Field table=VirtualList id=14 name=Data
+  58    Set Field [ VirtualList::FoundCount; ValueCount ( $md ) ]
+        DisableStepCollapsed state=False
+        refs: fn:ValueCount
+        Field table=VirtualList id=12 name=FoundCount
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Go to Layout [ “VirtualListRows” (VirtualListRows) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=30 name=VirtualListRows
+  61    Show All Records
+        DisableStepCollapsed state=False
+  62    Go to Record/Request/Page [ VirtualList::FoundCount + 1 ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+        refs: VirtualList::FoundCount#12
+  63    Omit Multiple Records [ 10000 ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Set Variable [ $filePath; Value:Get ( DesktopPath ) & "Change_Log.md" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:DesktopPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $filePath
+  66    Export Records [ File Name: “$filePath”; Create folders:No; Character Set: “Unicode (UTF-8)”; Field Order: VirtualListRows::RowData ]
+        [ No dialog ]
+        NoInteract state=True
+        CreateDirectories state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        AutoOpen state=False
+        CreateEmail state=False
+        Profile FieldDelimiter=" " IsPredefined=-1 FieldNameRow=-1 DataType=TABS
+        UniversalPathList: $filePath
+        ExportOptions FormatUsingCurrentLayout=False CharacterSet=UTF-8
+        ExportEntries
+          ExportEntry
+            Field table=VirtualListRows id=26 name=RowData
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    Go to Layout [ “Change” (Change) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=21 name=Change
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Show Custom Dialog [ Title: "Change Log"; Message: "A change log has been saved to your desktop in markdown format."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

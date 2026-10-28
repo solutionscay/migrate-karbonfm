@@ -1,0 +1,453 @@
+# script 309: Import Copied Tables to JSON Schema
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Public
+# source: ScriptCatalog/Script[@id=309]
+# steps: 80 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=253 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Create root
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $json; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   6    Set Variable [ $json; Value:JSONSetElement ( $json ; "$id" ; "http://karbon.geistinteractive.net/karbon.json" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   7    Set Variable [ $json; Value:JSONSetElement ( $json ; "type" ; "object" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   8    Set Variable [ $json; Value:JSONSetElement ( $json ; "definitions" ; "{}" ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   9    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" ; "{}" ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $ApiGeneratorId; Value:ApiGenerator::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $ApiGeneratorId
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $clip; Value:GLOBALS::ClipXml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: GLOBALS::ClipXml#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+  16 // Set Variable [ $clip; Value:clip_GetFMxml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_GetFMxml
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+  17    Set Variable [ $tableIndex; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $tableIndex
+  18    Set Variable [ $tableCount; Value:GetAsNumber ( <Function Missing> ( $clip ; "count(//BaseTable/@name)"  ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $tableCount
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #Loop through all copied tables
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Exit Loop If [ $tableIndex > $tableCount ]
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #Get field metadata as a list of JSON objects
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $thisTable; Value:List ( 
+        
+        	"<fmxmlsnippet type=\"FMObjectList\">" ; 
+        
+        	<Function Missing> ( $clip ; "//BaseTable[" & $tableIndex & "]" ; "" ; False ) ; 
+        
+        	"</fmxmlsnippet>" ; 
+        
+        	""
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisTable
+  26    Set Variable [ $tableName; Value:<Function Missing> ( $thisTable ; "//BaseTable/@name" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $tableName
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #Create the property object for this table
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName ; "object" ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  30    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & ".$id" ; "/properties/" & $tableName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  31    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & ".type" ; "object" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  32    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & ".fmp-table-name" ; $tableName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #Insert fields into schema
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $exclusionList; Value:List ( 
+        
+        	"CreationAccountName" ; 
+        	"CreationTimestamp" ; 
+        	"ModificationAccountName" ; 
+        	"ModificationCount" ; 
+        	"ModificationTimestamp" ; 
+        	"ONE" ; 
+        	"AsJSON" ; 
+        	"z_xJoin" 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $exclusionList
+  37    Set Variable [ $param; Value:JSONSetElement ( "{}" ; 
+        
+        	[ "exclusionList" ; $exclusionList ; JSONString ] ; 
+        	[ "clip" ; $thisTable ; JSONString ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  38    Perform Script [ “Get Field Metadata as JSON”; Parameter: $param ]
+        DisableStepCollapsed state=False
+        Script id=230 name="Get Field Metadata as JSON"
+  39    Set Variable [ $fields; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $fields
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $fieldIndex; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $fieldIndex
+  42    Set Variable [ $fieldCount; Value:ValueCount ( $fields ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldCount
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Exit Loop If [ $fieldIndex > $fieldCount ]
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #Get field metadata as a list of JSON objects
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Variable [ $thisField; Value:GetValue ( $fields ; $fieldIndex ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisField
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Variable [ $fieldName; Value:JSONGetElement ( $thisField ; "name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldName
+  51    Set Variable [ $fmpDataType; Value:JSONGetElement ( $thisField ; "fmpDataType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $fmpDataType
+  52    Set Variable [ $dataType; Value:JSONGetElement ( $thisField ; "dataType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataType
+  53    Set Variable [ $readOnly; Value:JSONGetElement ( $thisField ; "readOnly" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $readOnly
+  54    Set Variable [ $comment; Value:JSONGetElement ( $thisField ; "comment" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $comment
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName ; "object" ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  57    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".$id" ; "/properties/" & $tableName & "/" & $fieldName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  58    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".type" ; $dataType ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  59    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".title" ; "" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  60    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".description" ; $comment ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  61    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".default" ; "" ; "json" & $dataType ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  62    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".examples" ; "" ; JSONArray ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  63    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".readOnly" ; $readOnly ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  64    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".enum" ; "[]" ; JSONArray ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  65    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".fmp-path" ; $tableName & "::" & $fieldName ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  66    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".fmp-data-type" ; $fmpDataType ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  67    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".fmp-param" ; 1 ; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONBoolean
+        Name: $json
+  68    Set Variable [ $json; Value:JSONSetElement ( $json ; "properties" & "." & $tableName & "." & $fieldName & ".fmp-pluck-to" ; "" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Variable [ $fieldIndex; Value:$fieldIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $fieldIndex
+  72    End Loop
+        DisableStepCollapsed state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Set Variable [ $tableIndex; Value:$tableIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $tableIndex
+  76    End Loop
+        DisableStepCollapsed state=False
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Set Field [ ApiGenerator::JsonSchema; JSONFormatElements ( $json ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONFormatElements
+        Field table=ApiGenerator id=26 name=JsonSchema
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Exit Script [ Result: $new ]
+        DisableStepCollapsed state=False

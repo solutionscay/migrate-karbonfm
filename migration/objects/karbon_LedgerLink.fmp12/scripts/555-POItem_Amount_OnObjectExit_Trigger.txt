@@ -1,0 +1,152 @@
+# script 555: POItem Amount OnObjectExit Trigger
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Purchase Order Interface
+# source: ScriptCatalog/Script[@id=555]
+# steps: 38 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=541 groupCollapsed=True includeInMenu=False
+
+   1    #PURPOSE: provide the same auto-calculations as QBO interface
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #NOTE: attach to POItem::amount field on the PO Detail layout
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $detailType; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $detailType
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #Item based Expense Line Item
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ $detailType = "ItemBasedExpenseType" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Field [ PurchaseOrderLine_ItemBasedExpenseLineDetail::amount; Round ( PurchaseOrderLine_ItemBasedExpenseLineDetail::amount ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, PurchaseOrderLine_ItemBasedExpenseLineDetail::amount#6
+        Field table=PurchaseOrderLine_ItemBasedExpenseLineDetail id=6 name=amount
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ not IsEmpty ( PurchaseOrderLine_ItemBasedExpenseLineDetail::unitPrice  ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, PurchaseOrderLine_ItemBasedExpenseLineDetail::unitPrice#7
+  11    #unitPrice can have more precision (7 decimal places) than the amount field (2 decimal places)
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #adjust the unitPrice based on current amount ONLY if the amount would be different after rounding
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $qty; Value:If ( IsEmpty ( PurchaseOrderLine_ItemBasedExpenseLineDetail::qty ) ; 1 ; PurchaseOrderLine_ItemBasedExpenseLineDetail::qty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, PurchaseOrderLine_ItemBasedExpenseLineDetail::qty#8
+        Name: $qty
+  14    Set Variable [ $amount; Value:Round ( PurchaseOrderLine_ItemBasedExpenseLineDetail::unitPrice * $qty ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, PurchaseOrderLine_ItemBasedExpenseLineDetail::unitPrice#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $amount
+  15    If [ $amount ≠ PurchaseOrderLine_ItemBasedExpenseLineDetail::amount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: PurchaseOrderLine_ItemBasedExpenseLineDetail::amount#6
+  16    Set Variable [ $unitPrice; Value:Round ( PurchaseOrderLine_ItemBasedExpenseLineDetail::amount / $qty ; 7 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, PurchaseOrderLine_ItemBasedExpenseLineDetail::amount#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $unitPrice
+  17    Set Field [ PurchaseOrderLine_ItemBasedExpenseLineDetail::unitPrice; $unitPrice ]
+        DisableStepCollapsed state=False
+        Field table=PurchaseOrderLine_ItemBasedExpenseLineDetail id=7 name=unitPrice
+  18    End If
+        DisableStepCollapsed state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #Accountbased Expense Line Item
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Field [ PurchaseOrderLine_AccountBasedExpenseLineDetail::amount; Round ( PurchaseOrderLine_AccountBasedExpenseLineDetail::amount ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, PurchaseOrderLine_AccountBasedExpenseLineDetail::amount#6
+        Field table=PurchaseOrderLine_AccountBasedExpenseLineDetail id=6 name=amount
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ not IsEmpty ( PurchaseOrderLine_AccountBasedExpenseLineDetail::unitPrice  ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, PurchaseOrderLine_AccountBasedExpenseLineDetail::unitPrice#7
+  26    #unitPrice can have more precision (7 decimal places) than the amount field (2 decimal places)
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #adjust the unitPrice based on current amount ONLY if the amount would be different after rounding
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $qty; Value:If ( IsEmpty ( PurchaseOrderLine_AccountBasedExpenseLineDetail::qty ) ; 1 ; PurchaseOrderLine_AccountBasedExpenseLineDetail::qty ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, PurchaseOrderLine_AccountBasedExpenseLineDetail::qty#8
+        Name: $qty
+  29    Set Variable [ $amount; Value:Round ( PurchaseOrderLine_AccountBasedExpenseLineDetail::unitPrice * $qty ; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, PurchaseOrderLine_AccountBasedExpenseLineDetail::unitPrice#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $amount
+  30    If [ $amount ≠ PurchaseOrderLine_AccountBasedExpenseLineDetail::amount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: PurchaseOrderLine_AccountBasedExpenseLineDetail::amount#6
+  31    Set Variable [ $unitPrice; Value:Round ( PurchaseOrderLine_AccountBasedExpenseLineDetail::amount / $qty ; 7 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Round, PurchaseOrderLine_AccountBasedExpenseLineDetail::amount#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $unitPrice
+  32    Set Field [ PurchaseOrderLine_AccountBasedExpenseLineDetail::unitPrice; $unitPrice ]
+        DisableStepCollapsed state=False
+        Field table=PurchaseOrderLine_AccountBasedExpenseLineDetail id=7 name=unitPrice
+  33    End If
+        DisableStepCollapsed state=False
+  34    End If
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    End If
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,214 @@
+# script 18: Send QBO Request
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO / Public
+# source: ScriptCatalog/Script[@id=18]
+# steps: 51 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=58 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Lower level API
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # Makes the QBO request and refreshes token if necessary
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {object} request
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @returns {object} response
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    ##proxy2 replace
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $request; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  15    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  16    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #make the request
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “_Send Request”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=19 name="_Send Request"
+  21    Set Variable [ $response; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $code; Value:JSONGetElement ( $response ; "code" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $code
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    If [ $code = 200 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $Fault; Value:JSONGetElement ( $response; "body.Fault" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Fault
+  28    If [ not IsEmpty ( $Fault ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  29    Set Variable [ $error; Value:QBO.Error.ServerError ( "Sending request"  ;  JSONGetElement($response; "body" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error.ServerError, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  30    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  31    End If
+        DisableStepCollapsed state=False
+  32    End If
+        DisableStepCollapsed state=False
+  33    If [ $code > 499 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $error; Value:QBO.Error.ServerError ( "Sending request"  ;  JSONGetElement($response; "body" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error.ServerError, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  35    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  36    Else If [ $code = 401 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $error; Value:QBO.Error.UnAuthorized ( "Sending request"  ;  JSONGetElement($response; "body" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error.UnAuthorized, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  38    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  39    Else If [ $code > 399 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $error; Value:QBO.Error.BadRequest ( "Sending request"  ;  
+        
+        
+        JSONSetElement ( "";
+        
+        ["response"; JSONGetElement($response; "body" ); ""];
+        ["request"; $request ; ""]
+        
+        
+         )
+        
+        
+        
+        
+        
+        
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error.BadRequest, fn:JSONSetElement, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  41    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  42    End If
+        DisableStepCollapsed state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    If [ Error.IsError ( $response ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  46    Exit Script [ Result: $response ]
+        DisableStepCollapsed state=False
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $data; Value:JSONGetElement( $response ; "body") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False

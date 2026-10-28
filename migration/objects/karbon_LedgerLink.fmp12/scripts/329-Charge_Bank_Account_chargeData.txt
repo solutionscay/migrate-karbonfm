@@ -1,0 +1,142 @@
+# script 329: Charge Bank Account ( {chargeData} )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO Payments / Public
+# source: ScriptCatalog/Script[@id=329]
+# steps: 34 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=324 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #@param {object} data
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #@param {string} data.amount Amount of the transaction. Valid values range 0.00 through 99999.99.
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {string} data.token Opaque representation of the credit card associated with this charge
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} data.paymentMode - the payment mode. This is also known as the SEC Code. Valid options include:
+        								WEB—Internet-initiated entry mode, used for internet transactions.
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@param {string} data.paymentMode - the payment mode. This is also known as the SEC Code. Valid options include:
+        								WEB—Internet-initiated entry mode, used for internet transactions.
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $data; Value:JSON.Format ( Get ( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  19    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  20    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  21    End If
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    # validate the JSON for required props, and logic
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $error; Value:JSON.Validator.SetJSON ( $data) & JSON.Validator.ApplyRules(List(
+        
+        
+        JSON.Validate.IsRequired ( "amount" );
+        JSON.Validate.IsRequired ( "token" ) ;
+         JSON.Validate.IsRequired ( "paymentMode" ) 
+        )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validator.SetJSON, cf:JSON.Validator.ApplyRules, fn:List, cf:JSON.Validate.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  25    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  26    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $request; Value:JSONSetElement ( "" ; 
+        
+        ["data" ; $data; JSONObject] ;
+        ["method" ; "POST"; JSONString ];
+        ["path" ; "/echecks"; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Perform Script [ “Send Payment Request( {request} )”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=340 name="Send Payment Request( {request} )"
+  33    Set Variable [ $response; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  34    Exit Script [ Result: $response ]
+        DisableStepCollapsed state=False

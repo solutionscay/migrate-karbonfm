@@ -1,0 +1,43 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+karbon_kontacts.fmp12/layouts/86-Items.txt,233fa0ec2d26423127169fdcb9b30aa5f95fb1217907f75cc54d271e2622938c,layouts,karbon_kontacts.fmp12,86,Items,list,"Item (base Item, karbon_data.fmp12)","key 191 button (icon) | hidden when in Find mode
+key 224 text “DEV” | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)
+key 226 button (icon) | hidden when the server type is ""Production"" or in Find mode (DEV marker shows only on non-production)
+key 234 text “Showing {{FoundCount}} of {{TotalRecordCount}} Records” | hidden when the found set equals all records (nothing is narrowed) (rule not applied in Find mode)
+key 235 button “Show All” | hidden when the found set equals all records (nothing is narrowed) (rule not applied in Find mode)","key 214 button (icon) | when BrowserNav.SaveNavHistory is evaluated (side effect only: it records the visited layout in the $$BrowserNav history; the item has no Format) | none
+key 218 field Globals::RecordNav | when the typed record number (field value) differs from the current record number | style
+key 81 field Item::name | when this row is the active record | style","layout | OnLayoutEnter | id 345 “Sort Items by Name OnLayout Enter Trigger” | sorts Items by fully qualified name (kept sorted)
+key 218 field Globals::RecordNav | OnObjectEnter | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""Open""
+key 218 field Globals::RecordNav | OnObjectExit | id 382 “Record Nav” | record navigation: next, previous, toggle omitted-only (found set) or exit, by script parameter | param ""exit""
+key 239 popover [FindPopover] | OnObjectEnter | id 248 “Trigger: Set Up QuickFind Popover” | clears the QuickFind global (with triggers disabled) and focuses the QuickFind field
+key 240 field Globals::QuickFind | OnObjectSave | id 250 “Perform QuickFind” | runs Perform Quick Find on the QuickFind field; shows a no-records dialog on error, else closes the popover","key 191 (icon) | Perform Script [ “Open Card - UtilityItem { ItemDate }” ] (script id 512) | param Item::AsJSON (field value)
+key 212 (icon) | Perform Script [ “Display Main Nav” ] (script id 105)
+key 214 (icon) | Perform Script [ “Browser Nav (forward or backward)” ] (script id 466) | param ""Backward""
+key 215 (icon) | Perform Script [ “Browser Nav (forward or backward)” ] (script id 466) | param ""Forward""
+key 216 {{RecordNumber}} | no step
+key 217 {{RecordNumber}} | no step
+key 220 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""prev""
+key 221 (icon) | Perform Script [ “Record Nav” ] (script id 382) | param ""next""
+key 223 calc If ( /* Find mode requests*/ Get (… | Perform Script [ “Record Nav” ] (script id 382) | param ""ToggleFoundSet""
+key 226 (icon) | Perform Script [ “Add Pending Change to Build File” ] (script id 524)
+key 228 calc ""Customers"" | Perform Script [ “Sales Nav” ] (script id 506) | param ""Customers""
+key 229 calc ""Opportunities"" | Perform Script [ “Sales Nav” ] (script id 506) | param ""Leads""
+key 230 calc ""Transactions"" | Perform Script [ “Sales Nav” ] (script id 506) | param ""Sales""
+key 231 calc ""Items"" | Perform Script [ “Sales Nav” ] (script id 506) | param ""Items""
+key 232 calc ""Payments"" | Perform Script [ “Sales Nav” ] (script id 506) | param ""Payments""
+key 233 Showing {{FoundCount}} of {{TotalRecordCount}} Records | no step
+key 235 Show All | Show All Records
+key 237 (icon) | Perform Script [ “btn: New Item” ] (script id 427)
+key 238 (icon) | opens popover ""Find Opportunities""
+key 241 Show All | Perform Script [ “Close Find Popover and Show All” ] (script id 251)
+key 243 (icon) | Perform Script [ “Get Help” ] (script id 478)","key 214 | name of the previous layout in the browser-style history (BrowserNav.Tooltip), or ""Nowhere to go…""
+key 215 | name of the next layout in the browser-style history (BrowserNav.Tooltip), or ""Nowhere to go…""",key 80 | Item | sort none | none,Boolean,page,
+karbon_kontacts.fmp12/layouts/135-Card_-_Items.txt,70655d03da6c7ddf2c80b3cb05753429d9e4e01b8a11a4e9f9174706095b019a,layouts,karbon_kontacts.fmp12,135,Card - Items,dialog,"Item (base Item, karbon_data.fmp12)",none,key 81 field Item::name | when this row is the active record | style,none,key 199 Save | Perform Script [ “Close Window” ] (script id 344),none,key 80 | Item | sort none | none,"Boolean
+LL Accounts Asset Id
+LL Accounts COGS Id
+LL Accounts Income Id",modal,
+karbon_kontacts.fmp12/layouts/136-Card_-_UtilityItem.txt,5be31f0ab93c1d14735f140b843f98a28149e1b202bb54779b19bd134c123e2d,layouts,karbon_kontacts.fmp12,136,Card - UtilityItem,dialog,"UtilityItem (base UtilityItem, karbon_kontacts.fmp12)","key 69 text “Qty On Hand” | hidden when UtilityItem::trackQtyOnHand is false/empty (rule not applied in Find mode)
+key 95 field UtilityItem::qtyOnHand | hidden when UtilityItem::trackQtyOnHand is false/empty (rule not applied in Find mode)",none,none,key 81 Save | Perform Script [ “btn: Save Card - UtilityItem” ] (script id 513),none,none,"Boolean
+LL Accounts Asset Id
+LL Accounts COGS Id
+LL Accounts Income Id
+Item Type",modal,

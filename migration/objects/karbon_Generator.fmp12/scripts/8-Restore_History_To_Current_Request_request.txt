@@ -1,0 +1,336 @@
+# script 8: Restore History To Current Request ( request )
+# file: karbon_Generator.fmp12
+# folder: App Modules / Requests / Private
+# source: ScriptCatalog/Script[@id=8]
+# steps: 78 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   3    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   4    Set Variable [ $requestJSON; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $requestJSON
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #the object maybe wrapped with some metadata
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $request; Value:jsonGet($requestJSON ; "request" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+   8    If [ IsEmpty ( $request ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   9    #it wasn't wrapped
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $request; Value:$requestJSON ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Field [ Requests::urlEntry; jsonGet($request ; "url") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=1 name=urlEntry
+  17    Set Field [ Requests::body; jsonGet($request ; "body") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=18 name=body
+  18    Set Field [ Requests::basicAuthPassword; jsonGet($request ; "auth.password") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=10 name=basicAuthPassword
+  19    Set Field [ Requests::basicAuthUser; jsonGet($request ; "auth.user") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=9 name=basicAuthUser
+  20    Set Field [ Requests::method; jsonGet($request ; "method") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=2 name=method
+  21    Set Field [ Requests::body; jsonGet($request ; "data") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=18 name=body
+  22    Set Field [ Requests::uoteData; jsonGet($request ; "dataQuoted") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=30 name=uoteData
+  23    If [ Requests::uoteData ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Requests::uoteData#30
+  24    Set Field [ Requests::body; Evaluate ( Requests::body ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Evaluate, Requests::body#18
+        Field table=Requests id=18 name=body
+  25    End If
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27 // Truncate Table [ No dialog; Table: “Headers” ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        BaseTable id=132 comment="" name=Headers
+  28 // Truncate Table [ No dialog; Table: “QueryParameters” ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        BaseTable id=131 comment="" name=QueryParameters
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Go to Related Record [ From table: “QueryParameters”; Using layout: “QueryParameters” (QueryParameters) ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065091 name=QueryParameters
+        Layout id=2 name=QueryParameters
+  32    Set Variable [ $error; Value:Get (LastError) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LastError
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  33    If [ not $error ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  34    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  35    End If
+        DisableStepCollapsed state=False
+  36    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Go to Related Record [ From table: “Headers”; Using layout: “Headers” (Headers) ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065092 name=Headers
+        Layout id=3 name=Headers
+  40    Set Variable [ $error; Value:Get (LastError) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LastError
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  41    If [ not $error ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  42    Delete All Records
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  43    End If
+        DisableStepCollapsed state=False
+  44    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Variable [ $query; Value:jsonGet($request; "query") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $query
+  49    Set Variable [ $queryParams; Value:jsonGetKeyList($query) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGetKeyList
+        Repetition
+          Calculation:
+            | 1
+        Name: $queryParams
+  50    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  51    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $param; Value:GetValue ( $queryParams ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  53    Exit Loop If [ IsEmpty( $param ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  54    Go to Object [ Object Name: "QueryPortal"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  55    Go to Portal Row
+        [ Select; Last ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  56    Set Field [ QueryParameters::name;  $param ]
+        DisableStepCollapsed state=False
+        Field table=QueryParameters id=2 name=name
+  57    Set Field [ QueryParameters::value; jsonGet($query; $param) ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=QueryParameters id=3 name=value
+  58    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  59    End Loop
+        DisableStepCollapsed state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Variable [ $headers; Value:jsonGet($request; "headers") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $headers
+  63    Set Variable [ $headerList; Value:jsonGetKeyList($headers) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGetKeyList
+        Repetition
+          Calculation:
+            | 1
+        Name: $headerList
+  64    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  65    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $header; Value:GetValue ( $headerList ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $header
+  67    Exit Loop If [ IsEmpty( $header ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  68    Go to Object [ Object Name: "HeadersPortal"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  69    Go to Portal Row
+        [ Select; Last ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  70    Set Field [ Headers::name;  $header ]
+        DisableStepCollapsed state=False
+        Field table=Headers id=2 name=name
+  71    Set Field [ Headers::value; jsonGet($headers; $header) ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Headers id=3 name=value
+  72    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  73    End Loop
+        DisableStepCollapsed state=False
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    Set Variable [ $response; Value:jsonGet($request; "response") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  76    Perform Script [ “Set Response Into Fields”; Parameter: $response ]
+        DisableStepCollapsed state=False
+        Script id=26 name="Set Response Into Fields"
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False

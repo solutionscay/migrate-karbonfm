@@ -1,0 +1,116 @@
+# script 19: Make the Map
+# file: karbon_Generator.fmp12
+# folder: App Modules / Maps / Private
+# source: ScriptCatalog/Script[@id=19]
+# steps: 26 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=171 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Perform Script [ “Flatten( JSON )”; Parameter: FieldMap::JSONDocument ]
+        DisableStepCollapsed state=False
+        refs: FieldMap::JSONDocument#5
+        Script id=18 name="Flatten( JSON )"
+   3    Set Variable [ $props; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $props
+   4    Set Variable [ $idFieldMap; Value:FieldMap::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: FieldMap::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $idFieldMap
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Go to Layout [ “FieldMapItems” (FieldMapItems) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=7 name=FieldMapItems
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+   9    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $prop; Value:GetValue ( $props ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $prop
+  11    Exit Loop If [ IsEmpty( $prop ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  12    New Record/Request
+        DisableStepCollapsed state=False
+  13    Set Field [ FieldMapItems::idFieldMap; $idFieldMap ]
+        DisableStepCollapsed state=False
+        Field table=FieldMapItems id=2 name=idFieldMap
+  14    Set Variable [ $null; Value:Let(
+        [
+        t = $prop;
+        sep = Char(166);
+        c = PatternCount(t; sep);
+        p=Position(t ; sep; 1; c);
+        path = Left(t;p-1);
+        $path = Substitute(path; sep ; ".");
+        $value = Middle(t; p+1; 100000000)
+        ];
+        
+        ""
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Char, fn:PatternCount, fn:Position, fn:Left, fn:Substitute, fn:Middle
+        Name: $null
+  15    Set Field [ FieldMapItems::path; $path ]
+        DisableStepCollapsed state=False
+        Field table=FieldMapItems id=3 name=path
+  16    Set Field [ FieldMapItems::value; $value ]
+        DisableStepCollapsed state=False
+        Field table=FieldMapItems id=5 name=value
+  17    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  18    End Loop
+        DisableStepCollapsed state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Perform Script [ “Show Brief Message in Popover ( title ; msg )”; Parameter: "New Map Created!" & ¶ &  "Please review..." ]
+        DisableStepCollapsed state=False
+        Script id=182 name="Show Brief Message in Popover ( title ; msg )"
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False

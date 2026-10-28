@@ -1,0 +1,201 @@
+# script 261: Convert QBO Payment to Karbon Payment
+# file: karbon_tester.fmp12
+# folder: Modules / LedgerLink
+# source: ScriptCatalog/Script[@id=261]
+# steps: 29 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=180 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $TEST_Group; Value:"LedgerLink" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Group
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $TEST_Subject; Value:"Convert QBO Payment To Karbon Payment" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Subject
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $TEST_Case; Value:"Given a QBO Payment" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Insert Text [ $payment ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |     "CustomerRef": {
+          |       "value": "20",
+          |       "name": "Red Rock Diner"
+          |     },
+          |     "DepositToAccountRef": {
+          |       "value": "4"
+          |     },
+          |     "TotalAmt": 65.0,
+          |     "UnappliedAmt": 10.0,
+          |     "ProcessPayment": false,
+          |     "domain": "QBO",
+          |     "sparse": false,
+          |     "Id": "163",
+          |     "SyncToken": "0",
+          |     "MetaData": {
+          |       "CreateTime": "2015-01-16T15:08:12-08:00",
+          |       "LastUpdatedTime": "2015-01-16T15:08:12-08:00"
+          |     },
+          |     "TxnDate": "2015-01-16",
+          |     "Line": [
+          |       {
+          |         "Amount": 55.0,
+          |         "LinkedTxn": [
+          |           {
+          |             "TxnId": "70",
+          |             "TxnType": "Invoice"
+          |           }
+          |         ],
+          |         "LineEx": {
+          |           "any": [
+          |             {
+          |               "name": "{http://schema.intuit.com/finance/v3}NameValue",
+          |               "declaredType": "com.intuit.schema.finance.v3.NameValue",
+          |               "scope": "javax.xml.bind.JAXBElement$GlobalScope",
+          |               "value": {
+          |                 "Name": "txnId",
+          |                 "Value": "70"
+          |               },
+          |               "nil": false,
+          |               "globalScope": true,
+          |               "typeSubstituted": false
+          |             },
+          |             {
+          |               "name": "{http://schema.intuit.com/finance/v3}NameValue",
+          |               "declaredType": "com.intuit.schema.finance.v3.NameValue",
+          |               "scope": "javax.xml.bind.JAXBElement$GlobalScope",
+          |               "value": {
+          |                 "Name": "txnOpenBalance",
+          |                 "Value": "71.00"
+          |               },
+          |               "nil": false,
+          |               "globalScope": true,
+          |               "typeSubstituted": false
+          |             },
+          |             {
+          |               "name": "{http://schema.intuit.com/finance/v3}NameValue",
+          |               "declaredType": "com.intuit.schema.finance.v3.NameValue",
+          |               "scope": "javax.xml.bind.JAXBElement$GlobalScope",
+          |               "value": {
+          |                 "Name": "txnReferenceNumber",
+          |                 "Value": "1024"
+          |               },
+          |               "nil": false,
+          |               "globalScope": true,
+          |               "typeSubstituted": false
+          |             }
+          |           ]
+          |         }
+          |       }
+          |     ]
+          |   }
+        Field: $payment
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “Convert QBO Payment into Karbon Payment” from file: “Karbon_kontroller”; Parameter: $payment ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=403 name="Convert QBO Payment into Karbon Payment" in=karbon_kontroller.fmp12
+  14    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #Basic tests
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  19    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #Payment props
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "amount" ; "65" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,218 @@
+# script 214: Open EmailAddress Picker( data )
+# file: Picker Module.fmp12
+# folder: Modules / EmailAddress Picker
+# source: ScriptCatalog/Script[@id=214]
+# steps: 52 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=207 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-07-16 dave@geistinteractive.com - updated
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #init
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $defaultSettings; Value:JSONFormatElements ( JSONSetElement ( "{}" ; 
+        	[ "placeholderText" ; "Search..." ; JSONString ] ; 
+        	[ "footerMessage" ; "" ; JSONString ] ; 
+        	[ "cardTop" ; "" ; JSONNull ] ; 
+        	[ "cardLeft" ; "" ; JSONNull ] ; 
+        	[ "windowTop" ; "" ; JSONNull ] ; 
+        	[ "windowLeft" ; "" ; JSONNull ] 
+        ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONString, fn:JSONNull
+        Repetition
+          Calculation:
+            | 1
+        Name: $defaultSettings
+   9    If [ not IsEmpty ( $parameters ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  10    Set Field [ Picker::Settings; JSON.Merge ( $defaultSettings ; $parameters ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.Merge
+        Field table=Picker id=4 name=Settings
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $cardTop; Value:JSONGetElement ( Picker::Settings ; "cardTop" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $cardTop
+  15    Set Variable [ $cardLeft; Value:JSONGetElement ( Picker::Settings ; "cardLeft" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $cardLeft
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $windowName; Value:JSONGetElement ( Picker::Settings ; "windowName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowName
+  18    Set Variable [ $windowTop; Value:JSONGetElement ( Picker::Settings ; "windowTop" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowTop
+  19    Set Variable [ $windowLeft; Value:JSONGetElement ( Picker::Settings ; "windowLeft" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Settings#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $windowLeft
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #Clear search and result fields
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Field [ Picker::Search_Field; "" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+  24    Set Field [ Picker::Results; "" ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=2 name=Results
+  25    Set Field [ VIRTUALLISTS::foundCount; 0 ]
+        DisableStepCollapsed state=False
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #Init variables
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $$FirstFindHasBeenPerformed; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$FirstFindHasBeenPerformed
+  29    Set Variable [ $$PickerSearchStatus; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$PickerSearchStatus
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #Validate VirtualList
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Perform Script [ “Reset Rows Table” ]
+        DisableStepCollapsed state=False
+        Script id=85 name="Reset Rows Table"
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #Setup picker window
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    New Window [ Style: Card; Name: $windowName; Using layout: “Email Address Picker” (VIRTUALLISTS_Rows); Height: 570; Width: 500; Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=37 name="Email Address Picker"
+  36 // New Window [ Style: Card; Name: $windowName; Using layout: “Email Address Picker” (VIRTUALLISTS_Rows); Height: 80; Width: 500; Top: $cardTop; Left: $cardLeft; Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=37 name="Email Address Picker"
+  37    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  38    New Window [ Style: Dialog; Name: $windowName; Using layout: “Email Address Picker” (VIRTUALLISTS_Rows); Height: 80; Width: 500; Top: $windowTop; Left: $windowLeft; Close: Yes; Minimize: No; Maximize: No; Resize: Yes; Menu Bar: No; Dim parent window: No; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=No Toolbars=No MenuBar=No Style=Dialog Close=Yes Minimize=No Maximize=No Resize=Yes Styles=3221291524
+        Layout id=37 name="Email Address Picker"
+  39    End If
+        DisableStepCollapsed state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #OPTIONAL: start with all records
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Show All Records
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #OPTIONAL: start with empty set
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Show Omitted Only
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Go to Object [ Object Name: "searchField"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False

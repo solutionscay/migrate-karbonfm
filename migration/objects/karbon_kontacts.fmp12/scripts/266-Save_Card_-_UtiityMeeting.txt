@@ -1,0 +1,106 @@
+# script 266: Save Card - UtiityMeeting
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / Meeting
+# source: ScriptCatalog/Script[@id=266]
+# steps: 21 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=263 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-10-21 dave@geistinteractive.com - no longer using AsJson calc
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "ActivityMessage" ; UtilityMeeting::ActivityMessage ; JSONString ];
+        	[ "AddressId" ; UtilityMeeting::AddressId ; JSONString ];
+        	[ "CreatorId" ; session::CurrentUserPartyId ; JSONString ];
+        	[ "EndDate" ; UtilityMeeting::EndDate ; JSONString ];
+        	[ "EndTime" ; UtilityMeeting::EndTime ; JSONString ];
+        	[ "Id" ; UtilityMeeting::Id ; JSONString ];
+        	[ "Location" ; UtilityMeeting::Location ; JSONString ];
+        	[ "EntityId" ; UtilityMeeting::EntityId ; JSONString ];
+        	[ "EntityTypeId" ; UtilityMeeting::<Field Missing> ; JSONNumber ];
+        	[ "PartyId" ; UtilityMeeting::PartyId ; JSONString ];
+        	[ "StartDate" ; UtilityMeeting::StartDate ; JSONString ];
+        	[ "StartTime" ; UtilityMeeting::StartTime ; JSONString ];
+        	[ "Subject" ; UtilityMeeting::Subject ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ IsEmpty  (Selected_Activity::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_Activity::Id#1
+   8    Set Variable [ $create; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $create
+   9    Perform Script [ “Create Meeting { data }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=545 name="Create Meeting { data }" in=karbon_kontroller.fmp12
+  10    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Perform Script [ “Edit Meeting { data }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=546 name="Edit Meeting { data }" in=karbon_kontroller.fmp12
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  17    #Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Show Custom Dialog [ Title: "Error"; Message: "This Meeting was not " & If ( $create; "created." ; "edited." ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  19    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  21    End If
+        DisableStepCollapsed state=False

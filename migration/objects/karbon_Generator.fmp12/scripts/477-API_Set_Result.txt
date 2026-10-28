@@ -1,0 +1,221 @@
+# script 477: API Set Result
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=477]
+# steps: 48 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Build result as JSONObject
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Insert Text [ $LineTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: [ keyOrIndexOrPath ; value ; type ]
+        Field: $LineTemplate
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Insert Text [ $result ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSONSetElement ( "{}" ;
+        Field: $result
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Exit Loop If [ IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ApiGeneratorLine::Id#1
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    If [ not ApiGeneratorLine::FmpIgnore and ApiGeneratorLine::FmpResult ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, ApiGeneratorLine::FmpIgnore#11, fn:and, ApiGeneratorLine::FmpResult#43
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $KeyName; Value:Quote ( ApiGeneratorLine::JsonPropertyName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Quote, ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $KeyName
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #2019-08-23 dave@geistinteractive.com - most results will be a field reference. This should reduce the amount of editing that needs to take place.
+        DisableStepCollapsed state=False
+        Restore state=False
+  21 // Set Variable [ $ValueName; Value:ApiGeneratorLine::JsonPropertyName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $ValueName
+  22    Set Variable [ $ValueName; Value:ApiGeneratorLine::FmpTableName & "::" & ApiGeneratorLine::FmpFieldName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::FmpTableName#10, ApiGeneratorLine::FmpFieldName#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $ValueName
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $Type; Value:Let ( [ 
+        
+        type = ApiGeneratorLine::type
+        
+        ] ; 
+        
+        // convert to FileMaker JSON type
+        Case (
+        
+        	type = "object" ; "JSONObject" ;
+        	type = "string" ; "JSONString" ;
+        	type = "number" ; "JSONNumber" ;
+        	type = "boolean" ; "JSONBoolean" ;
+        	type = "array" ; "JSONArray" ;
+        	type = "null" ; "JSONNull" ;
+        	Quote("")
+        
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, ApiGeneratorLine::type#23, fn:Case, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $Type
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    If [ IsEmpty ( $lineList ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  28    Insert Calculated Result [ $lineList; Substitute ( $LineTemplate ; 
+        	[ "keyOrIndexOrPath" ; $KeyName ] ; 
+        	[ "value" ; $ValueName ] ; 
+        	[ "type" ; $Type ]
+        ) ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: fn:Substitute
+        Field: $lineList
+  29    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #Terminate the prior line
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Insert Text [ $lineList ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Text: ;
+        Field: $lineList
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #And add a new one
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Insert Calculated Result [ $lineList; Substitute ( $LineTemplate ; 
+        	[ "keyOrIndexOrPath" ; $KeyName ] ; 
+        	[ "value" ; $ValueName ] ; 
+        	[ "type" ; $Type ]
+        ) ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        refs: fn:Substitute
+        Field: $lineList
+  35    End If
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    End Loop
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Insert Calculated Result [ $result; $lineList ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field: $result
+  44    Insert Text [ $result ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Text: )
+        Field: $result
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $resultAsScriptStep; Value:ScriptStep_InsertCalculatedResult ( "$result" ; $result ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult
+        Name: $resultAsScriptStep
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Exit Script [ Result: $ResultAsScriptStep ]
+        DisableStepCollapsed state=False

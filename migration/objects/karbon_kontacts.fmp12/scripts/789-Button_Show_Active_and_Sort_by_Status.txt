@@ -1,0 +1,41 @@
+# script 789: Button: Show Active and Sort by Status
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Opportunity
+# source: ScriptCatalog/Script[@id=789]
+# steps: 6 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=601 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Perform Find [ Specified Find Requests: Find Records; Criteria: Opportunity::ActiveInd: “1” ]
+        [ Restore ]
+        DisableStepCollapsed state=False
+        Restore state=True
+        Query
+          RequestRow operation=Include
+            Criteria
+              Field table=Opportunity id=59 name=ActiveInd
+              Text: 1
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Sort Records [ Keep records in sorted order; Specified Sort Order: Opportunity::StatusCached; ascending
+        Opportunity::Name; ascending ]
+        [ Restore; No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        SortList BlanksLast=False Maintain=True value=True
+          Sort type=Ascending
+            PrimaryField
+              Field table=Opportunity id=50 name=StatusCached
+          Sort type=Ascending
+            PrimaryField
+              Field table=Opportunity id=69 name=Name
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

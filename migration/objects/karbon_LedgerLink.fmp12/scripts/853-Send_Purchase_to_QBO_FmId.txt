@@ -1,0 +1,232 @@
+# script 853: Send Purchase to QBO ( FmId )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Public / Purchase
+# source: ScriptCatalog/Script[@id=853]
+# steps: 59 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=852 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Sends a purchase directly checking first to see if Vendors have been sent
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {string} fmId
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @returnSuccess {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @returnSuccess {number} error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @returnError {number} error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Entity; Value:"Purchase" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  17    Set Variable [ $FmId; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $FmId
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Call Key Fields, Build Config” ]
+        DisableStepCollapsed state=False
+        Script id=233 name="Call Key Fields, Build Config"
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #Vendor Check
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $VendorId; Value:SQL.GetColumn  ( Config ( "Purchase.fields.vendorId" ) ; Config ( "Purchase.fields.fmId" ) ; $fmID ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn, cf:Config
+        Repetition
+          Calculation:
+            | 1
+        Name: $VendorId
+  23    If [ IsEmpty ( $VendorId ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  24    Set Variable [ $error; Value:QBO.Error ( "You can't send an Purchase that doesn't have a Vendor associated with it" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  25    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #standard lookup
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    # get the vendor qbo ID
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $VendorQBOId; Value:QBO.LookupQBOId ( "Vendor" ; $VendorId ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupQBOId
+        Repetition
+          Calculation:
+            | 1
+        Name: $VendorQBOId
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #if it is empty we need to send the vendor first.
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    If [ IsEmpty ( $VendorQBOID ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  35    #dialog
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Show Custom Dialog [ Title: "Alert"; Message: "This vendor is not yet in QBO.¶¶Continue to create a new vendor in QBO.¶¶Cancel to research the vendor and manually assign its QBOId."; Default Button: “Cancel”, Commit: “Yes”; Button 2: “Continue”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Cancel"
+          Button 2 CommitState=False: "Continue"
+          Button 3 CommitState=False
+  37    If [ Get ( LastMessageChoice )=1  // cancel ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  38    Exit Script [  ]
+        DisableStepCollapsed state=False
+  39    End If
+        DisableStepCollapsed state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Perform Script [ “Send Vendor ( FmId )”; Parameter: $VendorId ]
+        DisableStepCollapsed state=False
+        Script id=858 name="Send Vendor ( FmId )"
+  42    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  43    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  44    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  45    End If
+        DisableStepCollapsed state=False
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #Finally Send the Purchase
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ;  "Purchase" ; JSONString ];
+        	[ "FmId" ; $FmId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  52    Perform Script [ “Send FMData To QBO ( {Entity , FmID} )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=302 name="Send FMData To QBO ( {Entity , FmID} )"
+  53    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  54    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  55    Show Custom Dialog [ Title: "Error"; Message: "Purchase was not sent!¶¶" & If ( not IsEmpty($result); JSONFormatElements ( $result ) ); Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If, fn:not, fn:IsEmpty, fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  56    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  57    End If
+        DisableStepCollapsed state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False

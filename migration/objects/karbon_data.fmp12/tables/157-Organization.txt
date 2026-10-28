@@ -1,0 +1,164 @@
+# table 157: Organization
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=157]
+# fields: 16
+# records: 1
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  Comment: Inherits from Party Id
+  AutoEnter allowEditing=False calculation=False
+    Calculation table=Organization (inactive):
+      | Get ( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Normal name=OrganizationName
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Organization:
+      | CleanText ( Self )
+      refs: cf:CleanText, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=86 dataType=Text fieldType=Summary name=IdList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=1 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=105 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=106 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=107 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=Organization (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=108 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=Organization:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=109 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=Organization (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=Organization (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=110 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Organization:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=129 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Organization (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=130 dataType=Text fieldType=Normal name=FederalTaxIdNumber
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=131 dataType=Text fieldType=Normal name=CompanyType
+  Comment: E.g., corporation, government, non-profit
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=133 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=Organization:
+    | Let ( 
+    | 
+    | AsJson = JSONSetElement ( "{}" ; 
+    | 	["Name" ; Organization::OrganizationName ; JSONString]; 
+    | 	["CompanyType" ; Organization::CompanyType ; JSONString]; 
+    | 	["Id" ; Organization::Id ; JSONString]; 
+    | 	["FederalTaxIdNumber" ; Organization::FederalTaxIdNumber ; JSONString ] 
+    | ) ; 
+    | 
+    | 
+    | 	JSON.Merge ( <Field Missing> ; Party::AsJson ) 
+    | 
+    | )
+    refs: fn:Let, fn:JSONSetElement, Organization::OrganizationName#19, fn:JSONString, Organization::CompanyType#131, Organization::Id#1, Organization::FederalTaxIdNumber#130, cf:JSON.Merge, Party::AsJson#137
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=134 dataType=Text fieldType=Calculated name=AsJsonWithRelated
+  Calculation table=Organization:
+    | Let ( 
+    | 
+    | AsJson = JSONSetElement ( "{}" ; 
+    | 	["Name" ; Organization::OrganizationName ; JSONString]; 
+    | 	["CompanyType" ; Organization::CompanyType ; JSONString]; 
+    | 	["Id" ; Organization::Id ; JSONString]; 
+    | 	["FederalTaxIdNumber" ; Organization::FederalTaxIdNumber ; JSONString ] 
+    | ) ; 
+    | 
+    | 
+    | 	JSON.Merge ( AsJson ; Party::AsJsonWithRelationships ) 
+    | 
+    | )
+    refs: fn:Let, fn:JSONSetElement, Organization::OrganizationName#19, fn:JSONString, Organization::CompanyType#131, Organization::Id#1, Organization::FederalTaxIdNumber#130, cf:JSON.Merge, Organization::AsJson#133, Party::AsJsonWithRelationships#138
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=135 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=Organization:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=136 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Organization:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

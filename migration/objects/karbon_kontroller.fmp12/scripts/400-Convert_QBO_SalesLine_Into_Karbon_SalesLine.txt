@@ -1,0 +1,473 @@
+# script 400: Convert QBO SalesLine Into Karbon SalesLine
+# file: karbon_kontroller.fmp12
+# folder: Modules / QuickBooks Online / Sales Transactions / Private
+# source: ScriptCatalog/Script[@id=400]
+# steps: 88 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=563 groupCollapsed=False includeInMenu=True
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Converts a QBO Line Into Karbon SalesLine
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} Line
+        DisableStepCollapsed state=False
+        Restore state=False
+   6 // Insert Text [ $EXAMPLE ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | "Line": [{
+          |             "Id": "1",
+          |             "LineNum": 1,
+          |             "Description": "Rock Fountain",
+          |             "Amount": 275.0,
+          |             "DetailType": "SalesItemLineDetail",
+          |             "SalesItemLineDetail": {
+          |                 "ItemRef": {
+          |                     "value": "5",
+          |                     "name": "Rock Fountain"
+          |                 },
+          |                 "UnitPrice": 275,
+          |                 "Qty": 1,
+          |                 "TaxCodeRef": {
+          |                     "value": "TAX"
+          |                 }
+          |             }
+          |         }, {
+          |             "Id": "2",
+          |             "LineNum": 2,
+          |             "Description": "Fountain Pump",
+          |             "Amount": 12.75,
+          |             "DetailType": "SalesItemLineDetail",
+          |             "SalesItemLineDetail": {
+          |                 "ItemRef": {
+          |                     "value": "11",
+          |                     "name": "Pump"
+          |                 },
+          |                 "UnitPrice": 12.75,
+          |                 "Qty": 1,
+          |                 "TaxCodeRef": {
+          |                     "value": "TAX"
+          |                 }
+          |             }
+          |         }, {
+          |             "Id": "3",
+          |             "LineNum": 3,
+          |             "Description": "Concrete for fountain installation",
+          |             "Amount": 47.5,
+          |             "DetailType": "SalesItemLineDetail",
+          |             "SalesItemLineDetail": {
+          |                 "ItemRef": {
+          |                     "value": "3",
+          |                     "name": "Concrete"
+          |                 },
+          |                 "UnitPrice": 9.5,
+          |                 "Qty": 5,
+          |                 "TaxCodeRef": {
+          |                     "value": "TAX"
+          |                 }
+          |             }
+          |         }, {
+          |             "Amount": 335.25,
+          |             "DetailType": "SubTotalLineDetail",
+          |             "SubTotalLineDetail": {}
+          |         }]
+        Field: $EXAMPLE
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@returnSuccess {object} SalesLine
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #See sample object above
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {object} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@history	Barbara Cooney - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $json; Value:JSON.Format ( Get(ScriptParameter) ; "formatting Script Parameter" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ Error.IsError ( $json ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  26    Exit Script [ Result: $json ]
+        DisableStepCollapsed state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28 // Set Variable [ $json; Value:JSONGetElement ( $json ; "Invoice.Line" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #PARSE JSON INTO VARIABLES FROM QBO LINE OBJECT
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $Description; Value:JSONGetElement( $json ; "Description" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Description
+  35    Set Variable [ $LineNum; Value:JSONGetElement( $json ; "LineNum" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $LineNum
+  36    Set Variable [ $Id; Value:JSONGetElement( $json ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  37    Set Variable [ $Amount; Value:JSONGetElement( $json ; "Amount" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Amount
+  38    Set Variable [ $SalesItemLineDetail.ItemRef.value; Value:JSONGetElement( $json ; "SalesItemLineDetail.ItemRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.ItemRef.value
+  39    Set Variable [ $SalesItemLineDetail.TaxCodeRef.value; Value:JSONGetElement( $json ; "SalesItemLineDetail.TaxCodeRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.TaxCodeRef.value
+  40    Set Variable [ $SalesItemLineDetail.UnitPrice; Value:JSONGetElement( $json ; "SalesItemLineDetail.UnitPrice" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.UnitPrice
+  41    Set Variable [ $SalesItemLineDetail.Qty; Value:JSONGetElement( $json ; "SalesItemLineDetail.Qty" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.Qty
+  42    Set Variable [ $ParentId; Value:JSONGetElement( $json ; "ParentId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ParentId
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #get Karbon FMId for Item
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $SalesItemLineDetail.ItemRef.value; Value:JSONGetElement( $json ; "SalesItemLineDetail.ItemRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.ItemRef.value
+  56    Set Variable [ $Entity; Value:"Item" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  57    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "QBOId" ; $SalesItemLineDetail.ItemRef.value ; JSONNumber ];
+        	[ "Entity" ; $Entity ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  58    Perform Script [ “Lookup FMId { QBOId, Entity }”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=271 name="Lookup FMId { QBOId, Entity }"
+  59    Set Variable [ $result; Value:Get ( ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  60    Set Variable [ $SalesItemLineDetail.ItemRef.value; Value:$result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesItemLineDetail.ItemRef.value
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    Set Variable [ $SalesItemLineDetail.TaxCodeRef.value; Value:If ( $SalesItemLineDetail.TaxCodeRef.value = "TAX" ; 1; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If
+        Name: $SalesItemLineDetail.TaxCodeRef.value
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $DetailType; Value:"SalesItemLineDetail" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $DetailType
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $fmId; Value:SQL.GetColumn2Fields ( SalesLine::id ; SalesLine::SalesTransactionId ; $ParentId ; SalesLine::qbo_id ; $id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn2Fields, SalesLine::id#1, SalesLine::SalesTransactionId#10, SalesLine::qbo_id#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $fmId
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #BUILD INTO JSON FOR KARBON SALESLINE
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Set Variable [ $json; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  75    Set Variable [ $json; Value:JSONSetElement( $json ; "Id" ; $FmId; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  76    Set Variable [ $json; Value:JSONSetElement( $json ; "description" ; $Description; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  77    Set Variable [ $json; Value:JSONSetElement( $json ; "qbo_lineNum" ; $LineNum; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  78    Set Variable [ $json; Value:JSONSetElement( $json ; "qbo_id" ; $id; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  79    Set Variable [ $json; Value:JSONSetElement( $json ; "amount" ; $Amount; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  80    Set Variable [ $json; Value:JSONSetElement( $json ; "DetailType" ; $DetailType ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  81    Set Variable [ $json; Value:JSONSetElement( $json ; "id_Item" ; $SalesItemLineDetail.ItemRef.value; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  82    Set Variable [ $json; Value:JSONSetElement( $json ; "taxable" ; $SalesItemLineDetail.TaxCodeRef.value; JSONBoolean ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  83    Set Variable [ $json; Value:JSONSetElement( $json ; "unitPrice" ; $SalesItemLineDetail.UnitPrice; JSONNumber ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  84    Set Variable [ $json; Value:JSONSetElement( $json ; "qty" ; $SalesItemLineDetail.Qty; JSONNumber ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    Exit Script [ Result: $json ]
+        DisableStepCollapsed state=False

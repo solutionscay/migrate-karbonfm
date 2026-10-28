@@ -1,0 +1,22 @@
+# custom function 52: Transaction.Storage.Push
+# file: karbon_Build.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=52]
+
+CustomFunction id=52 functionArity=4 visible=True parameters=nameSpace;keyOrIndexOrPath;value;type name=Transaction.Storage.Push
+  Calculation:
+    | 
+    | 
+    | Let(
+    | [
+    | path= nameSpace & "." & keyOrIndexOrPath;
+    | array = JSONGetElement ( $$Transaction.Store ; path );
+    | array = If( Left(array;1) = "?" ; "" ; array );
+    | 
+    | 
+    | array = JSON.Push ( array; value ; type );
+    | 
+    | $$Transaction.Store  = JSONSetElement($$Transaction.Store ; path; array ; JSONArray )
+    | ];
+    | ""
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:If, fn:Left, cf:JSON.Push, fn:JSONSetElement, fn:JSONArray

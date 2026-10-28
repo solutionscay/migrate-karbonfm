@@ -1,0 +1,216 @@
+# table 135: NetworkAddress
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=135]
+# fields: 20
+# records: 2
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False calculation=False
+    Calculation table=NetworkAddress (inactive):
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=Address
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=NetworkAddress:
+      | CleanText (  Lower( Self ) )
+      refs: cf:CleanText, fn:Lower, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Number fieldType=Normal name=PrimaryInd
+  Comment: True if this is the primary network address
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Normal name=EmailAddressInd
+  Comment: True if this is an email address. This should be set programmatically based on content and/or label.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Number fieldType=Normal name=WebAddressInd
+  Comment: True if this is an web address. This should be set programmatically based on content and/or label.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Calculated name=AddressAndNameOut
+  Calculation table=NetworkAddress:
+    | /*/* Some mail clients support different address forms. */
+    | 
+    | Case ( 
+    | 
+    | 	SystemPlatformMac ; 
+    | 		Quote( Party::FirstName & " " & Party::LastName ) & " <" & Address & ">" ;
+    | 
+    | 	SystemPlatformWin ; 
+    | 		Quote( Party::FirstName & " " & Party::LastName ) & " <" & Address & ">" ; 
+    | 
+    | 	SystemPlatformWin ; 
+    | 		Address 
+    | )*/
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Text fieldType=Summary name=AddressList
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=7 name=Address
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=32 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=34 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=NetworkAddress (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=NetworkAddress:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=NetworkAddress (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=NetworkAddress (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=NetworkAddress:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=NetworkAddress (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=41 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=NetworkAddress:
+    | Let ( [ 
+    | 	type = Case ( 
+    | 		EmailAddressInd ; 
+    | 			"email" ; 
+    | 		WebAddressInd ; 
+    | 			"web" ; 
+    | 			"other" 
+    | 	) ; 
+    | 
+    | 	purpose = JSON.ArrayFromRelated ( ContactMethodPurposeType::AsJsonNameOnly )
+    | 
+    | ] ; 
+    | 
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "Address" ; Address ; JSONString ];
+    | 	[ "Billing" ; ContactMethod::_BillingIndCached ; JSONBoolean ];
+    | 	[ "Comment" ; ContactMethod::Comment ; JSONString ];
+    | 	[ "Label" ; ContactMethod::Label ; JSONString ];
+    | 	[ "PartyId" ; ContactMethod::PartyId ; JSONString ];
+    | 	[ "Primary" ; PrimaryInd ; JSONBoolean ];
+    | 	[ "Purpose" ; purpose ; JSONArray ];
+    | 	[ "Type" ; type ; JSONString ]
+    |  
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:Case, NetworkAddress::EmailAddressInd#18, NetworkAddress::WebAddressInd#19, cf:JSON.ArrayFromRelated, ContactMethodPurposeType::AsJsonNameOnly#48, fn:JSONSetElement, NetworkAddress::Address#7, fn:JSONString, ContactMethod::_BillingIndCached#48, fn:JSONBoolean, ContactMethod::Comment#51, ContactMethod::Label#47, ContactMethod::PartyId#33, NetworkAddress::PrimaryInd#14, fn:JSONArray
+  Comment: The network address is now the parent JSON object instead of the ContactMethod. Created 2018-02-10 by Dave Graham.
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=42 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=NetworkAddress:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=43 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=NetworkAddress:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=44 dataType=Text fieldType=Calculated name=AsJsonEmailSearch
+  Calculation table=NetworkAddress:
+    | JSONSetElement ( "{}" ; 
+    | 	[ "EmailAddress" ; Address ; JSONString ] ;
+    | 	[ "EmailAddressFormatted" ; AddressAndNameOut ; JSONString ] ;
+    | 	[ "ContactMethodId" ; Id ; JSONString ] ; 
+    | 	[ "Label" ; ContactMethod::Label ; JSONString ] ; 
+    | 	[ "OrganizationName" ; Person::EmployerName ; JSONString ] ; 
+    | 	[ "PartyId" ; Party::Id ; JSONString ] ; 
+    | 	[ "PartyName" ; Party::NameCached ; JSONString ] 
+    | )
+    refs: fn:JSONSetElement, NetworkAddress::Address#7, fn:JSONString, NetworkAddress::AddressAndNameOut#23, NetworkAddress::Id#1, ContactMethod::Label#47, Person::EmployerName#131, Party::Id#1, Party::NameCached#19
+  Comment: Used to construct a JSON array of email address in the picker module
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=45 dataType=Text fieldType=Summary name=AsJsonEmailSearchListOf
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=44 name=AsJsonEmailSearch
+  Comment: Used to construct a JSON array of email address in the picker module
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=46 dataType=Text fieldType=Summary name=IdListOf
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=1 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+

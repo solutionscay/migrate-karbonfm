@@ -1,0 +1,548 @@
+# script 210: Test CURL Parser
+# file: karbon_Generator.fmp12
+# folder: App Modules / cURL Parser / Tests
+# source: ScriptCatalog/Script[@id=210]
+# steps: 111 (4 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=209 groupCollapsed=False includeInMenu=True
+
+   1    ############################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #PURPOSE:
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #	Test of cURL Parser - this is mostly for development and may not test all functionality
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # RETURNS:
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #	Dialog of results Pass / Fail
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #	$$CURL_TEST_RESULTS - JSON Array of all results
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #AUTHOR:
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #	Charles Delfs cdelfs@delfsengineering.ca
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #REFERENCE
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #	https://curl.haxx.se/docs/manpage.html
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #TODO
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #NOTES:
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #	Tests can have the 'note:' key removed and still passed ... you're welcome
+        	Tests stop running at the first missing index of the $test[] var
+        	To debug a specific test, comment out the test after the one of interest
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    ############################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #------------------  CONFIG TEST DATA    ----------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #Test Data - $test is array[]
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #NOTE: Basic url only
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $test; Value:"curl http://www.centos.org" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $test
+  28    Set Variable [ $expect; Value:"
+        {
+          \"name\": \"Imported cURL - <timestamp>\",
+          \"notes\": \"Source:\rcurl http://www.centos.org\",
+          \"request\": {
+            \"url\": \"http://www.centos.org\",
+            \"method\": \"GET\",
+            \"headers\": {},
+            \"query\": {},
+            \"data\": \"\"
+          }
+        }
+        " ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $expect
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #NOTE: sample from PostNMan @ https://www.easypost.com/docs/api.html with multiple lines
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $test[2]; Value:"curl -X POST https://api.easypost.com/v2/addresses \
+          -u apiKey1234567890: \
+          -d \"addressstreet1=417 MONTGOMERY ST\" \
+          -d \"addressphone=415-123-4567\"" ]
+        DisableStepCollapsed state=False
+        Name: $test
+  32    Set Variable [ $expect[2]; Value:"
+        {
+          \"name\": \"Imported cURL - <timestamp>\",
+          \"request\": {
+            \"method\": \"POST\",
+            \"url\": \"https://api.easypost.com/v2/addresses\",
+            \"auth\": {
+              \"user\": \"apiKey1234567890\",
+              \"password\": \"\"
+            },
+            \"headers\": {
+              \"Content-Type\": \"application/x-www-form-urlencoded\"
+            },
+            \"query\": {},
+            \"data\": \"addressstreet1=417 MONTGOMERY ST&addressphone=415-123-4567\"
+          }
+        }
+        
+        " ]
+        DisableStepCollapsed state=False
+        Name: $expect
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #NOTE: test unsupported command
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $test[3]; Value:"curl  https://www.sumsite.com -O" ]
+        DisableStepCollapsed state=False
+        Name: $test
+  36    Set Variable [ $expect[3]; Value:"
+        {
+          \"name\": \"Imported cURL - <timestamp>\",
+          \"notes\": \"Source:\rcurl  https://www.sumsite.com -O\",
+          \"error\": \"Unsupported command: -O\",
+          \"request\": {
+            \"url\": \"https://www.sumsite.com\",
+            \"method\": \"GET\",
+            \"headers\": {},
+            \"query\": {},
+            \"data\": \"\"
+          }
+        }
+        " ]
+        DisableStepCollapsed state=False
+        Name: $expect
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #NOTE: double underscored command
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $test[4]; Value:"curl --compressed http://api.sloths.com" ]
+        DisableStepCollapsed state=False
+        Name: $test
+  40    Set Variable [ $expect[4]; Value:"{
+          \"name\": \"Imported cURL - <timestamp>\",
+          \"notes\": \"Source:\rcurl --compressed http://api.sloths.com\",
+          \"request\": {
+            \"url\": \"http://api.sloths.com\",
+            \"method\": \"GET\",
+            \"headers\": {
+              \"Accept-Encoding\": \"deflate-gzip\"
+            },
+            \"query\": {},
+            \"data\": \"\"
+          }
+        }" ]
+        DisableStepCollapsed state=False
+        Name: $expect
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #NOTE: with user name
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Variable [ $test[5]; Value:"curl -u charles:delfs https://api.booble.com" ]
+        DisableStepCollapsed state=False
+        Name: $test
+  44    Set Variable [ $expect[5]; Value:"{
+          \"name\": \"Imported cURL - <timestamp>\",
+          \"notes\": \"Source:\rcurl -u charles:delfs https://api.booble.com\",
+          \"request\": {
+            \"auth\": {
+              \"user\": \"charles\",
+              \"password\": \"delfs\"
+            },
+            \"url\": \"https://api.booble.com\",
+            \"method\": \"GET\",
+            \"headers\": {},
+            \"query\": {},
+            \"data\": \"\"
+          }
+        }" ]
+        DisableStepCollapsed state=False
+        Name: $expect
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #NOTE: https://smartystreets.com/docs/cloud/us-extract-api w/ query params
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $test[6]; Value:"curl -v 'https://us-extract.api.smartystreets.com/?
+        			auth-id=YOUR_AUTH_ID&
+        			auth-token=YOUR_AUTH_TOKEN'
+        	-H 'Content-Type: text/plain'
+        	--data-binary '
+        		There are addresses everywhere.
+        		1109 Ninth 85007
+        		SmartyStreets can find them.
+        		3785 Las Vegs Av.
+        		Los Vegas, Nevada
+        		That is all.'" ]
+        DisableStepCollapsed state=False
+        Name: $test
+  48    Set Variable [ $expect[6]; Value:"{
+          \"name\": \"Imported cURL - <timestamp>\",
+          \"notes\": \"Source:\rcurl -v 'https://us-extract.api.smartystreets.com/? \t\t\tauth-id=YOUR_AUTH_ID& \t\t\tauth-token=YOUR_AUTH_TOKEN' \t-H 'Content-Type: text/plain' \t--data-binary ' \t\tThere are addresses everywhere. \t\t1109 Ninth 85007 \t\tSmartyStreets can find them. \t\t3785 Las Vegs Av. \t\tLos Vegas, Nevada \t\tThat is all.'\",
+          \"request\": {
+            \"url\": \"https://us-extract.api.smartystreets.com/\",
+            \"method\": \"POST\",
+            \"headers\": {
+              \"Content-Type\": \"text/plain\"
+            },
+            \"query\": {
+              \"auth-id\": \"YOUR_AUTH_ID\",
+              \"auth-token\": \"YOUR_AUTH_TOKEN\"
+            },
+            \"data\": \" There are addresses everywhere. 1109 Ninth 85007 SmartyStreets can find them. 3785 Las Vegs Av. Los Vegas, Nevada That is all.\"
+          }
+        }" ]
+        DisableStepCollapsed state=False
+        Name: $expect
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #NOTE: https://smartystreets.com/docs/cloud/us-extract-api w/ query params
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $test[7]; Value:"curl -v 'https://us-zipcode.api.smartystreets.com/lookup?¶            auth-id=YOUR+AUTH-ID+HERE&¶            auth-token=YOUR+AUTH-TOKEN+HERE'¶    -H \"Content-Type: application/json\"¶    --data-binary '¶    [¶        {¶            \"city\":\"North Pole\",¶            \"state\":\"AK\"¶        },¶        {¶            \"zipcode\":\"12345\"¶        },¶        {¶            \"city\":\"cupertino\",¶            \"state\":\"CA\",¶            \"zipcode\":\"95014\"¶        }¶    ]'" ]
+        DisableStepCollapsed state=False
+        Name: $test
+  52    Set Variable [ $expect[7]; Value:"{
+          \"name\": \"Imported cURL - <timestamp>\",
+          \"request\": {
+            \"url\": \"https://us-zipcode.api.smartystreets.com/lookup\",
+            \"method\": \"POST\",
+            \"headers\": {
+              \"Content-Type\": \"application/json\"
+            },
+            \"query\": {
+              \"auth-id\": \"YOUR+AUTH-ID+HERE\",
+              \"auth-token\": \"YOUR+AUTH-TOKEN+HERE\"
+            },
+            \"data\": [
+              {
+                \"city\": \"North Pole\",
+                \"state\": \"AK\"
+              },
+              {
+                \"zipcode\": \"12345\"
+              },
+              {
+                \"city\": \"cupertino\",
+                \"state\": \"CA\",
+                \"zipcode\": \"95014\"
+              }
+            ]
+          }
+        }" ]
+        DisableStepCollapsed state=False
+        Name: $expect
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #NOTE: enable to add test
+        DisableStepCollapsed state=False
+        Restore state=False
+  58 // Set Variable [ $test[7]; Value:"curl  http://www.example.com some criterai" ]
+        DisableStepCollapsed state=False
+        Name: $test
+  59 // Set Variable [ $expect[7]; Value:"{ some json result }" ]
+        DisableStepCollapsed state=False
+        Name: $expect
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #--------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Show Custom Dialog [ Title: "Create Records?"; Message: "Do you want to create records from the test data?"; Default Button: “Yes”, Commit: “Yes”; Button 2: “No”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Yes"
+          Button 2 CommitState=False: "No"
+          Button 3 CommitState=False
+  64    If [ Get(LastMessageChoice)=1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  65    Set Variable [ $createRecords; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $createRecords
+  66    End If
+        DisableStepCollapsed state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    Set Variable [ $$curlTestRunning; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $$curlTestRunning
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Set Variable [ $$CURL_TEST_RESULTS; Value:"{}" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$CURL_TEST_RESULTS
+  71    Set Variable [ $TestResults; Value:"Test Results:¶" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestResults
+  72    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Exit Loop If [ Let([
+        	$i = $i + 1;
+        	$curl           = Evaluate ( "$test[" & $i & "]" );  // set this here is we are eval'ing it already
+        	$expectedResult = Evaluate ( "$expect[" & $i & "]" )
+        ];
+        
+        $curl = ""
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Let, fn:Evaluate
+  74    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #TODO check if $arg isURL?
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #convert to json
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Perform Script [ “Parse cURL (curl)”; Parameter: $curl ]
+        DisableStepCollapsed state=False
+        Script id=206 name="Parse cURL (curl)"
+  79    Set Variable [ $json; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Set Variable [ $$CURL_TEST_RESULTS; Value:jsonModify ( $$CURL_TEST_RESULTS ; "Test" & $i ; $json ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonModify
+        Repetition
+          Calculation:
+            | 1
+        Name: $$CURL_TEST_RESULTS
+  82    Set Variable [ $$CURL_TEST_LAST_TEST_JSON; Value:$json ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$CURL_TEST_LAST_TEST_JSON
+  83    Set Variable [ $$CURL_TEST_LAST_TEST_EXPECTED; Value:$expectedResult ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$CURL_TEST_LAST_TEST_EXPECTED
+  84    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #TODO $curl and $expectResult have command and expectedResult
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    #============= Test of compare sub script, enable to test =====================
+        DisableStepCollapsed state=False
+        Restore state=False
+  87 // Set Variable [ $json; Value:"{
+         \"key1\":\"foo\",
+         \"key2\":{
+        	\"subkey1\":\"this\",
+        	\"subkey2\":\"that\"
+           }
+        }" ]
+        DisableStepCollapsed state=False
+        Name: $json
+  88 // Set Variable [ $expectedResult; Value:"
+        {
+          \"key2\": {
+            \"subkey2\": \"that\",
+            \"subkey1\": \"this\"
+          },
+          \"key1\": \"foo\"
+        }
+        " ]
+        DisableStepCollapsed state=False
+        Name: $expectedResult
+  89    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    Perform Script [ “Test Compare json Objs ( obj1obj2 )”; Parameter: jsonA ( 
+        	jsonAv ( $expectedResult ) & jsonAv ( $json )
+        ) ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonA, cf:jsonAv
+        Script id=211 name="Test Compare json Objs ( obj1obj2 )"
+  91    Set Variable [ $pf; Value:If ( Get(ScriptResult) ; "Pass" ;  "Fail" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $pf
+  92    Set Variable [ $TestResults; Value:$TestResults & ¶ & "Test " & $i & " - " & $pf ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestResults
+  93    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  94    If [ $createRecords ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  95    Perform Script [ “API: New Request ( {request} )”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=71 name="API: New Request ( {request} )"
+  96    End If
+        DisableStepCollapsed state=False
+  97    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  98    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    End Loop
+        DisableStepCollapsed state=False
+ 100    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 101    #Report Results
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    Set Variable [ $TestResults; Value:$TestResults & ¶ & "See $$cURL_TEST_RESULTS for result JSON" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestResults
+ 103    Show Custom Dialog [ Title: "Test Complete"; Message: $TestResults; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    #clean up
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    Set Variable [ $$curlTestRunning; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$curlTestRunning
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 110    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 111    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,246 @@
+# script 327: Create Bank Account Token ( {bank} )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO Payments / Public
+# source: ScriptCatalog/Script[@id=327]
+# steps: 58 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=324 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Create bank account token
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # exchanges bank account details for a token on Intuit Servers
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # use the token instead of the bank account
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {object} bankAccount
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {string} bankAccount.accountNumber - minimum 4 characters,
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {string} bankAccount.accountType
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@param {string} bankAccount.name - The name of the bank account holder.
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@param {string} bankAccount.phone - A phone number associated with the account. Must be 10 digits
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@param {string} bankAccount.routingNumber - exactly 9 characters The bank routing number.
+        DisableStepCollapsed state=False
+        Restore state=False
+  13 // Insert Text [ $request ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "data": {
+          |     "bankAccount": {
+          |       "accountNumber": "11000000333456781",
+          |       "accountType": "PERSONAL_CHECKING",
+          |       "name": "bc",
+          |       "phone": "333-666-7777",
+          |       "routingNumber": "322079353"
+          |     }
+          |   },
+          |   "headers": {
+          |     "Accept": "application/json",
+          |     "Content-Type": "application/json"
+          |   },
+          |   "method": "POST",
+          |   "url": "https://sandbox.api.intuit.com/quickbooks/v4/payments/tokens"
+          | }
+        Field: $request
+  14    # @returnSuccess {object} response
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @returnSuccess {string} value - the token value
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #@history 2018-09-24 barbara@geistinteractive.com - Created by Generator version 2.5.1
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  26    Set Error Capture [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    # check for valid JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $bankAccount; Value:JSON.Format ( Get ( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $bankAccount
+  30    If [ Error.IsError ( $bankAccount ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  31    Exit Script [ Result: $bankAccount ]
+        DisableStepCollapsed state=False
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    # validate the JSON for required props, and logic
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $error; Value:JSON.Validator.SetJSON ( $bankAccount) & JSON.Validator.ApplyRules(List(
+        
+        
+        JSON.Validate.IsRequired ( "accountNumber" );
+        JSON.Validate.IsRequired ( "accountType" );
+        JSON.Validate.IsRequired ( "name" );
+        JSON.Validate.IsRequired ( "phone" );
+        JSON.Validate.IsRequired ( "routingNumber" )
+        )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validator.SetJSON, cf:JSON.Validator.ApplyRules, fn:List, cf:JSON.Validate.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  36    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  37    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  38    End If
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    If [ Length ( JSONGetElement ( $bankaccount ; "routingNumber" )) <> 9 //must be 9 digits ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Length, fn:JSONGetElement
+  41    Set Variable [ $error; Value:QBO.Error ( "RoutingNumber invalid" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  42    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  43    End If
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    If [ Length ( JSONGetElement ( $bankAccount ; "accountNumber" ))> 17 or Length ( JSONGetElement ( $bankAccount ; "accountNumber" ))< 4 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Length, fn:JSONGetElement, fn:or
+  46    Set Variable [ $error; Value:QBO.Error ( "Account Number invalid" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  47    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  48    End If
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    If [ Length ( JSONGetElement ( $bankAccount; "phone") ) <> 10 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Length, fn:JSONGetElement
+  51    Set Variable [ $error; Value:QBO.Error ( "Phone Number is invalid" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.Error
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  52    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  53    End If
+        DisableStepCollapsed state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Set Variable [ $request; Value:JSONSetElement ( "" ; 
+        
+        ["data.bankAccount" ; $bankAccount; JSONObject] ;
+        ["method" ; "POST"; JSONString ];
+        ["path" ; "/tokens"; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  56    Perform Script [ “Send Payment Request( {request} )”; Parameter: $request ]
+        DisableStepCollapsed state=False
+        Script id=340 name="Send Payment Request( {request} )"
+  57    Set Variable [ $response; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  58    Exit Script [ Result: $response ]
+        DisableStepCollapsed state=False

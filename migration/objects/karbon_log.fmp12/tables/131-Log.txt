@@ -1,0 +1,127 @@
+# table 131: Log
+# file: karbon_log.fmp12
+# source: BaseTableCatalog/BaseTable[@id=131]
+# fields: 11
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=Log:
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=LogEntryJSON
+  Comment: This is the full JSON message that was sent to the log
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=utillityGlobal
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=ProcessId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Log:
+      | JSONGetElement ( LogEntryJSON; "ProcessId" )
+      refs: fn:JSONGetElement, Log::LogEntryJSON#4
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=level
+  AutoEnter allowEditing=True overwriteExistingValue=True constant=False calculation=True
+    (inactive) ConstantData: "info"
+    Calculation table=Log:
+      | Let(
+      | [
+      | level = JSONGetElement ( LogEntryJSON; "Level" )
+      | ];
+      | 
+      | 
+      | Case(
+      |    IsEmpty ( level ) ; "info" ; 
+      |    level
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:JSONGetElement, Log::LogEntryJSON#4, fn:Case, fn:IsEmpty
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=Message
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Log:
+      | JSONGetElement ( LogEntryJSON; "Message" )
+      refs: fn:JSONGetElement, Log::LogEntryJSON#4
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Number fieldType=Normal name=UTC
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Log:
+      | JSONGetElement ( LogEntryJSON; "Meta.UTC" )
+      refs: fn:JSONGetElement, Log::LogEntryJSON#4
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=TimeStamp fieldType=Normal name=ServerTimeStamp
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Log:
+      | Let(
+      | [
+      | utc = Log::UTC;
+      | ms = Right(utc;3);
+      | gmt = Floor ( utc/1000 );
+      | 
+      | offsetSeconds = Round((
+      | GetAsNumber(Get(CurrentHostTimestamp) -  
+      | (Get(CurrentTimeUTCMilliseconds))/1000) 
+      | )/3600 ; 
+      | 0) * 3600 ;
+      | 
+      | 
+      | 
+      | z=1
+      | ];
+      | 
+      | GetAsTimestamp( gmt + offsetSeconds + ms/1000 )
+      | 
+      | )
+      refs: fn:Let, Log::UTC#12, fn:Right, fn:Floor, fn:Round, fn:GetAsNumber, fn:Get, fn:CurrentHostTimestamp, fn:CurrentTimeUTCMilliseconds, fn:GetAsTimestamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Log:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

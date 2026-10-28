@@ -1,0 +1,244 @@
+# script 28: Start Transaction ( TransactionPayload )
+# file: karbon_log.fmp12
+# folder: Modules / Transactions
+# source: ScriptCatalog/Script[@id=28]
+# steps: 67 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=27 groupCollapsed=False includeInMenu=False
+
+   1    ################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    # PURPOSE:
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #	Start a transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # PARAMETERS:
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #	TransactionPayload - A custom funtion that calcs up script parameters and name into a JSON string
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # RETURNS:
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #	none
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # NOTES:
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # REVISIONS:
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #	2015-MAR-4		Todd Geist		Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    ################################################################################
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #We are never showing dialogs or allowing cancel
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  19    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $script.SECTION; Value:         "PREP"      //- ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $script.SECTION
+  23    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #  this may get called many times before End Transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #we will store this if we find we are on the first transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $originalLayoutNumber; Value:Get (LayoutNumber) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LayoutNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $originalLayoutNumber
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #We should already be here, but...
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Go to Layout [ <unknown> ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=3 name="" ref=missing
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #If there are no open records then we can reset the counter
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    If [ Get ( RecordOpenState ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:RecordOpenState
+  37    Set Variable [ $$Transaction.Store; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$Transaction.Store
+  38    Set Field [ <Table Missing>; 0 ]
+        DisableStepCollapsed state=False
+        Field table="" id=2 name="" ref=missing
+  39    Set Field [ <Table Missing>; $originalLayoutNumber ]
+        DisableStepCollapsed state=False
+        Field table="" id=3 name="" ref=missing
+  40    Set Variable [ $payload; Value:JSONGetElement(Get(ScriptParameter) ; "scriptParameter") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $payload
+  41    Set Variable [ $scriptName; Value:JSONGetElement(Get(ScriptParameter) ; "scriptName") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $scriptName
+  42    New Record/Request
+        DisableStepCollapsed state=False
+  43    If [ JSON.IsValid ( $payload ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.IsValid
+  44    Set Variable [ $payload; Value:JSONFormatElements ( $payload ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements
+        Repetition
+          Calculation:
+            | 1
+        Name: $payload
+  45    End If
+        DisableStepCollapsed state=False
+  46    Set Field [ <Table Missing>; $payload ]
+        DisableStepCollapsed state=False
+        Field table="" id=16 name="" ref=missing
+  47    Set Field [ <Table Missing>; $scriptName ]
+        DisableStepCollapsed state=False
+        Field table="" id=21 name="" ref=missing
+  48    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  49    End If
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Set Variable [ $script.SECTION; Value:         "OPENING THE TRANSACTION RECORD"      //- ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $script.SECTION
+  55    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #start the transaction by opening the record
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Open Record/Request
+        DisableStepCollapsed state=False
+  58    Set Variable [ $error; Value:Error.Last("opening record"; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #Advance the counter
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  62    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  63    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Field [ <Table Missing>; <Table Missing>::<Field Missing> + 1 ]
+        DisableStepCollapsed state=False
+        Field table="" id=2 name="" ref=missing
+  65    End If
+        DisableStepCollapsed state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False

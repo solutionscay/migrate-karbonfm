@@ -1,0 +1,39 @@
+# script 378: Re-login { data }
+# file: karbon_kontroller.fmp12
+# folder: File Module
+# source: ScriptCatalog/Script[@id=378]
+# steps: 5 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=1 groupCollapsed=False includeInMenu=False
+
+   1    #called by Karbon
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $params; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   3    Set Variable [ $accountName; Value:JSONGetElement ( $params; "accountName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $accountName
+   4    Set Variable [ $accountPassword; Value:JSONGetElement ( $params; "accountPassword" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $accountPassword
+   5    Re-Login [ Account Name: $accountName; Password: $accountPassword; Current File ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False

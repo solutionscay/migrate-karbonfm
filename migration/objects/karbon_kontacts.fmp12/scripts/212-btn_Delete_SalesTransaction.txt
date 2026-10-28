@@ -1,0 +1,103 @@
+# script 212: btn: Delete SalesTransaction
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Buttons
+# source: ScriptCatalog/Script[@id=212]
+# steps: 22 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=557 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $Id; Value:SalesTransaction::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SalesTransaction::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   3    If [ $Id = "" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Exit Script [  ]
+        DisableStepCollapsed state=False
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Delete SalesTransaction ( SalesTransactionId )” from file: “karbon_kontroller”; Parameter: $Id ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=560 name="Delete SalesTransaction ( SalesTransactionId )" in=karbon_kontroller.fmp12
+   9    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  10    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  11    Set Variable [ $message; Value:"Transaction was not deleted" & 
+        "¶¶" & 
+        JSONFormatElements ( $result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements
+        Repetition
+          Calculation:
+            | 1
+        Name: $message
+  12    Set Variable [ $title; Value:"Error!" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $title
+  13    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $message; Value:"Transaction was deleted and any billable time was returned to an 'unbilled' state." ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $message
+  15    Set Variable [ $title; Value:"Success!" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $title
+  16    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  17    End If
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Close Popover
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Show Custom Dialog [ Title: $title; Message: $message; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False

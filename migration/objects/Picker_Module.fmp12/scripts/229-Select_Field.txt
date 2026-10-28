@@ -1,0 +1,203 @@
+# script 229: Select Field
+# file: Picker Module.fmp12
+# folder: Modules / Schema / Field Selector
+# source: ScriptCatalog/Script[@id=229]
+# steps: 50 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=225 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $data; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $TableName; Value:JSONGetElement ( $data ; "TableName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableName
+   5    Set Variable [ $TableOccurenceName; Value:JSONGetElement ( $data ; "TableOccurenceName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableOccurenceName
+   6    Set Variable [ $FieldName; Value:JSONGetElement ( $data ; "FieldName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldName
+   7    Set Variable [ $FieldType; Value:JSONGetElement ( $data ; "FieldType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldType
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ IsEmpty ( Picker::Schema_Results ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Picker::Schema_Results#28
+  12    Set Variable [ $Selected; Value:"[]" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Selected
+  13    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $Selected; Value:Picker::Schema_Results ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Picker::Schema_Results#28
+        Repetition
+          Calculation:
+            | 1
+        Name: $Selected
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    If [ IsInList ( JSON.GetValuesAtPath ( $Selected ; "FieldName" ) ; $FieldName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:IsInList, cf:JSON.GetValuesAtPath
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $exit; Value:JSON.ArrayLength ( $Selected; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength
+        Repetition
+          Calculation:
+            | 1
+        Name: $exit
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #Find the index in the array
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  26    Exit Loop If [ $i > $exit ]
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $ThisSelected; Value:JSONGetElement ( $selected ; $i - 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $ThisSelected
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    If [ JSONGetElement ( $ThisSelected ; "FieldName" ) = $FieldName ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  31    Set Variable [ $Selected; Value:JSONDeleteElement ( $Selected ; $i - 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONDeleteElement
+        Name: $Selected
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    End Loop
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $Selected; Value:JSON.Push ( $Selected ; $data ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $Selected
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    End If
+        DisableStepCollapsed state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Field [ Picker::Schema_Results; $Selected ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=28 name=Schema_Results
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ not Picker::Settings_AllowMultipleSelectionsInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, Picker::Settings_AllowMultipleSelectionsInd#6
+  45    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  46    End If
+        DisableStepCollapsed state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Exit Script [  ]
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,109 @@
+# script 323: Seed Sample Data for GeneratorLine
+# file: karbon_Generator.fmp12
+# folder: App Modules / JSONObjects / Private
+# source: ScriptCatalog/Script[@id=323]
+# steps: 24 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=286 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $tableList; Value:List( ApiGeneratorLine::FmpTableName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ApiGeneratorLine::FmpTableName#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $tableList
+   3    Set Variable [ $FieldList; Value:List( ApiGeneratorLine::FmpFieldName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ApiGeneratorLine::FmpFieldName#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldList
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Use Base Elements SQL to get the first record in this table
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $FileName; Value:"Karbon" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $Exit; Value:ValueCount( $tablelist ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $Exit
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Exit Loop If [ $i > $exit ]
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $TableName; Value:GetValue( $TableList; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableName
+  16    Set Variable [ $FieldName; Value:GetValue( $FieldList; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldName
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $IdInFirstRecord; Value:<Function Missing> ( "SELECT Id FROM $TableName FETCH FIRST 1 ROWS ONLY"; "" ; ¶ ; $FileName ) ]
+        DisableStepCollapsed state=False
+        Name: $IdInFirstRecord
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $GetTestData; Value:<Function Missing> ( "SELECT $FieldName FROM $TableName WHERE Id = '" & $IDInFirstRecord & "'"; "" ; "" ; $FileName ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $GetTestData
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Field [ ApiGeneratorLine::TestData; $GetTestData ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=40 name=TestData
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    End Loop
+        DisableStepCollapsed state=False

@@ -1,0 +1,21 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/521-Send_Email_Message_Activity_json.txt,1dc48b8b99a9c510ee299a9b466797d1a29d6db3ce162f7e949b667cebd0da7d,scripts,karbon_kontroller.fmp12,521,Send Email Message Activity { json },integration,external-adapter,tier1,"Sends an email message activity. Inside a transaction it checks the record, marks it sent and not alert, reads the From, To, Cc and Bcc addresses from the activity parties (roles 54-57), the subject and the message, calls _Send Email Message, and stores the SMTP timestamp.","DBTransactions::ActivityId#58
+EmailMessage::UseSystemSettingsInd#26
+ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddressFormatted#16
+ActivityParty#byActivityAndRole_ActivityPartyEmail::EmailAddress#15
+Activity::Subject#22
+ActivityMessage::Message#12
+Activity::Id#1","DBTransactions::ActivityId#58 (step 78, current record (transaction record))
+EmailMessage::ONE#11 (step 81, new record (get-or-create and lock by the DBTransactions key))
+EmailMessage::SentInd#9 (step 92, related via EmailMessage)
+Activity::AlertInd#107 (step 93, related via Activity)
+DBTransactions::ActivityPartyRoleId#77 (step 96, current record (transaction record))
+DBTransactions::ActivityPartyRoleId#77 (step 100, current record (transaction record))
+DBTransactions::ActivityPartyRoleId#77 (step 104, current record (transaction record))
+DBTransactions::ActivityPartyRoleId#77 (step 108, current record (transaction record))
+EmailMessage::SmtpTimestamp#25 (step 125, related via EmailMessage)","karbon_kontroller.fmp12/scripts/28 (step 42)
+karbon_kontroller.fmp12/scripts/337 (step 116)
+karbon_kontroller.fmp12/scripts/29 (step 138)
+karbon_kontroller.fmp12/scripts/31 (step 139)","karbon_kontacts.fmp12/scripts/775-Button_Send_Email_Message.txt (step 15)
+karbon_kontroller.fmp12/scripts/389-Create_EmailMessage_data.txt (step 216)
+karbon_kontroller.fmp12/scripts/522-Edit_EmailMessage_data.txt (step 223)",Email send via karbon_kontroller.fmp12/scripts/337 (step 116),"SentInd is set to 1 (step 92) before the send, and stays set when _Send Email Message fails (steps 119-121). The result always reports Sent=true (step 131-132) even on error. Strips a Password property from the stored transaction payload (step 38). Actual SMTP is in script 337."

@@ -1,0 +1,53 @@
+# script 840: #wip Get Employee Search Results
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / Subscriber Picker
+# source: ScriptCatalog/Script[@id=840]
+# steps: 9 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=716 groupCollapsed=False includeInMenu=False
+
+   1    Show Custom Dialog [ Title: "Message"; Message: Get(ScriptParameter); Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:Get, fn:ScriptParameter
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $partyArray; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyArray
+   4    Set Variable [ $PartyIdList; Value: JSON.GetValuesAtPath ( $partyArray ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.GetValuesAtPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyIdList
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Field [ UtilityDiscussion::SubscriberPartyIds; List ( UtilityDiscussion::SubscriberPartyIds ; $PartyIdList ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityDiscussion::SubscriberPartyIds#19
+        Field table=UtilityDiscussion id=19 name=SubscriberPartyIds
+   7 // Set Field [ UtilityDiscussion::SubscriberListName; $PartyNames ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=20 name=SubscriberListName
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False

@@ -1,0 +1,425 @@
+# script 333: Send Utility Email Message
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=333]
+# steps: 91 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    If [ not UtilityEmailMessage::ValidatedInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, UtilityEmailMessage::ValidatedInd#29
+   5    Beep
+        DisableStepCollapsed state=False
+   6    Show Custom Dialog [ Title: "Error"; Message: "An email must have at least one valid recipient, a subject, and a message before it can be sent."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   7    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+   8    End If
+        DisableStepCollapsed state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #authenticate user
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ not UtilityEmailMessage::UseSystemSettingsInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, UtilityEmailMessage::UseSystemSettingsInd#9
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #If the user wants to use their own Email Address, let's make sure we have their password stored
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    If [ IsEmpty ( Selected_User::SmtpPassword ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_User::SmtpPassword#118
+  17    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Show Custom Dialog [ Title: "Password Needed"; Message: "What is your password for " & Selected_User::SmtpEmailAddress & "."; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No”; Input #1: Selected_User::SmtpPassword, Password, "Password" ]
+        DisableStepCollapsed state=False
+        Message
+          refs: Selected_User::SmtpEmailAddress#111
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+        InputFields
+          InputField UsePasswordCharacter=True
+            Field table=Selected_User id=118 name=SmtpPassword
+          InputField UsePasswordCharacter=False
+            Field table="" id=0 name="" ref=none
+          InputField UsePasswordCharacter=False
+            Field table="" id=0 name="" ref=none
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    If [ Get ( LastMessageChoice ) = 2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  21    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Exit Loop If [ not IsEmpty ( Selected_User::SmtpPassword ) ]
+        DisableStepCollapsed state=False
+        refs: fn:not, fn:IsEmpty, Selected_User::SmtpPassword#118
+  25    End Loop
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $ActivityPartyFrom; Value:JSONSetElement (  ""; 
+         
+        	[ "ActivityId" ; UtilityEmailMessage::Id ; JSONString ];
+        	[ "ActivityPartyRoleId" ; 54 ; JSONNumber ]; //From
+        	[ "ActivityPartyRoleName" ; "From" ; JSONString ];
+        	[ "EmailAddress" ; UtilityEmailMessage_User::SmtpEmailAddress ; JSONString ];
+        	[ "EmailAddressFormatted" ; "<" & UtilityEmailMessage_User::SmtpEmailAddress & ">" ; JSONString ];
+        	[ "PartyId" ; UtilityEmailMessage_User::PartyId ; JSONString ]  
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityEmailMessage::Id#25, fn:JSONString, fn:JSONNumber, UtilityEmailMessage_User::SmtpEmailAddress#111, UtilityEmailMessage_User::PartyId#12
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyFrom
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $ActivityPartyFrom; Value:JSONSetElement (  ""; 
+         
+        	[ "ActivityId" ; UtilityEmailMessage::Id ; JSONString ];
+        	[ "ActivityPartyRoleId" ; 54 ; JSONNumber ]; //From
+        	[ "ActivityPartyRoleName" ; "From" ; JSONString ];
+        	[ "EmailAddress" ; System::SystemEmailAddress ; JSONString ];
+        	[ "PartyId" ; UtilityEmailMessage_User::PartyId ; JSONString ]  
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityEmailMessage::Id#25, fn:JSONString, fn:JSONNumber, System::SystemEmailAddress#47, UtilityEmailMessage_User::PartyId#12
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyFrom
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    End If
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #We always set "From" based on the logged in user
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $ActivityParty; Value:JSON.Push ( UtilityEmailMessage::ActivityPartyArray ; $ActivityPartyFrom ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Push, UtilityEmailMessage::ActivityPartyArray#10, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityParty
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #UserId should always be set to the logged in user as well
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Field [ UtilityEmailMessage::UserId; session::CurrentUserId ]
+        DisableStepCollapsed state=False
+        refs: session::CurrentUserId#58
+        Field table=UtilityEmailMessage id=21 name=UserId
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #If this is a draft, send it
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ not IsEmpty ( UtilityEmailMessage::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, UtilityEmailMessage::Id#25
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Perform Script [ “Edit EmailMessage { data }” from file: “karbon_kontroller”; Parameter: JSONSetElement( UtilityEmailMessage::AsJSON; 
+        	[ "UserId"; session::CurrentUserId; JSONString ];
+        	[ "Send"; True; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: fn:JSONSetElement, UtilityEmailMessage::AsJSON#13, session::CurrentUserId#58, fn:JSONString, fn:True
+        Script id=522 name="Edit EmailMessage { data }" in=karbon_kontroller.fmp12
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  54    #TODO: Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Field [ selector::ActivityId; JSONGetElement ( $ScriptResult ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=selector id=7 name=ActivityId
+  57    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  58    End If
+        DisableStepCollapsed state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #this is a new Activity -> create then send
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Set Variable [ $Attachments; Value:UtilityEmailMessage::Attachments ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::Attachments#8
+        Repetition
+          Calculation:
+            | 1
+        Name: $Attachments
+  65    Set Variable [ $EntityId; Value:UtilityEmailMessage::EntityId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::EntityId#31
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityId
+  66    Set Variable [ $EntityTypeId; Value:11 // activity ]
+        DisableStepCollapsed state=False
+        Name: $EntityTypeId
+  67    Set Variable [ $Id; Value:UtilityEmailMessage::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::Id#25
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  68    Set Variable [ $Message; Value:UtilityEmailMessage::Message ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::Message#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $Message
+  69 // Set Variable [ $MessageHtml ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $MessageHtml
+  70    Set Variable [ $Send; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $Send
+  71    Set Variable [ $Subject; Value:UtilityEmailMessage::Subject ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::Subject#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $Subject
+  72    Set Variable [ $TemplateId; Value:UtilityEmailMessage::TemplateId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::TemplateId#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $TemplateId
+  73    Set Variable [ $UserId; Value:UtilityEmailMessage::UserId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::UserId#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $UserId
+  74    Set Variable [ $UseSystemSettingsInd; Value:UtilityEmailMessage::UseSystemSettingsInd ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::UseSystemSettingsInd#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $UseSystemSettingsInd
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Set Variable [ $EmailMessage; Value:JSONSetElement (  ""; 
+         
+        //	[ "ActivityParentID" ; $ActivityParentID ; JSONString ];
+        //	[ "ActivityPurposeId" ; $ActivityPurposeId ; JSONString ];
+        	[ "ActivityParty" ; $ActivityParty ; JSONArray ];
+        	[ "Attachments" ; $Attachments ; JSONString ];
+        	[ "EntityId" ; $EntityId ; JSONString ];
+        	[ "EntityTypeId" ; $EntityTypeId ; JSONString ];
+        	[ "Id" ; $Id ; JSONString ];
+        	[ "Message" ; $Message ; JSONString ];
+        //	[ "MessageHtml" ; $MessageHtml ; JSONString ];
+        	[ "Send" ; $Send ; JSONBoolean ];
+        	[ "Subject" ; $Subject ; JSONString ];
+        	[ "TemplateId" ; $TemplateId ; JSONNumber ];
+        	[ "UserId" ; $UserId ; JSONString ];
+        	[ "UseSystemSettingsInd" ; $UseSystemSettingsInd ; JSONBoolean ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONArray, fn:JSONString, fn:JSONBoolean, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailMessage
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    Perform Script [ “Create EmailMessage { data }” from file: “karbon_kontroller”; Parameter: $EmailMessage ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=389 name="Create EmailMessage { data }" in=karbon_kontroller.fmp12
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    Set Variable [ $ScriptResult; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  83    #TODO: Handle Error
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  85    Show Custom Dialog [ Title: "Error"; Message: "This email was not created"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  86    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    Set Field [ selector::ActivityId; JSONGetElement ( $ScriptResult ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=selector id=7 name=ActivityId
+  88    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  89    End If
+        DisableStepCollapsed state=False
+  90    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  91    End If
+        DisableStepCollapsed state=False

@@ -1,0 +1,427 @@
+# script 186: Convert QBO Customer
+# file: karbon_tester.fmp12
+# folder: Modules / LedgerLink
+# source: ScriptCatalog/Script[@id=186]
+# steps: 62 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=180 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $TEST_Group; Value:"LedgerLink" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Group
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $TEST_Subject; Value:"Convert QBO Customer To Party" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Subject
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $TEST_Case; Value:"Given a QBO Customer" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Insert Text [ $customer ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "Taxable": true,
+          |   "Job": false,
+          |   "BillWithParent": false,
+          |   "Balance": 0,
+          |   "BalanceWithJobs": 0,
+          |   "BillAddr": {
+          |     "Id": "95",
+          |     "Line1": "1603 N. State Road #3B",
+          |     "City": "Lehi",
+          |     "Country": "USA",
+          |     "CountrySubDivisionCode": "UT",
+          |     "PostalCode": "84043"
+          |   },
+          |   "ShipAddr": {
+          |     "Id": "95",
+          |     "Line1": "1603 N. State Road #3B",
+          |     "City": "Lehi",
+          |     "Country": "USA",
+          |     "CountrySubDivisionCode": "UT",
+          |     "PostalCode": "84043"
+          |   },
+          |   "CurrencyRef": {
+          |     "value": "USD",
+          |     "name": "United States Dollar"
+          |   },
+          |   "PreferredDeliveryMethod": "Email",
+          |   "domain": "QBO",
+          |   "sparse": false,
+          |   "Id": "202",
+          |   "SyncToken": "1",
+          |   "MetaData": {
+          |     "CreateTime": "2015-12-17T09:07:47-08:00",
+          |     "LastUpdatedTime": "2018-02-03T09:33:13-08:00"
+          |   },
+          |   "GivenName": "John",
+          |   "FamilyName": "Nichols",
+          |   "FullyQualifiedName": "Five Inc",
+          |   "CompanyName": "Five Inc",
+          |   "DisplayName": "Five Inc",
+          |   "PrintOnCheckName": "Five Inc",
+          |   "Active": true,
+          |   "Mobile": {
+          |     "FreeFormNumber": "(801) 492-1137"
+          |   },
+          |   "PrimaryPhone": {
+          |     "FreeFormNumber": "(801) 492-1137"
+          |   },
+          |   "PrimaryEmailAddr": {
+          |     "Address": "john.nichols@fiveinc.com, test@mctestface.com"
+          |   },
+          |   "WebAddr": {
+          |     "URI": "http://www.fiveinc.com/"
+          |   }
+          | }
+        Field: $customer
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “Convert QBO Customer Into Karbon Customer” from file: “Karbon_kontroller”; Parameter: $customer ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=169 name="Convert QBO Customer Into Karbon Customer" in=karbon_kontroller.fmp12
+  14    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #Basic tests
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  19    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #Customer props
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "Taxable" ; True ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals, fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  23    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "OrganizationName" ; "Five Inc" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  24    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "FirstName" ; "John" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  25    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "LastName" ; "Nichols" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  26    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "Address[0].Purpose[0]" ; "billing" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  27    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "Phone[1].Primary" ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Name: $null
+  28    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "NetworkAddress[0].Type" ; "web") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  29    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "NetworkAddress[1].Type" ; "email") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Name: $null
+  30    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "NetworkAddress[2].Address" ; "test@mctestface.com") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $TEST_Case; Value:"Given a QBO Customer With Just a Display Name" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+  37    Insert Text [ $customer ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "Taxable": false,
+          |   "Job": false,
+          |   "BillWithParent": false,
+          |   "Balance": 0,
+          |   "BalanceWithJobs": 0,
+          |   "CurrencyRef": {
+          |     "value": "USD",
+          |     "name": "United States Dollar"
+          |   },
+          |   "PreferredDeliveryMethod": "None",
+          |   "domain": "QBO",
+          |   "sparse": false,
+          |   "Id": "255",
+          |   "SyncToken": "0",
+          |   "MetaData": {
+          |     "CreateTime": "2017-05-23T11:56:48-07:00",
+          |     "LastUpdatedTime": "2017-09-17T02:36:02-07:00"
+          |   },
+          |   "FullyQualifiedName": "Altas Digitial",
+          |   "DisplayName": "Altas Digitial",
+          |   "PrintOnCheckName": "Altas Digitial",
+          |   "Active": true
+          | }
+        Field: $customer
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Perform Script [ “Convert QBO Customer Into Karbon Customer” from file: “Karbon_kontroller”; Parameter: $customer ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=169 name="Convert QBO Customer Into Karbon Customer" in=karbon_kontroller.fmp12
+  40    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #Basic tests
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  45    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  46    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "OrganizationName" ; "Altas Digitial" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Variable [ $TEST_Case; Value:"Given a QBO Customer that is just a person" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+  51    Insert Text [ $customer ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          |   "Taxable": true,
+          |   "Notes": "a note",
+          |   "Job": false,
+          |   "BillWithParent": false,
+          |   "Balance": 0,
+          |   "BalanceWithJobs": 0,
+          |   "CurrencyRef": {
+          |     "value": "USD",
+          |     "name": "United States Dollar"
+          |   },
+          |   "PreferredDeliveryMethod": "Email",
+          |   "domain": "QBO",
+          |   "sparse": false,
+          |   "Id": "200",
+          |   "SyncToken": "2",
+          |   "MetaData": {
+          |     "CreateTime": "2015-11-14T07:45:59-08:00",
+          |     "LastUpdatedTime": "2018-03-10T20:28:18-08:00"
+          |   },
+          |   "GivenName": "Art",
+          |   "FamilyName": "Fox",
+          |   "FullyQualifiedName": "Art Fox",
+          |   "DisplayName": "Art Fox",
+          |   "PrintOnCheckName": "Art Fox",
+          |   "Active": true,
+          |   "PrimaryEmailAddr": {
+          |     "Address": "artfox@mac.com"
+          |   }
+          | }
+        Field: $customer
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Perform Script [ “Convert QBO Customer Into Karbon Customer” from file: “Karbon_kontroller”; Parameter: $customer ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=169 name="Convert QBO Customer Into Karbon Customer" in=karbon_kontroller.fmp12
+  54    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #Basic tests
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  59    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  60    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "DisplayName" ; "Art Fox" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False

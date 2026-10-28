@@ -1,0 +1,211 @@
+# script 1247: btn: Get From FileSystem
+# file: karbon_charts.fmp12
+# folder: Application Modules / Widgets / Editor UI / In FM
+# source: ScriptCatalog/Script[@id=1247]
+# steps: 50 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=1258 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $Path; Value:<Function Missing> ( "Choose a the folder that contains the index.html" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Path
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ IsEmpty ( $path ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   6    Exit Script [  ]
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $data.json; Value:Let(
+        [
+        contents = <Function Missing> ( $path & "/data.json" );
+        
+        contents = If(contents="?"; ""; contents)
+        ];
+        contents
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:If
+        Repetition
+          Calculation:
+            | 1
+        Name: $data.json
+  10    Set Variable [ $index.html; Value:Let(
+        [
+        contents = <Function Missing> ( $path & "/index.html" );
+        
+        contents = If(contents="?"; ""; contents)
+        ];
+        contents
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:If
+        Repetition
+          Calculation:
+            | 1
+        Name: $index.html
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ IsEmpty ( $index.html ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  14    Show Custom Dialog [ Title: "Couldn't find \"index.html\""; Message: "The folder you selected didn't contain an \"Index.html\" file."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  15    Exit Script [  ]
+        DisableStepCollapsed state=False
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $warn; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $warn
+  21    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ not IsEmpty ( $index.html ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  24    If [ not IsEmpty ( Widgets::Index.html) and Widgets::Index.html <> $index.html ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, Widgets::Index.html#6, fn:and
+  25    Set Variable [ $warn; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $warn
+  26    End If
+        DisableStepCollapsed state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    Exit Loop If [ $warn ]
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    If [ not IsEmpty ( $data.json ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  32    Set Variable [ $warn; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $warn
+  33    End If
+        DisableStepCollapsed state=False
+  34    Exit Loop If [ $warn ]
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  38    End Loop
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $update; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $update
+  42    If [ $warn ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Show Custom Dialog [ Title: "Caution"; Message: "The is will overwrite the data in this record file."; Default Button: “Cancel”, Commit: “Yes”; Button 2: “OK”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Cancel"
+          Button 2 CommitState=False: "OK"
+          Button 3 CommitState=False
+  44    Set Variable [ $update; Value:Get(LastMessageChoice) = 2 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:LastMessageChoice
+        Repetition
+          Calculation:
+            | 1
+        Name: $update
+  45    End If
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ $update ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Field [ Widgets::Index.html; Substitute($index.html; Char(13) ; "") ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, fn:Char
+        Field table=Widgets id=6 name=Index.html
+  49    Set Field [ Widgets::Data.json; Substitute($data.json; Char(13) ; "") ]
+        DisableStepCollapsed state=False
+        refs: fn:Substitute, fn:Char
+        Field table=Widgets id=7 name=Data.json
+  50    End If
+        DisableStepCollapsed state=False

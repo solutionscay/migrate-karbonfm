@@ -1,0 +1,228 @@
+# table 130: User
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=130]
+# fields: 26
+# records: 1
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=User:
+      | Get ( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Normal name=AccountName
+  AutoEnter allowEditing=True
+  Validation message=True type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+    ErrorMessage: A unique account name is required.
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=PartyId
+  Comment: All of the contact info for this user is stored in the Contact table and linked from here
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=98 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=99 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=100 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=User (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=101 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=User:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=102 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=User (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=User (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=103 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=User:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=105 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=User:
+    | // Created by Generator - 7/21/2018 8:04:10 AM
+    | // DO NOT format this JSON object!
+    | JSONSetElement (  ""; 
+    |  
+    | 	[ "AccountName" ; User::AccountName ; JSONString ];
+    | 	[ "CreationUserId" ; User::CreationUserId ; JSONString ];
+    | 	[ "EmailAddress" ; User::EmailAddress ; JSONString ];
+    | 	[ "EmailSignature" ; User::EmailSignature ; JSONString ];
+    | 	[ "Id" ; User::Id ; JSONString ];
+    | 	[ "ModificationUserId" ; User::ModificationUserId ; JSONString ];
+    | 	[ "PartyId" ; User::PartyId ; JSONString ];
+    | 	[ "PartyName" ; Party::NameCached ; JSONString ];
+    | 	[ "SmtpEmailAddress" ; User::SmtpEmailAddress ; JSONString ];
+    | 	[ "SmtpFullName" ; User::SmtpFullName ; JSONString ];
+    | 	[ "SmtpPassword" ; User::SmtpPassword ; JSONString ];
+    | 	[ "SmtpServer" ; User::SmtpServer ; JSONString ];
+    | 	[ "SmtpServerAuthentication" ; User::SmtpServerAuthentication ; JSONString ];
+    | 	[ "SmtpServerEncryptionType" ; User::SmtpServerEncryptionType ; JSONString ];
+    | 	[ "SmtpServerPort" ; User::SmtpServerPort ; JSONString ];
+    | 	[ "SmtpUserName" ; User::SmtpUserName ; JSONString ];
+    | 	[ "UnreadNotificationCountCached" ; User::UnreadNotificationCountCached ; JSONNumber ]
+    |  
+    | )
+    refs: fn:JSONSetElement, User::AccountName#11, fn:JSONString, User::CreationUserId#108, User::EmailAddress#119, User::EmailSignature#120, User::Id#1, User::ModificationUserId#109, User::PartyId#12, Party::NameCached#19, User::SmtpEmailAddress#111, User::SmtpFullName#112, User::SmtpPassword#118, User::SmtpServer#114, User::SmtpServerAuthentication#115, User::SmtpServerEncryptionType#116, User::SmtpServerPort#117, User::SmtpUserName#113, User::UnreadNotificationCountCached#121, fn:JSONNumber
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=106 dataType=Text fieldType=Calculated name=DisplayName
+  Calculation table=User:
+    | If ( IsEmpty ( Party::NameCached ) ; 
+    | 	AccountName ; 
+    | 	Party::NameCached
+    | )
+    refs: fn:If, fn:IsEmpty, Party::NameCached#19, User::AccountName#11
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=107 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=User (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=108 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=User:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=109 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=User:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=111 dataType=Text fieldType=Normal name=SmtpEmailAddress
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=112 dataType=Text fieldType=Normal name=SmtpFullName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=113 dataType=Text fieldType=Normal name=SmtpUserName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=114 dataType=Text fieldType=Normal name=SmtpServer
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=115 dataType=Text fieldType=Normal name=SmtpServerAuthentication
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=116 dataType=Text fieldType=Normal name=SmtpServerEncryptionType
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=117 dataType=Text fieldType=Normal name=SmtpServerPort
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=118 dataType=Text fieldType=Normal name=SmtpPassword
+  Comment: This is global storage so it has to be set by the user each session
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=119 dataType=Text fieldType=Normal name=EmailAddress
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=120 dataType=Text fieldType=Normal name=EmailSignature
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: --
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=121 dataType=Number fieldType=Normal name=UnreadNotificationCountCached
+  Comment: The number of unread notifications assigned to this user
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=122 dataType=Text fieldType=Summary name=ListId
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=List
+    SummaryField
+      Field id=1 name=Id
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+

@@ -1,0 +1,100 @@
+# script 245: Deselect Email Address
+# file: Picker Module.fmp12
+# folder: Modules / EmailAddress Picker
+# source: ScriptCatalog/Script[@id=245]
+# steps: 26 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=207 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-07-16 dave@geistinteractive.com - Finds and deletes the array object value that matches the current EmailAddressId
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $DeleteEmailAddressId; Value:VIRTUALLISTS_Rows::Email.ContactMethodId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: VIRTUALLISTS_Rows::Email.ContactMethodId#30
+        Repetition
+          Calculation:
+            | 1
+        Name: $DeleteEmailAddressId
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $i; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $i
+   6    Set Variable [ $end; Value:JSON.ArrayLength ( Picker::Results ; "" ) - 1 ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayLength, Picker::Results#2
+        Name: $end
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Exit Loop If [ $i > $end ]
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #Get the email address at this position in the array
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $ThisEmailAddressId; Value:JSONGetElement ( JSONGetElement ( Picker::Results ; 0 ) ; "EmailAddressId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, Picker::Results#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisEmailAddressId
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    If [ $ThisEmailAddressId = $DeleteEmailAddressId ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #It's a match, delete it
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Field [ Picker::Results; JSONDeleteElement ( Picker::Results ; "[" & $i & "]" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONDeleteElement, Picker::Results#2
+        Field table=Picker id=2 name=Results
+  18    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  19    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  20    End If
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    End Loop
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

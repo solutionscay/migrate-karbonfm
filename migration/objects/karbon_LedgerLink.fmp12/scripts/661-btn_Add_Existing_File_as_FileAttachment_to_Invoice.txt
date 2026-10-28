@@ -1,0 +1,197 @@
+# script 661: btn: Add Existing File as FileAttachment to Invoice
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Attachables
+# source: ScriptCatalog/Script[@id=661]
+# steps: 52 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=657 groupCollapsed=False includeInMenu=False
+
+   1    #adds existing File as Attachment record to Invoice
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   3    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Field [ Attachable::qbo_send; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=Attachable id=20 name=qbo_send
+   8    Set Variable [ $attachable_error; Value:Error.Last ( "creating the file attachment record" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $attachable_error
+   9    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  10    If [ Error.IsError ($attachable_error) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  11    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $AttachableId; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $AttachableId
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Go to Object [ Object Name: "portal.attachments"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  18    Set Variable [ $error; Value:Error.Last ( "going to attachment portal" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  19    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  20    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  21    End If
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Go to Portal Row
+        [ Select; Last ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  24    Set Field [ Invoice_AttachableRef::AttachmentId; $AttachableId ]
+        DisableStepCollapsed state=False
+        Field table=Invoice_AttachableRef id=8 name=AttachmentId
+  25    Set Variable [ $error; Value:Error.Last ( "creating the file attachment record" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  26    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  27    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $EntityType; Value:"Invoice" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityType
+  31    Set Field [ Invoice_AttachableRef::EntityType; $EntityType ]
+        DisableStepCollapsed state=False
+        Field table=Invoice_AttachableRef id=6 name=EntityType
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Field [ Invoice::qbo_send; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=Invoice id=3 name=qbo_send
+  34    Set Variable [ $error; Value:Error.Last ( "marking Invoice to send to QBO" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  35    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  36    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Exit Loop If [ True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+  41    End Loop
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    If [ $error ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Show Custom Dialog [ Title: "Alert"; Message: "There was a problem adding this attachment."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  47    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    End If
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Perform Script [ “Open Card - Attachable List” ]
+        DisableStepCollapsed state=False
+        Script id=659 name="Open Card - Attachable List"
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False

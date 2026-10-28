@@ -1,0 +1,421 @@
+# script 472: #wip Parse Properties From Comments { explodeParams ; comments }
+# file: karbon_Generator.fmp12
+# folder: Miscellaneous Generators / Comment Generators
+# source: ScriptCatalog/Script[@id=472]
+# steps: 84 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=218 groupCollapsed=False includeInMenu=False
+
+   1    #CONFIG
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Insert Text [ $paramCalcTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | JSONSetElement ( "{}" ; 
+          | {paramLines}
+          | )
+        Field: $paramCalcTemplate
+   3    Insert Text [ $paramCalcLineTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: [ "{propName}" ; ${propName} ; {type} ]
+        Field: $paramCalcLineTemplate
+   4    Insert Text [ $paramSetVarLineTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSONSetElement ( $json ; "{propName}" ; "" ; {type} )
+        Field: $paramSetVarLineTemplate
+   5    Insert Text [ $resultLineTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSONGetElement ( $result ; "{propName}" )
+        Field: $resultLineTemplate
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #INIT VARS
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $explodeParams; Value:JSONGetElement ( Get ( ScriptParameter ) ; "explodeParams" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $explodeParams
+  10    Set Variable [ $comments; Value:JSONGetElement ( Get ( ScriptParameter ) ; "comments" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $comments
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #START
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ $explodeParams ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #If we're exploding the params, start with an empty object
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $params; Value:ScriptStep_InsertCalculatedResult ( "$json" ; Quote ( "{}" ) ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult, fn:Quote
+        Name: $params
+  17    End If
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19 // Set Variable [ $comments; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $comments
+  20    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $comment; Value:GetValue( $comments; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $comment
+  24    Exit Loop If [ // no more comments
+        IsEmpty ( $comment ) or 
+        
+        // we've reached the end of the comment header
+        $comment = "#/" ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, fn:or
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $prefix; Value:LeftWords ( $comment ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:LeftWords
+        Name: $prefix
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    If [ Left ( $comment ; 1 ) = "@" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $type; Value:Let ( [ 
+        
+        type = MiddleWords ( $comment ; 2 ; 1 ) 
+        
+        ] ; 
+        
+        // convert to FileMaker JSON type
+        Case (
+        
+        	type = "object" ; "JSONObject" ;
+        	type = "string" ; "JSONString" ;
+        	type = "number" ; "JSONNumber" ;
+        	type = "boolean" ; "JSONBoolean" ;
+        	type = "array" ; "JSONArray" ;
+        	type = "null" ; "JSONNull" ;
+        	Quote("")
+        
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:MiddleWords, fn:Case, fn:Quote
+        Name: $type
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #Example line: @param {boolean} [Lead.ActiveOnly=1] - defaults to true
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #Strip extras
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $propName; Value:Substitute ( $comment ; 
+        	[ "  " ; " " ] ; // make sure we don't have any space runs
+        	[ "[" ; "" ] ; // strip brackets, which indicate optional property
+        	[ "]" ; "" ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #The property is the third value:
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $propName; Value:GetValue ( Substitute ( $propName ; " " ; ¶ ) ; 3 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #Get the last value from the dotted notation (i.e., Entity.Prop)
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $propName; Value:Let ( [ 
+        	propList = Substitute ( $propName ; "." ; ¶ )
+        ] ; 
+        	GetValue ( 
+        		propList ; 
+        		ValueCount ( propList )
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Substitute, fn:GetValue, fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #Strip any defaults, which are expressed like this: Property=Default
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Set Variable [ $propName; Value:Let ( [ 
+        	propList = Substitute ( $propName ; "=" ; ¶ )
+        ] ; 
+        	GetValue ( 
+        		propList ; 
+        		1
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Substitute, fn:GetValue
+        Name: $propName
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    If [ $prefix = "param" and IsEmpty ( $paramName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and, fn:IsEmpty
+  48    Set Variable [ $paramName; Value:$propName ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $paramName
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Else If [ $prefix = "returnSuccess" and IsEmpty ( $resultName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and, fn:IsEmpty
+  51    Set Variable [ $resultName; Value:$propName ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $resultName
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Else If [ $prefix = "param" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    If [ $explodeParams ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    Set Variable [ $thisParam; Value:Substitute ( $paramSetVarLineTemplate ; 
+        	[ "{propName}" ; $propName ] ;
+        	[ "{type}" ; $type ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisParam
+  57    Set Variable [ $thisParam; Value:ScriptStep_InsertCalculatedResult ( "$json" ; $thisParam ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult
+        Name: $thisParam
+  58    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $thisParam; Value:Substitute ( $paramCalcLineTemplate ; 
+        	[ "{propName}" ; $propName ] ;
+        	[ "{type}" ; $type ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisParam
+  60    End If
+        DisableStepCollapsed state=False
+  61    Set Variable [ $params; Value:List( $params ; $thisParam ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Else If [ $prefix = "returnSuccess" and $propName <> $result // ignore the result parent object ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    Set Variable [ $propExpression; Value:Substitute ( $resultLineTemplate ; 
+        	[ "{propName}" ; $propName ] ; 
+        	[ "{type}" ; $type ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $propExpression
+  66    Set Variable [ $resultStep; Value:ScriptStep_InsertCalculatedResult ( "$" & $propName ; $propExpression ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult
+        Name: $resultStep
+  67    Set Variable [ $results; Value:List( $results ; $resultStep ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    End If
+        DisableStepCollapsed state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    End If
+        DisableStepCollapsed state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  74    End Loop
+        DisableStepCollapsed state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    If [ $explodeParams = False ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:False
+  77    Set Variable [ $params; Value:Substitute ( $params ; ¶ ; " ;¶" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  78    Set Variable [ $params; Value:Substitute ( $paramCalcTemplate ; "{paramLines}" ; $params ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  79    Set Variable [ $params; Value:ScriptStep_InsertCalculatedResult ( "$json" ; $params ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult
+        Name: $params
+  80    End If
+        DisableStepCollapsed state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "params" ; $params ; JSONString ] ; 
+        	[ "results" ; $results ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    Exit Script [ Result: $json ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,91 @@
+# script 152: Create Map (JSON)
+# file: karbon_Generator.fmp12
+# folder: App Modules / Maps / Public / API Explorer
+# source: ScriptCatalog/Script[@id=152]
+# steps: 19 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=144 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $json; Value:Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $isArray; Value:Let(
+        [
+        
+        text = <Function Missing> ( $json ; "$" );
+        leftRight =  Left(text; 1 ) & Right(text;1)
+        
+        
+        ];
+        
+        leftRight = "[]"
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Left, fn:Right
+        Name: $isArray
+   5    If [ $isArray ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $json; Value:<Function Missing> ( $json ; "$[0]" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Go to Layout [ “FieldMap Details” (FieldMap) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=6 name="FieldMap Details"
+  11    New Record/Request
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Field [ FieldMap::JSONDocument; jsonPrettyPrint ( $json ; "  ") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonPrettyPrint
+        Field table=FieldMap id=5 name=JSONDocument
+  14    Set Field [ FieldMap::idSource; GLOBALS::Maps_SourceID ]
+        DisableStepCollapsed state=False
+        refs: GLOBALS::Maps_SourceID#7
+        Field table=FieldMap id=12 name=idSource
+  15    Set Field [ FieldMap::source; GLOBALS::Maps_Source ]
+        DisableStepCollapsed state=False
+        refs: GLOBALS::Maps_Source#8
+        Field table=FieldMap id=13 name=source
+  16    Set Field [ FieldMap::label; GLOBALS::Maps_Name ]
+        DisableStepCollapsed state=False
+        refs: GLOBALS::Maps_Name#9
+        Field table=FieldMap id=2 name=label
+  17    Set Field [ FieldMap::idSourceParentRequest; GLOBALS::Maps_SourceParentRequestID ]
+        DisableStepCollapsed state=False
+        refs: GLOBALS::Maps_SourceParentRequestID#13
+        Field table=FieldMap id=14 name=idSourceParentRequest
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Make the Map” ]
+        DisableStepCollapsed state=False
+        Script id=19 name="Make the Map"

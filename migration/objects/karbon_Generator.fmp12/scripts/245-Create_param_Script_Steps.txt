@@ -1,0 +1,227 @@
+# script 245: Create @param Script Steps
+# file: karbon_Generator.fmp12
+# folder: Miscellaneous Generators / Comment Generators
+# source: ScriptCatalog/Script[@id=245]
+# steps: 46 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=218 groupCollapsed=False includeInMenu=False
+
+   1    #@history 2018-02-13 dave@geistinteractive.com - WIP
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $params; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #Build script steps
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $mainObject; Value:GetValue ( $params ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $mainObject
+  11    Set Variable [ $baseTable; Value:JSONGetElement ( $mainObject ; "baseTable" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $baseTable
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #first step - this declares the object itself
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $steps; Value:ScriptStep_Comment ( "@param {object} " & $baseTable ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $steps
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  17    Set Variable [ $end; Value:ValueCount ( $params ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $end
+  18    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Exit Loop If [ $n > $end ]
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $param; Value:GetValue( $params ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $dataType; Value:JSONGetElement ( $param ; "dataType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataType
+  24    Set Variable [ $readOnly; Value:JSONGetElement ( $param ; "readOnly" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $readOnly
+  25    Set Variable [ $name; Value:JSONGetElement ( $param ; "name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  26    Set Variable [ $comment; Value:JSONGetElement ( $param ; "comment" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $comment
+  27    Set Variable [ $comment; Value:If ( not IsEmpty ( $comment ) ; " - " & $comment ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:not, fn:IsEmpty
+        Repetition
+          Calculation:
+            | 1
+        Name: $comment
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $string; Value:"@param {<<type>>} <<baseTable>>.<<name>><<comment>>" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $string
+  31    Set Variable [ $string; Value:Substitute ( $string ; 
+        	[ "<<type>>" ; $dataType ] ; 
+        	[ "<<baseTable>>" ; $baseTable ] ; 
+        	[ "<<name>>" ; $name ] ; 
+        	[ "<<comment>>" ; $comment ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $string
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $line; Value:ScriptStep_Comment ( $string ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $line
+  34    Set Variable [ $steps; Value:List( $steps ; "  " & $line ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $steps
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  37    End Loop
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $xml; Value:List(
+        ScriptStep_Comment ( "" );
+        $steps;
+        ScriptStep_Comment ( "" );
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_Comment
+        Repetition
+          Calculation:
+            | 1
+        Name: $xml
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Exit Script [ Result: $xml ]
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False

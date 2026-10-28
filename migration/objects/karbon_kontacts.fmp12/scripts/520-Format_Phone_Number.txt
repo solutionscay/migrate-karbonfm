@@ -1,0 +1,118 @@
+# script 520: Format Phone Number
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Contact Methods / Popover Edits
+# source: ScriptCatalog/Script[@id=520]
+# steps: 25 (1 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=429 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-08-05 dave@geistinteractive.com - you can run this on field save or validate to return a formatted version of the phone number based on formatting templates by country
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $FieldRef; Value:Get ( ActiveFieldTableName ) & "::" & Get ( ActiveFieldName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ActiveFieldTableName, fn:ActiveFieldName
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldRef
+   4    Set Variable [ $PhoneNumber; Value:Get ( ActiveFieldContents ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ActiveFieldContents
+        Repetition
+          Calculation:
+            | 1
+        Name: $PhoneNumber
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $Data; Value:JSONSetElement (  ""; 
+         
+        	[ "PhoneNumber" ; $PhoneNumber ; JSONString ] ; 
+        	[ "Format" ; System::TwilioFormatOption ; JSONString ] 
+        // 	[ "CountryCode" ; "US" ; jsonstring ] 
+         
+        )
+        
+        
+        // #TODO: support international phones  ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, System::TwilioFormatOption#70
+        Repetition
+          Calculation:
+            | 1
+        Name: $Data
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ IsEmpty ( System::TwilioAccountSid ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, System::TwilioAccountSid#68
+   9    Perform Script [ “_wip_Format Phone { Data }” from file: “karbon_kontroller”; Parameter: $Data ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=523 name="_wip_Format Phone { Data }" in=karbon_kontroller.fmp12
+  10    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Perform Script [ “Phone Lookup” from file: “karbon_kontroller”; Parameter: $Data ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=533 name="Phone Lookup" in=karbon_kontroller.fmp12
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $Result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  15    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  16    Show Custom Dialog [ Title: "Error"; Message: "The phone number appears to be invalid."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  17    Set Selection [ Start Position1; End Position20 ]
+        DisableStepCollapsed state=False
+  18    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field By Name [ $FieldRef; JSONGetElement ( $result ; "PhoneNumber" ) ]
+        DisableStepCollapsed state=False
+        Result
+          refs: fn:JSONGetElement
+  22 // Set Field [ UtilityContactMethod::Phone; JSONGetElement ( $result ; "PhoneNumber" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityContactMethod id=13 name=Phone
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False

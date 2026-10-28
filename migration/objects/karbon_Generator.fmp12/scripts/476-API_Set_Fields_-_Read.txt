@@ -1,0 +1,190 @@
+# script 476: API Set Fields - Read
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=476]
+# steps: 37 (2 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2 // Insert Text [ “JSON.Pluck.From ( $Customer ) & JSON.Pluck ( 
+        
+        List ( 
+        	JSON.Pluck.Prop ( "FirstName" ; JSONString ; "FirstName" ) ; 
+        
+        )
+        
+        
+        )” ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | JSON.Pluck.From ( $Customer ) & JSON.Pluck ( 
+          | 
+          | List ( 
+          | 	JSON.Pluck.Prop ( "FirstName" ; JSONString ; "FirstName" ) ; 
+          | 
+          | )
+          | 
+          | 
+          | )
+   3 // Set Variable [ $pluckProp; Value:List ( $pluckProp ; "	JSON.Pluck.Prop ( \"<<name>>\" ; <<dataType ; \"<<name>>\" ) ; " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $pluckProp
+   4    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Create Set Field script steps
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $entity; Value:ApiGenerator::Entity ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::Entity#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  11    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Exit Loop If [ IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ApiGeneratorLine::Id#1
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $skip; Value:ApiGeneratorLine::FmpIgnore or 
+        
+        IsEmpty ( ApiGeneratorLine::FmpFieldName ) or 
+        
+        not IsEmpty ( ApiGeneratorLine::JsonPathOut ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::FmpIgnore#11, fn:or, fn:IsEmpty, ApiGeneratorLine::FmpFieldName#4, fn:not, ApiGeneratorLine::JsonPathOut#26
+        Repetition
+          Calculation:
+            | 1
+        Name: $skip
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ not $skip ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #Init
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $table; Value:ApiGeneratorLine::FmpTableName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::FmpTableName#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $table
+  21    Set Variable [ $fieldName; Value:ApiGeneratorLine::FmpFieldName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::FmpFieldName#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $fieldName
+  22    Set Variable [ $name; Value:ApiGeneratorLine::JsonPropertyName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #Build a list of Set Field steps
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $setFieldString; Value:"$" & $name ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $setFieldString
+  26    Set Variable [ $setFieldString; Value:ScriptStep_SetField ( "f_" & $table & "::" & $fieldName ; $setFieldString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_SetField
+        Repetition
+          Calculation:
+            | 1
+        Name: $setFieldString
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Variable [ $stepsSetFields; Value:List( $stepsSetFields ; $setFieldString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $stepsSetFields
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    End If
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  33    End Loop
+        DisableStepCollapsed state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Exit Script [ Result: $stepsSetFields ]
+        DisableStepCollapsed state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False

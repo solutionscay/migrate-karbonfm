@@ -1,0 +1,111 @@
+# script 264: Ignore All
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / UI
+# source: ScriptCatalog/Script[@id=264]
+# steps: 29 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=298 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #toggle the show all checkbox
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Field [ ApiGenerator::IgnoreAll; If ( ApiGenerator::IgnoreAll ; "" ; 1 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:If, ApiGenerator::IgnoreAll#22
+        Field table=ApiGenerator id=22 name=IgnoreAll
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #we probably want to show ignored or they will disappear from view
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Field [ ApiGenerator::_ShowIgnored; 1 ]
+        DisableStepCollapsed state=False
+        Field table=ApiGenerator id=27 name=_ShowIgnored
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Freeze Window
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $row; Value:Get ( ActivePortalRowNumber ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ActivePortalRowNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $row
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  15    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Exit Loop If [ IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ApiGeneratorLine::Id#1
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Field [ ApiGeneratorLine::FmpIgnore; If ( ApiGenerator::IgnoreAll ; 1 ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:If, ApiGenerator::IgnoreAll#22
+        Field table=ApiGeneratorLine id=11 name=FmpIgnore
+  20    If [ ApiGeneratorLine::FmpIgnore ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: ApiGeneratorLine::FmpIgnore#11
+  21    Set Field [ ApiGeneratorLine::required; "" ]
+        DisableStepCollapsed state=False
+        Field table=ApiGeneratorLine id=19 name=required
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  25    End Loop
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Go to Portal Row [ $row ]
+        [ No dialog ]
+        NoInteract state=True
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

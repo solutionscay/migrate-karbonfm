@@ -1,0 +1,75 @@
+# script 663: btn: Download File and Open (filename)
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Attachables
+# source: ScriptCatalog/Script[@id=663]
+# steps: 14 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=657 groupCollapsed=False includeInMenu=False
+
+   1    Set Variable [ $filename; Value:Get ( ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $filename
+   2    Set Variable [ $dir; Value:Get ( TemporaryPath) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:TemporaryPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $dir
+   3    Set Variable [ $path; Value:$dir & $filename ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ Get(WindowStyle)= 3 //in file list card window ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:WindowStyle
+   6    Export Field Contents [ Attachable::Container; “$path”; Automatically open; Create folders:No ]
+        CreateDirectories state=False
+        DisableStepCollapsed state=False
+        AutoOpen state=True
+        CreateEmail state=False
+        UniversalPathList: $path
+        Field table=Attachable id=17 name=Container
+   7    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #attachment portal
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Export Field Contents [ Invoice_AttachableRef_Attachable::Container; “$path”; Automatically open; Create folders:No ]
+        CreateDirectories state=False
+        DisableStepCollapsed state=False
+        AutoOpen state=True
+        CreateEmail state=False
+        UniversalPathList: $path
+        Field table=Invoice_AttachableRef_Attachable id=17 name=Container
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12 // Set Variable [ $filename; Value:Attachable::FileName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Attachable::FileName#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $filename
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Exit Script [  ]
+        DisableStepCollapsed state=False

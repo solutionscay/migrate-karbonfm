@@ -1,0 +1,230 @@
+# table 160: TestLine
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=160]
+# fields: 26
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=Test_TestLine:
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=Test_TestLine (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=Test_TestLine (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=Test_TestLine (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=Test_TestLine:
+      | // ensure this field always evaluates to true
+      | IsEmpty ( Self ) or not IsEmpty ( Self )
+      refs: fn:IsEmpty, fn:Self, fn:or, fn:not
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=TestId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=ScriptId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=JSNObjectId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Normal name=LineTypeId
+  Comment: Pre, Test, or Post
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Number fieldType=Normal name=Sort
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=SQL_FieldValue
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=SQL_TableName
+  Comment: the TableName to retrieve for Pre or Post
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Normal name=SQL_FieldReturn
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=FileName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=ScriptName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Normal name=LastResultPassInd
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Test_TestLine (inactive):
+      | Let([
+      | 
+      | NumberOfResults = Count( Test_TestLine_TestLineResult::Id );
+      | NumberPassed = Sum( Test_TestLine_TestLineResult::LastTestResultPassInd );
+      | UseResults = If( Count( Test_TestLine_TestLineResult::Id ) > 0; True; False );
+      | SQLOverwrite = If( SQL_Result = LastResult; True; False );
+      | UseSQL = SQL_Ind
+      | 
+      | ];
+      | 
+      | Case(
+      | 
+      | UseSQL and SQLOverwrite; True;
+      | UseResults and NumberOfResults = NumberPassed; True; 
+      | False )
+      | 
+      | )
+      refs: fn:Let, fn:Count, Test_TestLine_TestLineResult::Id#3, fn:Sum, Test_TestLine_TestLineResult::LastTestResultPassInd#12, fn:If, fn:True, fn:False, Test_TestLine::LastResult#20, Test_TestLine::SQL_Ind#23, fn:Case, fn:and
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Number fieldType=Normal name=LastResultFailInd
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Test_TestLine (inactive):
+      | Let([
+      | 
+      | NumberFailed = Sum( Test_TestLine_TestLineResult::LastTestResultFailInd );
+      | SQLOverwrite = If( SQL_Result <> LastResult; True; False );
+      | UseSQL = SQL_Ind
+      | 
+      | ];
+      | 
+      | Case(
+      | 
+      | UseSQL and SQLOverwrite; True;
+      | NumberFailed > 0; True; 
+      | False 
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:Sum, Test_TestLine_TestLineResult::LastTestResultFailInd#13, fn:If, Test_TestLine::SQL_Result#22, Test_TestLine::LastResult#20, fn:True, fn:False, Test_TestLine::SQL_Ind#23, fn:Case, fn:and
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name=LastResult
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Number fieldType=Normal name=SQL_FieldJSONInd
+  Comment: Indicates whether the selected field returns a JSON Object or simple text
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=SQL_Result
+  Comment: If the SQL Result is not a JSON object, it just needs to be the value in this field to pass
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Test_TestLine:
+      | If ( SQL_FieldJSONInd; ""; SQL_Result )
+      refs: fn:If, Test_TestLine::SQL_FieldJSONInd#21, Test_TestLine::SQL_Result#22
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Number fieldType=Normal name=SQL_Ind
+  Comment: Means the developer is using SQL to analyze this testLine
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Number fieldType=Normal name=SQL_GetFromResultInd
+  Comment: If you want to get this field from the JSON result
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Normal name=SQL_Field
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Number fieldType=Normal name=SQL_GetFromResultKey
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Calculated name=SQL_GetFromResultValue
+  Calculation table=Test_TestLine:
+    | JSONGetElement ( Test_TestLine#ActualTest::LastResult ; SQL_GetFromResultKey )
+    refs: fn:JSONGetElement, Test_TestLine#ActualTest::LastResult#20, Test_TestLine::SQL_GetFromResultKey#26
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

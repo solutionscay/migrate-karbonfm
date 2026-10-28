@@ -1,0 +1,388 @@
+# table 129: Requests
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=129]
+# fields: 28
+# records: 0
+
+Field id=23 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=Requests (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=1 dataType=Text fieldType=Normal name=urlEntry
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Calculated name=url
+  Calculation table=Requests:
+    | urlEntry & query
+    refs: Requests::urlEntry#1, Requests::query#7
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=responseStatus
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=responseJSON
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=ResponseHeaders
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=ResponseCode
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Calculated name=requestJSONFileMakerCalcModify
+  Calculation table=Requests:
+    | Let(
+    | [
+    | data = "\"" & Substitute (   Requests::body ; "\"" ; "\\\"")& "\";";
+    | needData = not IsEmpty(data) and Requests::method <> "GET";
+    | dataStep = If( needData ; jsonModifyStep( "data" ; "data") );
+    | dataDeclaration = If( needData ; "  data=" & data & "¶" & If(uoteData ; "  data=Quote(data);" ; "" ) )
+    | ];
+    | 
+    | 
+    | List(
+    | "Let("; 
+    | "[" ;
+    | dataDeclaration ;
+    | "  json=\"{}\";";
+    | 
+    |  jsonModifyStep( "method" ; Requests::method);
+    |  jsonModifyStep( "url" ; Requests::urlEntry);
+    |  If(not IsEmpty(Requests::basicAuthUser) and includeAuth; jsonModifyStep( "auth.user" ; Requests::basicAuthUser) );
+    |  If ( not IsEmpty(Requests::basicAuthPassword )and includeAuth; jsonModifyStep( "auth.password" ; Requests::basicAuthPassword ) );
+    | 
+    | ) & "¶"
+    | 
+    | & List(QueryParameters::pairJSONModify) & "¶"
+    | 
+    | & List(Headers::pairJSONModify) & "¶" &
+    | 
+    | List(
+    | dataStep;
+    | If(uoteData ;  jsonModifyStep( "dataQuoted" ; 1) );
+    | "  null=\"\"";
+    | "];¶" ;
+    | "json";
+    | "¶)"
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:Substitute, Requests::body#18, fn:not, fn:IsEmpty, fn:and, Requests::method#2, fn:If, cf:jsonModifyStep, Requests::uoteData#30, fn:List, Requests::urlEntry#1, Requests::basicAuthUser#9, Requests::includeAuth#22, Requests::basicAuthPassword#10, QueryParameters::pairJSONModify#6, Headers::pairJSONModify#6
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Calculated name=requestJSONDisplay
+  Calculation table=Requests:
+    | Let(
+    | [
+    | 
+    | 
+    | json = requestJSON;
+    | json = If( not includeAuth ; jsonDelete(json ; "auth"); json );
+    | headers = jsonGet(json; "headers");
+    | headers = If( not includeAuth ; jsonDelete(headers ; "Authorization"); headers );
+    | json = jsonModify ( json ; "headers" ; headers )
+    | 
+    | ];
+    | jsonPrettyPrint(
+    |    json ; "  "
+    | )
+    | 
+    | )
+    refs: fn:Let, Requests::requestJSON#15, fn:If, fn:not, Requests::includeAuth#22, cf:jsonDelete, cf:jsonGet, cf:jsonModify, cf:jsonPrettyPrint
+  Comment: displays on the layout, with the option to show or hide auth
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Calculated name=requestJSON
+  Calculation table=Requests:
+    | Let(
+    | [
+    | 
+    | method = Requests::method ;
+    | 
+    | data = body;
+    | data = If(uoteData ; Quote ( data ); data );
+    | 
+    | json =
+    | 
+    | jsonO ( 
+    |  jsonOp("method" ; method) &
+    |  jsonOp("url" ; Requests::urlEntry )&
+    |  jsonOp("query" ; Requests::queryJSON )&
+    |  jsonOp("headers" ; Requests::headersJSON )
+    |  );
+    | 
+    | json = jsonModify(json ; "auth.user" ; basicAuthUser );
+    | json = jsonModify(json ; "auth.password" ; basicAuthPassword);
+    | 
+    | json = If(
+    |   method <> "GET" and not IsEmpty(data) ; jsonModify ( json ; "data" ; data ) ;
+    |  json
+    | );
+    | json = If(
+    |   uoteData and not IsEmpty(data) ; jsonModify ( json ; "dataQuoted" ; 1 ) ;
+    |  json
+    | )
+    | 
+    | ];
+    | jsonPrettyPrint(
+    |    json; "  "
+    | )
+    | 
+    | )
+    refs: fn:Let, Requests::method#2, Requests::body#18, fn:If, Requests::uoteData#30, fn:Quote, cf:jsonO, cf:jsonOp, Requests::urlEntry#1, Requests::queryJSON#12, Requests::headersJSON#13, cf:jsonModify, Requests::basicAuthUser#9, Requests::basicAuthPassword#10, fn:and, fn:not, fn:IsEmpty, cf:jsonPrettyPrint
+  Comment: the complete request that will be passed to the HTTP script to perform the Request
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Text fieldType=Calculated name=request.jsonFile
+  Calculation table=Requests:
+    | Let(
+    | [
+    | 
+    | // this script doing the export can set this variable
+    | // to controll if auth is used
+    | 
+    | removeAuth = $removeAuth;
+    | 
+    | 
+    | json = jsonModify ( "{}"; "name" ; Requests::name );
+    | json = jsonModify ( json ; "notes" ; jsonEscape(Requests::notes) );
+    | 
+    | 
+    | requestJSON = Requests::requestJSON;
+    | requestJSON = If ( removeAuth ; jsonDelete(requestJSON ; "auth") ; requestJSON );
+    | headers = jsonGet(requestJSON; "headers");
+    | headers = If( removeAuth ; jsonDelete(headers ; "Authorization"); headers );
+    | requestJSON = jsonModify ( requestJSON ; "headers" ; headers );
+    | 
+    | 
+    | json = jsonModify ( json ; "request" ; requestJSON )
+    | 
+    | ];
+    | jsonPrettyPrint ( 
+    |    json ; "  "
+    | )
+    | 
+    | )
+    refs: fn:Let, cf:jsonModify, Requests::name#24, cf:jsonEscape, Requests::notes#25, Requests::requestJSON#15, fn:If, cf:jsonDelete, cf:jsonGet, cf:jsonPrettyPrint
+  Comment: the contents of the file that will get written to disk on export. Auth is removed by the script as required
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=ResponseBodyRaw
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Calculated name=queryJSON
+  Calculation table=Requests:
+    | Let(
+    | [
+    | s = List(
+    |   QueryParameters::pairJSON
+    | )
+    | ];
+    | If ( 
+    |   IsEmpty ( s ) ; "{}" ; 
+    |  "{" & Substitute ( s ; "¶" ; ", " ) & "}"
+    | )
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:List, QueryParameters::pairJSON#5, fn:If, fn:IsEmpty, fn:Substitute
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Calculated name=query
+  Calculation table=Requests:
+    | Let(
+    | [
+    | pairs = List( QueryParameters::pair)
+    | ];
+    | 
+    | If ( IsEmpty ( pairs ); ""; "?" & Substitute(pairs; "¶" ; "&") )
+    | 
+    | )
+    refs: fn:Let, fn:List, QueryParameters::pair#4, fn:If, fn:IsEmpty, fn:Substitute
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Normal name=notes
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Text fieldType=Normal name=name
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=method
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Calculated name=jsonPathResult
+  Calculation table=Requests:
+    | Let(
+    | [
+    | json = jsonGet( ResponseBodyRaw ; jsonPath ) 
+    | ];
+    | 
+    |  If ( 
+    |    IsEmpty ( json ); ResponseBodyRaw ;
+    |    jsonPrettyPrint(json ; "  ")
+    |  )
+    | 
+    | )
+    refs: fn:Let, cf:jsonGet, Requests::ResponseBodyRaw#3, Requests::jsonPath#26, fn:If, fn:IsEmpty, cf:jsonPrettyPrint
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Normal name=jsonPath
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Number fieldType=Normal name=includeAuth
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Requests:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Calculated name=headersJSON
+  Calculation table=Requests:
+    | Let(
+    | [
+    | s = List(
+    |   Headers::pairJSON
+    | )
+    | ];
+    | If ( 
+    |   IsEmpty ( s ) ; "{}" ; 
+    |  "{" & Substitute ( s ; "¶" ; ", " ) & "}"
+    | )
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:List, Headers::pairJSON#5, fn:If, fn:IsEmpty, fn:Substitute
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Calculated name=headers
+  Calculation table=Requests:
+    | Let(
+    | [
+    | listOfHeaders  = List(Headers::pairs)
+    | ];
+    | 
+    | If( IsEmpty ( listOfHeaders) ; "" ; listOfHeaders )
+    | 
+    | )
+    refs: fn:Let, fn:List, Headers::pairs#4, fn:If, fn:IsEmpty
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=body
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=basicAuthPassword
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=basicAuthUser
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Number fieldType=Normal name=uoteData
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=31 dataType=Text fieldType=Calculated name=requestJSONFileMakerCalcModifyNative
+  Calculation table=Requests:
+    | Let(
+    | [
+    | data = "\"" & Substitute (   Requests::body ; "\"" ; "\\\"")& "\";";
+    | needData = not IsEmpty(data) and Requests::method <> "GET";
+    | dataStep = If( needData ; JSONSetElement_Step ( "data" ; "data") );
+    | dataDeclaration = If( needData ; "  data=" & data & "¶" & If(uoteData ; "  data=Quote(data);" ; "" ) )
+    | ];
+    | 
+    | 
+    | List(
+    | "Let("; 
+    | "[" ;
+    | dataDeclaration ;
+    | "  json=\"{}\";";
+    | 
+    |  JSONSetElement_Step( "method" ; Requests::method);
+    |  JSONSetElement_Step( "url" ; Requests::urlEntry);
+    |  If(not IsEmpty(Requests::basicAuthUser) and includeAuth; JSONSetElement_Step_WithType( "auth.user" ; Requests::basicAuthUser ; "JSONString") );
+    |  If ( not IsEmpty(Requests::basicAuthPassword )and includeAuth; JSONSetElement_Step_WithType( "auth.password" ; Requests::basicAuthPassword ; "JSONString" ) );
+    | 
+    | ) & "¶"
+    | 
+    | & List(QueryParameters::pairJSONSetElement) & "¶"
+    | 
+    | & List(Headers::pairJSONSetElement) & "¶" &
+    | 
+    | List(
+    | dataStep;
+    | If(uoteData ;  JSONSetElement_Step( "dataQuoted" ; 1) );
+    | "  null=\"\"";
+    | "];¶" ;
+    | "json";
+    | "¶)"
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:Substitute, Requests::body#18, fn:not, fn:IsEmpty, fn:and, Requests::method#2, fn:If, cf:JSONSetElement_Step, Requests::uoteData#30, fn:List, Requests::urlEntry#1, Requests::basicAuthUser#9, Requests::includeAuth#22, cf:JSONSetElement_Step_WithType, Requests::basicAuthPassword#10, QueryParameters::pairJSONSetElement#7, Headers::pairJSONSetElement#9
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

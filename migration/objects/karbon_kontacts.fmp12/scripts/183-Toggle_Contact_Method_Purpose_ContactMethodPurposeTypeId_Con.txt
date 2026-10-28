@@ -1,0 +1,97 @@
+# script 183: Toggle Contact Method Purpose { ContactMethodPurposeTypeId, ContactMethodId }
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Contact Methods
+# source: ScriptCatalog/Script[@id=183]
+# steps: 21 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=175 groupCollapsed=False includeInMenu=True
+
+   1    #2018-02-06 Dave Graham: created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $data; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Freeze Window
+        DisableStepCollapsed state=False
+   6    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Toggle Contact Method Purpose { ContactMethodId, ContactMethodPurposeTypeId }” from file: “karbon_kontroller”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=185 name="Toggle Contact Method Purpose { ContactMethodId, ContactMethodPurposeTypeId }" in=karbon_kontroller.fmp12
+   9    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  12    Set Variable [ $message; Value:JSONGetElement ( $result ; "errorMessage" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $message
+  13    Show Custom Dialog [ Title: "Error"; Message: "An error occurred: " & $errorMessage & "."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $RefreshPortalName; Value:JSONGetElement ( $data ; "RefreshPortalName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $RefreshPortalName
+  17    Refresh Portal [ Object Name: $RefreshPortalName ]
+        DisableStepCollapsed state=False
+  18    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False

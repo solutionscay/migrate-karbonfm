@@ -1,0 +1,150 @@
+# script 113: Save QBO Record To FM ( {Entity, Record )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Public / General
+# source: ScriptCatalog/Script[@id=113]
+# steps: 36 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=594 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Saves a QBO record to FileMaker
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} params.Entity the target Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} params.Record a json Record object
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @returnSuccess {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnSuccess {number} error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @returnError {number} error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $params; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  20    Set Variable [ $Entity; Value:JSONGetElement ( $params ;  "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  21    Set Variable [ $Record; Value:JSONGetElement ( $params ;  "Record" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Record
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ $Entity = "Invoice" or $Entity = "PurchaseOrder" or $Entity = "SalesReceipt" or $Entity = "Estimate" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  25    #addresses can be goofy on transactions, so we normalize them here
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Perform Script [ “Normalize Addresses On Transactions ( Data )”; Parameter: $record ]
+        DisableStepCollapsed state=False
+        Script id=442 name="Normalize Addresses On Transactions ( Data )"
+  27    Set Variable [ $record; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $record
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; $Entity ; JSONString ];
+        	[ "Record" ; $Record ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Perform Script [ “Configure Saving To FM( {Entity ; Record })”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=443 name="Configure Saving To FM( {Entity ; Record })"
+  34    Set Variable [ $error; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Exit Script [ Result:  $error ]
+        DisableStepCollapsed state=False

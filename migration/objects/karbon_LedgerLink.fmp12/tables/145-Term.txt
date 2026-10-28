@@ -1,0 +1,146 @@
+# table 145: Term
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=145]
+# fields: 14
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Term:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Number fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=Always
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Number fieldType=Normal name=qbo_send
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=Term:
+      | Let(
+      | [
+      | x = GetField("")
+      | 
+      | ];
+      | Case(
+      |    $LL_IsUpdatingThisRecord ; Self;
+      |    1
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:GetField, fn:Case, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=name
+  AutoEnter allowEditing=True
+  Validation maxLength=True type=Always
+    MaxDataLength value=31
+    StrictValidation value=True
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Number fieldType=Normal name=discountPercent
+  Comment: Discount percentage available against an amount if paid within the days specified by DiscountDays
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=100 from=0
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=active
+  Comment: If 1, this entity is currently enabled for use by QuickBooks
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Number fieldType=Normal name=dueDays
+  Comment: Number of days from delivery of goods or services until the payment is due.
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=999 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Number fieldType=Normal name=discountDays
+  Comment: Discount applies if paid within this number of days. Used only when DueDays is specified.
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=999 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Number fieldType=Normal name=dayOfMonthDue
+  Comment: Payment must be received by this day of the month. Used only if DueDays is not specified.
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=31 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Number fieldType=Normal name=dueNextMonthDays
+  Comment: Payment due next month if issued that many days before the DayOfMonthDue.
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=999 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Normal name=discountDayOfMonth
+  Comment: Discount applies if paid before this day of month.
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=31 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Calculated name=nameForActiveValueList
+  Calculation table=Term:
+    | If ( active ; name )
+    refs: fn:If, Term::active#11, Term::name#5
+  Storage storeCalculationResults=True autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Normal name="name Copy"
+  AutoEnter allowEditing=True
+  Validation maxLength=True type=Always
+    MaxDataLength value=31
+    StrictValidation value=True
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Normal name=Type
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

@@ -1,0 +1,323 @@
+source_id,source_hash,kind,file,id,name,category,context,tier,parameters,calls,callers,meaning,target_signature,open_question
+karbon_kontacts.fmp12/custom-functions/1-Custom.Error.txt,a6b0819504063a740952dd0fc8d284168d7034571f4c2a4e7534f53ce3ae1132,custom-functions,karbon_kontacts.fmp12,1,Custom.Error,utility,context-dependent,tier3,"descriptor
+data",Error,"karbon_kontacts.fmp12/scripts/323-btn_Send_Customer_to_QBO.txt
+karbon_kontacts.fmp12/scripts/535-Send_Attachable_to_QBO_FmId.txt
+karbon_kontacts.fmp12/scripts/54-Store_UserID_On_Session.txt","Builds a custom error object: calls Error(-2; descriptor; data) and sets message to ""Custom Error"". Header comment calls it an example error for another module; -2 is the custom errorCode.","customError(descriptor: string, data?: object): ErrorObject",Byte-identical body in: Picker Module.fmp12#16; karbon_Build.fmp12#1; karbon_charts.fmp12#1; karbon_data.fmp12#3; karbon_kontroller.fmp12#1; karbon_log.fmp12#1.
+karbon_kontacts.fmp12/custom-functions/2-Error.txt,5300f0f3c4caebca31c79f73b221b45396591b2b4b10a72d275ccdea5467d5df,custom-functions,karbon_kontacts.fmp12,2,Error,utility,context-dependent,tier3,"errorCode
+descriptor
+data",Error.Description,"karbon_kontacts.fmp12/custom-functions/1-Custom.Error.txt
+karbon_kontacts.fmp12/custom-functions/5-Error.Last.txt","Wraps a FileMaker error in a JSON object. errorCode empty is coerced to 0, else GetAsNumber. Always sets errorCode; adds errorMessage from Error.Description when code >= -1. When code is nonzero it also adds scriptName (Get(ScriptName)), type ""FM"", descriptor and data (data as JSONObject). Code 0 returns only {errorCode:0}.","errorObject(errorCode: number|string|null, descriptor: string, data?: object): ErrorObject","Reads Get(ScriptName), which has no direct target equivalent. Byte-identical body in: Picker Module.fmp12#19; karbon_Build.fmp12#4; karbon_Generator.fmp12#74; karbon_charts.fmp12#4; karbon_data.fmp12#6; karbon_log.fmp12#4."
+karbon_kontacts.fmp12/custom-functions/3-Error.Description.txt,11a9df3a0f38958bf15e9ab8668a8f3659f9ba2c9ebe9ecfbaf96dc8facc97c9,custom-functions,karbon_kontacts.fmp12,3,Error.Description,text,pure,tier3,errorCode,none,karbon_kontacts.fmp12/custom-functions/2-Error.txt,"Looks up the FileMaker error text for a code with nested Case ranges (0, <100, <200, <300, <500, <700, <800, <900, <1200, <1300, else). Unknown codes in a range return ""Unknown error code"". Code 301 returns ""Record is in use by "" & Get(LastErrorDetail), marked in a comment as a test of newer versions. Code 0 returns ""No error"". Non-numeric input is not coerced.",fmErrorDescription(code: number): string,"Reads Get(LastErrorDetail) for code 301, so it is not purely a function of its parameter. Differs from karbon_data twin (id 7) only at code 301. Decide whether the target needs FileMaker error-code text at all. Byte-identical body in: Picker Module.fmp12#20; karbon_Build.fmp12#5; karbon_Generator.fmp12#75; karbon_charts.fmp12#5; karbon_kontroller.fmp12#5; karbon_log.fmp12#5."
+karbon_kontacts.fmp12/custom-functions/4-Error.IsError.txt,ed4af00924a202b2d5b50f87609e68e9cef450997e77929c905934a87fde40aa,custom-functions,karbon_kontacts.fmp12,4,Error.IsError,utility,pure,tier3,thisError,none,"karbon_kontacts.fmp12/scripts/165-Create_Customer.txt
+karbon_kontacts.fmp12/scripts/173-Create_Employee.txt
+karbon_kontacts.fmp12/scripts/174-Button_Set_Primary_Phone.txt
+karbon_kontacts.fmp12/scripts/180-Button_Set_Primary_Network_Address.txt
+karbon_kontacts.fmp12/scripts/181-Button_Set_Primary_Address.txt
+karbon_kontacts.fmp12/scripts/183-Toggle_Contact_Method_Purpose_ContactMethodPurposeTypeId_Con.txt
+karbon_kontacts.fmp12/scripts/199-Button_Delete_Address.txt
+karbon_kontacts.fmp12/scripts/202-Button_Delete_Phone.txt
+karbon_kontacts.fmp12/scripts/203-Button_Delete_Network_Address.txt
+karbon_kontacts.fmp12/scripts/211-btn_Delete_SalesTransaction_From_Customer.txt
+karbon_kontacts.fmp12/scripts/212-btn_Delete_SalesTransaction.txt
+karbon_kontacts.fmp12/scripts/214-Send_Invoice_to_QBO_FMId.txt
+karbon_kontacts.fmp12/scripts/222-Refresh_Invoice_From_QBO_qbo_id.txt
+karbon_kontacts.fmp12/scripts/224-Display_Sales_Transaction_in_a_New_Window_Id.txt
+karbon_kontacts.fmp12/scripts/241-Handler_Address_Selection_from_Contact_Card.txt
+karbon_kontacts.fmp12/scripts/257-Save_Card_-_UtilityNote.txt
+karbon_kontacts.fmp12/scripts/266-Save_Card_-_UtiityMeeting.txt
+karbon_kontacts.fmp12/scripts/272-Create_Invoice_Customer_Id.txt
+karbon_kontacts.fmp12/scripts/276-New_Payment_API_params.txt
+karbon_kontacts.fmp12/scripts/283-btn_Save_Payment.txt
+karbon_kontacts.fmp12/scripts/289-Save_Card_-_UtiityTask.txt
+karbon_kontacts.fmp12/scripts/299-Refresh_SalesReceipt_From_QBO_qbo_id.txt
+karbon_kontacts.fmp12/scripts/307-Open_Card_-_UtilityDiscussion.txt
+karbon_kontacts.fmp12/scripts/308-Save_Card_-_UtilityDiscussion.txt
+karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt
+karbon_kontacts.fmp12/scripts/314-Discussion_-_Add_User_to_Discussion_Deprecated.txt
+karbon_kontacts.fmp12/scripts/315-Discussion_-_Add_Comment_to_Discussion_Deprecated.txt
+karbon_kontacts.fmp12/scripts/323-btn_Send_Customer_to_QBO.txt
+karbon_kontacts.fmp12/scripts/333-Send_Utility_Email_Message.txt
+karbon_kontacts.fmp12/scripts/335-btn_Unlock_Sales_Transaction_Id.txt
+karbon_kontacts.fmp12/scripts/351-Button_Add_Party_Email_Address_to_Email_Message_To_Cc_Bcc_Em.txt
+karbon_kontacts.fmp12/scripts/353-Delete_Email_Recipient.txt
+karbon_kontacts.fmp12/scripts/354-Select_Attachment.txt
+karbon_kontacts.fmp12/scripts/365-User_Detail_-_Update_Task_Portal.txt
+karbon_kontacts.fmp12/scripts/366-User_Detail_-_Quick_Add_Task_deprecated.txt
+karbon_kontacts.fmp12/scripts/371-Save_Card_-_Utility_User.txt
+karbon_kontacts.fmp12/scripts/377-btn_Lock_SalesTransaction.txt
+karbon_kontacts.fmp12/scripts/388-Search_for_Duplicate_Organizations.txt
+karbon_kontacts.fmp12/scripts/389-Search_for_Duplicate_People.txt
+karbon_kontacts.fmp12/scripts/393-Create_Parties.txt
+karbon_kontacts.fmp12/scripts/431-Save_Contact_Method_-_Phone.txt
+karbon_kontacts.fmp12/scripts/433-Save_Contact_Method_-_Address.txt
+karbon_kontacts.fmp12/scripts/435-Save_Contact_Method_-_Network_Address.txt
+karbon_kontacts.fmp12/scripts/482-Create_Welcome_Initial_Parties.txt
+karbon_kontacts.fmp12/scripts/488-Utility_User_-_Search_for_Duplicate_People.txt
+karbon_kontacts.fmp12/scripts/513-btn_Save_Card_-_UtilityItem.txt
+karbon_kontacts.fmp12/scripts/514-Create_Sales_Receipt_Id.txt
+karbon_kontacts.fmp12/scripts/517-Save_Utility_Email_Message_as_Draft.txt
+karbon_kontacts.fmp12/scripts/520-Format_Phone_Number.txt
+karbon_kontacts.fmp12/scripts/54-Store_UserID_On_Session.txt
+karbon_kontacts.fmp12/scripts/582-Send_SalesReceipt_to_QBO_FMId.txt
+karbon_kontacts.fmp12/scripts/609-btn_Remove_Sales_Transaction_From_QBO.txt
+karbon_kontacts.fmp12/scripts/610-btn_Create_Opportunity_From_Party.txt
+karbon_kontacts.fmp12/scripts/612-btn_Change_Opportunity_Status.txt
+karbon_kontacts.fmp12/scripts/615-OnTimer_Handle_Create_Opportunity.txt
+karbon_kontacts.fmp12/scripts/626-deprecated_btn_Add_Existing_File_as_FileAttachment_to_SalesT.txt
+karbon_kontacts.fmp12/scripts/627-btn_Delete_FileAttachment_from_SalesTransaction.txt
+karbon_kontacts.fmp12/scripts/631-Handler_Address_Selection_from_New_Contact_Wizard.txt
+karbon_kontacts.fmp12/scripts/637-btn_Delete_FileAttachment_from_Opportunity.txt
+karbon_kontacts.fmp12/scripts/639-OnTimer_Handle_Add_Existing_File_as_FileAttachment_DEPRECATE.txt
+karbon_kontacts.fmp12/scripts/642-Add_File_json.txt
+karbon_kontacts.fmp12/scripts/648-btn_Delete_FileAttachment_from_Party.txt
+karbon_kontacts.fmp12/scripts/66-wip_Handler_Employee_Selection.txt
+karbon_kontacts.fmp12/scripts/660-Create_UtilityEmailMessage_json.txt
+karbon_kontacts.fmp12/scripts/666-Button_Create_Note_from_Opportunity.txt
+karbon_kontacts.fmp12/scripts/669-Button_Create_Note_from_Party.txt
+karbon_kontacts.fmp12/scripts/670-btn_Create_Task_From_Opportunity.txt
+karbon_kontacts.fmp12/scripts/673-Add_Edit_Activity_Party_to_Activity_ActivityPartyRoleId.txt
+karbon_kontacts.fmp12/scripts/676-Handler_Meeting_Attendee_Selection.txt
+karbon_kontacts.fmp12/scripts/683-Button_Create_Meeting_From_Opportunity.txt
+karbon_kontacts.fmp12/scripts/691-Button_Create_Email_Message_From_Opportunity.txt
+karbon_kontacts.fmp12/scripts/694-wip_Button_Add_Comment_to_Activity_Discussion_v2.txt
+karbon_kontacts.fmp12/scripts/696-wip_Button_Add_User_to_Selected_Discussion_Deprecated.txt
+karbon_kontacts.fmp12/scripts/701-Button_Add_Activity_Attachment_v2.txt
+karbon_kontacts.fmp12/scripts/704-Button_Create_Call_from_Opportunity.txt
+karbon_kontacts.fmp12/scripts/706-Button_Create_Call_from_Party.txt
+karbon_kontacts.fmp12/scripts/715-Open_Card_-_Discussion_v1__Deprecated.txt
+karbon_kontacts.fmp12/scripts/719-Handler_Subscriber_Selection_deprecated.txt
+karbon_kontacts.fmp12/scripts/722-Timer_Handle_Assign_Referring_Party.txt
+karbon_kontacts.fmp12/scripts/725-Button_Add_Activity_Attachment_v1.txt
+karbon_kontacts.fmp12/scripts/757-dfg.txt
+karbon_kontacts.fmp12/scripts/758-btn_Mark_Task_Complete.txt
+karbon_kontacts.fmp12/scripts/759-btn_Mark_Task_Incomplete.txt
+karbon_kontacts.fmp12/scripts/76-System_Startup.txt
+karbon_kontacts.fmp12/scripts/760-btn_Create_Task_From_User_Home.txt
+karbon_kontacts.fmp12/scripts/767-Set_up_Opportunity_List_View.txt
+karbon_kontacts.fmp12/scripts/770-Button_Create_Email_Message_From_Party.txt
+karbon_kontacts.fmp12/scripts/771-Button_Create_Meeting_From_Party.txt
+karbon_kontacts.fmp12/scripts/772-btn_Create_Task_From_Party.txt
+karbon_kontacts.fmp12/scripts/775-Button_Send_Email_Message.txt
+karbon_kontacts.fmp12/scripts/776-Button_Add_Other_Email_Address_to_Email_Message_To_Cc_Bcc_Em.txt
+karbon_kontacts.fmp12/scripts/825-wip_Button_Add_Comment_to_Activity_Discussion_v1.txt
+karbon_kontacts.fmp12/scripts/827-Trigger_Send_Chat_Message.txt
+karbon_kontacts.fmp12/scripts/832-Handler_Phone_Selection.txt
+karbon_kontacts.fmp12/scripts/856-btn_Delete_PartyRelation.txt
+karbon_kontacts.fmp12/scripts/861-btn_Update_Subscribers.txt
+karbon_kontacts.fmp12/scripts/865-Search_for_FullContact_Person_Match.txt
+karbon_kontacts.fmp12/scripts/868-Search_for_FullContact_Company_Match.txt","Returns 1 when the JSON error object has a nonzero errorCode or a true ""error"" property, else 0. Empty input returns 0. Missing or non-boolean values read through GetAsBoolean.",isError(err: object|string|null): boolean,"Very widely called in karbon_kontacts (98 caller files), so error-object shape matters to the plan. Byte-identical body in: Picker Module.fmp12#21; karbon_Build.fmp12#6; karbon_Generator.fmp12#76; karbon_charts.fmp12#6; karbon_data.fmp12#8; karbon_kontroller.fmp12#6; karbon_log.fmp12#6."
+karbon_kontacts.fmp12/custom-functions/5-Error.Last.txt,d93bfa018089301337171da6dc795a6ad8ed29a4c16d3d9df1f8087f87f9a1bd,custom-functions,karbon_kontacts.fmp12,5,Error.Last,utility,context-dependent,tier3,"descriptor
+data",Error,"karbon_kontacts.fmp12/scripts/354-Select_Attachment.txt
+karbon_kontacts.fmp12/scripts/642-Add_File_json.txt
+karbon_kontacts.fmp12/scripts/673-Add_Edit_Activity_Party_to_Activity_ActivityPartyRoleId.txt
+karbon_kontacts.fmp12/scripts/701-Button_Add_Activity_Attachment_v2.txt
+karbon_kontacts.fmp12/scripts/725-Button_Add_Activity_Attachment_v1.txt
+karbon_kontacts.fmp12/scripts/767-Set_up_Opportunity_List_View.txt",Wraps Get(LastError) in an error object via Error(Get(LastError); descriptor; data).,"lastError(descriptor: string, data?: object): ErrorObject",Depends on FileMaker's last-error state; no target equivalent. Byte-identical body in: Picker Module.fmp12#22; karbon_Build.fmp12#7; karbon_Generator.fmp12#77; karbon_charts.fmp12#7; karbon_data.fmp12#9; karbon_kontroller.fmp12#7; karbon_log.fmp12#7.
+karbon_kontacts.fmp12/custom-functions/6-Timestamp.ToISO.txt,473c5983a9a113030e15733f871e5e55d3f0c523aeed47f4362ee41cd97c0513,custom-functions,karbon_kontacts.fmp12,6,Timestamp.ToISO,date-time,pure,tier3,theTimestamp,"Date.ToISO
+Time.ToISO",karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt,"Renders a timestamp as ISO 8601 text: Date.ToISO & ""T"" & Time.ToISO. Empty input returns empty. If either part starts with ""?"" it returns ""? Value is not a timestamp"" plus the input.",timestampToIso(ts: Date|null): string,"Invalid input is signalled by a leading ""?"" string, not an exception; the target must pick an error style. Byte-identical body in: Picker Module.fmp12#60; karbon_Build.fmp12#41; karbon_LedgerLink.fmp12#45; karbon_charts.fmp12#41; karbon_data.fmp12#44; karbon_kontroller.fmp12#41; karbon_log.fmp12#41; karbon_tester.fmp12#31."
+karbon_kontacts.fmp12/custom-functions/7-Timestamp.FromISO.txt,71b4af25994592d34b438334d2eaf2551b8622c93097d845a73d4a8ef6e93e72,custom-functions,karbon_kontacts.fmp12,7,Timestamp.FromISO,date-time,pure,tier3,iso8601Timestamp,"Date.FromISO
+Time.FromISO",karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt,"Parses an ISO 8601 timestamp into a FileMaker timestamp. Date part via Date.FromISO; time via Time.FromISO when a ""T"" is present, else 0. Returns ""? Not a valid ISO 8601 timestamp"" plus input when either part errors.",timestampFromIso(iso: string): Date,"Invalid input returns a ""?"" string; empty input flow follows Date.FromISO. Byte-identical body in: Picker Module.fmp12#59; karbon_Build.fmp12#40; karbon_LedgerLink.fmp12#44; karbon_charts.fmp12#40; karbon_data.fmp12#43; karbon_kontroller.fmp12#40; karbon_log.fmp12#40; karbon_tester.fmp12#30."
+karbon_kontacts.fmp12/custom-functions/8-Time.ToISO.txt,0f1825de058705fb00c8fe89349e3adc2a5b048e9b94470fda9f7a20387dc9ff,custom-functions,karbon_kontacts.fmp12,8,Time.ToISO,date-time,pure,tier3,theTime,none,"karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt
+karbon_kontacts.fmp12/custom-functions/6-Timestamp.ToISO.txt","Renders a time as ISO 8601 hh:mm[:ss[,fraction]]. Values of 24 hours or more are routed through GetAsTimestamp. Seconds are written only when nonzero; the fractional part is written with a comma and no leading zero. Empty input returns empty; non-time input returns ""? Value is not a time"" plus input.",timeToIso(t: Time|null): string,"The _seconds = ""?"" test compares a number to text; check behavior with real invalid input. Non-time input handling is unverified. Byte-identical body in: Picker Module.fmp12#58; karbon_Build.fmp12#39; karbon_LedgerLink.fmp12#43; karbon_charts.fmp12#39; karbon_data.fmp12#42; karbon_kontroller.fmp12#39; karbon_log.fmp12#39; karbon_tester.fmp12#29."
+karbon_kontacts.fmp12/custom-functions/9-Time.FromISO.txt,3d316d11dda72e2598b20383bf663edeb69b99f112e6338148a7427051e16b71,custom-functions,karbon_kontacts.fmp12,9,Time.FromISO,date-time,pure,tier3,iso8601Time,none,"karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt
+karbon_kontacts.fmp12/custom-functions/7-Timestamp.FromISO.txt","Parses an ISO 8601 time into a FileMaker time. Strips a leading date up to ""T"", drops any timezone suffix (Z, +, -, unicode minus; an invalid repeated sign gives an error), accepts colon or compact format, and applies a decimal fraction to the last present unit. Empty input returns empty; bad input returns ""? Not a valid ISO 8601 time"" plus input.",timeFromIso(iso: string): Time,"Timezone offset is discarded, not applied. Byte-identical body in: Picker Module.fmp12#57; karbon_Build.fmp12#38; karbon_LedgerLink.fmp12#42; karbon_charts.fmp12#38; karbon_data.fmp12#41; karbon_kontroller.fmp12#38; karbon_log.fmp12#38; karbon_tester.fmp12#28."
+karbon_kontacts.fmp12/custom-functions/10-JSON.Transform.This.txt,14be2ef9a271a920afad4f411eac8167cfffc88fc7d6de3e2e20f1b95a6a9aaa,custom-functions,karbon_kontacts.fmp12,10,JSON.Transform.This,json-xml,context-dependent,tier3,JSON,none,none found,Helper that stores its parameter in the global-script variable $JSON.Transform.This and returns an empty string. Sets up state for JSON.Transform.ISODates.,jsonTransformThis(json: string): void,Works by side effect on a $ variable; the target needs an explicit state or pipeline instead. Byte-identical body in: Picker Module.fmp12#41; karbon_Build.fmp12#23; karbon_charts.fmp12#23; karbon_data.fmp12#25; karbon_kontroller.fmp12#23; karbon_log.fmp12#23; karbon_tester.fmp12#59.
+karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt,c58e461df433e883ca19a86d66c757fafb1e6d206ed173aa6843778b2246a888,custom-functions,karbon_kontacts.fmp12,11,JSON.Transform.ISODates,json-xml,context-dependent,tier3,"path
+Type","JSON.ContainsProperty
+Date.FromISO
+Date.ToISO
+Time.ToISO
+Time.FromISO
+Timestamp.FromISO
+Timestamp.ToISO",none found,"Applies one ISO conversion to the property at path in $JSON.Transform.This. Type selects Date.FromISO/ToISO, Time.FromISO/ToISO, TimeStamp.FromISO/ToISO; any other Type leaves the value unchanged. The result is written back as a JSONString. Does nothing if the property is missing.","transformIsoDates(json: object, path: string, type: IsoTransform): object","Type names are matched case-insensitively by FileMaker (TimeStamp vs Timestamp). Result is always stored as JSONString, even after FromISO. Byte-identical body in: Picker Module.fmp12#40; karbon_Build.fmp12#22; karbon_charts.fmp12#22; karbon_data.fmp12#24; karbon_kontroller.fmp12#22; karbon_log.fmp12#22."
+karbon_kontacts.fmp12/custom-functions/12-JSON.Transform.txt,123e91b9782dab054ea3bce99b5a6e7fdc943de063af104b12bcbf285dd63cea,custom-functions,karbon_kontacts.fmp12,12,JSON.Transform,json-xml,context-dependent,tier3,TransformationList,none,none found,Returns the value of $JSON.Transform.This and clears it and $JSON.To.Transform. The parameter TransformationList is only evaluated to run the listed transform calls first; it is not used in the body.,"jsonTransform(transformations: Transform[], source: object): object",Relies on argument evaluation order for side effects. Byte-identical body in: Picker Module.fmp12#39; karbon_Build.fmp12#21; karbon_charts.fmp12#21; karbon_data.fmp12#23; karbon_kontroller.fmp12#21; karbon_log.fmp12#21; karbon_tester.fmp12#57.
+karbon_kontacts.fmp12/custom-functions/13-JSON.Pluck.Prop.txt,d1f517d2ac299309d3952edcb9146d7895e45d71fc959f2fc618ad4cab019d01,custom-functions,karbon_kontacts.fmp12,13,JSON.Pluck.Prop,json-xml,context-dependent,tier3,"PropToPluck
+JSONType
+As",JSON.ContainsProperty,"karbon_kontacts.fmp12/scripts/330-Handle_Card_-_EmailAddressPicker.txt
+karbon_kontacts.fmp12/scripts/393-Create_Parties.txt","Copies one property from $JSON.Pluck.From into $JSON.Pluck.Result under the name As (default: same name), if JSON.ContainsProperty finds it. JSONType sets the stored type; empty means FileMaker guesses. Returns an empty string.","pluckProp(from: object, prop: string, as?: string, type?: JsonType): object",Side effect on $ variables; JSONType uses FileMaker constants. Byte-identical body in: Picker Module.fmp12#37; karbon_Build.fmp12#20; karbon_charts.fmp12#20; karbon_data.fmp12#22; karbon_kontroller.fmp12#20; karbon_log.fmp12#20.
+karbon_kontacts.fmp12/custom-functions/14-JSON.Pluck.From.txt,8bd0887f3a1e3b0dd40e95399327a50bfd4357bd95fb0acd21cddf3707176f59,custom-functions,karbon_kontacts.fmp12,14,JSON.Pluck.From,json-xml,context-dependent,tier3,JSON,none,"karbon_kontacts.fmp12/scripts/330-Handle_Card_-_EmailAddressPicker.txt
+karbon_kontacts.fmp12/scripts/393-Create_Parties.txt",Helper that stores its parameter in $JSON.Pluck.From and returns an empty string.,pluckFrom(json: object): void,Side-effect helper on a $ variable. Byte-identical body in: Picker Module.fmp12#36; karbon_Build.fmp12#19; karbon_charts.fmp12#19; karbon_data.fmp12#21; karbon_kontroller.fmp12#19; karbon_log.fmp12#19; karbon_tester.fmp12#54.
+karbon_kontacts.fmp12/custom-functions/15-JSON.Pluck.txt,d3562eb15e91389526e1f7d7ab197b5f29a8e37402be7c2657629ffd36d795bc,custom-functions,karbon_kontacts.fmp12,15,JSON.Pluck,json-xml,context-dependent,tier3,PluckList,none,"karbon_kontacts.fmp12/scripts/330-Handle_Card_-_EmailAddressPicker.txt
+karbon_kontacts.fmp12/scripts/393-Create_Parties.txt","Returns $JSON.Pluck.Result and clears $JSON.Pluck.From and $JSON.To.Pluck. It does not clear $JSON.Pluck.Result, so a second pluck can append to the earlier result. PluckList is only evaluated for its side effects.","pluck(source: object, props: PluckSpec[]): object","Differs from the Build/charts version, which also clears $JSON.Pluck.Result. Stale-result behavior is likely a defect; check callers. Byte-identical body in: karbon_data.fmp12#20."
+karbon_kontacts.fmp12/custom-functions/16-JSON.Merge.txt,c6a6d21a8490473f905c08c5ab321e0c09342b317d6c163e5a5b24b6be689936,custom-functions,karbon_kontacts.fmp12,16,JSON.Merge,json-xml,recursive,tier3,"target
+source",JSON.Merge,none found,"Shallow merge of source into target, one key per recursion. Errors from JSONListKeys return the error text plus "" In Source."" or "" In Target.""; an array source returns ""? * Array in Source. Must be an object"". Values that start with a digit but are not numeric as written are stored as JSONString. Returns the merged target.","jsonMerge(target: object, source: object): object",Byte-identical body in: karbon_Build.fmp12#17; karbon_Generator.fmp12#64; karbon_charts.fmp12#17; karbon_data.fmp12#19; karbon_log.fmp12#17.
+karbon_kontacts.fmp12/custom-functions/17-JSON.GetValuesAtPath.txt,2bec5d14a7ca6f9db9f19f5ff00f9fdf2024d54b5983375eabc2aceec8148147,custom-functions,karbon_kontacts.fmp12,17,JSON.GetValuesAtPath,json-xml,recursive,tier3,"array
+path",JSON.GetValuesAtPath,"karbon_kontacts.fmp12/scripts/719-Handler_Subscriber_Selection_deprecated.txt
+karbon_kontacts.fmp12/scripts/840-wip_Get_Employee_Search_Results.txt","Returns a return-separated list of the values at path in each object of a JSON array, built by peeling the last element off recursively. Invalid or empty arrays return empty; a missing path adds an empty value (a ""?"" result is turned into empty).","jsonValuesAtPath(array: object[], path: string): string[]",Byte-identical body in: karbon_Build.fmp12#16; karbon_Generator.fmp12#104; karbon_charts.fmp12#16; karbon_data.fmp12#18; karbon_kontroller.fmp12#16; karbon_log.fmp12#16.
+karbon_kontacts.fmp12/custom-functions/18-JSON.FilterByExpression.txt,d97139cbf42358d7c77ef8fa7f8a33e60d722c3725924982439eb972760e9a92,custom-functions,karbon_kontacts.fmp12,18,JSON.FilterByExpression,json-xml,recursive,tier3,"array
+expression",JSON.FilterByExpression,"karbon_kontacts.fmp12/custom-functions/20-JSON.ArraySort.txt
+karbon_kontacts.fmp12/scripts/526-Edit_Meeting.txt
+karbon_kontacts.fmp12/scripts/527-Edit_Task.txt","Filters a JSON array by a FileMaker expression passed as text, evaluated per element with $item set to the element. Passing elements are collected in $newArray; timestamps, times and dates are stored as strings. Recurses over the remaining array and clears $newArray at the end.","filterArray(array: unknown[], predicate: (item: unknown) => boolean): unknown[]",The expression is arbitrary FileMaker calculation text run through Evaluate; callers pass expressions that must each be ported. Uses $item and $newArray as hidden state. Byte-identical body in: Picker Module.fmp12#30; karbon_Build.fmp12#15; karbon_charts.fmp12#15; karbon_data.fmp12#17; karbon_kontroller.fmp12#15; karbon_log.fmp12#15.
+karbon_kontacts.fmp12/custom-functions/19-JSON.ContainsProperty.txt,706caa3189f30a8aeecb02a9a1228dca637a8adc7174bdba95c5c8a539431ea3,custom-functions,karbon_kontacts.fmp12,19,JSON.ContainsProperty,json-xml,recursive,tier3,"json
+name",JSON.ContainsProperty,"karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt
+karbon_kontacts.fmp12/custom-functions/13-JSON.Pluck.Prop.txt",Tests whether a dotted path exists in a JSON object. A path with a dot recurses into the first segment; the last segment is tested with FilterValues against JSONListKeys. Returns a boolean.,"hasProperty(json: object, path: string): boolean",Dotted path only; array index paths are not handled. Byte-identical body in: Picker Module.fmp12#29; karbon_Build.fmp12#14; karbon_Generator.fmp12#84; karbon_charts.fmp12#14; karbon_data.fmp12#16; karbon_kontroller.fmp12#14; karbon_log.fmp12#14.
+karbon_kontacts.fmp12/custom-functions/20-JSON.ArraySort.txt,0fd903744b037ef9a2dd4becdb6bd0085b6a0335a53f3f664329258886d132c8,custom-functions,karbon_kontacts.fmp12,20,JSON.ArraySort,json-xml,recursive,tier3,"array
+sortChildren","JSON.FilterByExpression
+JSON.ArrayConcat",none found,"Sorts a JSON array by splitting items into numbers, text, dates, times, timestamps, arrays and objects, sorting each group, and concatenating them in that order (numbers, text, dates, times, timestamps, arrays, objects). Optional sortChildren sorts nested arrays by Evaluate-ing the function on each child. Non-array input returns a ""? * Line 1, Column 1"" error text. Contains a commented developer test harness.","sortArray(array: unknown[], sortChildren?: boolean): unknown[]","Type grouping uses text pattern tests, so mixed values sort differently from a normal comparator. Recursion for children happens inside an Evaluate string, not as a visible cf: reference. No caller found in this file. Byte-identical body in: Picker Module.fmp12#28; karbon_Build.fmp12#13; karbon_charts.fmp12#13; karbon_data.fmp12#15; karbon_kontroller.fmp12#13; karbon_log.fmp12#13."
+karbon_kontacts.fmp12/custom-functions/21-JSON.ArrayLength.txt,41b0809808d286aaf1afc2a68d67f54b8c06e8a2da108f7659ffe061b063a4a6,custom-functions,karbon_kontacts.fmp12,21,JSON.ArrayLength,json-xml,pure,tier3,"array
+path",none,"karbon_kontacts.fmp12/custom-functions/45-JSON.Push.txt
+karbon_kontacts.fmp12/scripts/222-Refresh_Invoice_From_QBO_qbo_id.txt
+karbon_kontacts.fmp12/scripts/299-Refresh_SalesReceipt_From_QBO_qbo_id.txt
+karbon_kontacts.fmp12/scripts/330-Handle_Card_-_EmailAddressPicker.txt
+karbon_kontacts.fmp12/scripts/353-Delete_Email_Recipient.txt
+karbon_kontacts.fmp12/scripts/360-Delete_Attachment.txt",Returns the number of items of the array at path (or the root when path is empty). Returns 0 for a non-array or an error result. Line breaks are removed first.,"arrayLength(array: unknown[], path?: string): number",Byte-identical body in: Picker Module.fmp12#27; karbon_Build.fmp12#12; karbon_charts.fmp12#12; karbon_data.fmp12#14; karbon_kontroller.fmp12#12; karbon_log.fmp12#12.
+karbon_kontacts.fmp12/custom-functions/22-JSON.ArrayFromRelated.txt,f5fc0ae3b4149676104333c319646e19d2986e7595546394aec2bf62b1e43cc0,custom-functions,karbon_kontacts.fmp12,22,JSON.ArrayFromRelated,json-xml,pure,tier3,JSONField,none,"karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt
+karbon_kontacts.fmp12/scripts/347-Edit_Email_Message.txt
+karbon_kontacts.fmp12/scripts/526-Edit_Meeting.txt
+karbon_kontacts.fmp12/scripts/527-Edit_Task.txt
+karbon_kontacts.fmp12/scripts/692-Open_Email_Message_in_New_Window_Id.txt
+karbon_kontacts.fmp12/scripts/842-btn_Manage_Subscribers_v2.txt","Builds a JSON array text by joining the values of a related field with commas inside brackets: ""["" & Substitute(List(field); ""¶""; "","") & ""]"". Values are not quoted or escaped.",arrayFromRelated(values: string[]): string,"The parameter is a field reference, so List() works on a related set; the target needs an explicit list. Output is not valid JSON unless the values already are. Byte-identical body in: Picker Module.fmp12#26; karbon_Build.fmp12#11; karbon_Generator.fmp12#85; karbon_charts.fmp12#11; karbon_kontroller.fmp12#11; karbon_log.fmp12#11."
+karbon_kontacts.fmp12/custom-functions/23-JSON.ArrayConcat.txt,f22fef6ff83e31dd8caa86f93272d0c24715fc5dd797d4507aeffc9c0a50e55c,custom-functions,karbon_kontacts.fmp12,23,JSON.ArrayConcat,json-xml,pure,tier3,"firstArray
+secondArray",none,"karbon_kontacts.fmp12/custom-functions/20-JSON.ArraySort.txt
+karbon_kontacts.fmp12/scripts/850-Open_Discussion_from_Contact.txt",Concatenates two JSON arrays into one. Each is trimmed and stripped of its outer brackets; a separator is added only if both are nonempty. The result is normalized through JSONGetElement.,"arrayConcat(a: unknown[], b: unknown[]): unknown[]",Byte-identical body in: Picker Module.fmp12#25; karbon_Build.fmp12#10; karbon_charts.fmp12#10; karbon_data.fmp12#12; karbon_kontroller.fmp12#10; karbon_log.fmp12#10.
+karbon_kontacts.fmp12/custom-functions/24-Date.ToISO.txt,126f6d0c7715200ae804eb66b3951f649863ce9a69aa110a7b6416577d33224f,custom-functions,karbon_kontacts.fmp12,24,Date.ToISO,date-time,pure,tier3,theDate,none,"karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt
+karbon_kontacts.fmp12/custom-functions/6-Timestamp.ToISO.txt","Renders a date as YYYY-MM-DD ISO text. If Year() is ""?"" it tries GetAsTimestamp. Empty input returns empty; input that is not a date returns ""? Value is not a date"" plus input.",dateToIso(d: Date|null): string,Byte-identical body in: Picker Module.fmp12#18; karbon_Build.fmp12#3; karbon_Generator.fmp12#69; karbon_LedgerLink.fmp12#14; karbon_charts.fmp12#3; karbon_data.fmp12#5; karbon_kontroller.fmp12#3; karbon_log.fmp12#3; karbon_tester.fmp12#20.
+karbon_kontacts.fmp12/custom-functions/25-Date.FromISO.txt,e0e1a870a22dabd5e0c3471a62a0e4e939277ace171f65bce25ba3560433ffa5,custom-functions,karbon_kontacts.fmp12,25,Date.FromISO,date-time,pure,tier3,iso8601Date,none,"karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt
+karbon_kontacts.fmp12/custom-functions/7-Timestamp.FromISO.txt","Parses an ISO 8601 date into a FileMaker date. Cuts at a ""T"" if present; supports calendar (YYYY-MM-DD, YYYYMMDD), ISO week (W), and ordinal-day formats; missing day defaults to 1. Empty input returns empty; invalid input returns ""? Not a valid ISO 8601 date"" plus input.",dateFromIso(iso: string): Date,The week and ordinal branches mix text and number math; validate against test dates. Byte-identical body in: Picker Module.fmp12#17; karbon_Build.fmp12#2; karbon_Generator.fmp12#68; karbon_LedgerLink.fmp12#13; karbon_charts.fmp12#2; karbon_data.fmp12#4; karbon_kontroller.fmp12#2; karbon_log.fmp12#2; karbon_tester.fmp12#19.
+karbon_kontacts.fmp12/custom-functions/26-JSON.Validate.This.txt,5d7b2879937c791a0af6c22d5092d67c84e3401c9062e5ce6893b1346b01a4a8,custom-functions,karbon_kontacts.fmp12,26,JSON.Validate.This,json-xml,context-dependent,tier3,json,none,"karbon_kontacts.fmp12/scripts/307-Open_Card_-_UtilityDiscussion.txt
+karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt
+karbon_kontacts.fmp12/scripts/642-Add_File_json.txt
+karbon_kontacts.fmp12/scripts/673-Add_Edit_Activity_Party_to_Activity_ActivityPartyRoleId.txt
+karbon_kontacts.fmp12/scripts/715-Open_Card_-_Discussion_v1__Deprecated.txt",Helper that stores its parameter in $JSON.Validate.This and returns an empty string.,validateThis(json: object): void,Side-effect helper on a $ variable. Byte-identical body in: Picker Module.fmp12#47; karbon_Build.fmp12#29; karbon_Generator.fmp12#83; karbon_charts.fmp12#29; karbon_data.fmp12#31; karbon_kontroller.fmp12#29; karbon_log.fmp12#29; karbon_tester.fmp12#65.
+karbon_kontacts.fmp12/custom-functions/27-JSON.Validate.Rule.IsRequired.txt,e4a5ed829ab1eb84dddd6db9d42c1a1282d81e3900828f3f33ed0c25e6e7e508,custom-functions,karbon_kontacts.fmp12,27,JSON.Validate.Rule.IsRequired,domain-rule,context-dependent,tier3,path,JSON.Validate._Error,"karbon_kontacts.fmp12/scripts/307-Open_Card_-_UtilityDiscussion.txt
+karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt
+karbon_kontacts.fmp12/scripts/642-Add_File_json.txt
+karbon_kontacts.fmp12/scripts/673-Add_Edit_Activity_Party_to_Activity_ActivityPartyRoleId.txt
+karbon_kontacts.fmp12/scripts/715-Open_Card_-_Discussion_v1__Deprecated.txt","Validation rule: returns empty when the value at path in $JSON.Validate.This is nonempty, else a JSON.Validate._Error with ""Required value is missing"".",ruleIsRequired(path: string): Rule,Byte-identical body in: Picker Module.fmp12#46; karbon_Build.fmp12#28; karbon_Generator.fmp12#82; karbon_charts.fmp12#28; karbon_data.fmp12#30; karbon_kontroller.fmp12#28; karbon_log.fmp12#28; karbon_tester.fmp12#64.
+karbon_kontacts.fmp12/custom-functions/28-JSON.Validate.Rule.IsOneOf.txt,575c40f84603f166115842cb1b54c7df85412f5241396ae5f68344b9b803663d,custom-functions,karbon_kontacts.fmp12,28,JSON.Validate.Rule.IsOneOf,domain-rule,context-dependent,tier3,"path
+theList",JSON.Validate._Error,none found,"Validation rule: returns empty when the value at path is one of the return-separated values in theList, else a JSON.Validate._Error that names the allowed values and the actual value (EMPTY STRING when blank).","ruleIsOneOf(path: string, allowed: string[]): Rule","The karbon_data twin (id 29) omits the ""Instead it was ..."" text in the message. Byte-identical body in: Picker Module.fmp12#45; karbon_Build.fmp12#27; karbon_Generator.fmp12#81; karbon_charts.fmp12#27; karbon_kontroller.fmp12#27; karbon_log.fmp12#27; karbon_tester.fmp12#63."
+karbon_kontacts.fmp12/custom-functions/29-JSON.Validate.Rule.IsNumeric.txt,221d59a6907f333a4f59cc00ee78909b8f3b08b025e2e106253088bc684c84e5,custom-functions,karbon_kontacts.fmp12,29,JSON.Validate.Rule.IsNumeric,domain-rule,context-dependent,tier3,path,JSON.Validate._Error,none found,"Validation rule: error when the value at path is not numeric. It strips a leading ""-0."", ""0."" or ""-"" and compares the filtered digits to Abs(GetAsNumber(...)); the Let returns that absolute number, not a comparison, so the value counts as numeric only when the number is nonzero. Error text: ""Required value is not numeric or in valid range"". The body keeps commented older attempts.",ruleIsNumeric(path: string): Rule,"Because isNumeric is a number, the values 0, ""0.0"" and a value with no digits all fail the rule. Confirm that is intended before porting. Byte-identical body in: Picker Module.fmp12#44; karbon_Build.fmp12#26; karbon_Generator.fmp12#80; karbon_charts.fmp12#26; karbon_data.fmp12#28; karbon_kontroller.fmp12#26; karbon_log.fmp12#26; karbon_tester.fmp12#62."
+karbon_kontacts.fmp12/custom-functions/30-JSON.Validate.ApplyRules.txt,1c3830be8b221f4e8dc118686fc976a90778ded3c3ce0d058e166de163be55bb,custom-functions,karbon_kontacts.fmp12,30,JSON.Validate.ApplyRules,domain-rule,context-dependent,tier3,ListOfRules,JSON.Validate._Error,"karbon_kontacts.fmp12/scripts/307-Open_Card_-_UtilityDiscussion.txt
+karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt
+karbon_kontacts.fmp12/scripts/642-Add_File_json.txt
+karbon_kontacts.fmp12/scripts/673-Add_Edit_Activity_Party_to_Activity_ActivityPartyRoleId.txt
+karbon_kontacts.fmp12/scripts/715-Open_Card_-_Discussion_v1__Deprecated.txt","Runs a list of rule results against $JSON.Validate.This. Invalid JSON returns a JSON.Validate._Error. No errors returns {""errorCode"":0}. Otherwise returns {errorCode:-2, type:""JSON.Validate"", ""errors "": [..]} with the error objects. Clears $JSON.Validate.This.","validate(json: object, rules: Rule[]): ValidationResult","The key written is ""errors "" with a trailing space, probably a typo that callers may depend on. Byte-identical body in: Picker Module.fmp12#43; karbon_Build.fmp12#25; karbon_Generator.fmp12#79; karbon_charts.fmp12#25; karbon_data.fmp12#27; karbon_log.fmp12#25; karbon_tester.fmp12#61."
+karbon_kontacts.fmp12/custom-functions/31-JSON.Validate._Error.txt,d93b9210fd07957bc9584d520ecf0e8921b9fcbbd320fc147f789f8b6fe89c77,custom-functions,karbon_kontacts.fmp12,31,JSON.Validate._Error,domain-rule,context-dependent,tier3,"path
+message",none,"karbon_kontacts.fmp12/custom-functions/27-JSON.Validate.Rule.IsRequired.txt
+karbon_kontacts.fmp12/custom-functions/28-JSON.Validate.Rule.IsOneOf.txt
+karbon_kontacts.fmp12/custom-functions/29-JSON.Validate.Rule.IsNumeric.txt
+karbon_kontacts.fmp12/custom-functions/30-JSON.Validate.ApplyRules.txt","Builds a validation error object: errorCode -2, type ""JSON.Validate"", descriptor (message), path and scriptName (Get(ScriptName)).","validationError(path: string, message: string): ValidationError","Differs from karbon_data twin (id 26), which omits scriptName. Byte-identical body in: Picker Module.fmp12#42; karbon_Build.fmp12#24; karbon_Generator.fmp12#78; karbon_charts.fmp12#24; karbon_kontroller.fmp12#24; karbon_log.fmp12#24; karbon_tester.fmp12#60."
+karbon_kontacts.fmp12/custom-functions/32-SQL.RecordExists.txt,fbdc27b34afe5a8740b6b7fed3dfd4611488702dff4c4201b029e81682bbedb6,custom-functions,karbon_kontacts.fmp12,32,SQL.RecordExists,utility,context-dependent,tier3,"WhereField
+WhereValue",SQL.GetColumnStatement,none found,"Returns true when SQL.GetColumnStatement(WhereField; WhereField; WhereValue) is not empty, i.e. when the field has a name. It builds a SQL text but never runs it, so it does not test that a record exists.","recordExists(table: string, field: string, value: string): boolean","Name and doc say a record lookup, but the body only builds a statement. Probable defect; no callers. Byte-identical body in: Picker Module.fmp12#56; karbon_Build.fmp12#37; karbon_charts.fmp12#37; karbon_data.fmp12#40; karbon_kontroller.fmp12#37; karbon_log.fmp12#37; karbon_tester.fmp12#34."
+karbon_kontacts.fmp12/custom-functions/33-SQL.GetTableName.txt,eff34171fcb618e0cf9a555681e92ea7eadb0279dca4cbc7ba2c665da49da3a0,custom-functions,karbon_kontacts.fmp12,33,SQL.GetTableName,utility,context-dependent,tier3,field,none,"karbon_kontacts.fmp12/custom-functions/34-SQL.GetRecordsAsJSON.txt
+karbon_kontacts.fmp12/custom-functions/36-SQL.GetColumn2Fields.txt
+karbon_kontacts.fmp12/custom-functions/37-SQL.GetColumnStatement.txt","Returns the quoted table-occurrence name of a field reference: GetFieldName(field), then the part before ""::"" wrapped by Quote().",sqlTableName(field: FieldRef): string,Depends on FileMaker field-reference introspection. Byte-identical body in: Picker Module.fmp12#55; karbon_Build.fmp12#36; karbon_charts.fmp12#36; karbon_data.fmp12#39; karbon_kontroller.fmp12#36; karbon_log.fmp12#36; karbon_tester.fmp12#35.
+karbon_kontacts.fmp12/custom-functions/34-SQL.GetRecordsAsJSON.txt,13f399250e577dddf8a9a26715401f5fe4a264eca6535b8daac6459c4121eed1,custom-functions,karbon_kontacts.fmp12,34,SQL.GetRecordsAsJSON,integration,context-dependent,tier3,"whereField
+whereValue","SQL.GetTableName
+SQL.GetFieldName",none found,"Runs ExecuteSQL to select the AsJSON column of the whereField's table where whereField = whereValue, and wraps the rows in [ ]. Rows are joined by commas. Relies on a field named AsJSON existing in each table.","getRecordsAsJson(whereField: FieldRef, value: string): object[]","Assumes a calculated AsJSON field per table; the plan needs to list those fields. ExecuteSQL returns ""?"" on error and the function does not check it. Byte-identical body in: Picker Module.fmp12#54; karbon_Build.fmp12#35; karbon_charts.fmp12#35; karbon_data.fmp12#38; karbon_kontroller.fmp12#35; karbon_log.fmp12#35; karbon_tester.fmp12#36."
+karbon_kontacts.fmp12/custom-functions/35-SQL.GetFieldName.txt,3a23c85da4590a59653e8775782be5573a022a6be373fdc420e521d2f2012f3c,custom-functions,karbon_kontacts.fmp12,35,SQL.GetFieldName,utility,context-dependent,tier3,field,none,"karbon_kontacts.fmp12/custom-functions/34-SQL.GetRecordsAsJSON.txt
+karbon_kontacts.fmp12/custom-functions/36-SQL.GetColumn2Fields.txt
+karbon_kontacts.fmp12/custom-functions/37-SQL.GetColumnStatement.txt","Returns the quoted SQL name of a field: Table::Field becomes ""Table"".""Field"".",sqlFieldName(field: FieldRef): string,Byte-identical body in: Picker Module.fmp12#53; karbon_Build.fmp12#34; karbon_charts.fmp12#34; karbon_data.fmp12#37; karbon_kontroller.fmp12#34; karbon_log.fmp12#34; karbon_tester.fmp12#37.
+karbon_kontacts.fmp12/custom-functions/36-SQL.GetColumn2Fields.txt,0cabe3811b885f213a0a4489fa641cde76ab963f64835e1469469f2243584327,custom-functions,karbon_kontacts.fmp12,36,SQL.GetColumn2Fields,utility,context-dependent,tier3,"columnField
+whereField
+whereValue
+whereField2
+whereValue2","SQL.GetColumnStatement
+SQL.GetFieldName
+SQL.GetTableName","karbon_kontacts.fmp12/scripts/214-Send_Invoice_to_QBO_FMId.txt
+karbon_kontacts.fmp12/scripts/291-Open_Activity_Id.txt
+karbon_kontacts.fmp12/scripts/325-btn_Customer_Open_In_QBO.txt
+karbon_kontacts.fmp12/scripts/615-OnTimer_Handle_Create_Opportunity.txt
+karbon_kontacts.fmp12/scripts/839-Open_Discussion_from_Opportunity.txt","Selects the values of columnField from whereField's table where whereField = ? and whereField2 = ?, via ExecuteSQL with two parameters. Returns the return-separated result list. The first SQL variable is overwritten.","getColumnWhere2(column: FieldRef, f1: FieldRef, v1: string, f2: FieldRef, v2: string): string[]",The first sql = SQL.GetColumnStatement(...) is dead code (overwritten). Doc comment is copied from another function. Byte-identical body in: Picker Module.fmp12#51; karbon_Build.fmp12#33; karbon_charts.fmp12#33; karbon_data.fmp12#35; karbon_kontroller.fmp12#33; karbon_log.fmp12#33; karbon_tester.fmp12#39.
+karbon_kontacts.fmp12/custom-functions/37-SQL.GetColumnStatement.txt,b3b0b8d209b85e95d8b87f5e2edfce7e729506130106c29e623c19c019ad28fb,custom-functions,karbon_kontacts.fmp12,37,SQL.GetColumnStatement,utility,context-dependent,tier3,"theField
+whereField
+whereValue","SQL.GetFieldName
+SQL.GetTableName","karbon_kontacts.fmp12/custom-functions/32-SQL.RecordExists.txt
+karbon_kontacts.fmp12/custom-functions/36-SQL.GetColumn2Fields.txt
+karbon_kontacts.fmp12/custom-functions/42-SQL.GetColumn.txt","Builds a SQL SELECT text for theField's table; adds a WHERE whereField = whereValue line when whereField is a valid field reference. whereValue is inserted as given, so callers pass ""?"" for a bound parameter.","columnStatement(column: FieldRef, whereField?: FieldRef, whereValue?: string): string","Concatenates whereValue into SQL; safe only because callers pass ""?"". Byte-identical body in: Picker Module.fmp12#52; karbon_Build.fmp12#32; karbon_charts.fmp12#32; karbon_data.fmp12#36; karbon_kontroller.fmp12#32; karbon_log.fmp12#32."
+karbon_kontacts.fmp12/custom-functions/38-RemoveDuplicates.txt,88ed93c2dfb251267515f355a3104fa7eca2c8e52223b045d3afb6e574c83b51,custom-functions,karbon_kontacts.fmp12,38,RemoveDuplicates,list,recursive,tier3,Text,RemoveDuplicates,none found,"Removes duplicate lines from a return-separated list, keeping the first occurrence order, by taking the first value and recursing on the rest with all copies of it removed.",removeDuplicates(list: string[]): string[],"Recursion depth equals the number of distinct values. The removal pattern marks line starts and strips the value after the marker, so it matches at the start of a line; a longer line that begins with the same text may be altered. Check against sample data. Byte-identical body in: Picker Module.fmp12#49; karbon_Build.fmp12#31; karbon_charts.fmp12#31; karbon_data.fmp12#33; karbon_kontroller.fmp12#31; karbon_log.fmp12#31."
+karbon_kontacts.fmp12/custom-functions/39-ListIncludes.txt,e5bb2e9cfe841e342e066cd13f758c0fa301f71030ac2379747879cc58c893bc,custom-functions,karbon_kontacts.fmp12,39,ListIncludes,list,pure,tier3,"theList
+theItem",none,karbon_kontacts.fmp12/layouts/85-Card_-_New_Payment.txt,"Returns true when the list contains the item (case-insensitive FilterValues, whole-value match).","listIncludes(list: string[], item: string): boolean",Same body as IsInList (different name). Byte-identical body in: Picker Module.fmp12#48; karbon_Build.fmp12#30; karbon_charts.fmp12#30; karbon_data.fmp12#32; karbon_kontroller.fmp12#30; karbon_log.fmp12#30; karbon_tester.fmp12#41.
+karbon_kontacts.fmp12/custom-functions/40-IsValidEmailFormat.txt,1543b70af4d32fd95a193ca29b67c6cd14f833afe0182cde71f94f65be00c8f6,custom-functions,karbon_kontacts.fmp12,40,IsValidEmailFormat,text,pure,tier3,text,none,none found,"Checks an email format: allowed characters (letters, digits, _ - @ . ' / +), exactly one @, alphanumeric first and last character, no "".."", no dot before @, a domain starting alphanumeric, and a TLD after a dot. Empty input returns true.",isValidEmailFormat(text: string): boolean,Empty text is valid (comment says to remove that line to prohibit nulls). Callers: none found. Byte-identical body in: Picker Module.fmp12#24; karbon_Build.fmp12#9; karbon_charts.fmp12#9; karbon_data.fmp12#11; karbon_kontroller.fmp12#9; karbon_log.fmp12#9.
+karbon_kontacts.fmp12/custom-functions/41-FilterValuesByExpression.txt,13b3047a54cf453da1c18b57d049519fc4833dc4ad8f11e5e0ab81ba0f8065c7,custom-functions,karbon_kontacts.fmp12,41,FilterValuesByExpression,list,context-dependent,tier3,"theList
+expression",none,none found,"Filters a return-separated list with an expression: builds a Let/If text for each value with ""item"" set to the value and runs it with Evaluate. Returns the values for which the expression is true.","filterValues(list: string[], predicate: (item: string) => boolean): string[]","Runs caller-supplied FileMaker expressions, which must each be ported. Values containing quotes are not escaped. Byte-identical body in: Picker Module.fmp12#23; karbon_Build.fmp12#8; karbon_charts.fmp12#8; karbon_data.fmp12#10; karbon_kontroller.fmp12#8; karbon_log.fmp12#8."
+karbon_kontacts.fmp12/custom-functions/42-SQL.GetColumn.txt,469c496aa6d9256b3ca28fe5ba741146e474ea816523535f80f9434051033f41,custom-functions,karbon_kontacts.fmp12,42,SQL.GetColumn,utility,context-dependent,tier3,"columnField
+whereField
+whereValue",SQL.GetColumnStatement,karbon_kontacts.fmp12/scripts/214-Send_Invoice_to_QBO_FMId.txt,"Runs ExecuteSQL for the values of columnField where whereField = ?, with whereValue bound. Returns the return-separated list.","getColumn(column: FieldRef, whereField: FieldRef, value: string): string[]",Doc comment copied from SQL.GetColumn2Fields. Byte-identical body in: Picker Module.fmp12#50; karbon_Build.fmp12#43; karbon_charts.fmp12#43; karbon_data.fmp12#34; karbon_kontroller.fmp12#43; karbon_log.fmp12#43; karbon_tester.fmp12#40.
+karbon_kontacts.fmp12/custom-functions/43-JSON.IsValid.txt,2c8a617cb0891b98784f75612a85b4a97b5c868aa29716ac2cad840eb70ffe15,custom-functions,karbon_kontacts.fmp12,43,JSON.IsValid,json-xml,pure,tier3,text,none,"karbon_kontacts.fmp12/scripts/290-Open_Party_Detail_Id.txt
+karbon_kontacts.fmp12/scripts/500-Go_to_Customer_List_Id.txt
+karbon_kontacts.fmp12/scripts/501-Go_to_Customer_Detail_Id.txt
+karbon_kontacts.fmp12/scripts/502-Go_to_Contacts_Detail_Id.txt
+karbon_kontacts.fmp12/scripts/503-Go_to_Contacts_List_Id.txt
+karbon_kontacts.fmp12/scripts/522-Go_to_Employee_User_Detail_Id.txt
+karbon_kontacts.fmp12/scripts/600-Go_to_Lead_List_Id.txt","Returns true when JSONGetElement on the text does not return an error starting with ""? *"".",isValidJson(text: string): boolean,Doc comment is copied from JSON.Merge and does not describe it. Byte-identical body in: Picker Module.fmp12#33; karbon_Build.fmp12#45; karbon_charts.fmp12#45; karbon_data.fmp12#45; karbon_kontroller.fmp12#45; karbon_log.fmp12#45; karbon_tester.fmp12#51.
+karbon_kontacts.fmp12/custom-functions/44-JSON.Format.txt,4c148abcea0fa8ee4b1dac4690b5ac69f278ae48aefe9370a3894a36d5069799,custom-functions,karbon_kontacts.fmp12,44,JSON.Format,json-xml,pure,tier3,"text
+descriptor",none,"karbon_kontacts.fmp12/scripts/163-Open_Party_Info_Card_Id.txt
+karbon_kontacts.fmp12/scripts/192-Initialize_Shadow_Party.txt
+karbon_kontacts.fmp12/scripts/254-Open_Card_-_UtilityNote.txt
+karbon_kontacts.fmp12/scripts/265-Open_Card_-_UtilityMeeting.txt
+karbon_kontacts.fmp12/scripts/276-New_Payment_API_params.txt
+karbon_kontacts.fmp12/scripts/288-Open_Card_-_UtilityTask.txt
+karbon_kontacts.fmp12/scripts/291-Open_Activity_Id.txt
+karbon_kontacts.fmp12/scripts/307-Open_Card_-_UtilityDiscussion.txt
+karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt
+karbon_kontacts.fmp12/scripts/319-Resolve_Discussion_-Activity.txt
+karbon_kontacts.fmp12/scripts/320-Resolve_Discussion_-Invoice.txt
+karbon_kontacts.fmp12/scripts/364-User_Detail_-_Handle_Slide_Panel.txt
+karbon_kontacts.fmp12/scripts/370-Open_Card_-_Utility_User.txt
+karbon_kontacts.fmp12/scripts/428-Open_Phone_Popover.txt
+karbon_kontacts.fmp12/scripts/432-Open_Address_Popover.txt
+karbon_kontacts.fmp12/scripts/434-Open_Network_Address_Popover_json.txt
+karbon_kontacts.fmp12/scripts/477-Resolve_Discussion_-Party.txt
+karbon_kontacts.fmp12/scripts/512-Open_Card_-_UtilityItem_ItemDate.txt
+karbon_kontacts.fmp12/scripts/642-Add_File_json.txt
+karbon_kontacts.fmp12/scripts/660-Create_UtilityEmailMessage_json.txt
+karbon_kontacts.fmp12/scripts/673-Add_Edit_Activity_Party_to_Activity_ActivityPartyRoleId.txt
+karbon_kontacts.fmp12/scripts/715-Open_Card_-_Discussion_v1__Deprecated.txt","Pretty-prints JSON via JSONFormatElements. If the text is not valid JSON it returns an error object with errorCode -2, errorMessage (the format error), type ""JSON"" and the descriptor.","formatJson(text: string, descriptor: string): string|ErrorObject",Build/charts version (id 47) adds scriptName; this one has no scriptName. Byte-identical body in: karbon_Generator.fmp12#73.
+karbon_kontacts.fmp12/custom-functions/45-JSON.Push.txt,20b7699f6a0813a8820968f741f5bb25094db70675495ad151229f3826a6625e,custom-functions,karbon_kontacts.fmp12,45,JSON.Push,json-xml,pure,tier3,"target
+source
+type",JSON.ArrayLength,"karbon_kontacts.fmp12/scripts/330-Handle_Card_-_EmailAddressPicker.txt
+karbon_kontacts.fmp12/scripts/333-Send_Utility_Email_Message.txt
+karbon_kontacts.fmp12/scripts/354-Select_Attachment.txt
+karbon_kontacts.fmp12/scripts/393-Create_Parties.txt
+karbon_kontacts.fmp12/scripts/701-Button_Add_Activity_Attachment_v2.txt
+karbon_kontacts.fmp12/scripts/725-Button_Add_Activity_Attachment_v1.txt","Appends source (with the given JSON type) to the end of a JSON array: index is JSON.ArrayLength(target). An empty target becomes ""[]"". A target that is not an array returns ""? target is not a valid array"".","jsonPush(target: unknown[], source: unknown, type?: JsonType): unknown[]","Returns an error string, not an exception. Byte-identical body in: Picker Module.fmp12#38; karbon_Build.fmp12#48; karbon_charts.fmp12#48; karbon_data.fmp12#46; karbon_kontroller.fmp12#48; karbon_log.fmp12#48."
+karbon_kontacts.fmp12/custom-functions/47-IsInList.txt,8c7c5434f8147b82658b3b8c2dea0bd2c850c71900a48667c26fde9064720483,custom-functions,karbon_kontacts.fmp12,47,IsInList,list,pure,tier3,"valueList
+filterBy",none,"karbon_kontacts.fmp12/layouts/176-Email_Message_-_Edit.txt
+karbon_kontacts.fmp12/layouts/187-Card_-_Manage_Subscribers.txt
+karbon_kontacts.fmp12/scripts/341-Update_Template_Merge_Fields.txt
+karbon_kontacts.fmp12/scripts/343-Apply_Template.txt
+karbon_kontacts.fmp12/tables/134-VirtualListRows.txt",Returns true when FilterValues(valueList; filterBy) is not empty.,"isInList(list: string[], filterBy: string[]): boolean",Same body as ListIncludes. Byte-identical body in: karbon_Generator.fmp12#100; karbon_kontroller.fmp12#53.
+karbon_kontacts.fmp12/custom-functions/48-IsNotInList.txt,bd50314e341c1a7dafbeed8e31859b85a38e674c3999864ec5b7fdf020751f26,custom-functions,karbon_kontacts.fmp12,48,IsNotInList,list,pure,tier3,"valueList
+filterBy",none,none found,Returns true when FilterValues(valueList; filterBy) is empty.,"isNotInList(list: string[], filterBy: string[]): boolean",Byte-identical body in: karbon_Generator.fmp12#101; karbon_kontroller.fmp12#54.
+karbon_kontacts.fmp12/custom-functions/55-BrowserNav.SaveNavHistory.txt,85f4bfb614e7838daf409ffd43c9072281f86174ad7d1d2df3cb8a62a6ab977b,custom-functions,karbon_kontacts.fmp12,55,BrowserNav.SaveNavHistory,ui,context-dependent,tier2,none,none,"karbon_kontacts.fmp12/layouts/10-Home.txt
+karbon_kontacts.fmp12/layouts/101-User_Home.txt
+karbon_kontacts.fmp12/layouts/111-Templates.txt
+karbon_kontacts.fmp12/layouts/125-Activity_List.txt
+karbon_kontacts.fmp12/layouts/126-Payments_List.txt
+karbon_kontacts.fmp12/layouts/128-Admin_Integrations.txt
+karbon_kontacts.fmp12/layouts/134-Admin_User_Detail.txt
+karbon_kontacts.fmp12/layouts/153-Opportunities.txt
+karbon_kontacts.fmp12/layouts/154-Admin_Developer.txt
+karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt
+karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+karbon_kontacts.fmp12/layouts/40-Customers.txt
+karbon_kontacts.fmp12/layouts/47-Parties.txt
+karbon_kontacts.fmp12/layouts/50-Party_Detail.txt
+karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt
+karbon_kontacts.fmp12/layouts/70-Admin_Dashboard.txt
+karbon_kontacts.fmp12/layouts/71-Admin_User_List.txt
+karbon_kontacts.fmp12/layouts/84-Sales_List.txt
+karbon_kontacts.fmp12/layouts/86-Items.txt
+karbon_kontacts.fmp12/scripts/459-BrowserNav_OnLayoutEnter.txt","Records layout navigation history in $$BrowserNav. First call sets defaults (disabled false, commonHistory false, hideInactiveWindow true). It pushes {layoutName, layoutNumber, windowName} onto history.<window or common>.backward when it differs from the latest entry, rebuilds the object (clearing .forward), and honors the disabled flag. Always returns False so it can sit in a hide calculation.","saveNavHistory(state: NavState, current: {layoutName: string, layoutNumber: number, windowName: string}): NavState","Reads layout and window names from Get(); the target needs its own route/history model. Returns False for use in a hide calc, a FileMaker-only idiom. Mutates global $$BrowserNav."
+karbon_kontacts.fmp12/custom-functions/56-BrowserNav.Tooltip.txt,f6ac34c3fdecd3b4be7d9a6be02559d4e9cdc7e14a03f7d254dd40bbab41a28d,custom-functions,karbon_kontacts.fmp12,56,BrowserNav.Tooltip,ui,context-dependent,tier2,which,none,"karbon_kontacts.fmp12/layouts/10-Home.txt
+karbon_kontacts.fmp12/layouts/101-User_Home.txt
+karbon_kontacts.fmp12/layouts/111-Templates.txt
+karbon_kontacts.fmp12/layouts/125-Activity_List.txt
+karbon_kontacts.fmp12/layouts/126-Payments_List.txt
+karbon_kontacts.fmp12/layouts/128-Admin_Integrations.txt
+karbon_kontacts.fmp12/layouts/134-Admin_User_Detail.txt
+karbon_kontacts.fmp12/layouts/153-Opportunities.txt
+karbon_kontacts.fmp12/layouts/154-Admin_Developer.txt
+karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt
+karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+karbon_kontacts.fmp12/layouts/40-Customers.txt
+karbon_kontacts.fmp12/layouts/47-Parties.txt
+karbon_kontacts.fmp12/layouts/50-Party_Detail.txt
+karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt
+karbon_kontacts.fmp12/layouts/70-Admin_Dashboard.txt
+karbon_kontacts.fmp12/layouts/71-Admin_User_List.txt
+karbon_kontacts.fmp12/layouts/84-Sales_List.txt
+karbon_kontacts.fmp12/layouts/86-Items.txt","Returns tooltip text for the back/forward browser-nav buttons from $$BrowserNav: the next layout name (with window name when commonHistory is true), or ""Nowhere to go…"". Uses forward[0] and backward[1].","navTooltip(which: 'forward'|'backward', state: NavState): string",
+karbon_kontacts.fmp12/custom-functions/61-CleanText.txt,41a4bce7337370007de5bd28c7090b1dced7e4ee52683f66878a0e847b148eab,custom-functions,karbon_kontacts.fmp12,61,CleanText,text,recursive,tier3,text,CleanText,"karbon_kontacts.fmp12/tables/138-UtilityParty.txt
+karbon_kontacts.fmp12/tables/144-UtilityUser.txt","Trims leading and trailing spaces, tabs, carriage returns and non-breaking-space characters, one end character at a time via recursion, and removes text formatting with TextFormatRemove. The original Trim4 version is kept in a comment.",cleanText(text: string): string,Character set in the PatternCount string contains spaces and a tab as typed; confirm which exact characters it trims. Twin: karbon_kontroller _wip_CleanText is a renamed copy. Byte-identical body in: karbon_data.fmp12#48.

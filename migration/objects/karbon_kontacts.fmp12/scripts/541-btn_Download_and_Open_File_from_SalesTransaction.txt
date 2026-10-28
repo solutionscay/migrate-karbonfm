@@ -1,0 +1,67 @@
+# script 541: btn: Download and Open File from SalesTransaction
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Buttons
+# source: ScriptCatalog/Script[@id=541]
+# steps: 13 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=557 groupCollapsed=False includeInMenu=False
+
+   1    Set Variable [ $filename; Value:Get ( ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $filename
+   2    Set Variable [ $dir; Value:Get ( TemporaryPath) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:TemporaryPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $dir
+   3    Set Variable [ $path; Value:$dir & $filename ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ Get(WindowStyle)= 3 //in file list card window ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:WindowStyle
+   6    Export Field Contents [ File::Container; “$path”; Automatically open; Create folders:No ]
+        CreateDirectories state=False
+        DisableStepCollapsed state=False
+        AutoOpen state=True
+        CreateEmail state=False
+        UniversalPathList: $path
+        Field table=File id=17 name=Container
+   7    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #attachment portal
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Export Field Contents [ SalesTransaction_FileAttachment_File::Container; “$path”; Automatically open; Create folders:No ]
+        CreateDirectories state=False
+        DisableStepCollapsed state=False
+        AutoOpen state=True
+        CreateEmail state=False
+        UniversalPathList: $path
+        Field table=SalesTransaction_FileAttachment_File id=17 name=Container
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    End If
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Exit Script [  ]
+        DisableStepCollapsed state=False

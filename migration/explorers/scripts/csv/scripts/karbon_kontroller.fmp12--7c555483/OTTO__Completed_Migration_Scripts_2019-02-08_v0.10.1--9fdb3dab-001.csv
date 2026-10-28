@@ -1,0 +1,17 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/696-Rebuild_Customer_Retainer_Balance.txt,47af8c2a46409f03cf2f03bae4ba86b24b2f1b95ec6793511b1cc113131721e1,scripts,karbon_kontroller.fmp12,696,Rebuild Customer Retainer Balance,data-change,drop-candidate,tier3,"One-time migration from v0.10.1 (2019-02-08): inside a transaction, loops over all customers and rebuilds the cached RetainerBalanceCached as the sum of the customer's retainer amounts across sales transactions plus the manual RetainerAdjustment.","f_Customer::IdListOf#57
+SalesTransaction#ByCustomer::totalRetainerAmount#65
+Customer::RetainerAdjustment#56","DBTransactions::PartyRoleId#68 (step 63, current record)
+Customer::ONE#20 (step 65, related via DBTransactions (record created or locked by the ONE field set))
+Customer::RetainerBalanceCached#55 (step 69, related via DBTransactions (record created or locked by the ONE field set))","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 33)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 87)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 88)",objects/karbon_kontroller.fmp12/scripts/701-Karbon_v.10.1.txt (step 1),none,The balance rule (sum of totalRetainerAmount + RetainerAdjustment) is a business definition that the field explorer should capture even if this one-time script is dropped.
+karbon_kontroller.fmp12/scripts/700-Update_Comment_Count_Cached_Value.txt,aa05c8334574d91b68f19f9aa4b89e3418d31bee2338e65737ecbfcbb8712072,scripts,karbon_kontroller.fmp12,700,Update Comment Count Cached Value,data-change,drop-candidate,tier3,"One-time migration from v0.10.1 (2019-02-06): finds all discussion activities and, inside a transaction, rewrites each one's cached comment count (CommentCountCached = count of its comments).","f_Activity::IdList#129
+ActivityComment#byActivityId::Id#6
+Activity::Id#1
+f_Activity::DiscussionInd#205 (find criterion step 40)","DBTransactions::ActivityId#58 (step 77, current record)
+Activity::CommentCountCached#207 (step 79, related via DBTransactions (record created or locked by the ONE field set))","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 61)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 96)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 97)",objects/karbon_kontroller.fmp12/scripts/701-Karbon_v.10.1.txt (step 2),none,The count rule (comments per discussion activity) belongs to the field explorer. Step 46 treats error 401 (no records) as a normal result but then continues to the cache loop with an empty id list.
+karbon_kontroller.fmp12/scripts/701-Karbon_v.10.1.txt,a48cd77709a1104bb509ad7134fe85f0b4f454dc408d6a1bd0c469beeb536cf5,scripts,karbon_kontroller.fmp12,701,Karbon v.10.1,orchestration,drop-candidate,tier3,Runner for the v0.10.1 migration: calls Rebuild Customer Retainer Balance and Update Comment Count Cached Value.,none,none,"karbon_kontroller.fmp12/scripts/696 ""Rebuild Customer Retainer Balance"" (step 1)
+karbon_kontroller.fmp12/scripts/700 ""Update Comment Count Cached Value"" (step 2)",none found (in Scripts menu),none,none

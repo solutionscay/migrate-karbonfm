@@ -1,0 +1,103 @@
+# script 302: Send FMData To QBO ( {Entity , FmID} )
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink API / Public / General
+# source: ScriptCatalog/Script[@id=302]
+# steps: 27 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=594 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Send a FileMaker Record to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} params.Entity the target Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {string} params.FmId the FileMaker record id
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @returnSuccess {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @returnSuccess {number} error.errorCode = 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @returnError {number} error.errorCode <> 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $Entity; Value:JSONGetElement ( Get (ScriptParameter ) ; "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Entity
+  18    Set Field [ QBO::syncLabel; List(
+        "Sending";
+        $Entity
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List
+        Field table=QBO id=42 name=syncLabel
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “Open QBO Card Window” ]
+        DisableStepCollapsed state=False
+        Script id=303 name="Open QBO Card Window"
+  21    Install OnTimer Script [ “_Close Sync window if required”; Interval: 1 ]
+        DisableStepCollapsed state=False
+        Script id=307 name="_Close Sync window if required"
+  22    Perform Script [ “_Send FMData To QBO ( {Entity , FmId )”; Parameter: Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptParameter
+        Script id=289 name="_Send FMData To QBO ( {Entity , FmId )"
+  23    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Perform Script [ “_DisplayError”; Parameter: $result ]
+        DisableStepCollapsed state=False
+        Script id=312 name=_DisplayError
+  27    Exit Script [ Result:  $result ]
+        DisableStepCollapsed state=False

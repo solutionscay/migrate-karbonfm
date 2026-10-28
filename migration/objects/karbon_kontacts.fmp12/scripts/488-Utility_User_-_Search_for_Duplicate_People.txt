@@ -1,0 +1,100 @@
+# script 488: Utility User - Search for Duplicate People
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / User / UtilityUser
+# source: ScriptCatalog/Script[@id=488]
+# steps: 25 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=368 groupCollapsed=False includeInMenu=False
+
+   1    Set Layout Object Animation [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Search for Party
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #Search Option: Set to True if you want the search to match on the full words in the name. They default is to shorten the names to produce more matches.
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $FullWordSearch; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FullWordSearch
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #Search Option: If you want to search just the left 3 digits of each word, set this to 3.
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $NumberOfDigitsPerWord; Value:12 ]
+        DisableStepCollapsed state=False
+        Name: $NumberOfDigitsPerWord
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #Run Search
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Perform Script [ “Get Party { data }” from file: “karbon_kontroller”; Parameter: JSONSetElement ( "{}" ; 
+        [ "Name" ; UtilityUser::FirstName & " " & UtilityUser::LastName ; JSONString ];
+        [ "SearchPerWord" ; $SearchPerWord ; JSONBoolean ];
+        [ "NumberOfDigitsPerWord" ; $NumberOfDigitsPerWord ; JSONString ];
+        [ "PersonInd" ; True ; JSONBoolean ]
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        refs: fn:JSONSetElement, UtilityUser::FirstName#19, UtilityUser::LastName#20, fn:JSONString, fn:JSONBoolean, fn:True
+        Script id=186 name="Get Party { data }" in=karbon_kontroller.fmp12
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $PartyList; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyList
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ Error.IsError ( $PartyList ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  18    #None found, Create the User record
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Save Card - Utility User” ]
+        DisableStepCollapsed state=False
+        Script id=371 name="Save Card - Utility User"
+  20    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ selector::PartyListId; JSONGetElement ( $PartyList ; "IdList" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=selector id=21 name=PartyListId
+  22    Go to Object [ Object Name: "Duplicate People Found"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

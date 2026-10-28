@@ -1,0 +1,91 @@
+# layout 187: Card - Manage Subscribers
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion
+# source: LayoutCatalog/Layout[@id=187]
+# objects: 14
+# theme: Karbon-1.0
+# folder group: id=98 groupCollapsed=False includeInMenu=False
+
+Layout width=540 quickFind=True includeInMenu=False id=187 name="Card - Manage Subscribers"
+  Table id=1065202 name=UtilityDiscussion
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  Object type=Text key=5 LabelKey=0 flags=268435456 bounds=20,20,51,380
+    Text flags=2 style=H2-Primary: "Who should be notified?"
+  Object type=Button key=12 LabelKey=0 flags=-1342177280 bounds=650,420,680,520
+    Text flags=2 style=Button-SuccessPill: OK
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “btn: Update Subscribers” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=861 name="btn: Update Subscribers"
+  Object type=Button key=22 LabelKey=0 flags=268500992 bounds=20,490,50,520
+    Text flags=2 style=Button-CardCloseCenter
+    ButtonObj buttonFlags=0 iconSize=20 displayType=1
+      Step enable=True id=121 name="Close Window"
+        StepText: Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+      Image name=a29_x.svg
+  Object type=Text key=25 LabelKey=0 flags=-1342177280 bounds=390,20,414,120
+    Text flags=2 style=Label-Medium-Left: "Everyone else"
+  Object type=Text key=28 LabelKey=0 flags=268435456 bounds=90,20,113,170
+    Text flags=2 style=Label-Medium-Left: "Our Company"
+  Object type=ExternalObject key=29 LabelKey=0 name=web.employees flags=268435456 bounds=120,20,340,520
+    ExternalObj typeID=WEBV typeIndex=0 externalFlagSet=32801
+      Calculation index=0:
+        | ""
+  Object type=Portal key=30 LabelKey=0 flags=-1342177280 bounds=400,630,518,1130
+    PortalObj portalFlags=17 numOfRows=2 initialRow=1
+      TableAliasKey: UtilityDiscussion_Party#DisplayParties
+      FieldList
+        Field table=UtilityDiscussion_Party#DisplayParties id=19 name=NameCached
+        Field table=Party id=32 name=Photo
+      Object type=Button key=35 LabelKey=0 name=pickerButton flags=1073741824 bounds=400,630,460,1110
+        Text flags=2
+        ButtonObj buttonFlags=0 iconSize=8 displayType=0
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Select Party for Discussion_deprecated” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Resume
+            Script id=844 name="Select Party for Discussion_deprecated"
+      Object type=Field key=31 LabelKey=0 bounds=418,690,442,1035
+        FieldObj numOfReps=1 flags=36 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-Medium-NoChrome
+          Field: UtilityDiscussion_Party#DisplayParties::NameCached#19
+      Object type=Button key=32 LabelKey=0 flags=4 bounds=410,640,450,680
+        Text flags=2
+        ButtonObj buttonFlags=0 iconSize=40 displayType=1
+          Image name=tick-inside-a-circle.svg
+        HideCondition findMode=False
+          Calculation:
+            | Let ( [ 
+            | 	pickedPartyIds = UtilityDiscussion::SubscriberPartyIds
+            | ] ; 
+            | 	not IsInList ( pickedPartyIds ; UtilityDiscussion_Party#DisplayParties::Id )
+            | )
+            refs: fn:Let, UtilityDiscussion::SubscriberPartyIds#19, fn:not, cf:IsInList, UtilityDiscussion_Party#DisplayParties::Id#1
+      Object type=Field key=40 LabelKey=0 bounds=410,640,450,680
+        FieldObj numOfReps=1 flags=8244 inputMode=0 keyboardType=0 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=7 style="Person icon"
+          Field: Party::Photo#32
+  Object type=Button key=38 LabelKey=0 flags=268435456 bounds=60,20,80,120
+    Text flags=2 style=Button-Small-CommandLink-Center: "Select Everyone"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “#wip btn: Select everyone as Subscriber” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=845 name="#wip btn: Select everyone as Subscriber"
+  Object type=Button key=39 LabelKey=0 flags=268435456 bounds=60,140,80,240
+    Text flags=2 style=Button-Small-CommandLink-Center: "Select no one"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “#wip btn: Select no one as Subscriber” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=846 name="#wip btn: Select no one as Subscriber"
+  Object type=ExternalObject key=41 LabelKey=0 name=web.everyone flags=-1342177280 bounds=420,20,640,520
+    ExternalObj typeID=WEBV typeIndex=0 externalFlagSet=32801
+      Calculation index=0:
+        | ""

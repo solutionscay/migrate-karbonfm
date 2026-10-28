@@ -1,0 +1,160 @@
+# script 776: Button: Add Other Email Address to Email Message ( To|Cc|Bcc, EmailAddress )
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / EmailMessage
+# source: ScriptCatalog/Script[@id=776]
+# steps: 33 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=326 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #validate
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ IsEmpty ( UtilityEmailMessage::OtherEmailAddress ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, UtilityEmailMessage::OtherEmailAddress#35
+   4    Beep
+        DisableStepCollapsed state=False
+   5    Show Custom Dialog [ Title: "Error"; Message: "An email address is required."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   6    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $ActivityPartyRole; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyRole
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $ActivityPartyRoleId; Value:Case ( 
+        	$ActivityPartyRole = "To" ; 
+        		55 ; 
+        	$ActivityPartyRole = "Cc" ; 
+        		56 ; 
+        	$ActivityPartyRole = "Bcc" ; 
+        		57 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyRoleId
+  14    Set Variable [ $EmailAddressFormatted; Value:UtilityEmailMessage::OtherEmailAddress ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityEmailMessage::OtherEmailAddress#35
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailAddressFormatted
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $json; Value:JSONSetElement (  ""; 
+         
+        	[ "ActivityId" ; Activity::Id ; JSONString ];
+        	[ "ActivityPartyRoleId" ; $ActivityPartyRoleId ; JSONNumber ];
+        	[ "ActivityPartyRoleName" ; $ActivityPartyRole ; JSONString ];
+        //	[ "ContactMethodId" ; Selected_NetworkAddress::Id ; JSONString ];
+        	[ "EmailAddress" ; UtilityEmailMessage::OtherEmailAddress ; JSONString ];
+        	[ "EmailAddressFormatted" ; UtilityEmailMessage::OtherEmailAddress ; JSONString ]
+        //	[ "PartyId" ; Selected_NetworkAddress_ContactMethod::PartyId ; JSONString ] ; 
+        //	[ "PartyName" ; Selected_NetworkAddress_ContactMethod_Party::NameCached ; JSONString ]  
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Activity::Id#1, fn:JSONString, fn:JSONNumber, UtilityEmailMessage::OtherEmailAddress#35
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “Create ActivityParty { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=376 name="Create ActivityParty { json }" in=karbon_kontroller.fmp12
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  21    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  22    If [ JSONGetElement ( $result ; "reason" ) = "duplicate" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement
+  23    Show Custom Dialog [ Title: "Error"; Message: "This email address has already been added."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  24    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  26    End If
+        DisableStepCollapsed state=False
+  27    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Field [ UtilityEmailMessage::OtherEmailAddress; "" ]
+        DisableStepCollapsed state=False
+        Field table=UtilityEmailMessage id=35 name=OtherEmailAddress
+  31    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

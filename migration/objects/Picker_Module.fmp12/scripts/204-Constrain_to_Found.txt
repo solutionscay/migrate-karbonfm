@@ -1,0 +1,56 @@
+# script 204: Constrain to Found
+# file: Picker Module.fmp12
+# folder: Modules / Address Autocomplete / API / Private
+# source: ScriptCatalog/Script[@id=204]
+# steps: 13 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Field [ Picker::FoundCount; "Found " & WriteNumber ( VIRTUALLISTS::foundCount ) & " address" & 
+        
+        If ( VIRTUALLISTS::foundCount > 1 ; "es" ) & 
+        
+        If ( VIRTUALLISTS::foundCount = 10 ; 
+        	"¶(max 10 results displayed)"
+        ) ]
+        DisableStepCollapsed state=False
+        refs: cf:WriteNumber, VIRTUALLISTS::foundCount#1, fn:If
+        Field table=Picker id=22 name=FoundCount
+   3 // Refresh Object [ Object Name: "foundCount"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   6    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+   7    Set Field [ VirtualListAddressPicker::n; "<=" & VIRTUALLISTS::foundCount ]
+        DisableStepCollapsed state=False
+        refs: VIRTUALLISTS::foundCount#1
+        Field table=VirtualListAddressPicker id=1 name=n
+   8    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  11    Perform Script [ “Go to Picker Button” ]
+        DisableStepCollapsed state=False
+        Script id=93 name="Go to Picker Button"
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False

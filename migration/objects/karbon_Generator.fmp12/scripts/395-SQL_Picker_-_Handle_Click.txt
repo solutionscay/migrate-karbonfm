@@ -1,0 +1,163 @@
+# script 395: SQL Picker - Handle Click
+# file: karbon_Generator.fmp12
+# folder: Schema Picker VirtualList / SQL Statement
+# source: ScriptCatalog/Script[@id=395]
+# steps: 42 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=393 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $data; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $FileName; Value:JSONGetElement ( $data ; "FileName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   5    Set Variable [ $TableOccurenceName; Value:JSONGetElement ( $data ; "TableOccurenceName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableOccurenceName
+   6    Set Variable [ $Object; Value:JSONGetElement ( $data ; "Object" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Object
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ $Object = "Table" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Perform Script [ “Set VL_Table”; Parameter: $FileName ]
+        DisableStepCollapsed state=False
+        Script id=378 name="Set VL_Table"
+  12    Go to Object [ Object Name: "Table"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Else If [ $Object = "Field" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Field [ GLOBALS::Schema_File; VIRTUALLIST::TableFileName ]
+        DisableStepCollapsed state=False
+        refs: VIRTUALLIST::TableFileName#12
+        Field table=GLOBALS id=21 name=Schema_File
+  17    Set Field [ GLOBALS::Schema_Table; VIRTUALLIST::TableName ]
+        DisableStepCollapsed state=False
+        refs: VIRTUALLIST::TableName#5
+        Field table=GLOBALS id=22 name=Schema_Table
+  18    Set Field [ GLOBALS::Schema_TableOccurence; VIRTUALLIST::TableOccurenceName ]
+        DisableStepCollapsed state=False
+        refs: VIRTUALLIST::TableOccurenceName#11
+        Field table=GLOBALS id=23 name=Schema_TableOccurence
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Perform Script [ “Set VL_Field”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        Script id=379 name="Set VL_Field"
+  21    Go to Object [ Object Name: "Field"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Else If [ $Object = "FieldValue" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Field [ GLOBALS::Schema_Field; VIRTUALLIST::FieldName ]
+        DisableStepCollapsed state=False
+        refs: VIRTUALLIST::FieldName#6
+        Field table=GLOBALS id=24 name=Schema_Field
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Perform Script [ “Set VL_FieldValue”; Parameter: JSONSetElement ( "{}" ; 
+        [ "FileName" ; GLOBALS::Schema_File ; JSONString];
+        [ "TableName" ; GLOBALS::Schema_Table ; JSONString];
+        [ "FieldName" ; GLOBALS::Schema_Field ; JSONString]
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, GLOBALS::Schema_File#21, fn:JSONString, GLOBALS::Schema_Table#22, GLOBALS::Schema_Field#24
+        Script id=380 name="Set VL_FieldValue"
+  28    Go to Object [ Object Name: "FieldValue"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Else If [ $Object = "ReturnField" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Field [ GLOBALS::Schema_FieldValue; VIRTUALLIST::FieldValue ]
+        DisableStepCollapsed state=False
+        refs: VIRTUALLIST::FieldValue#13
+        Field table=GLOBALS id=25 name=Schema_FieldValue
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Go to Object [ Object Name: "ReturnField"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $$VL_TableName; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$VL_TableName
+  39    Go to Object [ Object Name: "File"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    End If
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False

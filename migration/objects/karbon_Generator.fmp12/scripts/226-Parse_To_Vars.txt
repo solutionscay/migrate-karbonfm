@@ -1,0 +1,126 @@
+# script 226: Parse To Vars
+# file: karbon_Generator.fmp12
+# folder: Miscellaneous Generators / Comment Generators
+# source: ScriptCatalog/Script[@id=226]
+# steps: 26 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=218 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $params; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $mainObjectName; Value:MiddleWords ( GetValue($params;1) ; 3 ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:MiddleWords, fn:GetValue
+        Name: $mainObjectName
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $steps; Value:List ( 
+        	ScriptStep_InsertCalculatedResult ( "$" & $mainObjectName ; "JSON.Format ( Get (ScriptParameter) ; \"\" )" ; 1 ) ; 
+        	ScriptStep_If ( "Error.IsError ( $data )" ) ; 
+        	ScriptStep_ExitScript ( "$data" ) ; 
+        	ScriptStep_EndIf ; 
+        	ScriptStep_Comment ( "" ) 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, cf:ScriptStep_InsertCalculatedResult, cf:ScriptStep_If, cf:ScriptStep_ExitScript, cf:ScriptStep_EndIf, cf:ScriptStep_Comment
+        Name: $steps
+   9    Set Variable [ $n; Value:2 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+  10    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $param; Value:GetValue( $params ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  12    Exit Loop If [  IsEmpty ( $param ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $propName; Value:MiddleWords ( $param ; 3 ; 1) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:MiddleWords
+        Name: $propName
+  15    Set Variable [ $propName; Value:Substitute (  $propName ; $mainObjectName & "." ; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $Expression; Value:"JSONGetElement ( $" & $mainObjectName & " ;  " & Quote($propName) & " )" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $Expression
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $line; Value:ScriptStep_InsertCalculatedResult ( "$" & $propName ; $Expression ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult
+        Name: $line
+  20    Set Variable [ $steps; Value:List( $steps ; "  " & $line ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $steps
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  23    End Loop
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Exit Script [ Result: $steps ]
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False

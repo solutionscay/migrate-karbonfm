@@ -1,0 +1,123 @@
+# script 293: Create JSONObjectLines from JSONObject
+# file: karbon_Generator.fmp12
+# folder: App Modules / JSONObjects / Public
+# source: ScriptCatalog/Script[@id=293]
+# steps: 30 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=284 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $JSON; Value:JSNObject::JSONObjectAsText ]
+        DisableStepCollapsed state=False
+        Value
+          refs: JSNObject::JSONObjectAsText#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSON
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #Get a list of JSON keys
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $$Result; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$Result
+   6    Perform Script [ “JSON Get Keys as List”; Parameter: JSONSetElement ( "{}" ; "thisJSON" ; $JSON ; JSONObject ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONObject
+        Script id=295 name="JSON Get Keys as List"
+   7    Set Variable [ $JSONKeys; Value:$$Result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONKeys
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $JSONCount; Value:ValueCount( $JSONKeys ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONCount
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Go to Object [ Object Name: "JSONLines"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  14    Go to Portal Row
+        [ First ]
+        NoInteract state=False
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  15    Exit Loop If [ IsEmpty ( JSNObject_JSNObjectLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, JSNObject_JSNObjectLine::Id#3
+  16    Delete Portal Row
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+  17    End Loop
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  21    Exit Loop If [ $i > $JSONCount ]
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $thisKey; Value:GetValue( $JSONKeys; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisKey
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Go to Object [ Object Name: "JSONLines"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  26    Go to Portal Row
+        [ Last ]
+        NoInteract state=False
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=Last
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Field [ JSNObject_JSNObjectLine::Key; $ThisKey ]
+        DisableStepCollapsed state=False
+        Field table=JSNObject_JSNObjectLine id=8 name=Key
+  29    Set Field [ JSNObject_JSNObjectLine::Value; JSONGetElement ( $JSON ; $ThisKey ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=JSNObject_JSNObjectLine id=9 name=Value
+  30    End Loop
+        DisableStepCollapsed state=False

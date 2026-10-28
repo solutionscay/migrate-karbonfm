@@ -1,0 +1,51 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/254-wip_Create_Party_Relation_V2_data.txt,13a0fad3134a042187a654877d905c8e757bca970fdd38d8f22ea1af629cdff6,scripts,karbon_kontroller.fmp12,254,_wip_Create Party Relation V2 { data },data-change,server-domain,tier1,"Work-in-progress V2 create of a party relationship. Rejects a duplicate From/To pair, then creates two PartyRelation rows, one in each direction (From to To with the To party's relationship/billing/shipping, and the reverse with the From party's). Dates default to today, CurrentInd is always true on create. Transaction pattern; both PartyIds required.","DBTransactions::PartyIdFrom#98 (selector)
+DBTransactions::PartyIdTo#99 (selector)
+PartyRelation#ByPartyFromAndPartyTo::Id#16
+PartyRelation::Id#16","DBTransactions::PartyIdFrom#98 (step 109, global)
+DBTransactions::PartyIdTo#99 (step 110, global)
+DBTransactions::PartyRelationId#35 (steps 123, 145, global, cleared to force a new record)
+PartyRelation::ONE#36 (steps 124, 146, new record via relationship)
+PartyRelation::BillingInd#39 (steps 129, 151, current record)
+PartyRelation::CurrentInd#22 (steps 130, 152, current record)
+PartyRelation::FromDate#20 (steps 131, 153, current record)
+PartyRelation::PartyIdFrom#7 (steps 132, 155, current record)
+PartyRelation::PartyIdTo#6 (steps 133, 154, current record)
+PartyRelation::Relationship#12 (steps 134, 156, current record)
+PartyRelation::ShippingInd#40 (steps 135, 157, current record)
+PartyRelation::ThruDate#21 (steps 136, 158, current record, always empty: $ThruDate is never set)","karbon_kontroller.fmp12/scripts/28 (step 41)
+karbon_kontroller.fmp12/scripts/29 (step 174)
+karbon_kontroller.fmp12/scripts/31 (step 175)","objects/karbon_kontroller.fmp12/scripts/224-wip_Edit_Employee_data.txt (step 220)
+objects/karbon_kontroller.fmp12/scripts/164-wip_Create_Employee_data.txt (step 222)
+objects/karbon_kontroller.fmp12/scripts/229-wip_Create_Customer_V3_data.txt (step 252)
+objects/karbon_kontroller.fmp12/scripts/595-wip_Create_Lead_json.txt (step 199)
+objects/karbon_kontacts.fmp12/scripts/393-Create_Parties.txt (step 278)",none,"Looks unfinished (name starts with wip_): $PartyTo.RoleList (step 90) is built from itself rather than $PartyTo.Role, so PartyTo billing/shipping are always false; the reverse row uses $BillingInd.From and $ShippingInd.From, which are never set; $ThruDate is never set. Result Id is the second (reverse) row id only. Log.Entry custom function writes a log (steps 122, 144). No caller found in the DDR; compare with the live Create Party Relation script."
+karbon_kontroller.fmp12/scripts/508-Edit_Party_Relation_data.txt,5cc97dbd59bbbd79923d45ec60381e4efedfeba15c7409da276dfa2c84a30a82,scripts,karbon_kontroller.fmp12,508,Edit Party Relation { data },data-change,server-domain,tier1,"Patches both directional PartyRelation rows between two parties (From to To and To to From): for each, connects through the DBTransactions selector, errors if the row does not exist, and sets only the properties present in the JSON (CurrentInd, FromDate, ThruDate, relationship, role) plus billing/shipping flags from the role lists. Transaction pattern; both PartyIds required.","DBTransactions::PartyIdFrom#98 (selector)
+DBTransactions::PartyIdTo#99 (selector)
+PartyRelation#ByPartyFromAndPartyTo::Id#16
+PartyRelation::Id#16","DBTransactions::PartyIdFrom#98 (steps 108, 153, global)
+DBTransactions::PartyIdTo#99 (steps 109, 152, global)
+DBTransactions::PartyRelationId#35 (steps 115, 159, global)
+PartyRelation::CurrentInd#22 (steps 125, 169, current record)
+PartyRelation::FromDate#20 (steps 128, 172, current record)
+PartyRelation::ThruDate#21 (steps 131, 175, current record)
+PartyRelation::Relationship#12 (steps 134, 178, current record, from undefined $Relationship)
+PartyRelation::Role#45 (steps 137, 181, current record, from undefined $Role)
+PartyRelation::BillingInd#39 (steps 141, 185, current record)
+PartyRelation::ShippingInd#40 (steps 144, 188, current record)","karbon_kontroller.fmp12/scripts/28 (step 43)
+karbon_kontroller.fmp12/scripts/29 (step 203)
+karbon_kontroller.fmp12/scripts/31 (step 204)","objects/karbon_kontacts.fmp12/scripts/855-btn_Restore_Party_Relation_from_Party.txt (step 5)
+objects/karbon_kontacts.fmp12/scripts/848-btn_End_Party_Relationship_from_Opportunity_deprecated.txt (step 5)
+objects/karbon_kontacts.fmp12/scripts/423-btn_End_Party_Relation_from_Party.txt (step 5)",none,"$Relationship (steps 134, 178) and $Role (steps 137, 181) are never set, so those patches write empty values when the JSON includes Relationship or Role; the intended values are $PartyFrom.Relationship/$PartyTo.Relationship and the role lists. $PartyTo.RoleList is derived from the PartyTo role correctly here. Confirm the live behaviour before copying."
+karbon_kontroller.fmp12/scripts/720-Delete_Party_Relation_Id.txt,475ca3c3ac127c3b10b3dc04eb8fc1f575e97819ca4492767726223275c02b6d,scripts,karbon_kontroller.fmp12,720,Delete Party Relation { Id },data-change,server-domain,tier1,"Deletes a PartyRelation by Id and also its reciprocal row (the same two parties in reverse order). Locks the relation through the DBTransactions selector, remembers the From/To party ids, deletes the first row of PartyRelationPortal through a helper script, then looks up the reciprocal row by the swapped party ids and deletes it the same way. Transaction pattern; Id required.","DBTransactions::PartyRelationId#35 (selector)
+PartyRelation::PartyIdFrom#7
+PartyRelation::PartyIdTo#6
+PartyRelation#ByPartyFromAndPartyTo::Id#16
+PartyRelation::Id#16","DBTransactions::PartyRelationId#35 (steps 79, 111, global)
+PartyRelation::ONE#36 (steps 82, 118, current record, lock existing)
+DBTransactions::PartyIdTo#99 (step 104, global)
+DBTransactions::PartyIdFrom#98 (step 105, global)
+delete: PartyRelation (Delete First Portal Row via script 33, step 96, portal row ""PartyRelationPortal"", record by Id)
+delete: PartyRelation (Delete First Portal Row via script 33, step 128, portal row ""PartyRelationPortal"", reciprocal record)","karbon_kontroller.fmp12/scripts/28 (step 33)
+karbon_kontroller.fmp12/scripts/33 (steps 96, 128)
+karbon_kontroller.fmp12/scripts/31 (step 142)",objects/karbon_kontacts.fmp12/scripts/856-btn_Delete_PartyRelation.txt (step 5),none,"Delete target is inside script 33 (portal row delete), not read. A missing reciprocal row aborts with ""Party Relation record does not exist"" after the first row has already been deleted; whether the transaction rolls back depends on scripts 28/31. Save Transaction Result is not called, so success returns an empty result."

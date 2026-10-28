@@ -1,0 +1,52 @@
+# table 131: QueryParameters
+# file: karbon_Generator.fmp12
+# source: BaseTableCatalog/BaseTable[@id=131]
+# fields: 7
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=idRequest
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=name
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=value
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Calculated name=pair
+  Calculation table=QueryParameters:
+    | name&"="&value
+    refs: QueryParameters::name#2, QueryParameters::value#3
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Calculated name=pairJSON
+  Calculation table=QueryParameters:
+    | <Function Missing> ( name ;  value  )
+    refs: QueryParameters::name#2, QueryParameters::value#3
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Calculated name=pairJSONModify
+  Calculation table=QueryParameters:
+    | jsonModifyStep ( "query." & name ; value )
+    refs: cf:jsonModifyStep, QueryParameters::name#2, QueryParameters::value#3
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Calculated name=pairJSONSetElement
+  Calculation table=QueryParameters:
+    | JSONSetElement_Step ( "query." & name ; value )
+    refs: cf:JSONSetElement_Step, QueryParameters::name#2, QueryParameters::value#3
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

@@ -1,0 +1,97 @@
+# script 226: Select File
+# file: Picker Module.fmp12
+# folder: Modules / Schema / Field Selector
+# source: ScriptCatalog/Script[@id=226]
+# steps: 23 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=225 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $data; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $SelectedFileName; Value:JSONGetElement ( $data ; "FileName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SelectedFileName
+   5    Set Variable [ $ScriptsInd; Value:JSONGetElement ( $data ; "ScriptsInd" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptsInd
+   6    Set Variable [ $FieldsInd; Value:JSONGetElement ( $data ; "FieldsInd" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldsInd
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ $ScriptsInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Field [ Picker::Schema_ScriptsInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=30 name=Schema_ScriptsInd
+  11    Perform Script [ “Set Script Array”; Parameter: /*VirtualList_File::FileName*/ ]
+        DisableStepCollapsed state=False
+        Script id=220 name="Set Script Array"
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Go to Object [ Object Name: "Script"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Else If [ $FieldsInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Field [ Picker::Schema_FieldsInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=29 name=Schema_FieldsInd
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Set TableOccurence Array”; Parameter: JSONSetElement ( "" ; 
+        	[ "FileName" ; VIRTUALLISTS_Rows::json_SchemaPicker_File ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, VIRTUALLISTS_Rows::json_SchemaPicker_File#15, fn:JSONString
+        Script id=223 name="Set TableOccurence Array"
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Go to Object [ Object Name: "TableOccurence"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    End If
+        DisableStepCollapsed state=False

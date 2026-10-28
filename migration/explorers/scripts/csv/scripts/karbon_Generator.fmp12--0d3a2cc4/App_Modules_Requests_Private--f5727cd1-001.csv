@@ -1,0 +1,51 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_Generator.fmp12/scripts/1-Send_Request.txt,0699f6c972552d8073afa4a3095b7e1696e7c894961598299a22aba719521628,scripts,karbon_Generator.fmp12,1,Send Request,integration,drop-candidate,tier3,"Sends the current Requests record: clears the response, waits 0.2 s, runs 'HTTP ( {request} )' (script 6) with Requests::requestJSON, stores the response through 'Set Response Into Fields' and adds a RequestHistory record with request, id and response. Developer HTTP request tester in the Generator file; no target effect.","Requests::requestJSON#15
+Requests::id#6","RequestHistory::request#1 (Set Field step 17, new record)
+RequestHistory::idRequest#8 (Set Field step 18, new record)
+RequestHistory::response#2 (Set Field step 19, new record)","karbon_Generator.fmp12/scripts/30 (step 3)
+karbon_Generator.fmp12/scripts/6 (step 7)
+karbon_Generator.fmp12/scripts/26 (step 10)","karbon_Generator.fmp12/layouts/1-Request_Details.txt
+karbon_Generator.fmp12/relationships/48-Script_CONNECTOR.txt
+karbon_Generator.fmp12/scripts/27-btn_Send_Request.txt
+karbon_Generator.fmp12/table-occurrences/1065099-CONNECTOR.txt
+karbon_Generator.fmp12/table-occurrences/1065141-Script.txt",none,HTTP script 6 does the real call (not in this batch). History record is created on layout RequestHistory without a commit step.
+karbon_Generator.fmp12/scripts/8-Restore_History_To_Current_Request_request.txt,a94252e3870d5c85fa70370a632e3e63b2b7b860cf6c2bb81cb9e16df9a21125,scripts,karbon_Generator.fmp12,8,Restore History To Current Request ( request ),data-change,drop-candidate,tier3,"Loads a saved request JSON back into the current Requests record: url, body, basic auth user/password, method, quoted-data flag; deletes the Headers and QueryParameters child rows and recreates them from the JSON; sets the response fields. Developer HTTP request tester in the Generator file; no target effect.","Requests::uoteData#30
+Requests::body#18","Requests::urlEntry#1 (Set Field step 16, current record)
+Requests::body#18 (Set Field step 17, current record)
+Requests::basicAuthPassword#10 (Set Field step 18, current record)
+Requests::basicAuthUser#9 (Set Field step 19, current record)
+Requests::method#2 (Set Field step 20, current record)
+Requests::body#18 (Set Field step 21, current record)
+Requests::uoteData#30 (Set Field step 22, current record)
+Requests::body#18 (Set Field step 24, current record)
+QueryParameters::name#2 (Set Field step 56, portal row)
+QueryParameters::value#3 (Set Field step 57, portal row)
+Headers::name#2 (Set Field step 70, portal row)
+Headers::value#3 (Set Field step 71, portal row)
+delete: QueryParameters (Delete All Records step 34, found set from step 31)
+delete: Headers (Delete All Records step 42, found set from step 39)",karbon_Generator.fmp12/scripts/26 (step 76),"karbon_Generator.fmp12/scripts/25-btn_Restore_History.txt
+karbon_Generator.fmp12/scripts/28-btn_Restore_to_a_New_Request.txt
+karbon_Generator.fmp12/scripts/29-New_Reqest_Request.txt
+karbon_Generator.fmp12/value-lists/20-Script_By_Id.txt
+karbon_Generator.fmp12/value-lists/23-Script_By_Name.txt",none,"Writes request basic-auth password (Requests::basicAuthPassword#10, step 18): stored secret. Steps 24 Evaluate of body when quoted data is on. Truncate Table steps 27-28 are disabled. Write targets for QueryParameters/Headers are portal rows (steps 56-57, 70-71)."
+karbon_Generator.fmp12/scripts/9-Clear_Request_History_RequestID.txt,d1920d89b8b5acdc9116a9d699c6342e83f9deafaf3224b04542e43f30cb88dc,scripts,karbon_Generator.fmp12,9,Clear Request History ( RequestID ),data-change,drop-candidate,tier3,"Deletes the RequestHistory rows of one request id: opens a utility window, finds idRequest = id, deletes all found records, closes the window. Developer HTTP request tester in the Generator file; no target effect.",RequestHistory::idRequest#8 (find criterion step 25),"delete: RequestHistory (Delete All Records step 28, found set from step 25)","karbon_Generator.fmp12/scripts/56 (step 22)
+karbon_Generator.fmp12/scripts/57 (step 31)",karbon_Generator.fmp12/scripts/68-btn_Clear_History.txt,none,
+karbon_Generator.fmp12/scripts/26-Set_Response_Into_Fields.txt,0df3936d265560394bd687cf98dc2448748b7971a2b94920dee8035e5f6dae8d,scripts,karbon_Generator.fmp12,26,Set Response Into Fields,data-change,drop-candidate,tier3,"Parses an HTTP response JSON and stores formatted JSON, status code, status text, headers and body (pretty-printed JSON, decoded Base64 for text/html, otherwise raw) into the Requests record. Developer HTTP request tester in the Generator file; no target effect.",Requests::id#6,"Requests::responseJSON#16 (Set Field step 4, current record)
+Requests::ResponseCode#5 (Set Field step 9, current record)
+Requests::responseStatus#17 (Set Field step 10, current record)
+Requests::ResponseHeaders#4 (Set Field step 11, current record)
+Requests::ResponseBodyRaw#3 (Set Field step 16, current record)
+Requests::ResponseBodyRaw#3 (Set Field step 19, current record)
+Requests::ResponseBodyRaw#3 (Set Field step 21, current record)",none,"karbon_Generator.fmp12/scripts/1-Send_Request.txt (step 10)
+karbon_Generator.fmp12/scripts/8-Restore_History_To_Current_Request_request.txt (step 76)",none,
+karbon_Generator.fmp12/scripts/29-New_Reqest_Request.txt,4b7f2a7eb52c735df576607d374763aa6cebafa40588c49fd51b2865f735d76c,scripts,karbon_Generator.fmp12,29,New Reqest ( Request ),data-change,drop-candidate,tier3,"Creates a new Requests record on layout 'Request Details', restores the passed request into it (script 8), sets name and notes and commits. Developer HTTP request tester in the Generator file; no target effect.",none,"Requests::name#24 (Set Field step 6, new record)
+Requests::notes#25 (Set Field step 7, new record)",karbon_Generator.fmp12/scripts/8 (step 5),karbon_Generator.fmp12/scripts/71-API_New_Request_request.txt (step 14),none,
+karbon_Generator.fmp12/scripts/30-Clear_Response.txt,7343fa8ce88640c31a82ef66dc28f0c5a8b5b93b6ef0b875af071ced07c9b25b,scripts,karbon_Generator.fmp12,30,Clear Response,data-change,drop-candidate,tier3,"Clears the response fields (responseJSON, responseStatus, ResponseBodyRaw) of the current Requests record. Developer HTTP request tester in the Generator file; no target effect.",none,"Requests::responseJSON#16 (Set Field step 3, current record)
+Requests::responseStatus#17 (Set Field step 4, current record)
+Requests::ResponseBodyRaw#3 (Set Field step 5, current record)",none,karbon_Generator.fmp12/scripts/1-Send_Request.txt,none,
+karbon_Generator.fmp12/scripts/117-Export_This_Request_To_File_removeAuthBoolean.txt,98fc9c3e20f55d7fd8db2368cc37462242fda1b89d68d5576b6258994b1991a8,scripts,karbon_Generator.fmp12,117,Export This Request To File (removeAuthBoolean),print-export,drop-candidate,tier3,"Exports the current request as a .json file: file name from Requests::name (or 'Request'), contents from the calculated field request.jsonFile (auth removed when the flag is set), saved through plugin functions. Developer HTTP request tester in the Generator file; no target effect.","Requests::name#24
+Requests::request.jsonFile#29",none,none,karbon_Generator.fmp12/scripts/113-btn_Export_To_File_removeAuthBoolean.txt,"<Function Missing> (plugin, choose save location; step 18)
+<Function Missing> (plugin, write file; step 23)",Plugin functions at steps 18 and 23 are unresolved. $inFolder is used in step 18 but never set. Callers: only button script 113.
+karbon_Generator.fmp12/scripts/118-Export_Found_Set_To_Disk_removeAuthBoolean.txt,0e825923fa435f42c4361cc36a74a92966138054c54e7f7f4aa0bc0f5c7209d8,scripts,karbon_Generator.fmp12,118,Export Found Set To Disk (removeAuthBoolean),print-export,drop-candidate,tier3,"Exports every request of the found set to a chosen folder as separate .json files (name or 'request<n>'), auth removed when the flag is set. Developer HTTP request tester in the Generator file; no target effect.","Requests::name#24
+Requests::request.jsonFile#29",none,none,karbon_Generator.fmp12/scripts/116-btn_Export_Found_Set_To_Disk_removeAuthBoolean.txt,"<Function Missing> (plugin, choose folder; step 5)
+<Function Missing> (plugin, write file; step 25)",Plugin functions at steps 5 and 25 are unresolved.

@@ -1,0 +1,29 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontacts.fmp12/scripts/675-Button_Launch_Party_Picker_For_Meeting_Attendee.txt,f2c4a1af8aa65f8118cb4fe2645026d96cfc57d74fb2a2086ef82532f0f52720,scripts,karbon_kontacts.fmp12,675,Button: Launch Party Picker For Meeting Attendee,navigation,client-ui,tier3,"Button on the Meeting layout that opens the contact picker (Picker Module, multi-select, no create) to add attendees: installs a 1-second on-timer that runs the selection handler, commits, and calls Show Contact Picker with the window options.",none,none,"Picker_Module.fmp12/scripts/67 ""Show Contact Picker( { top { ; left { ; allowMultiple } } } )"" (step 12, in=Picker_Module.fmp12)
+karbon_kontacts.fmp12/scripts/676 ""Handler: Meeting Attendee Selection"" (step 3, Install OnTimer Script)",karbon_kontacts.fmp12/layouts/92-Meeting_Detail.txt,none,"Hands off to the Picker Module file, whose picked result is read by script 676."
+karbon_kontacts.fmp12/scripts/676-Handler_Meeting_Attendee_Selection.txt,90634d523e2c7c09d12b83b08d8b03347927301e844bb203470e452b51e6ea0c,scripts,karbon_kontacts.fmp12,676,Handler: Meeting Attendee Selection,data-change,server-domain,tier2,"Timer handler that runs after the contact picker: runs Contact Handler Common Tests, returns -1 if the user cancelled, otherwise for each picked party creates an ActivityParty on the meeting with role 60 (attendee) through karbon_kontroller Create ActivityParty, with the party's cached email id and address. Stops the timer once a pick was made.","Activity::Id#1 (step 45)
+Selected_Party::EmailAddressIdCached#145 (step 45)
+Selected_Party::EmailAddressCached#127 (step 45)","selector::PartyId#6 (step 43, global)","karbon_kontacts.fmp12/scripts/63 ""Contact Handler Common Tests"" (step 8)
+karbon_kontroller.fmp12/scripts/376 ""Create ActivityParty { json }"" (step 47, in=karbon_kontroller.fmp12)",karbon_kontacts.fmp12/scripts/675-Button_Launch_Party_Picker_For_Meeting_Attendee.txt,none,"$Comments is never set, so Comments is always empty. Reads PartyCount from key Result.CountPicked while the sample comment shows PartyCount. The creation of the ActivityParty record happens in karbon_kontroller (script 376)."
+karbon_kontacts.fmp12/scripts/683-Button_Create_Meeting_From_Opportunity.txt,71b35bb6f949996969d8cef1a64ba58b8c0dd4625ec5b3476e3d6cab8536a37d,scripts,karbon_kontacts.fmp12,683,Button: Create Meeting From Opportunity,navigation,client-ui,tier2,"Button that creates a Meeting from the current Opportunity: picks the first related person when the opportunity's party is an organization (otherwise the opportunity's party), calls karbon_kontroller Create Meeting with EntityId = opportunity id and EntityTypeId 13, then opens the new meeting in a window with the related contacts, salesperson and referring party as display parties.","Opportunity_Party::OrganizationInd#18 (step 3)
+Opportunity_Party_PartyRelation_Person::Id#1 (step 5)
+Opportunity::PartyId#55 (step 8)
+Opportunity::Id#1 (step 12)
+Opportunity_Party_PartyRelation::PartyIdTo#6 (step 25)
+Opportunity::SalespersonId#56 (step 25)
+Opportunity::ReferringPartyId#65 (step 25)",none,"karbon_kontroller.fmp12/scripts/545 ""Create Meeting { data }"" (step 14, in=karbon_kontroller.fmp12)
+karbon_kontacts.fmp12/scripts/291 ""Open Activity { Id }"" (step 27)","karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt
+Scripts menu (includeInMenu=True)",none,"$Location is never set, so Location is empty. Entity type id 13 (Opportunity) is hard-coded."
+karbon_kontacts.fmp12/scripts/684-Open_Meeting_in_New_Window_Id.txt,f094037310dc65ab1a9f4cd38b2591080cbcf83f0647b77007275b0be29f8947,scripts,karbon_kontacts.fmp12,684,Open Meeting in New Window { Id },navigation,client-ui,tier3,Opens the meeting whose Id is in the script parameter in a new 1080x800 document window on the Meeting Detail layout and puts the cursor in Activity::Subject; shows an error dialog when the Id is missing.,Activity::Subject#22 (Go to Field step 13),"selector::ActivityId#7 (step 8, global)",none,"karbon_kontacts.fmp12/scripts/291-Open_Activity_Id.txt
+Scripts menu (includeInMenu=True)",none,
+karbon_kontacts.fmp12/scripts/771-Button_Create_Meeting_From_Party.txt,8899d9515972324a68fd14946875dacc36e240fe8fec23742c13820f8f6ee18b,scripts,karbon_kontacts.fmp12,771,Button: Create Meeting From Party,navigation,client-ui,tier2,"Button that creates a Meeting from the current Party: uses the first related person when the party is an organization (otherwise the party), calls karbon_kontroller Create Meeting, then opens the new meeting in a window with the person, related persons and the party's activity parties as display parties.","Party::OrganizationInd#18 (step 3)
+Party_PartyRelation_Party::Id#1 (step 5)
+Party::Id#1 (step 7)
+Opportunity::Id#1 (step 11)
+Person::Id#1 (step 23)
+Party_PartyRelation_Party_Person::Id#1 (step 23)
+Party_ActivityParty::PartyIdList#59 (step 23)",none,"karbon_kontroller.fmp12/scripts/545 ""Create Meeting { data }"" (step 13, in=karbon_kontroller.fmp12)
+karbon_kontacts.fmp12/scripts/291 ""Open Activity { Id }"" (step 25)","karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt
+karbon_kontacts.fmp12/layouts/51-Customer_Detail.txt
+karbon_kontacts.fmp12/layouts/50-Party_Detail.txt
+Scripts menu (includeInMenu=True)",none,"The create call sends EntityId = Opportunity::Id and EntityTypeId 13 (Opportunity) although the script runs from a Party layout; likely copied from the opportunity version, so the entity link may be wrong. $Location is never set."

@@ -1,0 +1,63 @@
+source_id,source_hash,kind,file,id,name,purpose,context,hide_rules,conditional_formats,triggers,buttons,tooltips,portals,value_lists,target,open_question
+karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt,ab771c6cbe0cd75f4eefa23ea8fa591ba0b6e3d0cdbc1acc336145adc0844c6c,layouts,karbon_kontacts.fmp12,94,SalesReceipt,form,"SalesReceipt (base SalesReceipt, karbon_data.fmp12)","key 345 button ""(icon)"" | hidden when the line is not taxable, or the line has no item and the window is not in find mode (description-only line)
+key 346 button ""=""remove value"""" | hidden when the line has no item selected
+key 347 button ""(icon)"" | hidden when the line is taxable, or the line has no item and the window is not in find mode (description-only line)
+key 382 buttonbar | hidden when the QuickBooks Online integration is not in use
+key 385 button ""Open in QBO"" | hidden when the transaction has no QBO id or the window is in find mode
+key 389 button ""Remove From QBO"" | hidden when the transaction has no QBO id, or its date is on or before the QBO book-close date
+key 390 text (no label) | hidden when the transaction already has a QBO id and the QBO integration is in use
+key 393 popover button ""(icon)"" | hidden when the transaction has a QBO id
+key 397 buttonbar | hidden when the transaction has no QBO id
+key 410 field SalesTransaction_FileAttachment::IncludeOnSend#9 | hidden when the attachment portal row has no attachment record
+key 411 field SalesTransaction_FileAttachment_File::FileName#6 | hidden when the attachment portal row has no attachment record
+key 414 button ""(icon)"" | hidden when the attachment portal row has no attachment record
+key 436 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)","key 321 button ""(icon)"" | when the shipping address has no line 1, line 2, city, state, postal code or country | style
+key 346 button ""=""remove value"""" | when the line has no item selected | hide
+key 407 button ""(icon)"" | when the billing address has no line 1, line 2, city, state, postal code or country | style
+key 417 field SalesTransaction_FileAttachment_File::FileSize#27 | when the attached file is larger than 20000 (QBO attachment limit) | style","layout | OnRecordCommit | script 376 On Commit - Sales Transactions | recomputes subtotal, taxable subtotal, total and balance, and sets qbo_send to True
+key 352 field SalesLine::amount#6 | OnObjectExit | script 270 SalesLine Amount OnObjectExit Trigger | rounds the line amount and recomputes unit price from amount and quantity (mimics QBO auto-calculation)","key 321 (icon) | script 268 Open Map ( address ) | param address lines as a list: shipAddressLine1, shipAddressLine2, shipAddressCity, shipAddressState, shipAddressPostalCode, shipAddressCountry
+key 337 Choose… | script 163 Open Party Info Card { Id } | param JSON {Id: Party::Id}
+key 345 (icon) | Set Field [ SalesLine::taxable; not SalesLine::taxable ]
+key 347 (icon) | Set Field [ SalesLine::taxable; not SalesLine::taxable ]
+key 346 remove value | Set Field [ SalesLine::ItemId; """" ]
+key 357 Discuss | script 313 Open Discussion in New Window { data } v2 | param JSON {EntityId: Invoice::Id, EntityType: Invoice, Title: ""Invoice #"" & SalesTransaction::docNumber}
+key 366 Show Existing | script 533 Open Card - File List_DEPRECATED
+key 367 (icon) | script 622 btn: Add New File as FileAttachment to SalesTransaction
+key 383 (icon) | opens popover ""LedgerLink""
+key 385 Open in QBO | script 213 btn: Invoice Open In QBO | param JSON {Entity: Invoice, QBOId: SalesTransaction::qbo_id}
+key 389 Remove From QBO | script 609 btn: Remove Sales Transaction From QBO
+key 391 Lock | script 377 btn: Lock SalesTransaction
+key 393 (icon) | opens popover ""Popover""
+key 395 delete | script 212 btn: Delete SalesTransaction
+key 398 (icon) | no step
+key 407 (icon) | script 268 Open Map ( address ) | param address lines as a list: billAddressLine1, billAddressLine2, billAddressCity, billAddressState, billAddressPostalCode, billAddressCountry
+key 414 (icon) | script 627 btn: Delete FileAttachment from SalesTransaction
+key 435 Refresh from QBO | script 299 Refresh SalesReceipt From QBO ( qbo_id )","key 346 | remove value
+key 410 | Attach to email
+key 417 | shows ""This file exceeds the QBO maximum"" when the file size is over 20000, else nothing","key 344 SalesLine | none | none
+key 409 SalesTransaction_FileAttachment | none | none","LL Accounts Id (id 17)
+Items Id (id 15)
+Boolean (id 1)",page,"OnRecordCommit trigger sets SalesTransaction::qbo_send to True on every commit
+a button runs script 533 ""Open Card - File List_DEPRECATED"", whose name marks it deprecated or work-in-progress"
+karbon_kontacts.fmp12/layouts/145-SalesReceipt_-_View_Only.txt,05ae15428cfca45c52d11ecd73cdd189258d7e5cbc36e1fc6925b252c00c7ff1,layouts,karbon_kontacts.fmp12,145,SalesReceipt - View Only,form,"SalesReceipt (base SalesReceipt, karbon_data.fmp12)","key 295 button ""Open in QBO"" | hidden when the transaction has no QBO id or the window is in find mode
+key 293 popover button ""(icon)"" | hidden when the QuickBooks Online integration is not in use
+key 371 button ""(icon)"" | hidden when the line is not taxable, or the line has no item and the window is not in find mode (description-only line)
+key 372 button ""(icon)"" | hidden when the line is taxable, or the line has no item and the window is not in find mode (description-only line)
+key 374 popover button ""(icon)"" | hidden when the line is not flagged as deleted in QBO
+key 396 field SalesTransaction_FileAttachment_File::FileName#6 | hidden when the attachment portal row has no attachment record
+key 397 button group ""=""download"""" | hidden when the attachment portal row has no attachment record
+key 424 text ""DEV"" | hidden when the server type is Production or the window is in find mode (developer-only marker or button)","key 321 button ""(icon)"" | when the shipping address has no line 1, line 2, city, state, postal code or country | style
+key 405 field SalesTransaction_FileAttachment_File::FileSize#27 | when the attached file is larger than 20000 (QBO attachment limit) | style",key 370 field SalesLine::amount#6 | OnObjectExit | script 270 SalesLine Amount OnObjectExit Trigger | rounds the line amount and recomputes unit price from amount and quantity (mimics QBO auto-calculation),"key 293 (icon) | opens popover ""LedgerLink""
+key 295 Open in QBO | script 300 btn: SalesReceipt Open In QBO | param JSON {Entity: SalesReceipt, QBOId: SalesTransaction::qbo_id}
+key 321 (icon) | script 268 Open Map ( address ) | param address lines as a list: shipAddressLine1, shipAddressLine2, shipAddressCity, shipAddressState, shipAddressPostalCode, shipAddressCountry
+keys 354,371,372 (×3) (icon) | no step
+key 374 (icon) | opens popover """"
+key 391 Discuss | script 313 Open Discussion in New Window { data } v2 | param JSON {EntityId: Invoice::Id, EntityType: Invoice, Title: ""Invoice #"" & SalesTransaction::docNumber}
+key 397 download | script 541 btn: Download and Open File from SalesTransaction | param SalesTransaction_FileAttachment_File::FileName
+key 407 Subtotal | no step
+key 403 Unlock | script 335 btn: Unlock Sales Transaction ( Id ) | param SalesTransaction::id","key 396 | Attach to email
+key 398 | download
+key 405 | shows ""This file exceeds the QBO maximum"" when the file size is over 20000, else nothing","key 365 SalesLine | none | none
+key 395 SalesTransaction_FileAttachment | none | none","LL Accounts Id (id 17)
+Items Id (id 15)
+Boolean (id 1)",merge,"View-only twin of SalesReceipt (layout 94), opened by script 224 ""Display Sales Transaction in a New Window""; the rule that picks this layout over layout 94 sits in the script and was not verified here"

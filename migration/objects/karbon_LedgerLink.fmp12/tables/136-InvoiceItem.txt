@@ -1,0 +1,186 @@
+# table 136: InvoiceItem
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=136]
+# fields: 15
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=qbo_InvoiceItem:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation message=True type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+    ErrorMessage: InvoiceItem id must exist and be unique.
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Number fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Number fieldType=Normal name=qbo_lineNum
+  Comment: determines the sort order. NOT suitable for display to users due to it's auto-enter value.
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=qbo_InvoiceItem:
+      | /* auto-entering milliseconds ensures new records are sorted after previously entered records */
+      | Get ( CurrentTimeUTCMilliseconds )
+      refs: fn:Get, fn:CurrentTimeUTCMilliseconds
+  Validation type=Always
+    StrictDataType value=Numeric
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=description
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=InvoiceItem:
+      | Invoice_InvoiceItem_Item::description
+      refs: Invoice_InvoiceItem_Item::description#5
+  Validation maxLength=True type=Always
+    MaxDataLength value=4000
+    StrictValidation value=True
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Number fieldType=Normal name=amount
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=InvoiceItem:
+      | // amount field
+      | 
+      | /* This logic matches the QBO interface. */
+      | 
+      | Let ( [
+      | 	q = If ( not IsEmpty ( qty ) ; qty ; 1 ) ;
+      | 	a = Round ( q * unitPrice ; 2 )
+      | ] ;
+      | 	Case (
+      | 		IsEmpty ( id_Item ) ;
+      | 		"" ; /* if an item is not selected, assume this is a description-only line */
+      | 
+      | 		a ;
+      | 		a ;
+      | 
+      | 		/* else */
+      | 		0
+      | 	)
+      | )
+      refs: fn:Let, fn:If, fn:not, fn:IsEmpty, InvoiceItem::qty#8, fn:Round, InvoiceItem::unitPrice#7, fn:Case, InvoiceItem::id_Item#9
+  Validation type=OnlyDuringDataEntry
+    StrictDataType value=Numeric
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Number fieldType=Normal name=unitPrice
+  AutoEnter allowEditing=True overwriteExistingValue=True lookup=False calculation=True
+    Calculation table=InvoiceItem:
+      | Let ( [
+      | 	itemForeignKeyFieldName = GetFieldName ( id_Item ) ;
+      | 	
+      | 	fieldNameOnly = GetValue ( Substitute ( itemForeignKeyFieldName ; "::" ; "¶" ) ; 2 )
+      | ] ;
+      | 	If ( Get ( ActiveFieldName ) = fieldNameOnly ;
+      | 		/* the user changed the item for this line, get the default unit cost for that item */
+      | 		Invoice_InvoiceItem_Item::unitPrice ;
+      | 		
+      | 		/**
+      | 		 * else: this field was manually changed, so round the value using QBO rounding rules:
+      | 		 * https://developer.intuit.com/docs/0100_quickbooks_online/0200_dev_guides/accounting/global_tax_model/us_sales_tax_integrations
+      | 		 * NOTE: if you set the item via script, you will also have to set this value from the realted item record
+      | 		 */
+      | 		Round ( Self ; 7 )
+      | 	)
+      | )
+      refs: fn:Let, fn:GetFieldName, InvoiceItem::id_Item#9, fn:GetValue, fn:Substitute, fn:If, fn:Get, fn:ActiveFieldName, Invoice_InvoiceItem_Item::unitPrice#22, fn:Round, fn:Self
+    (inactive) Lookup
+      Table id=1065096 name=qbo_InvoiceItem
+      Field table=Invoice_InvoiceItem_Item id=22 name=unitPrice
+      NoMatchCopyOption value=CopyConstant
+      CopyEmptyContent value=True
+  Validation type=Always
+    StrictDataType value=Numeric
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Number fieldType=Normal name=qty
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=InvoiceItem:
+      | Round ( Self ; 7 )
+      refs: fn:Round, fn:Self
+  Validation type=Always
+    StrictDataType value=Numeric
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=id_Item
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+    StrictValidation value=True
+    ErrorMessage: A Product/Service must be selected.
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=id_Invoice
+  AutoEnter allowEditing=True
+  Validation type=Always
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=taxable
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=InvoiceItem:
+      | Invoice_InvoiceItem_Item::taxable
+      refs: Invoice_InvoiceItem_Item::taxable#19
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Number fieldType=Calculated name=amountTaxable
+  Calculation table=InvoiceItem:
+    | If ( taxable ; amount ; 0 )
+    refs: fn:If, InvoiceItem::taxable#11, InvoiceItem::amount#6
+  Comment: used to calculate taxable subtotal for Invoice
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Summary name=summaryTotalAmountTaxable
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=Total
+    SummaryField
+      Field id=12 name=amountTaxable
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=14 dataType=Number fieldType=Summary name=summaryTotalAmount
+  SummaryInfo restartForEachSortedGroup=False summarizeRepetition=Together operation=Total
+    SummaryField
+      Field id=6 name=amount
+  AutoEnter allowEditing=True
+  DisplayNames enable=False
+
+Field id=17 dataType=Number fieldType=Calculated name=retainerAmount
+  Calculation table=qbo_InvoiceItem:
+    | If(id_Item="FB50FC5C-42B6-4AB4-A610-D708FB9DA7C2"; amount; 0)
+    refs: fn:If, qbo_InvoiceItem::id_Item#9, qbo_InvoiceItem::amount#6
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=qbo_InvoiceItem:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

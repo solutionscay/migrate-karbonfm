@@ -1,0 +1,261 @@
+# script 224: Set Field Array
+# file: Picker Module.fmp12
+# folder: Modules / Schema
+# source: ScriptCatalog/Script[@id=224]
+# steps: 48 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=219 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $FileName; Value:JSONGetElement ( $data ; "FileName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   5    Set Variable [ $ThisTableOccurenceName; Value:JSONGetElement ( $data ; "TableOccurenceName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTableOccurenceName
+   6    Set Variable [ $ThisTableName; Value:JSONGetElement ( $data ; "TableName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTableName
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $sqlStatement; Value:"SELECT TableName, FieldName, FieldType, FieldId, FieldClass, FieldReps, ModCount FROM FileMaker_Fields WHERE TableName ='" & $ThisTableOccurenceName & "' ORDER BY FieldName ASC" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $sqlStatement
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $FieldList; Value:<Function Missing> (  $sqlStatement; "," ; "¶" ; $FileName ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldList
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $FieldArray; Value:"[]" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldArray
+  13    Set Variable [ $FieldArrayIndex; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldArrayIndex
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $exit; Value:ValueCount ( $FieldList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $exit
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  20    Exit Loop If [ $i > $exit ]
+        DisableStepCollapsed state=False
+  21    Set Variable [ $ThisField; Value:GetValue( $FieldList; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisField
+  22    Set Variable [ $ThisField; Value:Substitute ( $ThisField; ","; ¶ ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisField
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $TableOccurenceName; Value:GetValue( $ThisField; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $TableOccurenceName
+  25    Set Variable [ $FieldName; Value:GetValue( $ThisField; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldName
+  26    Set Variable [ $FieldType; Value:GetValue( $ThisField; 3 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldType
+  27    Set Variable [ $FieldId; Value:GetValue( $ThisField; 4 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldId
+  28    Set Variable [ $FieldClass; Value:GetValue( $ThisField; 5 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldClass
+  29    Set Variable [ $FieldReps; Value:GetValue( $ThisField; 6 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldReps
+  30    Set Variable [ $FieldModCount; Value:GetValue( $ThisField; 7 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldModCount
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $calcType; Value:Case(
+        
+        $FieldClass = "Summary"; "Summary";
+        $FieldClass = "Calculated"; "Calculation";
+        
+        $FieldType = "varchar"; "Text";
+        $FieldType = "decimal"; "Number";
+        $FieldType = "date"; "Date";
+        $FieldType = "time"; "Time";
+        $FieldType = "timestamp"; "Timestamp";
+        $FieldType = "binary"; "Container";
+        "Other"
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case
+        Repetition
+          Calculation:
+            | 1
+        Name: $calcType
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    If [ $TableOccurenceName = $ThisTableOccurenceName ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $FieldObject; Value:JSONSetElement ( "" ; 
+        	[ "TableOccurenceName" ; $TableOccurenceName ; JSONString ];
+        	[ "FileName" ; $FileName ; JSONString ];
+        	[ "FieldName" ; $FieldName ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldObject
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $FieldArray; Value:JSONSetElement ( $FieldArray ; $FieldArrayIndex; $FieldObject; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $FieldArray
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $FieldArrayIndex; Value:$FieldArrayIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $FieldArrayIndex
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    End If
+        DisableStepCollapsed state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    End Loop
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Field [ Picker::Schema_FieldArray; $FieldArray ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=34 name=Schema_FieldArray
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    Set Field [ VIRTUALLISTS::foundCount; JSON.ArrayLength ( $FieldArray ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.ArrayLength
+        Field table=VIRTUALLISTS id=1 name=foundCount

@@ -1,0 +1,180 @@
+# script 861: btn: Update Subscribers
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / Subscriber Picker
+# source: ScriptCatalog/Script[@id=861]
+# steps: 40 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=716 groupCollapsed=False includeInMenu=False
+
+   1    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ IsEmpty ( Selected_Discussion::Id ) and Activity::ActivityTypeId <> 10//Not an independent discussion ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_Discussion::Id#6, fn:and, Activity::ActivityTypeId#100
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #Create the discussion
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Activity::Id ; JSONString ]  ;
+        	[ "EntityTypeId" ; 11 ; JSONString ]  ;
+        	[ "Notes" ; UtilityDiscussion::Notes ; JSONString ]  ;
+        	[ "CreatorId" ; session::CurrentUserPartyId ; JSONString ] ;
+        	[ "SubscriberPartyIds" ; UtilityDiscussion::SubscriberPartyIds ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Activity::Id#1, fn:JSONString, UtilityDiscussion::Notes#9, session::CurrentUserPartyId#63, UtilityDiscussion::SubscriberPartyIds#19
+        Name: $json
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Create Discussion v2” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=421 name="Create Discussion v2" in=karbon_kontroller.fmp12
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  11    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  12    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  13    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $DiscussionId; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DiscussionId
+  17    Set Variable [ $ActivityCommentId; Value:JSONGetElement ( $result ; "ActivityCommentId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityCommentId
+  18    Set Field [ selector::DiscussionActivityId; $DiscussionId ]
+        DisableStepCollapsed state=False
+        Field table=selector id=35 name=DiscussionActivityId
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ Activity::ActivityTypeId <> 10 //Independent discussion, not related to an activity ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Activity::ActivityTypeId#100
+  24    Insert Calculated Result [ $json; JSONSetElement ( "{}" ; 
+        	[ "Id" ; selector::DiscussionActivityId ; JSONString ]  ;
+        
+        	[ "SubscriberPartyIds" ; UtilityDiscussion::SubscriberPartyIds ; JSONString ]  ;
+        	[ "CreatorId" ; Selected_Discussion_ActivityParty#Creator::PartyId ; JSONString ] 
+        ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, selector::DiscussionActivityId#35, fn:JSONString, UtilityDiscussion::SubscriberPartyIds#19, Selected_Discussion_ActivityParty#Creator::PartyId#7
+        Field: $json
+  25    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Insert Calculated Result [ $json; JSONSetElement ( "{}" ; 
+        	[ "Id" ; Selected_Discussion::Id ; JSONString ]  ;
+        
+        	[ "SubscriberPartyIds" ; UtilityDiscussion::SubscriberPartyIds ; JSONString ]  ;
+        	[ "CreatorId" ; Selected_Discussion_ActivityParty#Creator::PartyId ; JSONString ] 
+        ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, Selected_Discussion::Id#6, fn:JSONString, UtilityDiscussion::SubscriberPartyIds#19, Selected_Discussion_ActivityParty#Creator::PartyId#7
+        Field: $json
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Perform Script [ “Edit Discussion” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=739 name="Edit Discussion" in=karbon_kontroller.fmp12
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Insert Calculated Result [ $result; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $result
+  32    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  33    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  34    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  35    End If
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #refresh subscriber names
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    End If
+        DisableStepCollapsed state=False

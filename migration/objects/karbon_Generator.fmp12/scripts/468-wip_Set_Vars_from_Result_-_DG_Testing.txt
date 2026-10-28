@@ -1,0 +1,174 @@
+# script 468: #wip Set Vars from Result - DG Testing
+# file: karbon_Generator.fmp12
+# folder: Miscellaneous Generators / Comment Generators
+# source: ScriptCatalog/Script[@id=468]
+# steps: 34 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=218 groupCollapsed=False includeInMenu=False
+
+   1    #@history 2018-09-28 dave@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $items; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $items
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $mainObjectName; Value:MiddleWords ( GetValue( $items ; 1 ) ; 3 ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:MiddleWords, fn:GetValue
+        Name: $mainObjectName
+   6    Insert Text [ $lineTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: JSONGetElement ( $result ; "{propName}" )
+        Field: $lineTemplate
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $n; Value:2 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $n
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $item; Value:GetValue( $items ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $item
+  12    Exit Loop If [  IsEmpty ( $item ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $propName; Value:MiddleWords ( $item ; 3 ; 999 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:MiddleWords
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  15    Set Variable [ $type; Value:Case(
+        
+        PatternCount ( $item ; "{object}" ) ; "JSONObject";
+        PatternCount ( $item ; "{string}" ) ; "JSONString";
+        PatternCount ( $item ; "{number}" ) ; "JSONNumber";
+        PatternCount ( $item ; "{boolean}" ) ; "JSONBoolean";
+        PatternCount ( $item ; "{array}" ) ; "JSONArray";
+        PatternCount ( $item ; "{null}" ) ; "JSONNull";
+        Quote("")
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case, fn:PatternCount, fn:Quote
+        Repetition
+          Calculation:
+            | 1
+        Name: $type
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #Clean up prop
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "propName" ; $propName ; JSONString ] ; 
+        	[ "paramName" ; $mainObjectName ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  20    Perform Script [ “#DEPRECATED Clean fmDocs Prop { propName, paramName }”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=467 name="#DEPRECATED Clean fmDocs Prop { propName, paramName }"
+  21    Set Variable [ $propName; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $propExpression; Value:Substitute ( $lineTemplate ; 
+        	[ "{propName}" ; $propName ] ; 
+        	[ "{type}" ; $type ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $propExpression
+  25    Set Variable [ $line; Value:ScriptStep_InsertCalculatedResult ( "$" & $propName ; $propExpression ; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:ScriptStep_InsertCalculatedResult
+        Name: $line
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $steps; Value:List( $steps ; "  " & $line ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $steps
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  30    End Loop
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Exit Script [ Result: $steps ]
+        DisableStepCollapsed state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False

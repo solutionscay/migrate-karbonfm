@@ -1,0 +1,92 @@
+# script 830: Phone Handler Common Tests
+# file: karbon_kontacts.fmp12
+# folder: Modules / Picker / Private
+# source: ScriptCatalog/Script[@id=830]
+# steps: 25 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=62 groupCollapsed=False includeInMenu=True
+
+   1    #This script is going to wait until the picker is done doing its thing, and then proceed accordingly
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v2.1 2019-04-04 bc: updated for phone picker
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #v2.0 2017-06-21 dmg: updated for v16 compatibility (JSON)
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Perform Script [ “Get Results” from file: “Picker Module” ]
+        DisableStepCollapsed state=False
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Script id=99 name="Get Results" in=Picker_Module.fmp12
+   7    Set Variable [ $results; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ IsEmpty ( $results ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  10    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  11    Exit Script [ Result: -1 ]
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $phoneWasSelected; Value:GetAsBoolean ( JSONGetElement ( $results ; "ContactId" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $phoneWasSelected
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    If [ Get ( WindowMode ) ≠ 0 and
+        Get ( WindowMode ) ≠ 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:WindowMode, fn:and
+  17    #halt on layout mode
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Else If [ not $phoneWasSelected ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  21    #nothing picked
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Exit Script [ Result: -1 ]
+        DisableStepCollapsed state=False
+  23    End If
+        DisableStepCollapsed state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Exit Script [ Result: $results ]
+        DisableStepCollapsed state=False

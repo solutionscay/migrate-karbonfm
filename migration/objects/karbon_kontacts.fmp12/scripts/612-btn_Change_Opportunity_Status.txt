@@ -1,0 +1,84 @@
+# script 612: btn: Change Opportunity Status
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Opportunity
+# source: ScriptCatalog/Script[@id=612]
+# steps: 17 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=601 groupCollapsed=True includeInMenu=False
+
+   1    #@history 2018-09-25 dave@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $OpportunityStatusId; Value:OpportunityStatus::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: OpportunityStatus::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $OpportunityStatusId
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Close Popover
+        DisableStepCollapsed state=False
+   6    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "EndDate" ; Get ( CurrentDate ) ; JSONString ];
+        	[ "Id" ; Opportunity::Id ; JSONString ];
+        	[ "OpportunityStatusId" ; $OpportunityStatusId ; JSONNumber ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:CurrentDate, fn:JSONString, Opportunity::Id#1, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+   9    Perform Script [ “#wip Update Opportunity Status { json }” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=608 name="#wip Update Opportunity Status { json }" in=karbon_kontroller.fmp12
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  12    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  13    Show Custom Dialog [ Title: "Error"; Message: "The opportunity status couldn't be updated."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  14    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,383 @@
+# script 238: Convert Fields to AsJson
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=238]
+# steps: 76 (15 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2018-02-13 dave@geistinteractive.com - WIP
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Close Popover
+        DisableStepCollapsed state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $exclusionList; Value:List ( 
+        
+        	"ONE" ; 
+        	"AsJSON" ; 
+        	"z_xJoin" 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $exclusionList
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $clip; Value:clip_GetFMxml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_GetFMxml
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ Position ( $clip ; "<BaseTable" ; 1 ; 1 ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Position
+  11    #Fields were copied instead of table. We don't realy need the table name, but the script that gets the field metadata expects it
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Field [ GLOBALS::BaseTableName; "NULL" ]
+        DisableStepCollapsed state=False
+        Field table=GLOBALS id=15 name=BaseTableName
+  13    Set Variable [ $clip; Value:Substitute ( $clip ; 
+        
+        	[ "<fmxmlsnippet type=\"FMObjectList\">" ; 
+        		"<fmxmlsnippet type=\"FMObjectList\">¶  <BaseTable name=" & Quote ( GLOBALS::BaseTableName ) & ">" ] ;
+        
+        	[ "</fmxmlsnippet>" ; 
+        		"  </BaseTable>¶</fmxmlsnippet>" ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:Quote, GLOBALS::BaseTableName#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+  14    End If
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        
+        	[ "exclusionList" ; $exclusionList ; JSONString ] ; 
+        	[ "clip" ; $clip ; JSONString ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  18    Perform Script [ “Get Field Metadata as JSON”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=230 name="Get Field Metadata as JSON"
+  19    Set Variable [ $params; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #Build calculation
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  28    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $param; Value:GetValue( $params ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  30    Exit Loop If [  IsEmpty ( $param ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #init vars
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $skip; Value:JSONGetElement ( $param ; "fieldType" ) = "Calculated"  or 
+        JSONGetElement ( $param ; "global" ) = True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:or, fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $skip
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    If [ not $skip ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  36    Set Variable [ $readOnly; Value:JSONGetElement ( $param ; "readOnly" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $readOnly
+  37    Set Variable [ $dataType; Value:"JSON" & JSONGetElement ( $param ; "dataType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataType
+  38    Set Variable [ $name; Value:JSONGetElement ( $param ; "name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  39    Set Variable [ $tableName; Value:JSONGetElement ( $param ; "baseTable" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $tableName
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Insert Text [ $lineTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: [ "{keyOrIndexOrPath}" ; {tableName}::{fieldName} ; {dataType} ] ;
+        Field: $lineTemplate
+  42    Set Variable [ $string; Value:Substitute ( $lineTemplate ; 
+        	[ "{keyOrIndexOrPath}" ; $name ] ; 
+        	[ "{tableName}" ; $tableName ] ; 
+        	[ "{fieldName}" ; $name ]  ; 
+        	[ "{dataType}" ; $dataType ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $string
+  43    Set Variable [ $props; Value:List( $props ; $string ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $props
+  44    End If
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  47    End Loop
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50 // Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  51 // Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  52 // Set Variable [ $param; Value:GetValue( $params ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $param
+  53 // Exit Loop If [  IsEmpty ( $param ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  54 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  55 // #init vars
+        DisableStepCollapsed state=False
+        Restore state=False
+  56 // Set Variable [ $dataType; Value:"JSON" & JSONGetElement ( $param ; "dataType" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $dataType
+  57 // Set Variable [ $readOnly; Value:JSONGetElement ( $param ; "readOnly" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $readOnly
+  58 // Set Variable [ $name; Value:JSONGetElement ( $param ; "name" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $name
+  59 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  60 // Set Variable [ $string; Value:Let ( 
+        	string = "[ \"<<name>>\" ; $<<name>> ; <<type>> ]"  
+        ; 
+        
+        Substitute ( string ; 
+        	[ "<<type>>" ; $dataType ] ; 
+        	[ "<<name>>" ; $name ] 
+        ) 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $string
+  61 // Set Variable [ $props; Value:List( $props ; "	" & $string ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $props
+  62 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  63 // Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  64 // End Loop
+        DisableStepCollapsed state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #Send XML data to clipboard
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Variable [ $calc; Value:List(
+        	"// Created by Generator - " & Get ( CurrentHostTimestamp ) ; 
+        	"// DO NOT format this JSON object!" ; 
+        	"JSONSetElement (  \"\"; ";
+        	" ";
+        	$props;
+        	" ";
+        	")"
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Get, fn:CurrentHostTimestamp
+        Repetition
+          Calculation:
+            | 1
+        Name: $calc
+  72    Set Variable [ $result; Value:<Function Missing> ( $calc ; "public.utf8-plain-text" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Show Custom Dialog [ Title: "Done"; Message: "Your fields have been converted to FileMaker AsJson expression and copied to the clipboard."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

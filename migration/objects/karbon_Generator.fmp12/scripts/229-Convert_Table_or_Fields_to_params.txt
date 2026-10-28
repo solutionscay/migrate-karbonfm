@@ -1,0 +1,192 @@
+# script 229: Convert Table or Fields to @params
+# file: karbon_Generator.fmp12
+# folder: Miscellaneous Generators / Comment Generators
+# source: ScriptCatalog/Script[@id=229]
+# steps: 40 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=218 groupCollapsed=False includeInMenu=False
+
+   1    #@history 2018-02-13 dave@geistinteractive.com - WIP
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $exclusionList; Value:List ( 
+        
+        	"CreationAccountName" ; 
+        	"CreationTimestamp" ; 
+        	"ModificationAccountName" ; 
+        	"ModificationCount" ; 
+        	"ModificationTimestamp" ; 
+        	"ONE" ; 
+        	"AsJSON" ; 
+        	"z_xJoin" 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $exclusionList
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Close Popover
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #Get metadata from clipboard
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $clip; Value:clip_GetFMxml ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_GetFMxml
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ Position ( $clip ; "<BaseTable" ; 1 ; 1 ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Position
+  14    #Fields were copied instead of table
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Show Custom Dialog [ Title: "Base Table"; Message: "Please enter the name of the base table for these fields."; Default Button: “Continue”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No”; Input #1: GLOBALS::BaseTableName ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "Continue"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+        InputFields
+          InputField UsePasswordCharacter=False
+            Field table=GLOBALS id=15 name=BaseTableName
+          InputField UsePasswordCharacter=False
+            Field table="" id=0 name="" ref=none
+          InputField UsePasswordCharacter=False
+            Field table="" id=0 name="" ref=none
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ Get ( LastMessageChoice ) = 2 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastMessageChoice
+  18    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $clip; Value:Substitute ( $clip ; 
+        
+        	[ "<fmxmlsnippet type=\"FMObjectList\">" ; 
+        		"<fmxmlsnippet type=\"FMObjectList\">¶  <BaseTable name=" & Quote ( GLOBALS::BaseTableName ) & ">" ] ;
+        
+        	[ "</fmxmlsnippet>" ; 
+        		"  </BaseTable>¶</fmxmlsnippet>" ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, fn:Quote, GLOBALS::BaseTableName#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $clip
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        
+        	[ "exclusionList" ; $exclusionList ; JSONString ] ; 
+        	[ "clip" ; $clip ; JSONString ] 
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Perform Script [ “Get Field Metadata as JSON”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=230 name="Get Field Metadata as JSON"
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $params; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Perform Script [ “Create @param Script Steps”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=245 name="Create @param Script Steps"
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $result; Value:clip_Set ( Get ( ScriptResult ) ; "ScriptSteps" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:clip_Set, fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Show Custom Dialog [ Title: "Done"; Message: "Your fields have been converted to FileMaker @param comments and copied to the clipboard."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False

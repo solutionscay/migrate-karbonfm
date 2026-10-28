@@ -1,0 +1,166 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/376-Create_ActivityParty_json.txt,a60cc4e34273c93a54180b8195aea837862bd4888d65b60fa8a4eca3932136f3,scripts,karbon_kontroller.fmp12,376,Create ActivityParty { json },data-change,server-domain,tier1,"Creates one ActivityParty (a party's role on an activity) from a JSON payload inside the Start/Save/End Transaction wrapper. It checks the Party, Activity and role, that the role is allowed for the activity type, and that an email or task activity has no duplicate contact method in the same role. It then creates the ActivityParty plus its Email or Event subtype row, caches party name and initials, and caches creator, completed-by, from and to names on Activity and Task. Returns {Id}.","Activity::ActivityTypeId#100
+Activity::EmailMessageInd#74
+Activity::Id#1
+Activity::PartiesCached#198
+Activity::TaskInd#171
+ActivityParty#byActivityAndRoleAndContactMethodId::Id#23
+ActivityParty::Id#23
+ActivityPartyRole#ByActivityType::Id#18
+ActivityPartyRole::CreateActivityPartyEmailInd#22
+ActivityPartyRole::CreateActivityPartyEventInd#23
+ActivityPartyRole::Id#18
+DBTransactions::ActivityId#58
+DBTransactions::ActivityTypeId#81
+DBTransactions::ContactMethodId#33
+DBTransactions::PartyId#25
+Party::Id#1
+Party::NameCached#19
+Party::OrganizationInd#18","DBTransactions::ActivityPartyId#59 (step 99, current record)
+ActivityParty::ONE#62 (step 100, related via ActivityParty (creates record))
+DBTransactions::PartyId#25 (step 108, current record)
+DBTransactions::ActivityId#58 (step 121, current record)
+DBTransactions::ActivityTypeId#81 (step 133, current record)
+DBTransactions::ActivityPartyRoleId#77 (step 146, current record)
+DBTransactions::ContactMethodId#33 (step 157, current record)
+ActivityParty::ActivityId#6 (step 171, record created in step 100)
+ActivityParty::ActivityPartyRoleId#24 (step 172, record created in step 100)
+ActivityParty::ContactMethodId#28 (step 173, record created in step 100)
+ActivityParty::PartyId#7 (step 174, record created in step 100)
+ActivityParty::PartyNameCached#13 (step 178, record created in step 100)
+ActivityParty::PartyInitials#29 (step 182, record created in step 100)
+ActivityParty::PartyInitials#29 (step 185, record created in step 100)
+ActivityPartyEmail::ONE#62 (step 192, related via ActivityPartyEmail (creates record))
+ActivityPartyEmail::EmailAddress#15 (step 198, record created in step 192)
+ActivityPartyEmail::EmailAddressFormatted#16 (step 199, record created in step 192)
+ActivityPartyEvent::ONE#62 (step 208, related via ActivityPartyEvent (creates record))
+ActivityPartyEvent::AttendedInd#33 (step 212, record created in step 208)
+ActivityPartyEvent::Comments#35 (step 213, record created in step 208)
+ActivityPartyEvent::Rsvp#32 (step 214, record created in step 208)
+ActivityPartyEvent::RsvpInd#73 (step 215, record created in step 208)
+Activity::PartiesCached#198 (step 224, related via Activity)
+Task::FromCached#23 (step 235, related via Task)
+Task::ToCached#24 (step 240, related via Task)
+Activity::CreatorCached#197 (step 251, related via Activity)
+Activity::AlertInd#107 (step 263, related via Activity)
+Activity::CompletedByCached_deprecated#196 (step 267, related via Activity)","karbon_kontroller.fmp12/scripts/28 (step 45)
+karbon_kontroller.fmp12/scripts/29 (step 282)
+karbon_kontroller.fmp12/scripts/31 (step 283)","objects/karbon_kontroller.fmp12/scripts/509-Complete_Activity_deprecated.txt (step 76)
+objects/karbon_kontroller.fmp12/scripts/418-Parse_ActivityParty_Array.txt (step 99)
+objects/karbon_kontroller.fmp12/scripts/690-Mark_Task_Complete_data.txt (step 108)
+objects/karbon_kontacts.fmp12/scripts/351-Button_Add_Party_Email_Address_to_Email_Message_To_Cc_Bcc_Em.txt (step 20)
+objects/karbon_kontacts.fmp12/scripts/673-Add_Edit_Activity_Party_to_Activity_ActivityPartyRoleId.txt (step 84)
+objects/karbon_kontacts.fmp12/scripts/776-Button_Add_Other_Email_Address_to_Email_Message_To_Cc_Bcc_Em.txt (step 18)
+objects/karbon_kontacts.fmp12/scripts/676-Handler_Meeting_Attendee_Selection.txt (step 47)",none,"Hard-coded role ids 50 Creator, 51 Completed By, 52 and 53 (task from/to) at steps 222-261; the meaning of each role id is not in this file. Duplicate-contact-method check only runs for email and task activities (step 155, a @todo says more types are needed). Step 234 reads AttendedInd etc. that are not in the documented params. Transaction semantics of scripts 28/29/31 are not in this object."
+karbon_kontroller.fmp12/scripts/389-Create_EmailMessage_data.txt,58be73def16f3ae26f093ea52e58012929149d12ea0cae34ebe5ff3067655da3,scripts,karbon_kontroller.fmp12,389,Create EmailMessage { data },data-change,server-domain,tier1,"Creates an email-message activity (activity type 1) in a transaction: merges defaults (today, now, Send=false, empty party list) into the payload, adds a From party (role 54) for the current user if none is given, sets EmailMessage and Activity flags, and calls _Create Activity. After the transaction commits it optionally calls Send Email Message Activity { json }. Refuses Send when the transaction is nested (TransactionCounter > 1). Returns {Id}.","Activity::Id#1
+DBTransactions::ActivityId#58
+DBTransactions::TransactionCounter#2
+User::PartyId#12
+User::SmtpEmailAddress#111
+meta#data::CurrentUserId#3","DBTransactions::ActivityId#58 (step 123, current record)
+EmailMessage::ONE#11 (step 128, related via EmailMessage (creates EmailMessage and Activity record))
+DBTransactions::UserId#64 (step 141, current record)
+DBTransactions::PartyId#25 (step 149, current record)
+Activity::EmailMessageInd#74 (step 163, record created in step 128)
+Activity::AlertInd#107 (step 164, record created in step 128)
+EmailMessage::Attachments#10 (step 165, record created in step 128)
+EmailMessage::MessageHtml#24 (step 166, record created in step 128)
+EmailMessage::UseSystemSettingsInd#26 (step 167, record created in step 128)","karbon_kontroller.fmp12/scripts/28 (step 52)
+karbon_kontroller.fmp12/scripts/377 (step 180)
+karbon_kontroller.fmp12/scripts/29 (step 203)
+karbon_kontroller.fmp12/scripts/31 (step 204)
+karbon_kontroller.fmp12/scripts/521 (step 216)","objects/karbon_kontacts.fmp12/scripts/333-Send_Utility_Email_Message.txt (step 78)
+objects/karbon_kontacts.fmp12/scripts/691-Button_Create_Email_Message_From_Opportunity.txt (step 34)
+objects/karbon_kontacts.fmp12/scripts/770-Button_Create_Email_Message_From_Party.txt (step 25)
+objects/karbon_kontacts.fmp12/scripts/517-Save_Utility_Email_Message_as_Draft.txt (step 21)
+objects/karbon_tester.fmp12/scripts/291-Create_EmailMessage_-_Success.txt (step 44)",none,"Validation rules are disabled (steps 78-79) so Subject and UserId are not enforced. Step 62 (UUID default for Id) is disabled. The ContactMethodId lookup for the From party is a disabled TODO (step 150). Step 216 uses $ActivityId, which is set only when _Create Activity succeeds (step 188). Role id 54 = From is hard-coded."
+karbon_kontroller.fmp12/scripts/390-Create_Note_data.txt,a2ed7585baaa666e1885c22e0f3c5a7f39b73b29dbd142677485b298b322d0a9,scripts,karbon_kontroller.fmp12,390,Create Note { data },data-change,server-domain,tier1,"Creates a note activity (activity type 2) in a transaction: uses the given Id or a new UUID, creates the Note and Activity rows, sets NoteInd, builds Creator (role 50) and Regarding (role 63) party entries and calls _Create Activity. Returns {Id}.","DBTransactions::ActivityId#58
+Note::Id#6","DBTransactions::ActivityId#58 (step 103, current record)
+DBTransactions::ActivityId#58 (step 105, current record)
+Note::ONE#15 (step 109, related via Note (creates Note and Activity record))
+Activity::NoteInd#73 (step 114, record created in step 109)","karbon_kontroller.fmp12/scripts/28 (step 43)
+karbon_kontroller.fmp12/scripts/377 (step 128)
+karbon_kontroller.fmp12/scripts/29 (step 149)
+karbon_kontroller.fmp12/scripts/31 (step 150)","objects/karbon_kontacts.fmp12/scripts/669-Button_Create_Note_from_Party.txt (step 4)
+objects/karbon_kontacts.fmp12/scripts/257-Save_Card_-_UtilityNote.txt (step 11)
+objects/karbon_kontacts.fmp12/scripts/666-Button_Create_Note_from_Opportunity.txt (step 4)
+objects/karbon_tester.fmp12/scripts/294-Create_Note_-_Success.txt (step 60)
+objects/karbon_tester.fmp12/scripts/338-Create_Note_-_Standard_Note.txt (step 4)
+objects/karbon_tester.fmp12/scripts/327-Create_Note_-_Fail.txt (step 59)",none,"Step 117 tests $ActivityParty, which this script never sets, so the Creator party entry (steps 118) looks like it is never added unless a variable survives from the caller; confirm. $Date/$Time defaults (steps 89, 93) are computed but not passed on, because the call uses $Note (step 126). Validation is disabled (step 63)."
+karbon_kontroller.fmp12/scripts/391-Create_Task_data.txt,c4298691338e3cad19c79f4331e495e50ea2b34cb7859e07291411bffade321f,scripts,karbon_kontroller.fmp12,391,Create Task { data },data-change,server-domain,tier1,"Creates a task activity (activity type 3) in a transaction: creates the Task and Activity rows, builds party entries for Creator (50), Assigned To (53), Assigned By (52) and Regarding (63), calls _Create Activity, then sets the activity's display date and alert flag and caches the from/to names on the Task. When the creator is not the assignee it checks the assignee party and calls _wip_Create Notification { data } for them.","Activity::Subject#22
+DBTransactions::ActivityId#58
+Party::Id#1
+Party::NameCached#19
+Task::FromCached#23
+Task::Id#1","DBTransactions::ActivityId#58 (step 94, current record)
+DBTransactions::ActivityId#58 (step 96, current record)
+Task::ONE#20 (step 100, related via Task (creates Task and Activity record))
+Activity::TaskInd#171 (step 104, record created in step 100)
+Activity::DateDisplay#56 (step 140, record created in step 100)
+Activity::AlertInd#107 (step 142, record created in step 100)
+DBTransactions::PartyId#25 (step 145, current record)
+Task::FromCached#23 (step 147, record created in step 100)
+DBTransactions::PartyId#25 (step 151, current record)
+Task::ToCached#24 (step 153, record created in step 100)
+DBTransactions::PartyId#25 (step 161, current record)","karbon_kontroller.fmp12/scripts/28 (step 45)
+karbon_kontroller.fmp12/scripts/377 (step 131)
+karbon_kontroller.fmp12/scripts/670 (step 170)
+karbon_kontroller.fmp12/scripts/29 (step 196)
+karbon_kontroller.fmp12/scripts/31 (step 197)","objects/karbon_kontacts.fmp12/scripts/760-btn_Create_Task_From_User_Home.txt (step 4)
+objects/karbon_kontacts.fmp12/scripts/670-btn_Create_Task_From_Opportunity.txt (step 4)
+objects/karbon_kontacts.fmp12/scripts/289-Save_Card_-_UtiityTask.txt (step 11)
+objects/karbon_kontacts.fmp12/scripts/772-btn_Create_Task_From_Party.txt (step 4)
+objects/karbon_kontacts.fmp12/scripts/366-User_Detail_-_Quick_Add_Task_deprecated.txt (step 13)
+objects/karbon_tester.fmp12/scripts/328-Create_Task_-_Fail.txt (step 57)
+objects/karbon_tester.fmp12/scripts/346-Create_Task_-_Standard_Task.txt (step 6)
+objects/karbon_tester.fmp12/scripts/292-Create_Task_-_Success.txt (step 61)",none,"DueTime is read (step 80) but not used. Debug Log.Entry calls at steps 125, 156 (an 'emerg' level test message) and 199 look like leftovers. Notification EntityTypeId 11 is hard-coded (step 168); its meaning is not in this file. Custom.Error is called with (-2; message) at step 164 while script 376 calls it as (message; json)."
+karbon_kontroller.fmp12/scripts/418-Parse_ActivityParty_Array.txt,4a97efb9dd4d2919c58fdb4d4db91d8e2fb660dd7c7ebe51b167068ecac3dc87,scripts,karbon_kontroller.fmp12,418,Parse ActivityParty Array,data-change,server-domain,tier2,"Takes {ActivityId, ActivityParty[]} and calls Create ActivityParty { json } once per array entry, inside one Start/Save/End Transaction wrapper, after checking that the activity exists. Returns the Id of the last ActivityParty created.","Activity::Id#1
+ActivityParty::Id#23
+DBTransactions::ActivityId#58","DBTransactions::ActivityId#58 (step 78, current record)","karbon_kontroller.fmp12/scripts/28 (step 35)
+karbon_kontroller.fmp12/scripts/376 (step 99)
+karbon_kontroller.fmp12/scripts/29 (step 125)
+karbon_kontroller.fmp12/scripts/31 (step 126)","objects/karbon_kontroller.fmp12/scripts/542-Edit_Activity.txt (step 170)
+objects/karbon_kontroller.fmp12/scripts/377-Create_Activity.txt (step 189)",none,"Result Id is the current ActivityParty::Id after the loop (step 118), so only the last created row is reported. The inner loop counter $i is not reset before the loop (step 92)."
+karbon_kontroller.fmp12/scripts/422-Create_ActivityComment.txt,f0e692ada34a20f8547eb0b03d522571b57f42d1c5fb50bc18a1c7192125663b,scripts,karbon_kontroller.fmp12,422,Create ActivityComment,data-change,server-domain,tier1,"Adds a comment to a Discussion activity in a transaction. It validates the Discussion, creates the ActivityComment row (date and time taken from the host clock), and bumps the cached comment count on the Activity. Optionally adds Subscriber parties (role 64) through _Edit Activity, then calls _wip_Create Notification { data } for each subscriber (or for every ActivityParty of the discussion if none are given). Returns the comment as JSON.","Activity::Id#1
+ActivityComment#byActivityId::Id#6
+ActivityComment::AsJSON#20
+ActivityParty#ByActivity::PartyId#7
+DBTransactions::ActivityCommentId#88
+DBTransactions::ActivityId#58
+Discussion::Id#6
+Discussion::Title#15","DBTransactions::ActivityId#58 (step 92, current record)
+DBTransactions::ActivityCommentId#88 (step 103, current record)
+ActivityComment::ONE#7 (step 106, related via ActivityComment (creates record))
+Activity::CommentCountCached#207 (step 116, related via Activity (the Discussion's activity))
+ActivityComment::Comment#10 (step 118, record created in step 106)
+ActivityComment::ActivityId#15 (step 119, record created in step 106)
+ActivityComment::CreatorId#21 (step 120, record created in step 106)
+ActivityComment::Date#18 (step 121, record created in step 106)
+ActivityComment::Time#19 (step 122, record created in step 106)","karbon_kontroller.fmp12/scripts/28 (step 39)
+karbon_kontroller.fmp12/scripts/542 (step 149)
+karbon_kontroller.fmp12/scripts/670 (step 178)
+karbon_kontroller.fmp12/scripts/29 (step 203)
+karbon_kontroller.fmp12/scripts/31 (step 204)","objects/karbon_kontroller.fmp12/scripts/421-Create_Discussion_v2.txt (step 161)
+objects/karbon_kontroller.fmp12/scripts/666-Create_Discussion_v1.txt (step 130)
+objects/karbon_kontacts.fmp12/scripts/694-wip_Button_Add_Comment_to_Activity_Discussion_v2.txt (step 40)
+objects/karbon_kontacts.fmp12/scripts/825-wip_Button_Add_Comment_to_Activity_Discussion_v1.txt (step 40)
+objects/karbon_kontacts.fmp12/scripts/315-Discussion_-_Add_Comment_to_Discussion_Deprecated.txt (step 6)
+objects/karbon_tester.fmp12/scripts/313-Create_DiscussionComment.txt (step 43)
+objects/karbon_tester.fmp12/scripts/355-Create_ActivityComment.txt (step 43)",none,"$Id is read at step 102 but never set, so DBTransactions::ActivityCommentId is always set to empty. The Date/Time params are parsed but the comment uses the host timestamp (steps 121-122). $parameters and $ActivityParty are not initialised before use (steps 139, 146-148). With no SubscriberPartyIds, notifications go to every party on the activity, which includes the commenter (step 163). EntityTypeId 11 for notification is the same constant script 391 uses for a task; its meaning is not in this file. Subscriber role 64 is hard-coded."
+karbon_kontroller.fmp12/scripts/497-Get_ActivityList_by_ActivityParty.txt,fd6a5f99430dee9af46eaf00c13d41740171df08e5d526c61f3702c851a710e9,scripts,karbon_kontroller.fmp12,497,Get ActivityList by ActivityParty,find-query,server-query,tier1,"Finds the activities that a party takes part in, optionally for one role, and returns their ids as a list with a count. The Status value decides the find: Incomplete omits parties whose task is completed, Complete keeps completed tasks, Overdue keeps activities dated up to today and omits completed tasks; any other value applies no status filter. It runs on the f_ActivityParty layout and ends on f_Activity.","f_Activity::IdList#129
+f_ActivityParty::ActivityPartyRoleId#24 (find criterion step 78)
+f_ActivityParty::PartyId#7 (find criterion step 79)
+f_Task::CompletedInd#29 (find criterion step 87, omit request)
+f_Task::CompletedInd#29 (find criterion step 91)
+f_Activity::DateDisplay#56 (find criterion step 95)
+f_Task::CompletedInd#29 (find criterion step 98, omit request)",none,none,objects/karbon_kontacts.fmp12/scripts/365-User_Detail_-_Update_Task_Portal.txt (step 8),none,"After a 'no records found' error (401, step 109) the script still goes to the related record (step 118), so the result for an empty find is not shown in this file. Behaviour for Status values other than the three named is a silent no-filter find. Status Overdue omits only completed tasks and does not limit to task activities."
+karbon_kontroller.fmp12/scripts/509-Complete_Activity_deprecated.txt,2974e3508e8d53861077cda7182beddff22da53dc0e5d12e7c5f4ea29dc4c1a8,scripts,karbon_kontroller.fmp12,509,Complete Activity_deprecated,data-change,drop-candidate,tier3,"Deprecated wrapper that marks an activity complete by creating an ActivityParty with role 51 (Completed By) through Create ActivityParty { json }, inside a transaction. Its effect, if kept, would belong to server-domain.",Activity::Id#1,none,"karbon_kontroller.fmp12/scripts/28 (step 34)
+karbon_kontroller.fmp12/scripts/376 (step 76)
+karbon_kontroller.fmp12/scripts/29 (step 97)
+karbon_kontroller.fmp12/scripts/31 (step 98)",none found,none,"No caller found. Steps 62-63 read $ActivityParty, which this script never sets (it parsed $Activity), so Id and PartyId are empty and the inner create would fail its required-field check. Replaced by Mark Task Complete { data } (script 690), which calls Create ActivityParty directly; confirm."
+karbon_kontroller.fmp12/scripts/515-Delete_Activity_Id.txt,df672cd0da81784f30695ebaa58b44423e710e6bcdf9ea9865677cbf718eff77,scripts,karbon_kontroller.fmp12,515,Delete Activity ( Id ),data-change,server-domain,tier2,"Deletes one Activity by Id inside a transaction: it points DBTransactions at the activity, then calls Delete First Portal Row on the ActivityPortal object (script 33), and returns {Result:true}.",DBTransactions::ActivityId#58,"DBTransactions::ActivityId#58 (step 76, current record)
+Activity::Id#1 (step 79, related via Activity (creates or locks record))
+delete: Activity (Delete First Portal Row via script 33, portal object ""ActivityPortal"", step 87, portal row)","karbon_kontroller.fmp12/scripts/28 (step 34)
+karbon_kontroller.fmp12/scripts/33 (step 87)
+karbon_kontroller.fmp12/scripts/29 (step 108)
+karbon_kontroller.fmp12/scripts/31 (step 109)",objects/karbon_tester.fmp12/scripts/345-Mark_Task_Complete_-_Success.txt (dead code),none,"Only caller is a disabled step in a tester script, so no live caller was found (none found; may be called by name or from outside the DDR since it is in the API/Activity/Public folder). Step 79 sets Activity::Id to 1, which looks like the usual ONE trick but writes the Id field; confirm it does not overwrite the key. Cascade deletes of ActivityParty and subtype rows are not visible here; check the relationship options. Delete First Portal Row (script 33) was not read in this share."

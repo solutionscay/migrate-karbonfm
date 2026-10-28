@@ -1,0 +1,119 @@
+# script 62: btn: Refresh Fields For Selected Table
+# file: karbon_Generator.fmp12
+# folder: App Modules / Schema / Buttons
+# source: ScriptCatalog/Script[@id=62]
+# steps: 30 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=176 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $table; Value:SCHEMA::tableName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SCHEMA::tableName#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $table
+   5    Set Variable [ $db; Value:SCHEMA::fileName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: SCHEMA::fileName#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $db
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $fields; Value:design_TableFields ( $table ; $db ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:design_TableFields
+        Repetition
+          Calculation:
+            | 1
+        Name: $fields
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Perform Script [ “Create Temporary Utility Window” ]
+        DisableStepCollapsed state=False
+        Script id=56 name="Create Temporary Utility Window"
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Go to Layout [ “Fields” (Fields) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=21 name=Fields
+  13    Truncate Table [ No dialog; Table: “Fields” ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        BaseTable id=142 comment="" name=Fields
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  17    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $field; Value:GetValue ( $fields ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $field
+  19    Exit Loop If [ IsEmpty( $field ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  20    New Record/Request
+        DisableStepCollapsed state=False
+  21    Set Field [ Fields::FieldName; $field ]
+        DisableStepCollapsed state=False
+        Field table=Fields id=1 name=FieldName
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  24    End Loop
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Perform Script [ “Close Temporary Utility Window” ]
+        DisableStepCollapsed state=False
+        Script id=57 name="Close Temporary Utility Window"
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False

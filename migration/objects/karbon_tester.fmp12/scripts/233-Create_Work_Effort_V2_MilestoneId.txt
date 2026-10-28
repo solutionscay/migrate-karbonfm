@@ -1,0 +1,199 @@
+# script 233: Create Work Effort V2 { MilestoneId }
+# file: karbon_tester.fmp12
+# folder: Modules / ZeitGeist
+# source: ScriptCatalog/Script[@id=233]
+# steps: 40 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=228 groupCollapsed=False includeInMenu=False
+
+   1    Set Variable [ $TEST_Group; Value:"Project" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Group
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $TEST_Subject; Value:"Create work effort" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Subject
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $TEST_Case; Value:"Given a milestone ID" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_Case
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $BudgetedHours; Value:25 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $BudgetedHours
+  12    Set Variable [ $Description; Value:"A detailed description would go here" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Description
+  13    Set Variable [ $ExternalId ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $ExternalId
+  14    Set Variable [ $MilestoneId; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $MilestoneId
+  15    Set Variable [ $Name; Value:"Managed Services - 2018 Feb" ]
+        DisableStepCollapsed state=False
+        Name: $Name
+  16    Set Variable [ $Status; Value:"open" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Status
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $WorkEffort; Value:JSONSetElement (  ""; 
+         
+        	[ "BudgetedHours" ; $BudgetedHours ; JSONNumber ];
+        	[ "Description" ; $Description ; JSONString ];
+        	[ "ExternalId" ; $ExternalId ; JSONString ];
+        	[ "MilestoneId" ; $MilestoneId ; JSONString ];
+        	[ "Name" ; $Name ; JSONString ];
+        	[ "Status" ; $Status ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONNumber, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $WorkEffort
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Perform Script [ “<unknown>” from file: “Karbon_kontroller”; Parameter: $WorkEffort ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=243 name=<unknown> ref=missing
+  23    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ not Error.IsError ( $TEST_result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  26    #Get the Id of the record we just created
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $Id; Value:JSONGetElement ( $TEST_result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #Get full JSON result
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Perform Script [ “<unknown>” from file: “Karbon_kontroller”; Parameter: $Id ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=Karbon_kontroller
+          UniversalPathList: file:Karbon_kontroller
+        Script id=359 name=<unknown> ref=missing
+  31    Set Variable [ $TEST_result; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $TEST_result
+  32    End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $null; Value:Assert.ValidJSON ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.ValidJSON
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  35    Set Variable [ $null; Value:Assert.NotAnError ( $TEST_Result ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.NotAnError
+        Repetition
+          Calculation:
+            | 1
+        Name: $null
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Variable [ $null; Value:Assert.JSONPathEquals ( $TEST_result ; "Name" ; "Managed Services - 2018 Feb" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Assert.JSONPathEquals
+        Name: $null
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Exit Script [ Result: JSONGetElement ( $TEST_result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement

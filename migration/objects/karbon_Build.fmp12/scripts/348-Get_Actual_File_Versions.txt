@@ -1,0 +1,305 @@
+# script 348: Get Actual File Versions
+# file: karbon_Build.fmp12
+# folder: API / Public
+# source: ScriptCatalog/Script[@id=348]
+# steps: 78 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=337 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Get Actual File Versions
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@description
+        
+        This script queries the Commander script located in each file to retrieve the version from the meta table in each file. Commander was originally designed to be used with an FMP URL call to avoid dependencies, however in this case we do want dependencies so the files open with the credentials that opened this file. 
+        
+        Since we envision this script being used to retrieve file versions from other servers, we created the external data sources to support variable file paths. With this approach you could, for instance, query a production server for its versions and compare them to the dev files in order to build a migration template for just the files that have changed.
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@returnSuccess - n/a
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returnError - n/a
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@history 2018-08-14 dave@geistinteractive.com - added version check for local file. minor refactoring and erro-trapping
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@history 2018-08-13 dave@geistinteractive.com - Created
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Go to Layout [ “File” (File) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=22 name=File
+  17    Show All Records
+        DisableStepCollapsed state=False
+  18    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  19    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $HostName; Value:"kaladin.gicloud.net" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $HostName
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #Clear variables
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $FileVersion; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileVersion
+  27    Set Variable [ $AppVersion; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $AppVersion
+  28    Set Variable [ $Result; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #Single-pass error loop
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #Strip the filename extension
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $FileName; Value:Substitute ( File::FileName ; 
+        	[ ".fmp12" ; "" ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, File::FileName#6
+        Name: $FileName
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #The file in the list is this file
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ Get ( FileName ) = $FileName ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FileName
+  39    Set Field [ File::ActualVersion; meta::ThisFileVersion ]
+        DisableStepCollapsed state=False
+        refs: meta::ThisFileVersion#10
+        Field table=File id=9 name=ActualVersion
+  40    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  41    End If
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #Create and init the dynamic data source. This must already exist in External Data Sources
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    Insert Text [ $DataSourceExpression ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: Let ( $${DynamicDataSourceName} = "file:{FileName}" ; "" )
+        Field: $DataSourceExpression
+  45    Set Variable [ $DataSourceExpression; Value:Substitute ( $DataSourceExpression ; 
+        	[ "{DynamicDataSourceName}" ; File::DynamicDataSourceName ] ; 
+        	[ "{FileName}" ; $FileName ] ; 
+        	[ "{HostName}" ; $HostName ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, File::DynamicDataSourceName#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $DataSourceExpression
+  46    Set Variable [ $InitDataSource; Value:Evaluate ( $DataSourceExpression ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Evaluate
+        Repetition
+          Calculation:
+            | 1
+        Name: $InitDataSource
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #Call the script
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $ScriptName; Value:File::DynamicDataSourceName & "::Commander" ]
+        DisableStepCollapsed state=False
+        Value
+          refs: File::DynamicDataSourceName#16
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptName
+  50    Perform Script [ By name; $ScriptName; Parameter: Quote ( "GetVersion" ) ]
+        DisableStepCollapsed state=False
+        FileReference id=6 name="" ref=missing
+        refs: fn:Quote
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Variable [ $error; Value:Error.Last ( "calling script by name" ; $ScriptName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  53    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  54    Set Field [ File::ActualVersion; $error ]
+        DisableStepCollapsed state=False
+        Field table=File id=9 name=ActualVersion
+  55    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  56    End If
+        DisableStepCollapsed state=False
+  57    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #Handle the result
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $Result; Value:JSON.Format ( Get ( ScriptResult ) ; "validating JSON response" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+  60    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  61    Set Field [ File::ActualVersion; $result ]
+        DisableStepCollapsed state=False
+        Field table=File id=9 name=ActualVersion
+  62    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  63    End If
+        DisableStepCollapsed state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #Store the file/app version(s)
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $FileVersion; Value:JSONGetElement ( $Result ; "FileVersion" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileVersion
+  67    Set Variable [ $AppVersion; Value:JSONGetElement ( $Result ; "AppVersion" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AppVersion
+  68    Set Field [ File::ActualVersion; $FileVersion ]
+        DisableStepCollapsed state=False
+        Field table=File id=9 name=ActualVersion
+  69    If [ not IsEmpty ( $AppVersion ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  70    Set Field [ meta::ActualAppVersion; $AppVersion ]
+        DisableStepCollapsed state=False
+        Field table=meta id=9 name=ActualAppVersion
+  71    End If
+        DisableStepCollapsed state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Exit Loop If [ 1 ]
+        DisableStepCollapsed state=False
+  74    End Loop
+        DisableStepCollapsed state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Go to Record/Request/Page
+        [ Next; Exit after last ]
+        NoInteract state=False
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  77    End Loop
+        DisableStepCollapsed state=False
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False

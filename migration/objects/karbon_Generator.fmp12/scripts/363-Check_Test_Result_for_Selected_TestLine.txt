@@ -1,0 +1,290 @@
+# script 363: Check Test Result for Selected TestLine
+# file: karbon_Generator.fmp12
+# folder: Test Engine (UI) / Private
+# source: ScriptCatalog/Script[@id=363]
+# steps: 81 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=367 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $Result; Value:Get( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Field [ Selected_TestLine::LastResult; $Result ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=20 name=LastResult
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $TestLineResultList; Value:List( Selected_TestLine_TestLineResult::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, Selected_TestLine_TestLineResult::Id#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineResultList
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $TestLineResultListCount; Value:ValueCount( $TestLineResultList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $TestLineResultListCount
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Set Variable [ $CompareResult; Value:If ( Selected_TestLine::SQL_Ind and not IsEmpty( Selected_TestLine::SQL_Result ) ; True; False ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, Selected_TestLine::SQL_Ind#23, fn:and, fn:not, fn:IsEmpty, Selected_TestLine::SQL_Result#22, fn:True, fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $CompareResult
+  12    Set Variable [ $CompareLineResult; Value:If ( $CompareResult ; False; True ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:False, fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $CompareLineResult
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #If this is a SQL call with a single value, we make one comparison
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    If [ $CompareResult ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    If [ Selected_TestLine::SQL_Result = Selected_TestLine::LastResult ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_TestLine::SQL_Result#22, Selected_TestLine::LastResult#20
+  19    Set Field [ Selected_TestLine::LastResultPassInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=18 name=LastResultPassInd
+  20    Set Field [ Selected_TestLine::LastResultFailInd; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=19 name=LastResultFailInd
+  21    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Field [ Selected_TestLine::LastResultFailInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=19 name=LastResultFailInd
+  23    Set Field [ Selected_TestLine::LastResultPassInd; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=18 name=LastResultPassInd
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #Loop through TestResultLines
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  31    Exit Loop If [ $i > $TestLineResultListCount ]
+        DisableStepCollapsed state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $ThisTestLineResult; Value:GetValue ( $TestLineResultList ; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTestLineResult
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Field [ SELECTOR::TestLineResultId; $ThisTestLineResult ]
+        DisableStepCollapsed state=False
+        Field table=SELECTOR id=19 name=TestLineResultId
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #Check for value
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    If [ Selected_TestLineResult::HasValueInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Selected_TestLineResult::HasValueInd#11
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    If [ JSONGetElement ( $Result ; Selected_TestLineResult::Key ) = Selected_TestLineResult::Value ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:JSONGetElement, Selected_TestLineResult::Key#8, Selected_TestLineResult::Value#9
+  43    Set Field [ Selected_TestLineResult::LastTestResultPassInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLineResult id=12 name=LastTestResultPassInd
+  44    Set Field [ Selected_TestLineResult::LastTestResultFailInd; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLineResult id=13 name=LastTestResultFailInd
+  45    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    Set Field [ Selected_TestLineResult::LastTestResultFailInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLineResult id=13 name=LastTestResultFailInd
+  47    Set Field [ Selected_TestLineResult::LastTestResultPassInd; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLineResult id=12 name=LastTestResultPassInd
+  48    End If
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #Check for Key
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    If [ not IsEmpty( JSONGetElement ( $Result ; Selected_TestLineResult::Key ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:JSONGetElement, Selected_TestLineResult::Key#8
+  54    Set Field [ Selected_TestLineResult::LastTestResultPassInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLineResult id=12 name=LastTestResultPassInd
+  55    Set Field [ Selected_TestLineResult::LastTestResultFailInd; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLineResult id=13 name=LastTestResultFailInd
+  56    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Set Field [ Selected_TestLineResult::LastTestResultFailInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLineResult id=13 name=LastTestResultFailInd
+  58    Set Field [ Selected_TestLineResult::LastTestResultPassInd; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLineResult id=12 name=LastTestResultPassInd
+  59    End If
+        DisableStepCollapsed state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    End If
+        DisableStepCollapsed state=False
+  62    End Loop
+        DisableStepCollapsed state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #Now that each TestLineResult has a pass/fail, let's sum them to see if this testline passed or failed
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Set Variable [ $CountResults; Value:Count( Selected_TestLine_TestLineResult::Id ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Count, Selected_TestLine_TestLineResult::Id#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $CountResults
+  67    Set Variable [ $SumPassed; Value:Sum( Selected_TestLine_TestLineResult::LastTestResultPassInd ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Sum, Selected_TestLine_TestLineResult::LastTestResultPassInd#12
+        Repetition
+          Calculation:
+            | 1
+        Name: $SumPassed
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    If [ $SumPassed = $CountResults ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    Set Field [ Selected_TestLine::LastResultPassInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=18 name=LastResultPassInd
+  72    Set Field [ Selected_TestLine::LastResultFailInd; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=19 name=LastResultFailInd
+  73    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    Set Field [ Selected_TestLine::LastResultFailInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=19 name=LastResultFailInd
+  77    Set Field [ Selected_TestLine::LastResultPassInd; "" ]
+        DisableStepCollapsed state=False
+        Field table=Selected_TestLine id=18 name=LastResultPassInd
+  78    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    End If
+        DisableStepCollapsed state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    End If
+        DisableStepCollapsed state=False

@@ -1,0 +1,82 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_Generator.fmp12/scripts/264-Ignore_All.txt,f7a2547e0dc946d7d4ddb162b764cbb1af3c33a0e2d98a2c9963f254967e7991,scripts,karbon_Generator.fmp12,264,Ignore All,data-change,drop-candidate,tier3,"Toggles the ""ignore all"" checkbox on an API, forces the ""show ignored"" flag on, then loops over every portal row of ApiGeneratorLine setting FmpIgnore to the checkbox state (and clearing required on ignored rows). API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGenerator::IgnoreAll#22
+ApiGeneratorLine::Id#1
+ApiGeneratorLine::FmpIgnore#11","ApiGenerator::IgnoreAll#22 (Set Field step 3, current record)
+ApiGenerator::_ShowIgnored#27 (Set Field step 6, current record)
+ApiGeneratorLine::FmpIgnore#11 (Set Field step 19, portal row, every row)
+ApiGeneratorLine::required#19 (Set Field step 21, portal row, ignored rows)",none,"objects/karbon_Generator.fmp12/layouts/61-API_Generator.txt
+objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt",none,Loop goes through portal rows with Go to Portal Row; restores the original row afterwards (step 27).
+karbon_Generator.fmp12/scripts/265-Reset_Ignore_All_Checkbox.txt,7487d8bff11f5f27eb53ab113ea3eda72a2ddb8e4d168d9047311fe009cedd60,scripts,karbon_Generator.fmp12,265,Reset Ignore All Checkbox,utility,drop-candidate,tier3,"After a line is edited, exits with 1 when the line is ignored and ""ignore all"" is on, and clears the ""ignore all"" checkbox when a non-ignored line exists while it is on. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGeneratorLine::FmpIgnore#11
+ApiGenerator::IgnoreAll#22","ApiGenerator::IgnoreAll#22 (Set Field step 5, current record)",none,"objects/karbon_Generator.fmp12/layouts/61-API_Generator.txt
+objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt",none,Result 1 is the only explicit return; the caller (a trigger) is not read here.
+karbon_Generator.fmp12/scripts/267-Refresh_Portal.txt,14f8d7d0e53e04ac0fcf7e6a6147064df76796c3be704c5741766139c832810c,scripts,karbon_Generator.fmp12,267,Refresh Portal,utility,drop-candidate,tier3,Clears the IgnoreAll and RequireAll checkboxes and refreshes the portal. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?,none,"ApiGenerator::IgnoreAll#22 (Set Field step 1, current record)
+ApiGenerator::RequireAll#23 (Set Field step 2, current record)",none,"objects/karbon_Generator.fmp12/layouts/61-API_Generator.txt
+objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt",none,none
+karbon_Generator.fmp12/scripts/268-Require_All.txt,56e352151f825f581dedd913dc093b073b66e685643d53182efec4312c100290,scripts,karbon_Generator.fmp12,268,Require All,data-change,drop-candidate,tier3,"Toggles the ""require all"" checkbox on an API and loops over every portal row of ApiGeneratorLine setting required to the checkbox state. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGenerator::RequireAll#23
+ApiGeneratorLine::Id#1","ApiGenerator::RequireAll#23 (Set Field step 2, current record)
+ApiGeneratorLine::required#19 (Set Field step 15, portal row, every row)",none,none found (in Scripts menu),none,Menu script with no caller found. Steps 16-18 (clear FmpIgnore on required rows) are disabled.
+karbon_Generator.fmp12/scripts/271-Clear_Filter.txt,91f226441786fb5270f04d3610e40e3ba285d4600d935f684dd99bb31282af88,scripts,karbon_Generator.fmp12,271,Clear Filter,utility,drop-candidate,tier3,"Clears the portal filter fields (table and name) on the API record, commits and refreshes the portal. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?",none,"ApiGenerator::PortalFilterTable#21 (Clear step 1, current record)
+ApiGenerator::PortalFilterName#30 (Clear step 2, current record)",none,"objects/karbon_Generator.fmp12/layouts/61-API_Generator.txt
+objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt",none,none
+karbon_Generator.fmp12/scripts/311-Select_Property.txt,c0f71698e2abd93ef80c26b3ecb58dccd1fbd9e4cd8413308e82a37c708465f0,scripts,karbon_Generator.fmp12,311,Select Property,data-change,drop-candidate,tier3,"Toggles the ""selected"" flag on one ApiGeneratorLine and on all its child lines, using the SELECTOR global to point at each record. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGeneratorLine::Id#1
+Selected_ApiGeneratorLine::selected#34
+Selected_ApiGeneratorLine_ApiGeneratorLine#children::Id#1","SELECTOR::ApiGeneratorLineId#13 (Set Field steps 2, 17, global)
+Selected_ApiGeneratorLine::selected#34 (Set Field step 7, related via SELECTOR; step 18, each child line)",none,objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt,none,none
+karbon_Generator.fmp12/scripts/314-Handle_Batch_Action.txt,fa1c2cfca6fbfaaea761fe5081c14dc88cfa25eb30c95eaf17aa6fd4d87776e3,scripts,karbon_Generator.fmp12,314,Handle Batch Action,data-change,drop-candidate,tier3,"Batch move: for every selected ApiGeneratorLine, sets its parent object to the chosen destination, rebuilds its JSON path from the parent path plus its property name and clears the selected flag. Commits; on a commit error reverts and shows a dialog. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGenerator::_BatchActionDestination#29
+ApiGeneratorLine#selected::Id#1
+Selected_ApiGeneratorLine#parent::JsonPathIn#27
+Selected_ApiGeneratorLine::JsonPropertyName#21","SELECTOR::ApiGeneratorLineParentId#14 (Set Field step 1, global)
+SELECTOR::ApiGeneratorLineId#13 (Set Field step 15, global)
+Selected_ApiGeneratorLine::ParentObjectId#32 (Set Field step 16, related via SELECTOR, each selected line)
+Selected_ApiGeneratorLine::JsonPathIn#27 (Set Field step 17, related via SELECTOR, each selected line)
+Selected_ApiGeneratorLine::selected#34 (Set Field step 18, related via SELECTOR, each selected line)
+ApiGenerator::_BatchAction#28 (Set Field step 33, current record)
+ApiGenerator::_BatchActionDestination#29 (Set Field step 34, current record)",none,objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt,none,Revert (step 28) only reverts the current record; earlier committed changes in the loop are not undone.
+karbon_Generator.fmp12/scripts/318-Add_Child_Schema.txt,1b22b34b4759e5e27e76b0a7d43499d8f02cd5e4789df7537a82d2c55c1a62b3,scripts,karbon_Generator.fmp12,318,Add Child Schema,data-change,drop-candidate,tier3,"Adds a child schema as a property: creates a new line for the current API that points to another API schema (ChildSchemaId), typed ""object"", and named after the child's entity. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGenerator::id#1
+SELECTOR::ApiGeneratorId#11
+Selected_ApiGenerator::Entity#19","SELECTOR::ApiGeneratorLineId#13 (Set Field step 4, global)
+Selected_ApiGeneratorLine::ApiGeneratorId#2 (Set Field step 6, new record via SELECTOR)
+Selected_ApiGeneratorLine::ChildSchemaId#36 (Set Field step 7, new record)
+Selected_ApiGeneratorLine::JsonPathIn#27 (Set Field step 8, new record)
+Selected_ApiGeneratorLine::JsonPathOut#26 (Set Field step 9, new record)
+Selected_ApiGeneratorLine::JsonPropertyName#21 (Set Field step 10, new record)
+Selected_ApiGeneratorLine::type#23 (Set Field step 11, new record)",none,"objects/karbon_Generator.fmp12/layouts/61-API_Generator.txt
+objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt",none,none
+karbon_Generator.fmp12/scripts/330-Duplicate_API_Generator.txt,d936cdcaf0fb32958fa3a7a28a1aab7a80ab68c7877d48e5268f2ff32b5eb7bb,scripts,karbon_Generator.fmp12,330,Duplicate API Generator,data-change,drop-candidate,tier3,"Duplicates an API definition: creates a copy of the ApiGenerator record named ""<name> Copy"" (same entity and API type) and copies every ApiGeneratorLine (25 fields) to the new API; on error reverts, otherwise commits, then finds the new API and shows a Success dialog. API Generator tool metadata (ApiGenerator and ApiGeneratorLine records describing a generated API); effect owner would be client-ui. OD-00-04: is the Generator in scope?","ApiGenerator::id#1
+ApiGeneratorLine::Id#1
+Selected_ApiGenerator::APIName#2
+Selected_ApiGenerator::Entity#19
+Selected_ApiGenerator::APIType#18
+Selected_ApiGenerator_duplicate::id#1
+Selected_ApiGeneratorLine::ChildSchemaId#36
+Selected_ApiGeneratorLine::default#20
+Selected_ApiGeneratorLine::description#22
+Selected_ApiGeneratorLine::FmpDataType#28
+Selected_ApiGeneratorLine::FmpFieldId#25
+Selected_ApiGeneratorLine::FmpFieldName#4
+Selected_ApiGeneratorLine::FmpIgnore#11
+Selected_ApiGeneratorLine::FmpParam#29
+Selected_ApiGeneratorLine::FmpPath#30
+Selected_ApiGeneratorLine::FmpTableName#10
+Selected_ApiGeneratorLine::IsNumeric#38
+Selected_ApiGeneratorLine::IsOneOf#37
+Selected_ApiGeneratorLine::IsOnlyOneOf#39
+Selected_ApiGeneratorLine::JsonPathIn#27
+Selected_ApiGeneratorLine::JsonPathOut#26
+Selected_ApiGeneratorLine::JsonPropertyName#21
+Selected_ApiGeneratorLine::ParentObjectId#32
+Selected_ApiGeneratorLine::PluckInd#42
+Selected_ApiGeneratorLine::readOnly#24
+Selected_ApiGeneratorLine::required#19
+Selected_ApiGeneratorLine::TestData#40
+Selected_ApiGeneratorLine::type#23
+ApiGenerator::id#1 (find criterion step 75)","SELECTOR::ApiGeneratorId#11 (Set Field step 9, global)
+SELECTOR::ApiGeneratorId_duplicate#15 (Set Field step 15, global)
+Selected_ApiGenerator_duplicate::APIName#2 (Set Field step 16, new record)
+Selected_ApiGenerator_duplicate::Entity#19 (Set Field step 18, new record)
+Selected_ApiGenerator_duplicate::APIType#18 (Set Field step 19, new record)
+SELECTOR::ApiGeneratorLineId#13 (Set Field step 31, global)
+SELECTOR::ApiGeneratorLineId_duplicate#16 (Set Field step 33, global)
+19 fields on Selected_ApiGeneratorLine_duplicate (Set Field steps 39-60, new record per source line)
+Selected_ApiGeneratorLine_duplicate::ApiGeneratorId#2 (Set Field step 62, new record)","karbon_Generator.fmp12/scripts/33 (""Refresh xJoins"", step 36)","objects/karbon_Generator.fmp12/layouts/61-API_Generator.txt
+objects/karbon_Generator.fmp12/layouts/91-API_Generator-Backup.txt",none,"Uses the SELECTOR global ""magic key"" pattern to create the new records (a global emptied so setting a related field creates a record). The success dialog text ends with ""??"". Step 36 (Refresh xJoins, script 33) is disabled. If an error occurs the revert at step 68 only reverts the current record."

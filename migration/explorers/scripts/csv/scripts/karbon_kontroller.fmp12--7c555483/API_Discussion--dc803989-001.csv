@@ -1,0 +1,80 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/421-Create_Discussion_v2.txt,fa86cc421348bfb01952bd113da73238241b8b7b2c51be495d6db7c178aa404f,scripts,karbon_kontroller.fmp12,421,Create Discussion v2,data-change,server-domain,tier1,"API operation that creates a Discussion on an entity (Party, Activity, Sales Transaction or Opportunity) inside a DBTransactions transaction. It validates EntityId and EntityTypeId, derives the discussion title from the entity (party name; activity subject; ""#docNumber - customer name""; opportunity's party name), sets the Discussion date/time/title and the discussion indicator on the activity, optionally creates a first comment (Create ActivityComment), builds the activity-party list (creator role 50, subscribers role 64) and creates the Activity (type 10) through _Create Activity. Returns Id, EntityId, EntityTypeId, ActivityCommentId and Title.","DBTransactions::ActivityId#58 (step 90)
+EntityType::Id#6 (step 105)
+Party::NameCached#19 (step 117)
+Activity#Parent::Subject#22 (step 123)
+SalesTransaction::id_Customer#7 (step 129)
+SalesTransaction::docNumber#4 (step 130)
+Opportunity::PartyId#55 (step 136)","DBTransactions::ActivityId#58 (step 91, current record (transaction scratch record))
+DBTransactions::ActivityId#58 (step 93, current record (transaction scratch record))
+Discussion::ONE#7 (step 97, related via Discussion (creates the record))
+DBTransactions::EntityTypeId#118 (step 104, current record (transaction scratch record))
+DBTransactions::PartyId#25 (step 116, current record (transaction scratch record))
+DBTransactions::ActivityParentId#120 (step 122, current record (transaction scratch record))
+DBTransactions::SalesTransactionId#93 (step 128, current record (transaction scratch record))
+DBTransactions::PartyId#25 (step 129, current record (transaction scratch record))
+DBTransactions::OpportunityId#60 (step 135, current record (transaction scratch record))
+DBTransactions::PartyId#25 (step 136, current record (transaction scratch record))
+Activity::DiscussionInd#205 (step 146, related via Activity)
+Discussion::Date#18 (step 147, record created in step 97)
+Discussion::Time#19 (step 148, record created in step 97)
+Discussion::Title#15 (step 149, record created in step 97)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 42)
+karbon_kontroller.fmp12/scripts/422 ""Create ActivityComment"" (step 161)
+karbon_kontroller.fmp12/scripts/377 ""_Create Activity"" (step 196)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 218)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 219)","karbon_kontacts.fmp12/scripts/694-wip_Button_Add_Comment_to_Activity_Discussion_v2.txt
+karbon_kontacts.fmp12/scripts/861-btn_Update_Subscribers.txt
+karbon_kontacts.fmp12/scripts/308-Save_Card_-_UtilityDiscussion.txt
+karbon_kontacts.fmp12/scripts/313-Open_Discussion_in_New_Window_data_v2.txt
+karbon_kontacts.fmp12/scripts/825-wip_Button_Add_Comment_to_Activity_Discussion_v1.txt
+karbon_tester.fmp12/scripts/353-Create_a_Discussion_-_Invoice_v2.txt
+karbon_tester.fmp12/scripts/315-Create_a_Discussion_-_Party.txt
+karbon_tester.fmp12/scripts/335-Create_a_Discussion_-_Invoice_-_Fail.txt
+karbon_tester.fmp12/scripts/350-Create_a_Discussion_-_Party_-_Fail_v2.txt
+karbon_tester.fmp12/scripts/351-Create_a_Discussion_-_Activity_v2.txt
+karbon_tester.fmp12/scripts/352-Create_a_Discussion_-_Activity_-_Fail_v2.txt
+karbon_tester.fmp12/scripts/317-Create_a_Discussion_-_Invoice.txt
+karbon_tester.fmp12/scripts/316-Create_a_Discussion_-_Activity.txt
+karbon_tester.fmp12/scripts/349-Create_a_Discussion_-_Party_v2.txt
+karbon_tester.fmp12/scripts/334-Create_a_Discussion_-_Activity_-_Fail.txt
+karbon_tester.fmp12/scripts/333-Create_a_Discussion_-_Party_-_Fail.txt
+karbon_tester.fmp12/scripts/354-Create_a_Discussion_-_Invoice_-_Fail_v2.txt",none,"$Id is never set (step 90), so the id always comes from Get ( UUID ). $json at step 194 is never set before use. Discussion looks like a view of Activity (same id in DBTransactions::ActivityId): confirm the table structure. Entity type ids 10-13 are hard-coded (Party, Activity, Sales Transaction, Opportunity)."
+karbon_kontroller.fmp12/scripts/424-Create_DiscussionUser_deprecated.txt,b4f116ea13fbfb42f4d4a033bd40a21351fa69ece589cb76d7471ae9ca0f9538,scripts,karbon_kontroller.fmp12,424,Create DiscussionUser_deprecated,data-change,drop-candidate,tier3,"Deprecated API operation that creates a DiscussionUser link (user subscribed to a discussion) in a transaction. Its target table and fields are missing from the DDR (<Table Missing>), so it cannot run as stored. Effect owner would be server-domain (discussion subscribers), now replaced by SubscriberPartyIds on Create Discussion v2.","DBTransactions::DiscussionUserId#89 (step 79)
+<Table Missing>::<Field Missing> (step 101, result Id)","DBTransactions::DiscussionUserId#89 (step 80, current record (transaction scratch record))
+<Table Missing>::#7 (step 83, related via missing table)
+<Table Missing>::#20 (step 92, same record)
+<Table Missing>::#9 DiscussionId (step 93, same record)
+<Table Missing>::#10 UserId (step 94, same record)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 35)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 108)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 109)","karbon_kontroller.fmp12/scripts/666-Create_Discussion_v1.txt
+karbon_kontacts.fmp12/scripts/314-Discussion_-_Add_User_to_Discussion_Deprecated.txt
+karbon_kontacts.fmp12/scripts/696-wip_Button_Add_User_to_Selected_Discussion_Deprecated.txt",none,"Steps 83, 92-94 and 101 write/read a table that no longer exists (ref=missing). $Id is never set. Callers are only deprecated scripts."
+karbon_kontroller.fmp12/scripts/666-Create_Discussion_v1.txt,3e340199a320b9aef67b27badebf8f0954f10224524d5487b9b7b38afd828003,scripts,karbon_kontroller.fmp12,666,Create Discussion v1,data-change,drop-candidate,tier3,"Version 1 of the API operation that creates a Discussion on an entity using the old Discussion/DiscussionEntity tables (fields marked _Deprecated). It sets title, resolution id/view, date and time, creates the first comment (Create ActivityComment) and one DiscussionUser per UserListId value, then returns Discussion::AsJSON. Replaced by Create Discussion v2; effect owner would be server-domain.","DBTransactions::DiscussionId_deprecated#87 (step 92)
+DiscussionEntity::Id#6 (step 103)
+Discussion::Id#6 (step 128)
+Discussion::AsJSON#26 (step 174)","DBTransactions::DiscussionId_deprecated#87 (step 93, current record (transaction scratch record))
+Discussion::ONE#7 (step 96, related via Discussion (creates the record))
+DBTransactions::DiscussionEntityId_Deprecated#100 (step 102, current record (transaction scratch record))
+Discussion::Date#18 (step 112, record created in step 96)
+Discussion::EntityId_Deprecated#10 (step 113, record created in step 96)
+Discussion::EntityTypeId_Deprecated#9 (step 114, record created in step 96)
+Discussion::ResolutionId#25 (step 115, record created in step 96)
+Discussion::ResolutionView#24 (step 116, record created in step 96)
+Discussion::Time#19 (step 117, record created in step 96)
+Discussion::Title#15 (step 118, record created in step 96)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 38)
+karbon_kontroller.fmp12/scripts/422 ""Create ActivityComment"" (step 130)
+karbon_kontroller.fmp12/scripts/424 ""Create DiscussionUser_deprecated"" (step 154)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 181)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 182)",none found (may be called by name),none,"No caller found; it may be reached by name from the API layer. The parameters it sends to Create ActivityComment (DiscussionId, UserId, Comment, UserList) differ from those v2 sends (ActivityId, CreatorId, Comment, SubscriberPartyIds), so the call may not work today. $Id is never set."
+karbon_kontroller.fmp12/scripts/739-Edit_Discussion.txt,f0c47725e278b8109c581ff32524513b3aa370984862fc9fd8602d9a2c714499,scripts,karbon_kontroller.fmp12,739,Edit Discussion,data-change,server-domain,tier2,"API operation that edits a Discussion by Id inside a transaction: finds the creator party (activity party role 50), optionally sets ActiveInd and Title, rebuilds the activity-party list (creator plus subscribers, role 64) and updates the activity through _Edit Activity. Returns the Discussion Id.","DBTransactions::ActivityId#58 (step 83)
+ActivityParty#byActivityAndRole::PartyId#7 (step 94)
+Activity::Id#1 (step 140)
+Discussion::Id#6 (step 152)","DBTransactions::ActivityId#58 (step 84, current record (transaction scratch record))
+Discussion::ONE#7 (step 87, related via Discussion (locks the existing record))
+DBTransactions::ActivityPartyRoleId#77 (step 93, current record (transaction scratch record))
+Discussion::ActiveInd#20 (step 106, current record found in step 87)
+Discussion::Title#15 (step 109, current record found in step 87)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 36)
+karbon_kontroller.fmp12/scripts/542 ""_Edit Activity"" (step 141)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 165)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 166)","karbon_kontacts.fmp12/scripts/861-btn_Update_Subscribers.txt
+Scripts menu (includeInMenu=True)",none,"Steps 105-110 test JSON.ContainsProperty($Discussion; ...) but $Discussion and $Title are never set (the parameter lives in $json), so ActiveInd and Title are probably never updated. Step 144 checks $error instead of $result after _Edit Activity, so an _Edit Activity error is not caught. CreatorPartyId line (step 68) is disabled."

@@ -1,0 +1,319 @@
+# layout 47: Parties
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Parties
+# source: LayoutCatalog/Layout[@id=47]
+# objects: 40
+# theme: Karbon-1.0
+# folder group: id=43 groupCollapsed=False includeInMenu=False
+
+Layout width=1280 quickFind=True includeInMenu=False id=47 name=Parties
+  Table id=1065107 name=Party
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=False showFieldFrames=False saveRecord=True
+  Object type=Button key=38 LabelKey=0 flags=1073807360 bounds=120,0,190,1280
+    Text flags=2 style=Button-Invisible
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Go to Contacts Detail {Id}”; Parameter: JSONSetElement ( "{}" ; "Id" ; Party::Id ; JSONString ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Exit
+        Calculation:
+          | JSONSetElement ( "{}" ; "Id" ; Party::Id ; JSONString )
+          refs: fn:JSONSetElement, Party::Id#1, fn:JSONString
+        Script id=502 name="Go to Contacts Detail {Id}"
+  Object type=Field key=40 LabelKey=0 flags=4 bounds=150,70,172,350
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewSecondary
+      Field: Person::EmployerName#131
+      PlaceholderText findMode=True
+        Calculation:
+          | If ( 
+          | 	Get ( WindowMode ) = 1 ; 
+          | 		"employer name" 
+          | )
+          refs: fn:If, fn:Get, fn:WindowMode
+    HideCondition findMode=False
+      Calculation:
+        | Party::OrganizationInd
+        refs: Party::OrganizationInd#18
+  Object type=Field key=42 LabelKey=0 bounds=130,360,170,640
+    FieldObj numOfReps=1 flags=1048612 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewSecondary
+      Field: Party::AddressDisplayCached#128
+  Object type=GroupButton key=138 LabelKey=0 bounds=130,70,152,350
+    GroupButtonObj numOfObjs=1
+      Object type=Field key=47 LabelKey=0 bounds=130,70,152,350
+        FieldObj numOfReps=1 flags=131108 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=1 pictFormat=5 style=Edit-ListViewPrimary
+          Field: Party::NameCached#19
+          PlaceholderText findMode=True
+            Calculation:
+              | "name"
+  Object type=Field key=49 LabelKey=0 flags=260 bounds=130,10,180,60
+    FieldObj numOfReps=1 flags=1048628 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Person icon"
+      Field: Party::Photo#32
+    HideCondition findMode=True
+      Calculation:
+        | Party::OrganizationInd
+        | 
+        | or Get ( WindowMode ) = 1
+        refs: Party::OrganizationInd#18, fn:or, fn:Get, fn:WindowMode
+  Object type=GroupButton key=89 LabelKey=0 bounds=130,10,180,60
+    GroupButtonObj numOfObjs=1
+      Object type=GroupButton key=90 LabelKey=0 bounds=130,10,180,60
+        GroupButtonObj numOfObjs=1
+          Object type=Field key=50 LabelKey=0 flags=260 bounds=130,10,180,60
+            FieldObj numOfReps=1 flags=1048628 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Org icon"
+              Field: Party::Photo#32
+            HideCondition findMode=True
+              Calculation:
+                | Party::PersonInd
+                | 
+                | or Get ( WindowMode ) = 1
+                refs: Party::PersonInd#130, fn:or, fn:Get, fn:WindowMode
+  Object type=Text key=41 LabelKey=0 bounds=91,70,110,111
+    Text style=Text-Dark: Name
+  Object type=Text key=43 LabelKey=0 bounds=91,360,110,415
+    Text style=Text-Dark: Address
+  Object type=Rect key=116 LabelKey=0 flags=1073741824 style=Shape-Dark bounds=0,0,70,1280
+  Object type=Text key=117 LabelKey=0 bounds=15,120,55,460
+    Text flags=2 style=H1-Muted: "All Contacts"
+  Object type=ButtonBar key=118 LabelKey=0 style=BB-KarbonMenu bounds=15,10,55,50
+    ButtonBarObj segmentKey=0
+      Object type=Button key=119 LabelKey=0 flags=65536 bounds=15,10,55,50
+        Text flags=6 style=BB-KarbonMenu
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Display Main Nav” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=105 name="Display Main Nav"
+          Image name=a5_menu.svg
+  Object type=ButtonBar key=124 LabelKey=0 style=BB-NavHeader bounds=15,50,55,110
+    ButtonBarObj flags=2 segmentKey=0
+      ActiveSegmentCalc
+        Calculation:
+          | ""
+      Object type=Button key=125 LabelKey=0 flags=16385 bounds=15,50,55,80
+        ConditionalFormatting
+          Item id=0 flags=1
+            Condition op=0
+              Calculation:
+                | BrowserNav.SaveNavHistory
+                refs: cf:BrowserNav.SaveNavHistory
+        ToolTip
+          Calculation:
+            | BrowserNav.Tooltip ( "backward" )
+            refs: cf:BrowserNav.Tooltip
+        Text flags=6 style=BB-NavHeader
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Browser Nav (forward or backward)”; Parameter: "Backward" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Backward"
+            Script id=466 name="Browser Nav (forward or backward)"
+          Image name=a33_leftChevron.svg
+      Object type=Button key=126 LabelKey=0 flags=16384 bounds=15,80,55,110
+        ToolTip
+          Calculation:
+            | BrowserNav.Tooltip ( "forward" )
+            refs: cf:BrowserNav.Tooltip
+        Text flags=6 style=BB-NavHeader
+        ButtonObj buttonFlags=0 iconSize=20 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Browser Nav (forward or backward)”; Parameter: "Forward" ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Calculation:
+              | "Forward"
+            Script id=466 name="Browser Nav (forward or backward)"
+          Image name=a35_rightChevron.svg
+  Object type=Text key=120 LabelKey=0 flags=260 bounds=0,350,30,410
+    Text flags=6: DEV
+    HideCondition findMode=True
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode
+  Object type=Field key=136 LabelKey=0 flags=268435456 bounds=16,620,56,660
+    FieldObj numOfReps=1 flags=1048628 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Cont-Icon
+      Field: System::Logo#67
+  Object type=Button key=137 LabelKey=0 flags=1342243076 bounds=10,850,60,900
+    Text flags=2 style=Button-Invisible
+    ButtonObj buttonFlags=0 iconSize=26 displayType=1
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Add Pending Change to Build File” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=524 name="Add Pending Change to Build File"
+      Image name=code-solid-2.svg
+    HideCondition findMode=True
+      Calculation:
+        | System::ServerType = "Production" or 
+        | 
+        | Get ( WindowMode ) = 1
+        refs: System::ServerType#57, fn:or, fn:Get, fn:WindowMode
+  Object type=Text key=139 LabelKey=0 flags=4 bounds=211,120,240,580
+    Text flags=10 tableViewVisibility=0 style=Label-Medium-Left-Muted: "Showing {{FoundCount}} of {{TotalRecordCount}} Records"
+      FieldList quickFind=False
+    HideCondition findMode=False
+      Calculation:
+        | Get ( FoundCount ) = Get(TotalRecordCount)
+        refs: fn:Get, fn:FoundCount, fn:TotalRecordCount
+  Object type=Button key=140 LabelKey=0 flags=65540 bounds=205,10,235,110
+    Text flags=2 style=_DEPRECATED_Button-Medium: "Show All"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=23 name="Show All Records"
+        StepText: Show All Records
+        DisableStepCollapsed state=False
+    HideCondition findMode=False
+      Calculation:
+        | Get ( FoundCount ) = Get(TotalRecordCount)
+        refs: fn:Get, fn:FoundCount, fn:TotalRecordCount
+  Object type=GroupButton key=141 LabelKey=0 flags=1342177280 bounds=20,900,52,1120
+    GroupButtonObj numOfObjs=2
+      Object type=GroupButton key=142 LabelKey=0 flags=1342177280 bounds=20,900,52,1020
+        GroupButtonObj numOfObjs=3
+          Object type=GroupButton key=143 LabelKey=0 flags=1342177280 bounds=20,930,52,990
+            GroupButtonObj numOfObjs=2
+              Object type=Field key=144 LabelKey=0 name=Nav.RecordNumberField flags=1 bounds=20,930,50,990
+                ConditionalFormatting
+                  Item id=0 flags=3
+                    Condition op=0
+                      Calculation:
+                        | Get(RecordNumber) <> Self
+                        refs: fn:Get, fn:RecordNumber, fn:Self
+                    Format: color: rgba(32.9412%,36.8627%,45.4902%,1); -fm-icon-color: rgba(0%,0%,0%,0);
+                ScriptTriggers
+                  Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+                    Script id=382 name="Record Nav"
+                      Calculation:
+                        | "Open"
+                    TriggerText: "Record Nav"; Parameter: "Open"
+                  Trigger event=OnObjectExit id=2 triggerFlags=1(browse)
+                    Script id=382 name="Record Nav"
+                      Calculation:
+                        | "exit"
+                    TriggerText: "Record Nav"; Parameter: "exit"
+                FieldObj numOfReps=1 flags=1048800 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-StatusAreaRecordNumber
+                  Field: Globals::RecordNav#31
+              Object type=Text key=145 LabelKey=0 name=Nav.RecordNumberMerge bounds=20,930,52,990
+                Text flags=10 tableViewVisibility=0 style=Text-StatusAreaRecordNavOverlay: {{RecordNumber}}
+                  FieldList quickFind=False
+          Object type=Button key=146 LabelKey=0 flags=1342242816 bounds=20,900,50,930
+            Text flags=2 style=Button-NavPrev
+            ButtonObj buttonFlags=0 iconSize=12 displayType=1
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Record Nav”; Parameter: "prev" ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | "prev"
+                Script id=382 name="Record Nav"
+              Image name=a34_leftChevronOutline.svg
+          Object type=Button key=147 LabelKey=0 flags=1342242816 bounds=20,990,50,1020
+            Text flags=2 style=Button-NavNext
+            ButtonObj buttonFlags=0 iconSize=12 displayType=1
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Record Nav”; Parameter: "next" ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | "next"
+                Script id=382 name="Record Nav"
+              Image name=a36_rightChevronOutline.svg
+      Object type=ButtonBar key=148 LabelKey=0 flags=1342177280 style=BB-NavHeaderRecords bounds=20,1030,50,1120
+        ButtonBarObj segmentKey=149
+          Object type=Button key=149 LabelKey=0 flags=65536 bounds=20,1030,50,1120
+            Text flags=2 style=BB-NavHeaderRecords
+            ButtonObj buttonFlags=3 iconSize=12 displayType=0
+              Step enable=True id=1 name="Perform Script"
+                StepText: Perform Script [ “Record Nav”; Parameter: "ToggleFoundSet" ]
+                DisableStepCollapsed state=False
+                CurrentScript value=Pause
+                Calculation:
+                  | "ToggleFoundSet"
+                Script id=382 name="Record Nav"
+            LabelCalc
+              Calculation:
+                | If ( 
+                | 
+                | 	// Find mode requests 
+                | 	Get ( WindowMode ) = 1 ; 
+                | 		Get ( TotalRecordCount ) & " Find Requests" ; 
+                | 
+                | 
+                | 		// Browse mode record counts
+                | 		If ( Get(TotalRecordCount) = Get(FoundCount) ; 
+                | 			Get ( TotalRecordCount ) & "¶Total" ; 
+                | 			Get ( FoundCount ) & " / " & Get ( TotalRecordCount ) & "¶Found" 
+                | 		) & 
+                | 
+                | 		// Sort status
+                | 		If ( Get( SortState ) = 0 ; " (Unsorted)" ; " (Sorted)" )
+                | 
+                | )
+                refs: fn:If, fn:Get, fn:WindowMode, fn:TotalRecordCount, fn:FoundCount, fn:SortState
+  Object type=ButtonBar key=150 LabelKey=0 name=ToolbarButtons flags=1342177280 bounds=10,1120,60,1270
+    ButtonBarObj flags=2 segmentKey=0
+      ActiveSegmentCalc
+        Calculation:
+          | False
+          refs: fn:False
+      Object type=Button key=151 LabelKey=0 flags=65536 bounds=10,1120,60,1170
+        Text flags=2
+        ButtonObj buttonFlags=0 iconSize=26 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “btn: Open Create Party Card - All Contacts” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=619 name="btn: Open Create Party Card - All Contacts"
+          Image name=a15_smallAdd.svg
+      Object type=PopoverButton key=152 LabelKey=0 bounds=10,1170,60,1220
+        PopoverButtonObj buttonFlags=0 key=153 iconSize=26 displayType=1
+          Image name=a89_find.svg
+          Object type=Popover key=153 LabelKey=0 name="pop.Find 2" style="Popover-White No Title" bounds=71,1045,230,1345
+            ScriptTriggers
+              Trigger event=OnObjectEnter id=1 triggerFlags=1(browse)
+                Script id=248 name="Trigger: Set Up QuickFind Popover"
+                TriggerText: "Trigger: Set Up QuickFind Popover"
+            TitleCalc
+              Calculation:
+                | "Find Opportunities"
+            PopoverObj flags=2 position=1 key=152
+              Object type=Field key=154 LabelKey=0 bounds=90,1066,114,1326
+                ScriptTriggers
+                  Trigger event=OnObjectSave id=4 triggerFlags=1(browse)
+                    Script id=250 name="Perform QuickFind"
+                    TriggerText: "Perform QuickFind"
+                FieldObj numOfReps=1 flags=1179872 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium
+                  Field: Globals::QuickFind#1
+                  PlaceholderText findMode=True
+                    Calculation:
+                      | "Search For..."
+              Object type=Button key=155 LabelKey=0 flags=65536 bounds=180,1064,210,1324
+                Text flags=2 style=Button-Info: "Show All"
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Close Find Popover and Show All” ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Exit
+                    Script id=251 name="Close Find Popover and Show All"
+              Object type=Button key=156 LabelKey=0 flags=65536 bounds=130,1064,160,1324
+                Text flags=2 style=Button-Info: "Advanced Find"
+                ButtonObj buttonFlags=0 iconSize=12 displayType=0
+                  Step enable=True id=1 name="Perform Script"
+                    StepText: Perform Script [ “Button: Go to Advanced Find Layout ( EntityName )”; Parameter: "contact" ]
+                    DisableStepCollapsed state=False
+                    CurrentScript value=Exit
+                    Calculation:
+                      | "contact"
+                    Script id=804 name="Button: Go to Advanced Find Layout ( EntityName )"
+      Object type=Button key=157 LabelKey=0 flags=65536 bounds=10,1220,60,1270
+        ButtonObj buttonFlags=0 iconSize=26 displayType=1
+          Step enable=True id=1 name="Perform Script"
+            StepText: Perform Script [ “Get Help” ]
+            DisableStepCollapsed state=False
+            CurrentScript value=Pause
+            Script id=478 name="Get Help"
+          Image name=a55_help.svg

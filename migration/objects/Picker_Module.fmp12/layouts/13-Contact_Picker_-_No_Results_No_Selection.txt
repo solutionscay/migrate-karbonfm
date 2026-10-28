@@ -1,0 +1,77 @@
+# layout 13: Contact Picker - No Results No Selection
+# file: Picker Module.fmp12
+# folder: Contact Picker
+# source: LayoutCatalog/Layout[@id=13]
+# objects: 11
+# theme: Cool Gray
+# folder group: id=22 groupCollapsed=False includeInMenu=True
+
+Layout width=460 quickFind=True includeInMenu=True id=13 name="Contact Picker - No Results No Selection"
+  Table id=1065093 name=Party
+  CustomMenuSet id=2 name="Default Menu Set"
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=False showFieldFrames=False saveRecord=True
+  Object type=Rect key=117 LabelKey=0 flags=268435456 style="Search Field Old" bounds=10,40,40,360
+  Object type=Text key=118 LabelKey=0 flags=268435456 bounds=40,40,60,300
+    Text flags=10 tableViewVisibility=0: <<$$PickerSearchStatus>>
+      FieldList quickFind=False
+  Object type=Button key=119 LabelKey=0 name=findButton flags=268500992 bounds=10,370,40,440
+    Text flags=2 style="Header Button": Find
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Find Contacts” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=69 name="Find Contacts"
+  Object type=Button key=120 LabelKey=0 name=cancelButton flags=268435456 bounds=16,330,34,348
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=49 name=Clear
+        StepText
+          | Clear [ Picker::Search_Field ]
+          | [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+      Image name=a27_XCircle.svg
+  Object type=Button key=121 LabelKey=0 flags=268435456 bounds=17,50,33,66
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Image name=a89_find.svg
+  Object type=Field key=122 LabelKey=0 name=searchField flags=285212672 bounds=10,70,40,320
+    ScriptTriggers
+      Trigger event=OnObjectValidate id=6 triggerFlags=1(browse)
+        Script id=69 name="Find Contacts"
+        TriggerText: "Find Contacts"
+    FieldObj numOfReps=1 flags=114 inputMode=0 keyboardType=0 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Picker::Search_Field#1
+      PlaceholderText findMode=True
+        Calculation:
+          | Picker::Settings_PlaceholderText
+          refs: Picker::Settings_PlaceholderText#13
+  Object type=ButtonBar key=127 LabelKey=0 flags=1073741824 style=FooterMessage bounds=110,0,160,460
+    ButtonBarObj segmentKey=0
+      Object type=Button key=130 LabelKey=0 bounds=110,0,160,460
+        Text flags=2 style=FooterMessage
+        ButtonObj buttonFlags=3 iconSize=18 displayType=4
+          Image name=a53_info.svg
+        LabelCalc
+          Calculation:
+            | Picker::Settings_FooterMessage
+            refs: Picker::Settings_FooterMessage#14
+  Object type=Button key=124 LabelKey=0 name=executeButton flags=4 bounds=120,262,150,450
+    Text flags=2: "Create new contact…"
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Create Contact” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=72 name="Create Contact"
+    HideCondition findMode=False
+      Calculation:
+        | $$FirstFindHasBeenPerformed = False 
+        | 
+        | or Picker::Settings_AllowCreate = False
+        refs: fn:False, fn:or, Picker::Settings_AllowCreate#12
+  Object type=Rect key=131 LabelKey=0 name=headerBackground flags=1073741824 style="Title Bar Shape" bounds=0,0,70,461
+  Object type=Text key=132 LabelKey=0 flags=-1073741824 bounds=72,480,92,670
+    Text flags=2: "expland >"

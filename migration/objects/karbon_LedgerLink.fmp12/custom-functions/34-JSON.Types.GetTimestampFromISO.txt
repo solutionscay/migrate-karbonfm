@@ -1,0 +1,33 @@
+# custom function 34: JSON.Types.GetTimestampFromISO
+# file: karbon_LedgerLink.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=34]
+
+CustomFunction id=34 functionArity=2 visible=True parameters=json;keyOrIndexOrPath name=JSON.Types.GetTimestampFromISO
+  Calculation:
+    | /*******************************************************************************
+    |  * JSONGetTimestampFromISO ( json ; keyOrIndexOrPath )
+    |  * Parses a value from JSON data, and casts it to a FileMaker timestamp.
+    |  * This function assumes that the timestamp is encoded as a JSONString formatted
+    |  * according to ISO 8601. Timestamps with limited accuracy will return the first
+    |  * timestamp in the specified period.
+    |  *
+    |  * @parameter json: the json to parse
+    |  * @parameter keyOrIndexOrPath: which value to parse out
+    |  *
+    |  * @return A timestamp
+    |  *
+    |  * @history 2017-04-16 - Jeremy Bante <http://scr.im/fugue> - Created
+    |  *
+    |  * @see https://en.wikipedia.org/wiki/ISO_8601
+    |  ******************************************************************************/
+    | 
+    | Let ( [
+    | 	_value = JSONGetElement ( json ; keyOrIndexOrPath ) ;
+    | 	_thereWasAParsingError = Left ( _value ; 1 ) = "?"
+    | ] ;
+    | 	If ( _thereWasAParsingError ;
+    | 		_value ;
+    | 		/* Else */ Timestamp.FromISO ( _value )
+    | 	)
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:Left, fn:If, cf:Timestamp.FromISO

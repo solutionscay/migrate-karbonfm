@@ -1,0 +1,574 @@
+# script 715: Open Card - Discussion v1 _Deprecated
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion
+# source: ScriptCatalog/Script[@id=715]
+# steps: 148 (17 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=305 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #The goal of opening a discussion card is to load the UtilityDiscussion window ( New Record) or the Discussion Detail (Existing Record)
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #If there is an existing Discussion record for this Entity, we load the existing record.
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #This is found using the Table Occurence "UtilityDiscussion_Discussion#ByEntity" because we do not want to create table occurences for every entity that can be discussed in the system.
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #If the UUID for the Entity has a related Discussion record, we load it.
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@param {object} Discussion
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@param {string} Discussion.EntityId
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@param {string} Discussion.EntityType
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@param {string} Discussion.Title
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnSuccess {object} result
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnSuccess {object} result.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #@history 2018-08-12 dave@geistinteractive.com - using selector to see if there is an existing discussion so we can open new or GTRR for an existing discussion without messing with the window
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #@history  admin - Created by Generator
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  32    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $data; Value:JSON.Format( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  42    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  43    End If
+        DisableStepCollapsed state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Set Variable [ $error; Value:JSON.Validate.This ( $data ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "EntityId" ) ;
+        		JSON.Validate.Rule.IsRequired ( "EntityTypeId" ) ;
+        		JSON.Validate.Rule.IsRequired ( "Title" ) ;
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  50    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  51    End If
+        DisableStepCollapsed state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #Commit before opening to avoid record lock
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $Date; Value:JSONGetElement( $data ; "Date" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Date
+  61    Set Variable [ $EntityId; Value:JSONGetElement( $data ; "EntityId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityId
+  62    Set Variable [ $EntityTypeId; Value:JSONGetElement( $data ; "EntityTypeId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityTypeId
+  63    Set Variable [ $Notes; Value:JSONGetElement( $data ; "Notes" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Notes
+  64    Set Variable [ $ResolutionId; Value:JSONGetElement( $data ; "ResolutionId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ResolutionId
+  65    Set Variable [ $ResolutionView; Value:JSONGetElement( $data ; "ResolutionView" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ResolutionView
+  66    Set Variable [ $Title; Value:JSONGetElement( $data ; "Title" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Title
+  67    Set Variable [ $UserId; Value:JSONGetElement( $data ; "UserId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $UserId
+  68    Set Variable [ $UserListId; Value:JSONGetElement( $data ; "UserListId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $UserListId
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #SET GLOBAL FIELDS BEFORE SHOWING THE CARD WINDOW
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    Set Field [ UtilityDiscussion::Date; $Date ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=6 name=Date
+  74    Set Field [ UtilityDiscussion::EntityId; $EntityId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=7 name=EntityId
+  75    Set Field [ UtilityDiscussion::EntityTypeId; $EntityTypeId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=8 name=EntityTypeId
+  76    Set Field [ UtilityDiscussion::Notes; $Notes ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=9 name=Notes
+  77    Set Field [ UtilityDiscussion::ResolutionId_Deprecated; $ResolutionId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=17 name=ResolutionId_Deprecated
+  78    Set Field [ UtilityDiscussion::ResolutionView_Deprecated; $ResolutionView ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=16 name=ResolutionView_Deprecated
+  79    Set Field [ UtilityDiscussion::Title; $Title ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=10 name=Title
+  80    Set Field [ UtilityDiscussion::UserId_Deprecated; $UserId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=14 name=UserId_Deprecated
+  81    Set Field [ UtilityDiscussion::UserListId_Deprecated; $UserListId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=12 name=UserListId_Deprecated
+  82    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #OPEN THE UTILITYDISCUSSION LAYOUT AS A CARD
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  87    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  88    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  89    #Start a new discussion or jump into an existing one
+        DisableStepCollapsed state=False
+        Restore state=False
+  90    Set Field [ selector::EntityId; $EntityId ]
+        DisableStepCollapsed state=False
+        Field table=selector id=26 name=EntityId
+  91    If [ IsEmpty ( Selected_Discussion::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_Discussion::Id#6
+  92    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  93    New Window [ Style: Card; Using layout: “Card - Discussion Utility_deprecated” (UtilityDiscussion); Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Layout id=100 name="Card - Discussion Utility_deprecated"
+  94    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  95    #a card window was already open. close it and try again
+        DisableStepCollapsed state=False
+        Restore state=False
+  96    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  97    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  98    #don't start a discussion if there was an error closing the current window
+        DisableStepCollapsed state=False
+        Restore state=False
+  99    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+ 100    End If
+        DisableStepCollapsed state=False
+ 101    New Window [ Style: Card; Using layout: “Card - Discussion Utility_deprecated” (UtilityDiscussion); Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Layout id=100 name="Card - Discussion Utility_deprecated"
+ 102    End If
+        DisableStepCollapsed state=False
+ 103    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    Go to Related Record [ From table: “Selected_Discussion”; Using layout: “Discussion Detail” (Discussion) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Table id=1065288 name=Selected_Discussion
+        Layout id=93 name="Discussion Detail"
+ 107    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+ 108    #a card window was already open. close it and try again
+        DisableStepCollapsed state=False
+        Restore state=False
+ 109    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+ 110    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+ 111    #don't start a discussion if there was an error closing the current window
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+ 113    End If
+        DisableStepCollapsed state=False
+ 114    Go to Related Record [ From table: “Selected_Discussion”; Using layout: “Discussion Detail” (Discussion) ]
+        [ Show only related records; New window ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=True
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Table id=1065288 name=Selected_Discussion
+        Layout id=93 name="Discussion Detail"
+ 115    Adjust Window
+        [ Resize to Fit ]
+        DisableStepCollapsed state=False
+        WindowState value=ResizeToFit
+ 116    End If
+        DisableStepCollapsed state=False
+ 117    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    Perform Script [ “_wip_Mark Notification as Read” from file: “karbon_kontroller”; Parameter: JSONSetElement ( "" ; 
+        	[ "DiscussionId" ; <Table Missing>::<Field Missing> ; JSONString ];
+        	[ "UserId" ; session::CurrentUserId ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=445 name="_wip_Mark Notification as Read" in=karbon_kontroller.fmp12
+ 119    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 120    End If
+        DisableStepCollapsed state=False
+ 121    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 122    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 123    #@history 2018-08-12 dave@geistinteractive.com - saved
+        DisableStepCollapsed state=False
+        Restore state=False
+ 124 // Set Variable [ $WindowHeightOriginal; Value:Get( WindowHeight ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:WindowHeight
+        Repetition
+          Calculation:
+            | 1
+        Name: $WindowHeightOriginal
+ 125 // Set Variable [ $WindowWidthOriginal; Value:Get( WindowWidth) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:WindowWidth
+        Repetition
+          Calculation:
+            | 1
+        Name: $WindowWidthOriginal
+ 126 // New Window [ Style: Card; Using layout: “Card - Discussion Utility_deprecated” (UtilityDiscussion); Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Layout id=100 name="Card - Discussion Utility_deprecated"
+ 127 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+ 128 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129 // #Check to see if there is an existing Discussion for this Entity
+        DisableStepCollapsed state=False
+        Restore state=False
+ 130 // If [ not IsEmpty ( UtilityDiscussion_ActivityEntity#EntityId::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, UtilityDiscussion_ActivityEntity#EntityId::Id#6
+ 131 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+ 132 // Go to Related Record [ From table: “UtilityDiscussion_ActivityEntity#EntityId”; Using layout: “Discussion Detail” (Discussion) ]
+        [ Show only related records ]
+        Option state=False
+        MatchAllRecords state=False
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=True
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=3606018
+        Table id=1065207 name=UtilityDiscussion_ActivityEntity#EntityId
+        Layout id=93 name="Discussion Detail"
+ 133 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+ 134 // Adjust Window
+        [ Resize to Fit ]
+        DisableStepCollapsed state=False
+        WindowState value=ResizeToFit
+ 135 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+ 136 // Move/Resize Window [ Current Window; Top: ( $WindowHeightOriginal - Get( WindowHeight ) ) / 2; Left: ( $WindowWidthOriginal - Get( WindowWidth ) ) / 2 ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+        DistanceFromTop
+          refs: fn:Get, fn:WindowHeight
+        DistanceFromLeft
+          refs: fn:Get, fn:WindowWidth
+ 137 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+ 138 // Perform Script [ “_wip_Mark Notification as Read” from file: “karbon_kontroller”; Parameter: JSONSetElement ( "" ; 
+        	[ "DiscussionId" ; <Table Missing>::<Field Missing> ; JSONString ];
+        	[ "UserId" ; session::CurrentUserId ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=445 name="_wip_Mark Notification as Read" in=karbon_kontroller.fmp12
+ 139 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+ 140 // End If
+        DisableStepCollapsed state=False
+ 141    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 142    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 143    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 144    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 145    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 146    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 147    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 148    #
+        DisableStepCollapsed state=False
+        Restore state=False

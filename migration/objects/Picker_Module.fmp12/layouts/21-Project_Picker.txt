@@ -1,0 +1,116 @@
+# layout 21: Project Picker
+# file: Picker Module.fmp12
+# folder: Project Picker
+# source: LayoutCatalog/Layout[@id=21]
+# objects: 18
+# theme: Cool Gray
+# folder group: id=25 groupCollapsed=False includeInMenu=True
+
+Layout width=460 quickFind=True includeInMenu=True id=21 name="Project Picker"
+  Table id=1065109 name="" ref=missing
+  CustomMenuSet id=2 name="Default Menu Set"
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=False showFieldFrames=False saveRecord=True
+  Object type=Button key=132 LabelKey=0 name=pickerButton flags=1073741824 bounds=70,0,130,460
+    ScriptTriggers
+      Trigger event=OnObjectKeystroke id=5 triggerFlags=1(browse)
+        Script id=70 name="Handle Keystroke on Picker Row"
+        TriggerText: "Handle Keystroke on Picker Row"
+    Text flags=2 style="Selector Button"
+    ButtonObj buttonFlags=0 iconSize=8 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Select Project” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Resume
+        Script id=103 name="Select Project"
+  Object type=ButtonBar key=143 LabelKey=0 flags=4 style=FooterMessage bounds=130,0,180,460
+    HideCondition findMode=False
+      Calculation:
+        | Picker::Settings_AllowCreate = False
+        refs: Picker::Settings_AllowCreate#12, fn:False
+    ButtonBarObj segmentKey=0
+      Object type=Button key=144 LabelKey=0 bounds=130,0,180,460
+        Text flags=2 style=FooterMessage
+        ButtonObj buttonFlags=3 iconSize=18 displayType=4
+          Image name=a53_info.svg
+        LabelCalc
+          Calculation:
+            | Picker::Settings_FooterMessage
+            refs: Picker::Settings_FooterMessage#14
+  Object type=Rect key=146 LabelKey=0 flags=268435456 style="Search Field Old" bounds=10,40,40,360
+  Object type=Text key=147 LabelKey=0 flags=268435456 bounds=40,40,60,300
+    Text flags=10 tableViewVisibility=0: <<$$PickerSearchStatus>>
+      FieldList quickFind=False
+  Object type=Button key=148 LabelKey=0 name=findButton flags=268500992 bounds=10,370,40,440
+    Text flags=2 style="Header Button": Find
+    ButtonObj buttonFlags=0 iconSize=12 displayType=0
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Find Projects” ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Script id=100 name="Find Projects"
+  Object type=Button key=149 LabelKey=0 name=cancelButton flags=268435456 bounds=16,330,34,348
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=16 displayType=1
+      Step enable=True id=49 name=Clear
+        StepText
+          | Clear [ Picker::Search_Field ]
+          | [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+      Image name=a27_XCircle.svg
+  Object type=Button key=150 LabelKey=0 flags=268435456 bounds=17,50,33,66
+    Text flags=2 style="Circle Button Small"
+    ButtonObj buttonFlags=0 iconSize=14 displayType=1
+      Image name=a89_find.svg
+  Object type=Field key=151 LabelKey=0 name=searchField flags=285212672 bounds=10,70,40,320
+    ScriptTriggers
+      Trigger event=OnObjectValidate id=6 triggerFlags=1(browse)
+        Script id=100 name="Find Projects"
+        TriggerText: "Find Projects"
+    FieldObj numOfReps=1 flags=114 inputMode=0 keyboardType=0 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5
+      Field: Picker::Search_Field#1
+      PlaceholderText findMode=True
+        Calculation:
+          | Picker::Settings_PlaceholderText
+          refs: Picker::Settings_PlaceholderText#13
+  Object type=Rect key=152 LabelKey=0 name=headerBackground flags=1073741824 style="Title Bar Shape" bounds=0,0,70,461
+  Object type=Field key=157 LabelKey=0 bounds=80,10,120,50
+    FieldObj numOfReps=1 flags=8244 inputMode=0 keyboardType=0 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=7
+      Field: Party::Photo#32
+  Object type=Text key=158 LabelKey=0 flags=1342177280 bounds=100,170,120,440
+    Text flags=10 tableViewVisibility=0: <<PhoneNumerCached>>
+      Display: number flags=24027 negativeStyle=0 currencySymbol="" thousandsSep="" decimalPoint="" negativeColor=#54F51200 decimalDigits=0 trueString="" falseString=""; date format=168 monthStyle=231 dayStyle=11 separator=U+DB50 elements=0,136,140,211 separators=||||
+      FieldList quickFind=False
+  Object type=Text key=159 LabelKey=0 bounds=100,60,120,320
+    Text flags=10 tableViewVisibility=0: <<Person::EmployerName>>
+      Display: number flags=24027 negativeStyle=0 currencySymbol="" thousandsSep="" decimalPoint="" negativeColor=#54F51200 decimalDigits=0 trueString="" falseString=""; date format=168 monthStyle=231 dayStyle=11 separator=U+DB50 elements=0,136,140,211 separators=||||
+      FieldList quickFind=False
+        Field table=Person id=131 name=EmployerName
+  Object type=Button key=160 LabelKey=0 flags=4 bounds=80,10,120,50
+    Text flags=2
+    ButtonObj buttonFlags=0 iconSize=40 displayType=1
+      Image name=tick-inside-a-circle.svg
+    HideCondition findMode=False
+      Calculation:
+        | Let ( [ 
+        | 	pickedContactIds = JSON.GetValuesAtPath ( JSONGetElement ( Picker::Results ; "Result.PartyArray" )  ; "Id" )
+        | ] ; 
+        | 	not IsInList ( pickedContactIds ; kContactID )
+        | )
+        refs: fn:Let, cf:JSON.GetValuesAtPath, fn:JSONGetElement, Picker::Results#2, fn:not, cf:IsInList, cf:kContactID
+  Object type=Text key=161 LabelKey=0 flags=1342177280 bounds=80,170,100,440
+    Text flags=10 tableViewVisibility=0: <<NetworkAddressCached>>
+      Display: number flags=24027 negativeStyle=0 currencySymbol="" thousandsSep="" decimalPoint="" negativeColor=#54F51200 decimalDigits=0 trueString="" falseString=""; date format=168 monthStyle=231 dayStyle=11 separator=U+DB50 elements=0,136,140,211 separators=||||
+      FieldList quickFind=False
+  Object type=Field key=162 LabelKey=0 name=ContactName bounds=80,60,98,320
+    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Command Link"
+      Field: Person::#19 ref=missing
+  Object type=Text key=163 LabelKey=0 bounds=100,60,120,320
+    Text flags=10 tableViewVisibility=0: "<<Organization::<Field Missing>>>"
+      Display: number flags=24027 negativeStyle=0 currencySymbol="" thousandsSep="" decimalPoint="" negativeColor=#54F51200 decimalDigits=0 trueString="" falseString=""; date format=168 monthStyle=231 dayStyle=11 separator=U+DB50 elements=0,136,140,211 separators=||||
+      FieldList quickFind=False
+        Field table=Organization id=132 name="" ref=missing
+  Object type=Field key=164 LabelKey=0 name="ContactName Copy" bounds=80,60,98,320
+    FieldObj numOfReps=1 flags=52 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style="Command Link"
+      Field: Organization::OrganizationName#19

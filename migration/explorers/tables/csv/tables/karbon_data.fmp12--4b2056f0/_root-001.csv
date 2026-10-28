@@ -1,0 +1,392 @@
+source_id,source_hash,kind,file,id,name,role,fields,regular,calculated,summary,global,container,repeating,keys,logic,logic_count,target,open_question
+karbon_data.fmp12/tables/129-meta.txt,1da8fde05d3cdab25d53a3bc8865eac0044bb3d6a8d874429f190c4ddb1bd0bd,tables,karbon_data.fmp12,129,meta,settings-globals,2,0,1,0,1,0,0,none,"6 FileVersion | calc-unstored | Unstored calculation returning the literal file version ""0.9.8""; the long comment explains semantic versioning and that it is unstored so the version survives cloning",1,config,none
+karbon_data.fmp12/tables/130-User.txt,1a7e0b5291914b21d8bf419765cc7ace3ce0d493843b32df80004c9cb3db034f,tables,karbon_data.fmp12,130,User,entity,26,20,3,1,2,0,0,"Id (id 1): UUID auto-enter; parent side of Equal predicates to ActivityComment, DBTransactions, Deleter, UtilityEmailMessage, selector
+AccountName (id 11): unique validation
+FK PartyId -> Party::Id","1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+11 AccountName | validate-rule | Validation: not empty, unique, strict (no override) (always) - message ""A unique account name is required.""
+98 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+99 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+100 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+101 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+102 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+103 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+105 AsJSON | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (account name, ids, email, SMTP server settings incl. SmtpPassword, unread notification count, party name from Party::NameCached)
+106 DisplayName | calc-unstored | Unstored: the related Party name (Party::NameCached) or, if empty, the AccountName
+108 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+109 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+120 EmailSignature | auto-data | Constant default ""--"" entered at creation (a placeholder signature)
+122 ListId | summary | List summary of Id: return-separated ids of the found users",14,table,"secret: SmtpPassword (global, set by the user each session) is also exported by AsJSON; decide where per-user SMTP credentials live in the target"
+karbon_data.fmp12/tables/131-Address.txt,4dc3bc9c168d36140d3c7aa372ed61c2f8b167063f4b11fbdb5327a9be36d70c,tables,karbon_data.fmp12,131,Address,entity,22,17,4,0,1,0,0,FK Id -> ContactMethod::Id,"7 AddressLine1 | auto-calc | Cleans the entered text with custom function CleanText on every entry (replaces the existing value)
+8 AddressLine2 | auto-calc | Cleans the entered text with custom function CleanText on every entry (replaces the existing value)
+9 AddressLine3 | auto-calc | Cleans the entered text with custom function CleanText on every entry (replaces the existing value)
+10 City | auto-calc | Cleans the entered text with custom function CleanText on every entry (replaces the existing value)
+11 StateProvince | auto-calc | Cleans the entered text with custom function CleanText on every entry (replaces the existing value)
+12 PostalCode | auto-calc | Cleans the entered text with custom function CleanText on every entry (replaces the existing value)
+13 Country | auto-calc | Cleans the entered text with custom function CleanText on every entry (replaces the existing value)
+18 AddressWide | calc-unstored | Unstored: AddressDisplay with line breaks replaced by "", "" (one-line address)
+22 AddressDisplay | calc-unstored | Unstored: empty if lines 1-3, city, state and postal code are all empty; otherwise lines 1-3 listed then ""City, State PostalCode""
+29 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+30 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+31 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+32 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+33 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+34 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+35 County | auto-calc | Cleans the entered text with custom function CleanText on every entry (replaces the existing value)
+39 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (address lines, city, state, county, country, postal code, primary flag, plus ContactMethod label/comment/party and the purpose names array from ContactMethodPurposeType)
+40 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+41 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",19,table,"Address, Phone and NetworkAddress share Id with ContactMethod; ContactMethod::AsJson says ContactMethod is no longer referenced since 2018-02-10 yet these tables read ContactMethod label, comment and party; confirm the supertype stays"
+karbon_data.fmp12/tables/132-ContactMethod.txt,2236fe9067a1b499a83d388899e1a841300f26a59133743e59d6cd8a9ef370ec,tables,karbon_data.fmp12,132,ContactMethod,entity,22,17,4,0,1,0,0,"Id (id 1): UUID auto-enter; parent side of Equal predicates to Address, ContactMethodPurpose, DBTransactions, Deleter, NetworkAddress, Phone, selector
+FK PartyId -> Party::Id","1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit); re-evaluated always
+21 ContactMethodDisplay | calc-unstored | Unstored display text: the related Address wide text, NetworkAddress address or Phone number depending on which indicator (AddressInd, NetworkAddressInd, PhoneInd) is set; ""<empty>"" if none
+25 TypeDisplay | calc-unstored | Unstored calculation whose entire formula is commented out, so it returns empty (the commented text derived a type label from the indicators)
+35 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+36 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+37 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+38 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+39 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+40 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+41 AsJson | calc-unstored | Unstored JSON of the contact method wrapping the Address, Phone or NetworkAddress JSON by indicator, plus id, creation info, label, party and purposes; the field comment says it is no longer referenced since 2018-02-10
+52 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+53 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",12,table,Supertype of Address/Phone/NetworkAddress by the PhoneInd/AddressInd/NetworkAddressInd flags; its AsJson says it is no longer referenced; confirm whether it stays a table or merges into the three subtypes
+karbon_data.fmp12/tables/133-Country.txt,ee57938e133c3a1c6115b9d2f411ead56bfd80cc5934a49e572c5acaf28d4034,tables,karbon_data.fmp12,133,Country,lookup,11,9,1,0,1,0,0,Id (id 18): serial; parent side of Equal predicates to DBTransactions,"11 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+13 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+16 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+17 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+18 Id | auto-serial | Serial number, increment 1, next value 1, generated OnCreation",5,table,none
+karbon_data.fmp12/tables/134-ExternalLink.txt,13f3b6b3848c3d3413dcb542dec5609a3d16a04fcf1d76a40e71fe27ad79e504,tables,karbon_data.fmp12,134,ExternalLink,join,17,11,4,1,1,0,0,"Id (id 1): UUID auto-enter; parent side of Equal predicates to DBTransactions
+FK InternalId -> PartyRole::Id
+FK ExternalLinkTypeId -> ExternalLinkType::Id","1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+3 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+4 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+5 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+6 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+7 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+8 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+12 AsJsonV1 | calc-stored | Stored JSON (Id, PartyRoleId from InternalId, ExternalId, ExternalType from ExternalLinkTypeId); older shape kept beside V2
+16 NameDisplay | calc-unstored | Unstored: the related ExternalLinkType::ExternalType name
+17 InternalIdListOf | summary | List summary of InternalId (comment: a list of internal ids)
+18 AsJsonV2 | calc-stored | Stored JSON (Id, InternalId, ExternalId, ExternalLinkTypeId); current shape
+19 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+20 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",13,table,InternalId is called PartyRoleId in AsJsonV1 but the comment also names ProjectId; which entity types can be linked? V1 and V2 JSON both exist: which is current?
+karbon_data.fmp12/tables/135-NetworkAddress.txt,1bbc5e76a16cd2c6817a86eee9aa27ad3ce442bcf5119e1a36d21c50f8406ad6,tables,karbon_data.fmp12,135,NetworkAddress,entity,20,12,4,3,1,0,0,FK Id -> ContactMethod::Id,"7 Address | auto-calc | Auto-enters calculation: CleanText ( Lower( Self ) )
+23 AddressAndNameOut | calc-unstored | Unstored calculation whose entire formula is commented out (formatted ""Name <address>"" per platform), so it returns empty
+30 AddressList | summary | List summary of Address: the found email/web addresses
+32 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+33 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+34 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+35 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+36 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+37 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+41 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer: type ""email""/""web""/""other"" from the two indicators, address, label, comment, billing flag and purpose names from related ContactMethod
+42 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+43 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+44 AsJsonEmailSearch | calc-unstored | Unstored JSON used by the picker module to list email addresses with formatted address, label, employer name and party name/id
+45 AsJsonEmailSearchListOf | summary | List summary of AsJsonEmailSearch (builds the picker array)
+46 IdListOf | summary | List summary of Id",15,table,See ContactMethod; AddressAndNameOut is fully commented out
+karbon_data.fmp12/tables/136-Party.txt,f637fa29846bcc53bd5d3493067a2e32e0cde1d407765cd69829780a8fa4ff9a,tables,karbon_data.fmp12,136,Party,entity,39,28,6,4,1,1,0,"Id (id 1): UUID auto-enter; parent side of Equal predicates to ActivityComment, ActivityParty, ContactMethod, DBTransactions, Deleter, FileAttachment, Opportunity, Organization, PartyRelation, PartyRole, Person, System, User, UtilityDiscussion, UtilityTask, VIRTUALLISTS_Rows, selector","44 Comments | auto-calc | Cleans the entered comments with CleanText on every entry
+62 DeletedInd | auto-calc | Forces the soft-delete flag to 0 when empty and 1 when it has any value (always boolean)
+1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+86 IdList | summary | List summary of Id
+105 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+106 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+107 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+108 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+109 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+110 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+112 DeletedTimestamp | auto-calc | Auto-enters the current host timestamp when DeletedInd is set, else empty (overwrites on change)
+113 DeletedAccountName | auto-calc | Auto-enters the current account name when DeletedInd is set, else empty (overwrites on change)
+137 AsJson | calc-unstored | Unstored JSON of the party (Id, Name, creation account, comments) with arrays of related Phone, Address and NetworkAddress JSON; the comment says to use the Person or Organization JSON instead and not to format the text
+138 AsJsonWithRelationships | calc-unstored | Unstored: AsJson plus a PartyRelation array built from PartyRelation#to::AsJSON
+139 AsJsonListOf | summary | List summary of AsJson (comment: found parties in JSON)
+141 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+142 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+143 AsJsonEmailSearch | calc-unstored | Unstored JSON for the email picker listing a party without email: blank email fields plus employer name, party id and name
+144 AsJsonEmailSearchListOf | summary | List summary of AsJsonEmailSearch
+148 AsJsonPhoneSearch | calc-unstored | Unstored JSON for the phone picker listing a party without phone: PhoneId null, phone ""none"", organization name, party id and name
+149 AsJsonPhoneSearchListOf | summary | List summary of AsJsonPhoneSearch
+150 AsJsonSubscriberSearch | calc-unstored | Unstored JSON {id,name} of the party for the discussion subscriber search",22,table,"NameCached and OrganizationInd auto-enter calculations are inactive and point to deleted fields (<Field Missing>), so who maintains the cached name and the primary phone/email/address caches now (script?)"
+karbon_data.fmp12/tables/137-PartyRelation.txt,09858e1f15834d6c5dc6ae68523cdd4f04a3474a9840509bafa8cd54a2a85e24,tables,karbon_data.fmp12,137,PartyRelation,join,20,16,3,0,1,0,0,"Id (id 16): UUID auto-enter; parent side of Equal predicates to DBTransactions
+FK PartyIdFrom -> Party::Id
+FK PartyIdTo -> Party::Id","16 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit); re-evaluated always
+22 CurrentInd | auto-data | Constant default 1 (the relation is current)
+31 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+32 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+33 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+34 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+35 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+36 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+37 AsJSON | calc-unstored | Unstored JSON with Id, Relationship, dates, current flag; the calculation is defined on the PartyRelation#to occurrence, repeats FromDate and sends CurrentInd under the key ""FromDate"", and its Party element references a deleted field (<Field Missing>), so it is partly broken
+45 Role | calc-unstored | Unstored JSON array of ""billing"" and/or ""shipping"" built from BillingInd and ShippingInd with JSON.Push
+46 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+47 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",12,table,AsJSON references a deleted field and repeats FromDate; relationship type values (Relationship text) are not constrained in the file
+karbon_data.fmp12/tables/138-Phone.txt,bf16b86347dc760144aa4332c582fa28bb4672aebcd3519f479d041d31b2f063,tables,karbon_data.fmp12,138,Phone,entity,28,16,10,1,1,0,0,FK Id -> ContactMethod::Id,"1 Id | validate-rule | StrictValidation flag only on the key (auto-enter UUID calculation is switched off)
+7 AreaCode | calc-unstored | Unstored: first three digits of Number after filtering to digits
+9 Extension | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+14 CountryDisplay | calc-unstored | Unstored: Country or, when empty, the default country (Country#default::Country); recalculates always
+15 LengthFilteredPhoneNumber | calc-unstored | Unstored: digit count of the number after cutting any ""ext""/""x"" extension and keeping digits only
+18 InternationalNumberInd | calc-unstored | Unstored boolean: the displayed country differs from the default country
+21 NumberDisplay | calc-unstored | Unstored: Number followed by "" x"" and Extension when an extension exists; country-code prefixing is commented out as TODO
+25 CountryDefault | calc-unstored | Unstored: the default country name from Country#default
+35 NumberDigitsOnly | calc-stored | Stored, indexed: Number reduced to digits (for matching)
+36 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+37 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+38 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+39 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+40 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+41 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+45 VoiceInd | auto-data | Constant default 1: a phone is voice-capable unless changed
+47 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer: type array (fax/sms/voice from the three indicators), number, extension, country code, primary flag, label/comment/party from ContactMethod, purposes
+48 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+49 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+50 AsJsonPhoneSearch | calc-unstored | Unstored JSON for the phone picker (client flag, organization, party, number, phone id)
+51 AsJsonPhoneSearchListOf | summary | List summary of AsJsonPhoneSearch",21,table,Phone formatting by PhoneFormat and country is only partly implemented (country-code prefix TODO is commented out)
+karbon_data.fmp12/tables/139-PhoneFormat.txt,be1fe2081f8e82b9ed8c814ccb7a29d58d8b0aa92df06776a7cca21f6e947954,tables,karbon_data.fmp12,139,PhoneFormat,lookup,14,10,3,0,1,0,0,ID (id 1): UUID auto-enter; parent side of Equal predicates to DBTransactions,"1 ID | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+9 DigitsOnly | calc-stored | Stored, indexed: count of ""#"" placeholders in Format (number of digits the format takes)
+15 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+16 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+17 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+18 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+19 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+20 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+23 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (CountryCode, Format, ID); always evaluated
+24 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+25 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",11,table,none
+karbon_data.fmp12/tables/140-Customer.txt,8ab0d38a40b52c61b8b9cab2a39b35d802470e2c9873089f23452d65936c1d05,tables,karbon_data.fmp12,140,Customer,entity,39,32,5,1,1,0,0,FK Id -> PartyRole::Id,"23 AsJsonV1 | calc-unstored | Unstored, pretty-printed JSON (JSONFormatElements) of the QuickBooks-style customer fields (balance, job, level, refs, taxable, notes)
+50 AsJsonV2 | calc-unstored | Unstored JSON of the same customer fields merged with Party::AsJson (JSON.Merge) so one object holds customer and party data
+15 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+16 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+17 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+18 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+19 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+20 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+52 BillingEmailsDisplay | calc-unstored | Unstored: billing email addresses (related Customer_NetworkAddress#billingEmail) as one comma-separated string
+54 BillingAddressDisplay | calc-unstored | Unstored: first address line only of the related billing address (Customer_NetworkAddress#billingAddress::AddressLine1)
+57 IdListOf | summary | List summary of Id
+58 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+59 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",13,table,"Subtype of PartyRole by Id; AsJsonV1 and V2 coexist; the QuickBooks-style fields (Balance, SalesTermRef, ParentRef...) look sync-owned, confirm which system is the source of truth"
+karbon_data.fmp12/tables/141-Employee.txt,6f3c1c439c9070e9fd2d979bbca82106991578e13130eb7ec70f28f36c9b1e8b,tables,karbon_data.fmp12,141,Employee,entity,26,18,4,3,1,1,0,FK Id -> PartyRole::Id,"14 SocialSecurityNumber | validate-rule | Validation: maximum 11 characters, checked during data entry only
+21 Initials | auto-calc | Auto-enters the capital letters of Party::NameCached (initials); the user can overwrite
+25 IdListOf | summary | List summary of Id
+26 NameList | summary | List summary of NameCached
+32 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+33 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+34 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+35 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+36 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+37 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+40 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (hours/rate fields, ids, initials, names, pay period, SSN, type, party id)
+46 Avatar | calc-stored | Stored container calculation: TextSize(Initials;72), a text-formatted initials image
+52 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+53 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+56 AsJSONListOf | summary | List summary of AsJson
+57 FoundSetAsJSON | calc-unstored | Unstored: found-set JSON array built from AsJSONListOf (values joined with commas inside [ ] and pretty-printed)",16,table,"SocialSecurityNumber is stored as plain text (PII); an unnamed leftover field (Field 58) exists; BillableTime comment mentions QuickBooks enablement, not billable time"
+karbon_data.fmp12/tables/142-Activity.txt,6a04ad00583be9625a03f660859aadeabb130313afcf48d415883984fc8553ad,tables,karbon_data.fmp12,142,Activity,entity,38,34,2,1,1,0,0,"Id (id 1): UUID auto-enter; parent side of Equal predicates to ActivityComment, ActivityEntity, ActivityMessage, ActivityParty, ActivityPurpose, Call, Chat, DBTransactions, Deleter, Discussion, FileAttachment, Meeting, Note, Task, mis, selector
+FK TemplateId -> Template::Id
+FK ActivityTypeId -> ActivityType::Id
+FK ActivityGroupId -> ActivityGroup::Id
+FK ActivityPurposeId -> ActivityPurpose::Id","6 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+99 ActivityPurposeId | auto-calc | Auto-enter calculation is only a comment (/*Template::ActivityPurposeId*/), so it enters nothing; always-evaluate flag is set
+117 CompletionTimestamp_deprecated | auto-calc | Deprecated: auto-enters the host timestamp when AlertInd is set, else empty (recalculated on change)
+118 CompletionAccountName_deprecated | auto-calc | Deprecated: auto-enters the account name when AlertInd is set, else empty (recalculated on change)
+129 IdList | summary | List summary of Id
+180 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+181 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+182 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+183 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+184 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+188 AsJSON | calc-unstored | Unstored JSON {Activity:{group, parent, purpose, type, subtype indicators, id, date, time, subject, ActivityParty array from ActivityParty::AsJSON}}
+193 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+194 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",14,table,"Supertype with subtype flags (EmailMessageInd, EventInd, NoteInd, TaskInd, CommentInd, CallInd, ChatInd, DiscussionInd) plus subtype tables; several *_deprecated fields remain; TemplateId is Number while ActivityTypeId/ActivityPurposeId types differ from their parents"
+karbon_data.fmp12/tables/143-ActivityMessage.txt,1266e7efa00dcc83e1a1e7c05b8c9839d0905a37271440fa7f2aaf8a3d483abe,tables,karbon_data.fmp12,143,ActivityMessage,entity,14,11,2,0,1,0,0,"Id (id 28): UUID auto-enter
+FK ActivityId -> Activity::Id","16 LengthOfMessage | calc-unstored | Unstored: character count of Message
+17 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+18 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+19 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+20 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+21 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+22 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+26 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+27 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+28 Id | auto-calc | Generates a UUID string as the record key at creation (user may override); re-evaluated always",10,merge,"Separate table only holds the message body ""to improve performance"" per its comment; one row per Activity (ActivityId); confirm it merges into Activity"
+karbon_data.fmp12/tables/144-ActivityParty.txt,579b7a4d7573168e2794dc6cab0e9690d36ee28f8b967d82c686e22ffc661097,tables,karbon_data.fmp12,144,ActivityParty,join,20,15,2,2,1,0,0,"Id (id 23): UUID auto-enter; parent side of Equal predicates to ActivityPartyEmail, ActivityPartyEvent, DBTransactions
+FK ActivityId -> Activity::Id
+FK ActivityPartyRoleId -> ActivityPartyRole::Id
+FK PartyId -> Party::Id","6 ActivityId | validate-rule | StrictValidation flag only (no override of the value rules); the lookup auto-enter is off
+7 PartyId | validate-rule | StrictValidation flag only; the lookup auto-enter is off
+23 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+56 IdList | summary | List summary of Id
+59 PartyIdList | summary | List summary of PartyId
+62 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+63 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+64 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+65 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+66 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+67 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+71 AsJSON | calc-unstored | Unstored JSON of the activity party (ids, role, contact method, notification sent flag)
+73 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+74 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",14,table,PartyNameCached lookup auto-enter is off and its source is not shown: who fills it? ActivityPartyRoleId constant 7 default is off
+karbon_data.fmp12/tables/145-ActivityPartyRole.txt,06191d244e15470e2cb534832c3de7e73d85e5f67a703b3e59bfc794fe907345,tables,karbon_data.fmp12,145,ActivityPartyRole,lookup,16,13,2,0,1,0,0,"Id (id 18): serial, unique validation; parent side of Equal predicates to ActivityParty, DBTransactions
+FK ActivityTypeIds -> ActivityType::Id","12 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+13 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+14 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+15 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+16 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+17 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+18 Id | auto-serial, validate-rule | Serial number (increment 1, next value 64) with validation: not empty, unique, at most 5 characters, strict, message asks for a unique code of five characters or less (ex: CC)
+21 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (activity type ids, the two Create...Ind flags, description, id, name)
+24 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+25 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",10,table,"ActivityTypeIds holds a list of ActivityType ids in one text field, so a join table may be needed; Id is a serial that also carries a 5-character code validation"
+karbon_data.fmp12/tables/146-ActivityPurpose.txt,00da97737cee625a24308b0bf4a251375d2b591c57f71bdb8ceb8e262311f30c,tables,karbon_data.fmp12,146,ActivityPurpose,join,13,11,1,0,1,0,0,"Id (id 10): UUID auto-enter; parent side of Equal predicates to Activity
+FK ActivityId -> Activity::Id
+FK ActivityPurposeTypeId -> ActivityPurposeType::Id","8 ActivityId | validate-rule | Validation (always, strict): not empty
+9 ActivityPurposeTypeId | validate-rule | Validation (always, strict): not empty
+10 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+12 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+13 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+14 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+15 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+16 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+17 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+20 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+21 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",11,table,Activity also has its own ActivityPurposeId; which one is current?
+karbon_data.fmp12/tables/147-ActivityPurposeType.txt,5c6976ec9d5d1ec628b6b61cedb832c4939214869933450d19923bb6d2a1c394,tables,karbon_data.fmp12,147,ActivityPurposeType,lookup,12,9,2,0,1,0,0,"Id (id 1): unique validation; parent side of Equal predicates to ActivityPurpose, DBTransactions","1 Id | validate-rule | Validation (always, strict): not empty, unique, at most 5 characters; message asks for a unique 5-character code (ex: SALES)
+9 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+10 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+11 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+12 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+13 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+14 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+17 AsJSON | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (Description, Id)
+18 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+19 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",10,table,none
+karbon_data.fmp12/tables/148-ActivityType.txt,133d5f53b192d6d9b124946593b6caa359f8c34c133d5fb357eea3f61fc6c9f1,tables,karbon_data.fmp12,148,ActivityType,lookup,12,9,2,0,1,0,0,"Id (id 18): serial, unique validation; parent side of Equal predicates to Activity, ActivityPartyRole, DBTransactions","16 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+17 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+18 Id | auto-serial, validate-rule | Serial number (increment 1, next value 8) with validation: not empty, unique, at most 3 characters, strict; message asks for a unique code of three characters or less (ex: EML)
+19 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+20 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+21 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+22 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+25 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+26 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+27 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (description, creation/modification info, id)",10,table,Id is a numeric serial but its validation message asks for a 3-character code (ex: EML)
+karbon_data.fmp12/tables/149-Note.txt,82d2f55fc02c1aad61e48b141ecac871f78354a97d21cc2ce26c4d569b0ec0d9,tables,karbon_data.fmp12,149,Note,entity,3,2,0,0,1,0,0,FK Id -> Activity::Id,15 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts,1,merge,"Subtype marker only (Id, ONE, z_xJoin); Activity has NoteInd; confirm it merges into Activity"
+karbon_data.fmp12/tables/150-Task.txt,5405b19bb48e540d193bcf2ff4b427c6c288fa7af36776b615ea4300fbfa1607,tables,karbon_data.fmp12,150,Task,entity,11,10,0,0,1,0,0,FK Id -> Activity::Id,20 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts,1,table,"Priority text (low, medium, high) and cached names; no logic"
+karbon_data.fmp12/tables/151-PartyRole.txt,528fd99cf7e7c3b1ea122f988604764b8e7f2fad78309603b38efd1e24d77edd,tables,karbon_data.fmp12,151,PartyRole,join,20,15,4,0,1,0,0,"Id (id 16): UUID auto-enter; parent side of Equal predicates to Customer, DBTransactions, Deleter, Employee, ExternalLink, Lead, Vendor
+FK PartyId -> Party::Id
+FK PartyRoleTypeId -> PartyRoleType::Id","16 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit); re-evaluated always
+20 FromDate | auto-data | Constant default 1/1/0001 (start of validity)
+22 CurrentInd | auto-data | Constant default 1 (role is current)
+31 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+32 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+36 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+37 AsJSON | calc-unstored | Unstored JSON: AsJSONWithoutRelated plus the subtype JSON (Customer::AsJsonV2, Vendor::AsJson or Employee::AsJson) chosen by CustomerInd, VendorInd, EmployeeInd
+42 CustomerInd | auto-calc, validate-rule | Coerces the flag to a boolean with GetAsBoolean(Self) on entry; strict range 0 to 1
+47 PartyRoleTypeName | calc-unstored | Unstored: the related PartyRoleType name
+48 AsJSONWithoutRelated | calc-unstored | Unstored JSON of the role (id, dates, current/customer/employee/vendor flags, party id, role type id)
+49 LeadInd | auto-calc, validate-rule | Coerces the flag to a boolean with GetAsBoolean(Self) on entry; strict range 0 to 1
+50 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+51 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value
+52 AsJSONforEmployeeSearch | calc-unstored | Unstored JSON {id,name} for employee roles (EmployeeInd=1), else empty; used by the employee search",14,table,"CustomerInd, EmployeeInd, VendorInd and LeadInd flags coexist with PartyRoleTypeId; confirm which is the source of the role"
+karbon_data.fmp12/tables/153-Vendor.txt,a0cfd2ca6689488f6d250c2476c624538a95e351d79946b7517262b1779c9d1e,tables,karbon_data.fmp12,153,Vendor,entity,16,14,2,0,0,0,0,FK Id -> PartyRole::Id,"23 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+24 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+25 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+26 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+27 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+28 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+32 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (vendor fields and audit info); comment says the vendor-related fields still need updating (#TODO)
+34 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+35 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",9,table,CreditLimit and TaxId are Text; AsJson comment says vendor fields still need updating (#TODO)
+karbon_data.fmp12/tables/154-PartyRoleType.txt,ddc4208f24736f8d70e0b706dc38a08d2a6b8bc37fbc86bd4c352b76843a112b,tables,karbon_data.fmp12,154,PartyRoleType,lookup,5,3,1,0,1,0,0,"Id (id 16): serial; parent side of Equal predicates to DBTransactions, PartyRole","16 Id | auto-serial | Serial number (increment 1, next value 5); the UUID auto-enter calculation is switched off
+36 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+37 AsJSON | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (Id, Name)",3,table,none
+karbon_data.fmp12/tables/155-ActivityGroup.txt,2a387d9a625c711f8c0174e56e7b025fa817dbc956a9b421c26140dcb3a0244a,tables,karbon_data.fmp12,155,ActivityGroup,entity,12,10,1,0,1,0,0,"Id (id 10): UUID auto-enter; parent side of Equal predicates to Activity, mis","10 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+12 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+13 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+14 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+15 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+16 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+17 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+18 CreatedByTestBatchID | auto-calc | Auto-enter calculation is only a comment (/*Globals::TestBatchID*/), so it enters nothing; the comment says a value would mark a record created by a test batch
+20 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+21 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",10,table,none
+karbon_data.fmp12/tables/156-Person.txt,fb96d90908a3e27b9612da5c036afef6a55c78c3c4150aea909e13efbdaa200c,tables,karbon_data.fmp12,156,Person,entity,27,23,2,1,1,0,0,FK Id -> Party::Id,"15 Department | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+55 Ethnicity | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+7 FirstName | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+56 Gender | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+14 JobTitle | auto-calc | Cleans the entered text with CleanText on every entry
+9 LastName | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+8 MiddleName | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+12 Nickname | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+10 Prefix | auto-calc | Cleans the entered text with CleanText on every entry
+11 Suffix | auto-calc | Cleans the entered text with CleanText on every entry
+86 IdList | summary | List summary of Id
+105 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+106 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+107 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+108 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+109 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+110 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+132 AsJson | calc-unstored | Unstored JSON of the person fields (names, prefix, suffix, salutation, gender, date of birth, job title) merged with Party::AsJson via JSON.Merge; Gender and Nickname are listed twice
+133 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+134 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",20,table,Subtype of Party by Id; AsJson lists Gender and Nickname twice
+karbon_data.fmp12/tables/157-Organization.txt,050d020ff1e6280c416d64ad2b73b3f4c93f35c0e266f60feafde690f8bf5f74,tables,karbon_data.fmp12,157,Organization,entity,16,11,3,1,1,0,0,FK Id -> Party::Id,"19 OrganizationName | auto-calc | Cleans the entered text with custom function CleanText on every entry (overwrites the existing value)
+86 IdList | summary | List summary of Id
+105 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+106 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+107 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+108 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+109 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+110 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+133 AsJson | calc-unstored | Unstored JSON of the organization (Name, CompanyType, Id, FederalTaxIdNumber) merged via JSON.Merge with a deleted field (<Field Missing>) and Party::AsJson, so the merge target is broken
+134 AsJsonWithRelated | calc-unstored | Unstored JSON of the organization fields merged with Party::AsJsonWithRelationships
+135 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+136 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",12,table,AsJson merges with a deleted field (<Field Missing>)
+karbon_data.fmp12/tables/158-ContactMethodPurpose.txt,8d8d6ad38729140871afb876850736c4a74bfdee9caacb71f4ed80600bd9e11b,tables,karbon_data.fmp12,158,ContactMethodPurpose,join,13,10,2,0,1,0,0,"Id (id 1): UUID auto-enter; parent side of Equal predicates to DBTransactions
+FK ContactMethodId -> ContactMethod::Id
+FK ContactMethodPurposeTypeId -> ContactMethodPurposeType::Id","1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit); re-evaluated always
+35 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+36 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+37 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+38 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+39 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+40 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+49 AsJson | calc-unstored | Unstored JSON {TypeId, Id, Type name from ContactMethodPurposeType}
+50 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+51 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",10,table,none
+karbon_data.fmp12/tables/159-ContactMethodPurposeType.txt,10c5f512e2e5b5142871124cc51a0154793662ef3e377028283bc492f326d92d,tables,karbon_data.fmp12,159,ContactMethodPurposeType,lookup,8,5,2,0,1,0,0,"Id (id 16): serial; parent side of Equal predicates to ContactMethodPurpose, DBTransactions","16 Id | auto-serial | Serial number (increment 1, next value 4); the UUID auto-enter calculation is switched off
+36 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+48 AsJsonNameOnly | calc-stored | Stored (index none): the quoted Name, designed to be collected into a JSON array of names such as [""mailing"",""billing""]
+49 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (Id, Name); always evaluated
+50 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+51 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",6,table,none
+karbon_data.fmp12/tables/160-ExternalLinkType.txt,65a5788b4a6307ec12521f8da679491e7b78ecfe8265dae875aaf522d64e0fab,tables,karbon_data.fmp12,160,ExternalLinkType,lookup,13,10,2,0,1,0,0,"Id (id 1): serial; parent side of Equal predicates to DBTransactions, ExternalLink","1 Id | auto-serial | Serial number (increment 1, next value 8)
+3 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+4 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+5 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+6 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+7 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+8 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+12 AsJson | calc-stored | Stored JSON (ExternalType, Id, InternalType); always evaluated
+16 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+17 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",10,table,none
+karbon_data.fmp12/tables/162-Lead.txt,b58cc3c21d20a5da033bc500b43cd67b3816c036709197ef6f6be0b48fcd1734,tables,karbon_data.fmp12,162,Lead,entity,15,12,2,0,1,0,0,FK Id -> PartyRole::Id,"15 CreationAccountName | auto-created | Stamps the account name that created the record (not editable)
+16 CreationTimestamp | auto-created | Stamps the record creation timestamp (not editable)
+17 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+18 ModificationCount | calc-unstored | Unstored Get(RecordModificationCount): number of times the record has been modified
+19 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+20 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+23 AsJson | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (audit, id, notes, source, status)
+51 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+52 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",9,table,Notes comment is copied from Customer; Status and Source are free text
+karbon_data.fmp12/tables/165-System.txt,ee550804237b90109942882affa9d589980304bf37dc6bae9577ae811f95c643,tables,karbon_data.fmp12,165,System,settings-globals,42,39,2,0,1,1,0,FK OwnerId -> Party::Id,"1 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+12 CountryIdd | calc-unstored | Unstored calculation whose entire formula is commented out (/*system country#country::IDD*/), so it returns empty
+42 ModificationAccountName | auto-modified | Stamps the account name of the last modifier; the SyncDeK-aware calculation is inactive
+43 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+44 CreatedByTestBatchID | auto-calc | Auto-enter calculation is only a comment (/*Globals::TestBatchID*/), so it enters nothing
+46 AsJson | calc-unstored | Unstored JSON of the system settings (SMTP/email account incl. SystemEmailAccountPassword, SmartyStreets id and token, country, owner, tax code, server type, authentication method, book close date, timesheet recipients); a saved older version sits in a comment
+60 CreationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id stored per session) on creation (not editable)
+61 ModificationUserId | auto-calc | Copies meta::CurrentUserId (the signed-in user id) on every change, replacing the prior value",8,config,"secret: SystemEmailAccountPassword, SmartyStreetsAuthToken, TwilioAuthToken and FullContactAPIKey hold credentials, and AsJson exports the first two; they must stay out of code and need a secret store"
+karbon_data.fmp12/tables/168-EmailMessage.txt,abdece40978a10f707381344ff8103d4e530b83e50501ec12471898d00f66bc9,tables,karbon_data.fmp12,168,EmailMessage,entity,9,8,1,0,0,0,0,Id (id 1): UUID auto-enter,"1 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit)
+11 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+23 AsJSON | calc-unstored | Unstored calculation that builds the record as a JSON object (JSONSetElement) for the script/API layer (attachments, id, HTML message, sent flag, SMTP result)",3,table,Holds send results for email Activities; MessageHtml is Text

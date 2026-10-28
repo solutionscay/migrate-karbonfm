@@ -1,0 +1,126 @@
+# table 143: TaxCode
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=143]
+# fields: 12
+# records: 0
+
+Field id=1 dataType=Number fieldType=Normal name=active
+  Comment: If 1, this entity is currently enabled for use by QuickBooks
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=Text fieldType=Normal name=id
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=TaxCode:
+      | Get(UUID)
+      refs: fn:Get, fn:UUID
+  Validation type=Always
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=name
+  AutoEnter allowEditing=True
+  Validation maxLength=True type=Always
+    NotEmpty value=True
+    MaxDataLength value=100
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=Text fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=Always
+    Unique value=True
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=description
+  AutoEnter allowEditing=True
+  Validation maxLength=True type=Always
+    MaxDataLength value=100
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Number fieldType=Normal name=taxable
+  Comment: If 1, then taxable. Always true, except for the pseudo taxcode NON
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Number fieldType=Normal name=taxGroup
+  Comment: If 1, then represents a group of one or more tax rates. 0 represents pseudo-tax codes TAX and NON.
+  AutoEnter allowEditing=True value=ConstantData constant=True
+    ConstantData: 1
+  Validation type=Always
+    StrictDataType value=Numeric
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=qbo_idList_TaxRate
+  Comment: list of TaxRates associated with this TaxCode
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Number fieldType=Normal name=percentage
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=TaxCode:
+      | /*Sum ( QBOSync_TaxCode_TaxRate::rateValue )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Calculated name=nameAndPercentage
+  Calculation table=TaxCode:
+    | name & " (" & percentage & "%)"
+    refs: TaxCode::name#3, TaxCode::percentage#10
+  Storage storeCalculationResults=True autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Calculated name=nameForActiveValueList
+  Calculation table=TaxCode:
+    | If ( active ; nameAndPercentage )
+    refs: fn:If, TaxCode::active#1, TaxCode::nameAndPercentage#11
+  Storage storeCalculationResults=True autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Normal name=qbo_send
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=TaxCode:
+      | Let(
+      | [
+      | x = GetField("")
+      | 
+      | ];
+      | Case(
+      |    $LL_IsUpdatingThisRecord ; Self;
+      |    1
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:GetField, fn:Case, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

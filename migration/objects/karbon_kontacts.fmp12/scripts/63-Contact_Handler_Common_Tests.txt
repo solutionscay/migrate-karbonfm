@@ -1,0 +1,96 @@
+# script 63: Contact Handler Common Tests
+# file: karbon_kontacts.fmp12
+# folder: Modules / Picker / Private
+# source: ScriptCatalog/Script[@id=63]
+# steps: 23 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=62 groupCollapsed=False includeInMenu=True
+
+   1    #This script is going to wait until the picker is done doing its thing, and then proceed accordingly
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v2.0 2017-06-21 dmg: updated for v16 compatibility (JSON)
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ “Get Results” from file: “Picker Module” ]
+        DisableStepCollapsed state=False
+        FileReference id=3 name="Picker Module"
+          UniversalPathList: file:Picker Module
+        Script id=99 name="Get Results" in=Picker_Module.fmp12
+   6    Set Variable [ $results; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+   7    Set Variable [ $selectionWasCanceled; Value:GetAsBoolean ( JSONGetElement ( $results ; "Result.Canceled" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $selectionWasCanceled
+   8    Set Variable [ $partyWasSelected; Value:GetAsBoolean ( JSONGetElement ( $results ; "Result.CountPicked" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyWasSelected
+   9    Set Variable [ $createParty; Value:GetAsBoolean ( JSONGetElement ( $results ; "Result.CreateRecord" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $createParty
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ Get ( WindowMode ) ≠ 0 and
+        Get ( WindowMode ) ≠ 1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:WindowMode, fn:and
+  12    #halt on layout mode
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  14    Else If [ $selectionWasCanceled ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #user canceled
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  17    Exit Script [ Result: -1 ]
+        DisableStepCollapsed state=False
+  18    Else If [ not $partyWasSelected and not $createParty ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:and
+  19    #nothing picked and we're not creating a party
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Exit Script [ Result: -1 ]
+        DisableStepCollapsed state=False
+  21    End If
+        DisableStepCollapsed state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Exit Script [ Result: $results ]
+        DisableStepCollapsed state=False

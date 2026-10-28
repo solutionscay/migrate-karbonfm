@@ -1,0 +1,38 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/249-wip_Create_Party_V2_data.txt,9c307d17669f3e889f06bc0679b1a8808cd5762ff70270319c2e55665c1159d0,scripts,karbon_kontroller.fmp12,249,_wip_Create Party V2 { data },data-change,server-domain,tier1,"Work-in-progress core party create or update: validates that Id is present, creates or locks the Party record, downloads the photo from PhotoAccessURL into a container, sets name, comments, department, deleted flags and photo, then creates each phone, address and network address through Create Phone (206), Create or Edit Address (194) and Create or Update Network Address (207). Stops at the first error. Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyId#25 (step 85)
+DBTransactions::utilityGlobalContainer#124 (step 119)
+Party::Id#1 (step 200)","DBTransactions::PartyId#25 (Set Field step 86, current record)
+Party::ONE#110 (Set Field step 89, related via Party)
+Party::Comments#44 (Set Field step 111, related via Party)
+Party::DeletedAccountName#113 (Set Field step 112, related via Party)
+Party::DeletedInd#62 (Set Field step 113, related via Party)
+Party::DeletedReason#103 (Set Field step 114, related via Party)
+Party::DeletedTimestamp#112 (Set Field step 115, related via Party)
+Party::Department#136 (Set Field step 116, related via Party)
+Party::NameCached#19 (Set Field step 117, related via Party)
+Party::Photo#32 (Set Field step 117, related via Party)
+Party::Photo#32 (Set Field step 119, related via Party)
+DBTransactions::utilityGlobalContainer#124 (Set Field step 120, current record)","karbon_kontroller.fmp12/scripts/28 step 42
+karbon_kontroller.fmp12/scripts/206 step 135
+karbon_kontroller.fmp12/scripts/194 step 161
+karbon_kontroller.fmp12/scripts/207 step 187
+karbon_kontroller.fmp12/scripts/29 step 210
+karbon_kontroller.fmp12/scripts/31 step 211","objects/karbon_kontroller.fmp12/scripts/246-wip_Create_Person_data.txt
+objects/karbon_kontroller.fmp12/scripts/284-wip_Edit_Person_data.txt
+objects/karbon_kontroller.fmp12/scripts/253-wip_Create_Organization_data.txt",Insert from URL step 99,"Steps 112-115 write $DeletedAccountName, $DeletedInd, $DeletedReason and $DeletedTimestamp, which are never set in this script, so each run blanks the deleted flags of an existing party (it is also used for edits by script 284). Step 118 (Photo from variable) is disabled in favour of the downloaded container. Script is named Create but is the shared worker for create and edit."
+karbon_kontroller.fmp12/scripts/285-wip_Edit_Party_V2_data.txt,e6e173159b3a939195a0ccca9d799b94869973cb2b846dc11b6abf70c439b3c6,scripts,karbon_kontroller.fmp12,285,_wip_Edit Party V2 { data },data-change,server-domain,tier1,"Work-in-progress edit of a party's core data: requires Id, locks the Party record, sets comments, department, name and photo, then creates each phone, address and network address through Create Phone (206), Create or Edit Address (194) and Create or Update Network Address (207). Runs inside the Start/Save/End Transaction scripts (kontroller 28, 29, 31).","DBTransactions::PartyId#25 (step 91)
+Party::Id#1 (step 195)","DBTransactions::PartyId#25 (Set Field step 92, current record)
+Party::ONE#110 (Set Field step 95, related via Party)
+Party::Comments#44 (Set Field step 105, related via Party)
+Party::DeletedAccountName#113 (Set Field step 106, related via Party)
+Party::DeletedInd#62 (Set Field step 107, related via Party)
+Party::DeletedReason#103 (Set Field step 108, related via Party)
+Party::DeletedTimestamp#112 (Set Field step 109, related via Party)
+Party::Department#136 (Set Field step 110, related via Party)
+Party::NameCached#19 (Set Field step 111, related via Party)
+Party::Photo#32 (Set Field step 112, related via Party)","karbon_kontroller.fmp12/scripts/28 step 40
+karbon_kontroller.fmp12/scripts/206 step 127
+karbon_kontroller.fmp12/scripts/194 step 153
+karbon_kontroller.fmp12/scripts/207 step 179
+karbon_kontroller.fmp12/scripts/29 step 207
+karbon_kontroller.fmp12/scripts/31 step 208",none found (may be called by name),none,"Header says 'Create Party' (copy of script 249 without the photo download). Steps 106-109 write $DeletedAccountName, $DeletedInd, $DeletedReason and $DeletedTimestamp, which are never set here, so an edit blanks the deleted flags. Step 112 writes Party::Photo from a text variable. No caller found; person edits call script 249 instead."

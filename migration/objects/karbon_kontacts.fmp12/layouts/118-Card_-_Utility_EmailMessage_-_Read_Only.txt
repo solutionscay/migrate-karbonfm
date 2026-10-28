@@ -1,0 +1,40 @@
+# layout 118: Card - Utility_EmailMessage - Read Only
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / Activity Utility
+# source: LayoutCatalog/Layout[@id=118]
+# objects: 3
+# theme: Karbon-1.0
+# folder group: id=88 groupCollapsed=False includeInMenu=False
+
+Layout width=840 quickFind=True includeInMenu=False id=118 name="Card - Utility_EmailMessage - Read Only"
+  Table id=1065210 name=UtilityEmailMessage
+  CustomMenuSet id=0 name=""
+  Options showRecordIndicator=False showFieldFramesCurrentRecord=True showFieldFrames=False saveRecord=True
+  ScriptTriggers
+    Trigger event=OnLayoutKeystroke id=102 triggerFlags=1(browse)
+      Script id=348 name="_Prevent Keystrokes"
+      TriggerText: "_Prevent Keystrokes"
+  Object type=Button key=49 LabelKey=0 bounds=80,1700,110,1790
+    Text flags=2 style=Button-Muted: Add
+    ButtonObj buttonFlags=0 iconSize=12 displayType=4
+      Step enable=True id=1 name="Perform Script"
+        StepText: Perform Script [ “Open Card - EmailAddressPicker”; Parameter: JSONSetElement ( "" ; "WindowHeight" ; Get( WindowHeight ) ; JSONNumber ) ]
+        DisableStepCollapsed state=False
+        CurrentScript value=Pause
+        Calculation:
+          | JSONSetElement ( "" ; "WindowHeight" ; Get( WindowHeight ) ; JSONNumber )
+          refs: fn:JSONSetElement, fn:Get, fn:WindowHeight, fn:JSONNumber
+        Script id=329 name="Open Card - EmailAddressPicker"
+      Image name=a13_add.svg
+  Object type=Text key=85 LabelKey=0 flags=4 bounds=40,610,62,810
+    Text flags=10 tableViewVisibility=0 style=Label-Medium-Muted: "<<Date>> at <<Time>>"
+      FieldList quickFind=False
+        Field table=UtilityEmailMessage id=14 name=Date
+        Field table=UtilityEmailMessage id=15 name=Time
+    HideCondition findMode=False
+      Calculation:
+        | IsEmpty ( UtilityEmailMessage::Date )
+        refs: fn:IsEmpty, UtilityEmailMessage::Date#14
+  Object type=Field key=86 LabelKey=0 flags=-1073741824 bounds=40,30,610,810
+    FieldObj numOfReps=1 flags=288 inputMode=0 keyboardType=1 displayType=0(edit-box) tableViewVisibility=0 quickFind=0 pictFormat=5 style=Edit-Medium-NoChrome
+      Field: UtilityEmailMessage::SentMailDisplay#24

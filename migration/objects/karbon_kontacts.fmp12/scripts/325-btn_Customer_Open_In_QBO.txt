@@ -1,0 +1,66 @@
+# script 325: btn Customer Open In QBO
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Sales Transactions / Private / Buttons
+# source: ScriptCatalog/Script[@id=325]
+# steps: 11 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=557 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Close Popover
+        DisableStepCollapsed state=False
+   3    Go to Field [  ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+   4    #qbo.customers are type 5 external links
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $ExternalTypeId; Value:5 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $ExternalTypeId
+   6    Set Variable [ $Id; Value:Party_PartyRole_Customer::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Party_PartyRole_Customer::Id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   7    Set Variable [ $ExternalId; Value:SQL.GetColumn2Fields ( Party_PartyRole_ExternalLink::ExternalId ; Party_PartyRole_ExternalLink::InternalId ; $Id ; Party_PartyRole_ExternalLink::ExternalLinkTypeId ;  $ExternalTypeId
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:SQL.GetColumn2Fields, Party_PartyRole_ExternalLink::ExternalId#10, Party_PartyRole_ExternalLink::InternalId#2, Party_PartyRole_ExternalLink::ExternalLinkTypeId#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $ExternalId
+   8    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "Entity" ; "Customer" ; JSONString ];
+        	[ "QBOId" ; $ExternalId ; JSONNumber ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Perform Script [ “Open in QB ( {entity , qbo_id} )” from file: “karbon_LedgerLink”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        FileReference id=6 name=karbon_LedgerLink
+          UniversalPathList: file:karbon_LedgerLink
+        Script id=501 name="Open in QB ( {entity , qbo_id} )" in=karbon_LedgerLink.fmp12
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False

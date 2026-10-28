@@ -1,0 +1,82 @@
+# script 78: HTTP ( {request} )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / HTTP / Public
+# source: ScriptCatalog/Script[@id=78]
+# steps: 19 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=80 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $log; Value:$$HTTP_LoggingOn ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $log
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Perform Script [ “_HTTP ( {request} )”; Parameter: Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptParameter
+        Script id=35 name="_HTTP ( {request} )"
+   7    Set Variable [ $response; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    If [ $log ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Perform Script [ “Log”; Parameter: JSONSetElement ( "" ; 
+        
+        	["request" ; Get(ScriptParameter) ; JSONObject];
+        	["response" ; $response ; JSONObject] ; 
+        	["curlOptions" ; $$lastCurlOptions ; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:Get, fn:ScriptParameter, fn:JSONObject, fn:JSONString
+        Script id=79 name=Log
+  13    End If
+        DisableStepCollapsed state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $$lastCurlOptions; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$lastCurlOptions
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Exit Script [ Result: $response ]
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False

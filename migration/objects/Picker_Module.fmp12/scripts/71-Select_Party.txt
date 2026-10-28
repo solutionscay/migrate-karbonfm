@@ -1,0 +1,210 @@
+# script 71: Select Party
+# file: Picker Module.fmp12
+# folder: Modules / Contact Picker (Contacts Sample File) / Private
+# source: ScriptCatalog/Script[@id=71]
+# steps: 39 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=13 groupCollapsed=False includeInMenu=False
+
+   1    #Update this expression by pointing to the primary key in your contacts table.
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v3.0 2017-06-20 dmg: updated for v16 (JSON)
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #v2.0 2016-03-15 dmg: allowing for selection of multiple contacts
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #v1.0 2014-07-31 dmg: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6 // Insert Text [ $SAMPLE RESULT OBJECT ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | {
+          | 	"Result" : 
+          | 	{
+          | 		"CreateParty" : False
+          | 		"PartyCount" : 2,
+          | 		"PartyArray" : 
+          | 		[
+          | 			{
+          | 				"Id" : "123",
+          | 				"Name" : "Dave Graham",
+          | 				"CustomerId" : "",
+          | 				"VendorId" : "",
+          | 				"EmployeeId" : ""
+          | 			},
+          | 			{
+          | 				"Id" : "456",
+          | 				"Name" : "Lance Brandenberg",
+          | 				"CustomerId" : "",
+          | 				"VendorId" : "",
+          | 				"EmployeeId" : ""
+          | 			}
+          | 		]
+          | 	}
+          | }
+        Field: $SAMPLE RESULT OBJECT
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #Get this record as a JSON object in the form of: { "Id" : 1234, "Name" : "John Doe" }
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $thisPartyObject; Value:JSONSetElement ( "{}" ; 
+        	[ "Id" ; kContactID ; JSONString ] ; 
+        	[ "Name" ; kContactName ; JSONString ] ; 
+        	[ "CustomerId" ; Customer::Id ; JSONString ] ; 
+        	[ "VendorId" ; Vendor::Id ; JSONString ] ; 
+        	[ "EmployeeId" ; Employee::Id ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, cf:kContactID, fn:JSONString, cf:kContactName, Customer::Id#1, Vendor::Id#7, Employee::Id#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $thisPartyObject
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #Get a list of already selected parties from the result field
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $partyArrayValues; Value:JSONListValues ( Picker::Results ; "Result.PartyArray" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListValues, Picker::Results#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyArrayValues
+  13    Set Variable [ $partyArrayValues; Value:If ( Left ( $partyArrayValues ; 1 ) = "?" ; "" ; $partyArrayValues ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:Left
+        Name: $partyArrayValues
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #Add or remove this record from the currently selected records
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $partyArrayValuesOut; Value:AddRemoveListItems ( $partyArrayValues ; $thisPartyObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:AddRemoveListItems
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyArrayValuesOut
+  17    Set Variable [ $partyCount; Value:ValueCount ( $partyArrayValuesOut ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyCount
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #Re-insert the modified list of values into the results array
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Field [ Picker::Results; JSONFormatElements ( 
+        	JSONSetElement ( "{}" ; 
+        		[ "Result.CreateRecord" ; False ; JSONBoolean ] ; 
+        		[ "Result.PartyArray" ; JSON.ArrayFromList ( $partyArrayValuesOut ) ; JSONArray ] ; 
+        		[ "Result.CountPicked" ; $partyCount ; JSONNumber ] 
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONFormatElements, fn:JSONSetElement, fn:False, fn:JSONBoolean, cf:JSON.ArrayFromList, fn:JSONArray, fn:JSONNumber
+        Field table=Picker id=2 name=Results
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Field [ VIRTUALLISTS::foundCount; $partyCount ]
+        DisableStepCollapsed state=False
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ Picker::Settings_AllowMultipleSelectionsInd ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Picker::Settings_AllowMultipleSelectionsInd#6
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Perform Script [ “Go To Correct Layout” ]
+        DisableStepCollapsed state=False
+        Script id=79 name="Go To Correct Layout"
+  28    Perform Script [ “Go to Picker Button” ]
+        DisableStepCollapsed state=False
+        Script id=93 name="Go to Picker Button"
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Set Window Title [ Current Window; New Title: Let( [ 
+        
+        	countOfSelectedContacts = ValueCount ( Picker::Results )
+        
+        ] ;
+        
+        	Case( 
+        		// singular form
+        		countOfSelectedContacts = 1 ; 
+        			"One Contact Selected" ; 
+        
+        		// spell our numbers from two through nine
+        		countOfSelectedContacts > 1 and countOfSelectedContacts < 10 ; 
+        			Choose ( countOfSelectedContacts ; "" ; "" ; "Two" ; "Three" ; "Four" ; "Five" ; "Six" ; "Seven" ; "Eight" ; "Nine" ) & " Contacts Selected" ; 
+        
+        		// 10 or more
+        			countOfSelectedContacts & " Contacts Selected"
+        	)
+        
+        ) ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+        NewName
+          refs: fn:Let, fn:ValueCount, Picker::Results#2, fn:Case, fn:and, fn:Choose
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #we aren't allowing selection of multiple parties
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True

@@ -1,0 +1,122 @@
+# script 79: Go To Correct Layout
+# file: Picker Module.fmp12
+# folder: Modules / Contact Picker (Contacts Sample File) / Private
+# source: ScriptCatalog/Script[@id=79]
+# steps: 31 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=13 groupCollapsed=False includeInMenu=False
+
+   1    #v2.0 2017-06-21 dmg: updated for v16 compatibility (JSON)
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v1.0 2016-03-14: [Initial release] We are now going to the appropriate layout based on whether there is a found set and/or selection
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $selectionExists; Value:GetAsBoolean ( JSONGetElement ( Picker::Results ; "Result.CountPicked" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement, Picker::Results#2
+        Repetition
+          Calculation:
+            | 1
+        Name: $selectionExists
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    If [ Get( FoundCount ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+   7    #no records are found
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ $selectionExists ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #one or more contacts are selected
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Go to Layout [ “Contact Picker - No Results With Selection” (Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=1 name="Contact Picker - No Results With Selection"
+  11    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #a contact hasn't been selected yet
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Go to Layout [ “Contact Picker - No Results No Selection” (Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=13 name="Contact Picker - No Results No Selection"
+  14    End If
+        DisableStepCollapsed state=False
+  15 // Adjust Window
+        [ Resize to Fit ]
+        DisableStepCollapsed state=False
+        WindowState value=ResizeToFit
+  16    Perform Script [ “Go to Search Field” ]
+        DisableStepCollapsed state=False
+        Script id=98 name="Go to Search Field"
+  17    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #records are found
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    If [ $selectionExists ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #one or more contacts are selected
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Go to Related Record [ From table: “Party”; Using layout: “Contact Picker - Results With Selection” (Party) ]
+        Option state=False
+        MatchAllRecords state=True
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=983554
+        Table id=1065093 name=Party
+        Layout id=14 name="Contact Picker - Results With Selection"
+  22    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #a contact hasn't been selected yet
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Go to Related Record [ From table: “Party”; Using layout: “Contact Picker - Results No Selection” (Party) ]
+        Option state=False
+        MatchAllRecords state=True
+        ShowInNewWindow state=False
+        DisableStepCollapsed state=False
+        Restore state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles Style=Document Close=Yes Minimize=Yes Maximize=Yes Resize=Yes Styles=983554
+        Table id=1065093 name=Party
+        Layout id=15 name="Contact Picker - Results No Selection"
+  25    End If
+        DisableStepCollapsed state=False
+  26    Move/Resize Window [ Current Window; Height: 565 ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Refresh Window
+        Option state=False
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,253 @@
+# script 222: Set Table Array
+# file: Picker Module.fmp12
+# folder: Modules / Schema
+# source: ScriptCatalog/Script[@id=222]
+# steps: 54 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=219 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $FileName; Value:JSONGetElement ( $data ; "FileName" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $FileName
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $sqlStatement; Value:"SELECT TableName, TableID, BaseTableName, BaseFileName, ModCount FROM FileMaker_Tables ORDER BY TableName ASC" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $sqlStatement
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Set Variable [ $TableOccurenceList; Value:<Function Missing> ( $sqlStatement; "," ; ¶ ; $FileName ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableOccurenceList
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $TableArray; Value:"[]" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableArray
+  11    Set Variable [ $TableArrayIndex; Value:0 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableArrayIndex
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Set Variable [ $exit; Value:ValueCount ( $TableOccurenceList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $exit
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  18    Exit Loop If [ $i > $exit ]
+        DisableStepCollapsed state=False
+  19    Set Variable [ $ThisTable; Value:GetValue( $TableOccurenceList; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTable
+  20    Set Variable [ $ThisTable; Value:Substitute ( $ThisTable; ","; ¶ ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisTable
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $TableName; Value:GetValue( $ThisTable; 1 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Name: $TableName
+  23    Set Variable [ $TableId; Value:GetValue( $ThisTable; 2 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableId
+  24    Set Variable [ $BaseTableName; Value:GetValue( $ThisTable; 3 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $BaseTableName
+  25    Set Variable [ $BaseFileName; Value:GetValue( $ThisTable; 4 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $BaseFileName
+  26    Set Variable [ $ModCount; Value:GetValue( $ThisTable; 5 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ModCount
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #The BaseFileName can have a host in parenentheses, so we just get the file name
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $BaseFileName; Value:Let([
+        
+        ~paren = Position ( $BaseFileName ; "(" ; 1 ; 1 )
+        
+        ];
+        
+        If ( ~paren = 0 ; $BaseFileName; Left ( $BaseFileName ; ~paren - 2 ) )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Position, fn:If, fn:Left
+        Name: $BaseFileName
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #Set Table Variables
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    If [ $BaseFileName = $FileName ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    If [ not IsInList ( JSON.GetValuesAtPath ( $TableArray ; "TableName" ) ; $BaseTableName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:IsInList, cf:JSON.GetValuesAtPath
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    Set Variable [ $TableObject; Value:JSONSetElement ( "" ; 
+        	[ "TableName" ; $TableName ; JSONString ];
+        	[ "FileName" ; $FileName ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableObject
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $TableArray; Value:JSONSetElement ( $TableArray ; $TableArrayIndex; $TableObject; JSONObject ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $TableArray
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Set Variable [ $TableArrayIndex; Value:$TableArrayIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $TableArrayIndex
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    End If
+        DisableStepCollapsed state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    End If
+        DisableStepCollapsed state=False
+  45    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    End Loop
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Field [ Picker::Schema_TableArray; $TableArray ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=32 name=Schema_TableArray
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Set Field [ VIRTUALLISTS::foundCount; JSON.ArrayLength ( $TableArray ; "" ) ]
+        DisableStepCollapsed state=False
+        refs: cf:JSON.ArrayLength
+        Field table=VIRTUALLISTS id=1 name=foundCount
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    Refresh Window
+        [ Flush cached join results ]
+        Option state=True
+        FlushSQLData state=False
+        DisableStepCollapsed state=False

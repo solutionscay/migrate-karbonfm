@@ -1,0 +1,248 @@
+# script 275: Create Karbon Customer From QBO ( {KabonCustomer } )
+# file: karbon_kontroller.fmp12
+# folder: Modules / QuickBooks Online / Customers / Private
+# source: ScriptCatalog/Script[@id=275]
+# steps: 64 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=273 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Creates a Karbon Customer and Links to QBO Customer
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} KarbonCustomer
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@returnSuccess {object} customer
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@returnSuccess {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnError {object} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  17    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $KarbonCustomer; Value:JSON.Format ( Get(ScriptParameter) ; "formatting Script Parameter" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonCustomer
+  21    Set Variable [ $QBOId; Value:JSONGetElement ( $KarbonCustomer ; "QBOId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOId
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    # start the transaction
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Perform Script [ “Start Transaction ( TransactionPayload )”; Parameter: Transaction.Payload ]
+        DisableStepCollapsed state=False
+        refs: cf:Transaction.Payload
+        Script id=28 name="Start Transaction ( TransactionPayload )"
+  27    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  28    If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  29    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  30    End If
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Perform Script [ “_wip_Create Customer V3 { data }”; Parameter: $KarbonCustomer ]
+        DisableStepCollapsed state=False
+        Script id=229 name="_wip_Create Customer V3 { data }"
+  35    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ not Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, cf:Error.IsError
+  39    Set Variable [ $ExternalTypeId; Value:5 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $ExternalTypeId
+  40    Set Variable [ $PartyRoleId; Value:DBTransactions::PartyRoleId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: DBTransactions::PartyRoleId#68
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyRoleId
+  41    Set Variable [ $ExternalId; Value:$QBOId ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $ExternalId
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "InternalId" ; $PartyRoleId ; JSONString ];
+        	[ "ExternalId" ; $ExternalId ; JSONString ];
+        	[ "ExternalLinkTypeId" ; $ExternalTypeId ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  44    Perform Script [ “Create External Link V2 { data }”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=315 name="Create External Link V2 { data }"
+  45    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #END TRANSACTION
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    Set Field [ DBTransactions::Result; JSONSetElement ( ""; "Id" ; DBTransactions::PartyRoleId; JSONString) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, DBTransactions::PartyRoleId#68, fn:JSONString
+        Field table=DBTransactions id=17 name=Result
+  54    Perform Script [ “End Transaction ( {error}  )”; Parameter: $error ]
+        DisableStepCollapsed state=False
+        Script id=31 name="End Transaction ( {error}  )"
+  55    #==== [ END TRANSACTION ] ==========================================================================
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Exit Script [ Result: Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False

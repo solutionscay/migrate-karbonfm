@@ -1,0 +1,79 @@
+# table 168: EmailMessage
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=168]
+# fields: 9
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=EmailMessage:
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=SmtpResult
+  Comment: An error code or success result
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Number fieldType=Normal name=SentInd
+  Comment: True if the message was sent successfully
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=Attachments
+  Comment: A return-separated list of FileMaker-formatted file paths
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=EmailMessage:
+      | Let ( dependsOn = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Calculated name=AsJSON
+  Calculation table=EmailMessage:
+    | JSONSetElement ( "{}" ; 
+    | 	[ "Attachments" ; Attachments ; JSONString ];
+    | 	[ "Id" ; Id ; JSONString ];
+    | 	[ "MessageHtml" ; MessageHtml ; JSONString ] ; 
+    | 	[ "SentInd" ; SentInd ; JSONBoolean ] ; 
+    | 	[ "SmtpTimestamp" ; SmtpResult ; JSONString ]
+    | )
+    refs: fn:JSONSetElement, EmailMessage::Attachments#10, fn:JSONString, EmailMessage::Id#1, EmailMessage::MessageHtml#24, EmailMessage::SentInd#9, fn:JSONBoolean, EmailMessage::SmtpResult#8
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Text fieldType=Normal name=MessageHtml
+  Comment: The formatted version of the message. Used when sending a "multipart" Content-Type.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=TimeStamp fieldType=Normal name=SmtpTimestamp
+  Comment: The date/time the message was sent
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Number fieldType=Normal name=UseSystemSettingsInd
+  Comment: True if we are using sending the email message with the system email account
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

@@ -1,0 +1,68 @@
+source_id,source_hash,kind,file,id,name,role,fields,regular,calculated,summary,global,container,repeating,keys,logic,logic_count,target,open_question
+karbon_Build.fmp12/tables/129-meta.txt,5c1be12dca55c68bb73b66cdb0eda266f4b3846557aee3b4357c733528c993e1,tables,karbon_Build.fmp12,129,meta,settings-globals,5,2,1,0,2,0,0,none,"10 ThisFileVersion | calc-stored | Stored calculated number whose formula is the literal text ""0.1.7"" (file version)",1,config,none
+karbon_Build.fmp12/tables/132-AppBuild.txt,6a8245dc76b7a0e5b9833478e9e6975d9a86c01181e3ba0757b64a06fe857990,tables,karbon_Build.fmp12,132,AppBuild,entity,10,9,0,0,1,0,0,"Id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to Change, DBTransactions, FileBuild
+FK ApplicationId -> Application::Id","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override) (always)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override) (always)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict",5,unresolved,FileMaker build and deployment tracking (OttoMigrationId); confirm it is out of scope for the migration
+karbon_Build.fmp12/tables/133-Change.txt,3a969b31d1532d2e7591c9889848a24e48089c9a5bad4be6fdac63180a85b1aa,tables,karbon_Build.fmp12,133,Change,entity,17,11,4,1,1,0,0,"Id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to DBTransactions
+FK FileId -> File::Id
+FK FileBuildId_DEPRECATED -> FileBuild::Id
+FK AppBuildId -> AppBuild::Id","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override) (always)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override) (always)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+8 FileBuildId_DEPRECATED | auto-calc | Deprecated: auto-enters an empty string (comment: unnecessary since a change can apply to several files)
+9 AppBuildId | auto-calc | Auto-enters an empty string, so a new change has no app build yet (it is pending)
+13 AppBuildVersionDisplay | calc-unstored | Unstored: version of the related app build (Tx_AppBuild::Version)
+14 FileBuildVersionDisplay | calc-unstored | Unstored: version of the related file build (Tx_FileBuild::Version)
+15 DescriptionDisplay | calc-unstored | Unstored: ""[Type] Description"" on one line
+16 Severity | auto-data | Constant default ""Patch""
+17 PendingInd | calc-stored | Stored, indexed: true while AppBuildId is empty (change not yet in a build)
+18 IdListOf | summary | List summary of Id",13,unresolved,Change log entries for builds; FileBuildId_DEPRECATED is unused; confirm whether to keep the history
+karbon_Build.fmp12/tables/134-File.txt,b6ba725e9fce49609bb596b0658054cbce24597476cc00e0c701074868bef079,tables,karbon_Build.fmp12,134,File,entity,17,14,1,1,1,0,0,"Id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to Change, DBTransactions, FileBuild","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override) (always)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override) (always)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+10 AsJson | calc-unstored | Unstored JSON {FileName, SaveAsCopyInd:0} used to drive file operations; migration id is commented out
+17 IdListOf | summary | List summary of Id",7,unresolved,"secret: Password_Development, Password_Build and Password_Production hold file passwords; FileMaker deployment record, confirm out of scope"
+karbon_Build.fmp12/tables/135-FileBuild.txt,537ff96082b546fa31f77551c57d1dcfbd3ed271cdba8b16c29feba7362b99fb,tables,karbon_Build.fmp12,135,FileBuild,entity,10,8,1,0,1,0,0,"Id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to Change, DBTransactions
+FK AppBuildId -> AppBuild::Id
+FK FileId -> File::Id","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override) (always)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override) (always)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+10 FileNameOut | calc-unstored | Unstored: related file name (FileBuild_File::FileName)",6,unresolved,FileMaker file build records; confirm out of scope
+karbon_Build.fmp12/tables/136-connector.txt,8dbb5a64196af5fd648aeb4b820609e6d932f2409f463872f62a2195d141616d,tables,karbon_Build.fmp12,136,connector,utility,2,1,0,0,1,0,0,Id (id 12): UUID auto-enter,12 Id | auto-calc | Generates a UUID string as the record key at creation (user cannot edit),1,drop-candidate,"Single-record relationship anchor (z_xJoin, Id)"
+karbon_Build.fmp12/tables/137-selector.txt,baf4ab570b001e3f8681117dc8aee29e24602f9ae69626d0bd8ea4c6528eb6f4,tables,karbon_Build.fmp12,137,selector,utility,11,0,1,0,10,0,0,none,5 zc_TRUE | calc-stored | Stored (index none) calculated number that is always 1,1,drop-candidate,Global-field holder for UI selection state (build tool)
+karbon_Build.fmp12/tables/138-VirtualList.txt,a6e10a7b6ea44d0043537f0719efb0c0980597af6f931d5df1c8dcd4b2a34593,tables,karbon_Build.fmp12,138,VirtualList,utility,5,0,0,0,5,0,0,none,none,0,drop-candidate,Global-field holder for the virtual list technique; replaced by normal queries in a web UI
+karbon_Build.fmp12/tables/139-VirtualListRows.txt,90432ab5b7568e8a0f0c7e7f14108f46dc3a8f9f6bf64abc2944d7cccd12c6b0,tables,karbon_Build.fmp12,139,VirtualListRows,utility,11,1,7,0,3,0,0,n (id 1): serial,"1 n | auto-serial | Serial number (increment 1, next value 1001): the row number (1000 rows exist) used to pick the nth value of VirtualList::Data
+10 Template.InUseInd | calc-unstored | Unstored calculation whose entire formula is commented out (IsInList of FieldsInUse), so it returns empty
+26 RowData | calc-unstored | Unstored: the nth value of the global VirtualList::Data (n = this row)
+27 ActivityParty_ActivityPartyRoleName | calc-unstored | Unstored: JSON element ""ActivityPartyRoleName"" of RowData, blank if it starts with ""?""
+30 ActivityParty_EmailAddress | calc-unstored | Unstored: JSON element ""EmailAddress"" of RowData, blank if it starts with ""?""
+33 ActivityParty_PartyName | calc-unstored | Unstored: JSON element ""PartyName"" of RowData, blank if it starts with ""?""
+34 Attachment_FileName | calc-unstored | Unstored: JSON element ""FileName"" of RowData, blank if it starts with ""?""
+35 Attachment_FilePath | calc-unstored | Unstored: JSON element ""FilePath"" of RowData, blank if it starts with ""?""",8,drop-candidate,1000 pre-created rows that read the nth value of VirtualList::Data; FileMaker virtual list technique
+karbon_Build.fmp12/tables/140-System.txt,950fdac0d23437cc821fd39f858b18a368c423af5bbc259aa84bed56c42336e4,tables,karbon_Build.fmp12,140,System,settings-globals,9,8,0,0,1,0,0,none,none,0,unresolved,secret: MigrationAccountPassword (and Otto Migrator server ids) belong to FileMaker deployment tooling; confirm out of scope
+karbon_Build.fmp12/tables/141-Application.txt,4dd788288dea356a5bf4b8d4eaaccfab08144f6f850c7c63056e410f870c3373,tables,karbon_Build.fmp12,141,Application,entity,9,8,0,0,1,0,0,"Id (id 1): serial, unique validation; parent side of Equal predicates to AppBuild, DBTransactions","1 Id | auto-serial, validate-rule | Serial number (increment 1, next value 13); UUID auto-enter is off; validation (always, strict): not empty and unique
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override) (always)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict",5,unresolved,Application registry for the build tool; confirm out of scope
+karbon_Build.fmp12/tables/142-DBTransactions.txt,a8e3fed46806cb81b346ff15063e0b07c48fe5212346a3a054e97e33a73069a6,tables,karbon_Build.fmp12,142,DBTransactions,staging,24,22,0,0,2,0,0,"Id (id 1): UUID auto-enter
+FK FileId -> File::Id
+FK FileBuildId -> FileBuild::Id
+FK ChangeId -> Change::Id
+FK ApplicationId -> Application::Id
+FK AppBuildId -> AppBuild::Id","1 Id | auto-calc | Generates a UUID string as the record key at creation (user may override)
+20 createdAt | auto-created | Auto-enters the creation timestamp
+21 ScriptName | auto-calc | Auto-enters the running script name from global variable $$Script.Name (overwrites)
+23 ErrorInd | auto-calc | Auto-enters whether Result is an error, via custom function Error.IsError (overwrites)
+24 ONE | auto-calc | Self-referencing calculation that always returns 1; an always-1 anchor used for all-records joins and counts
+32 createdBy | auto-created | Auto-enters the creating account name
+44 CreationUTCMilliseconds | auto-calc, auto-created | Auto-enters Get(CurrentTimeUTCMilliseconds) at creation (not editable)",7,session-state,Script-transaction parameter table (0 records) of FileMaker script context ids; the Build copy differs from the karbon_kontroller copy

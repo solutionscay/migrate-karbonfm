@@ -1,0 +1,55 @@
+# script 543: Edit Note { data } _deprecated
+# file: karbon_kontroller.fmp12
+# folder: API / Activity / Public
+# source: ScriptCatalog/Script[@id=543]
+# steps: 11 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=383 groupCollapsed=False includeInMenu=False
+
+   1    Set Variable [ $data; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #edits to notes do not change activityparty data, so we'll skip
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $data; Value:JSONSetElement ( $data ; "ActivityPartySkip" ; "1" ; JSONBoolean) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONBoolean
+        Name: $data
+   5    Perform Script [ “_Edit Activity”; Parameter: $data ]
+        DisableStepCollapsed state=False
+        Script id=542 name="_Edit Activity"
+   6    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   9    Set Variable [ $error; Value:$Result ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  10    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  11    End If
+        DisableStepCollapsed state=False

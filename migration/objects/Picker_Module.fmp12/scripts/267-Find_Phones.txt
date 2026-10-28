@@ -1,0 +1,237 @@
+# script 267: _Find Phones
+# file: Picker Module.fmp12
+# folder: Modules / Phone Picker
+# source: ScriptCatalog/Script[@id=267]
+# steps: 71 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=265 groupCollapsed=False includeInMenu=True
+
+   1    #@history 2019-04-02 barbara@geistinteractive.com - created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    If [ $$scriptTriggersAreDisabled ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Freeze Window
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #Find matching phone numbers
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #The search field can be used for phones and/or names. Filter the search field to numerical characters only.
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $Phone; Value:Filter ( Picker::Search_Field ; "0123456789" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Filter, Picker::Search_Field#1
+        Name: $Phone
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Go to Layout [ “Phone - Search” (Phone) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=50 name="Phone - Search"
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ not IsEmpty ( $Phone ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  23    #only search the phone number if a phone number was entered
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Field [ Phone::NumberDigitsOnly; "*" & $Phone ]
+        DisableStepCollapsed state=False
+        Field table=Phone id=35 name=NumberDigitsOnly
+  25    Set Field [ Party::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Party id=110 name=ONE
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    New Record/Request
+        DisableStepCollapsed state=False
+  29    Set Field [ Party::NameCached; Picker::Search_Field ]
+        DisableStepCollapsed state=False
+        refs: Picker::Search_Field#1
+        Field table=Party id=19 name=NameCached
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Set Variable [ $Results; Value:Let( [ 
+        	Start = 1 ; 
+        	End = Get ( FoundCount ) ; 
+        	Function = "GetNthRecord ( Phone::AsJsonPhoneSearch ; [n])"
+        ] ; 
+        	CustomList ( Start ; End ; Function ) 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Get, fn:FoundCount, cf:CustomList
+        Name: $Results
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #Find matching parties who don't have a phone number
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  42    Go to Layout [ “Party With No Email - Search” (Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=46 name="Party With No Email - Search"
+  43    Set Field [ Party::NameCached; Picker::Search_Field ]
+        DisableStepCollapsed state=False
+        refs: Picker::Search_Field#1
+        Field table=Party id=19 name=NameCached
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    New Record/Request
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    Omit Record
+        DisableStepCollapsed state=False
+  48    Set Field [ Phone::ONE; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Phone id=41 name=ONE
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    New Record/Request
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    Omit Record
+        DisableStepCollapsed state=False
+  53    Set Field [ Party::OrganizationInd; 1 ]
+        DisableStepCollapsed state=False
+        Field table=Party id=18 name=OrganizationInd
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    If [ Get ( FoundCount ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount
+  58    Set Variable [ $Results; Value:Let( [ 
+        	Start = 1 ; 
+        	End = Get ( FoundCount ) ; 
+        	Function = "GetNthRecord ( party::AsJsonPhoneSearch ; [n])"
+        ] ; 
+        	List ( $Results ; CustomList ( Start ; End ; Function ) )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Get, fn:FoundCount, fn:List, cf:CustomList
+        Name: $Results
+  59    End If
+        DisableStepCollapsed state=False
+  60    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #Display JSON object list in Virtual List
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #--------------------------------------------------------------------------------
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Set Field [ Picker::Phone.Found; $Results ]
+        DisableStepCollapsed state=False
+        Field table=Picker id=39 name=Phone.Found
+  68    Perform Script [ “_Display Results in Virtual List”; Parameter: $Results ]
+        DisableStepCollapsed state=False
+        Script id=268 name="_Display Results in Virtual List"
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  70    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False

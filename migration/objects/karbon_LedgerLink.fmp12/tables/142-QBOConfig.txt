@@ -1,0 +1,139 @@
+# table 142: QBOConfig
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=142]
+# fields: 16
+# records: 1
+
+Field id=2 dataType=Number fieldType=Normal name=maxResult
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=QBOConfig:
+      | If ( Self < 10 or Self > 1000 ;
+      | 	500 ;
+      | 	Self
+      | )
+      refs: fn:If, fn:Self, fn:or
+  Validation type=OnlyDuringDataEntry
+    StrictDataType value=Numeric
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=QBOConfig (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Text fieldType=Normal name=metaData
+  Comment
+    | data stored in next serial number; first value is the version string (last value is a number that FM will auto-increment if a new record is created, which prevents the meta data from being changed)
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Serial increment=1 nextValue=1.1 generate=OnCreation
+    Calculation table=QBOConfig:
+      | If ( GetField ( "" ) or Self ; "" ; "" )
+      | 
+      | /* meta data is stored as the next serial value; don't allow the field to contain a value since it may be confusing which is the "real" data */
+      refs: fn:If, fn:GetField, fn:or, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Normal name=versionForDisplay
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=QBOConfig:
+      | qbo_meta::FileVersion
+      refs: qbo_meta::FileVersion#8
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Date fieldType=Normal name=oldestGetDate
+  Comment: sync won't get data modified before this date
+  AutoEnter allowEditing=True
+  Validation type=Always
+    StrictDataType value=FourDigitYear
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Number fieldType=Normal name=UseSandbox
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Normal name=CompanyID
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Normal name=ApiKey
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Normal name=RefreshToken
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Calculated name=One
+  Calculation table=QBOConfig:
+    | 1
+  Storage storeCalculationResults=True index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Calculated name=ConfigAsJSON
+  Calculation table=QBOConfig:
+    | JSONSetElement ("";
+    | 
+    | ["companyId" ; CompanyID ; JSONString];
+    | ["apiKey" ; ApiKey ; JSONString ];
+    | ["sandbox" ; UseSandbox ; JSONBoolean ];
+    | ["payments" ; UsePayments ; JSONBoolean ];
+    | ["license" ; License ; JSONString ]
+    | 
+    | 
+    | )
+    | 
+    | //proxy2 replace
+    refs: fn:JSONSetElement, QBOConfig::CompanyID#17, fn:JSONString, QBOConfig::ApiKey#18, QBOConfig::UseSandbox#16, fn:JSONBoolean, QBOConfig::UsePayments#26, QBOConfig::License#22
+  Storage storeCalculationResults=True autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=License
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Normal name=ActivationId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Text fieldType=Normal name=DataSourceDataFile
+  Comment: the file path to your data file, if applicable
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Normal name=DataSourceControllerFile
+  Comment: the file path to your controller file, if applicable
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Number fieldType=Normal name=UsePayments
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

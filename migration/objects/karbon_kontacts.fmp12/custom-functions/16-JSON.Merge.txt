@@ -1,0 +1,63 @@
+# custom function 16: JSON.Merge
+# file: karbon_kontacts.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=16]
+
+CustomFunction id=16 functionArity=2 visible=True parameters=target;source name=JSON.Merge
+  Calculation:
+    | /**
+    |  *
+    |  * performs a shallow merge on two JSONObjects
+    |  *
+    |  * @param {object} target the object to merge into
+    |  * @param {object} source the object to merge into
+    |  *
+    |  * @module fm-json-additions
+    |  * @see https://github.com/geistinteractive/fm-json-additions
+    |  *
+    |  * @history 2017–05-15 fixed gh# 1, todd@geistinteractive.com
+    |  * @history 2017–04-04 created, todd@geistinteractive.com
+    |  *
+    |  */
+    | 
+    | 
+    | Let(
+    | [
+    | 
+    | sourceKeys = JSONListKeys ( source ; "" );
+    | targetKeys = JSONListKeys ( target ; "" )
+    | 
+    | ];
+    | Case(
+    | 
+    | 	//look for error ans exit
+    | 	Left(sourceKeys; 1) = "?" ; sourceKeys & " In Source.";
+    | 	Left(targetKeys; 1) = "?" ; targetKeys  & " In Target." ;
+    | 	Left(  JSONGetElement (source ; "" )  ;1) = "[" ; "? * Array in Source. Must be an object" ;
+    | 
+    | 	// look for the last recusion  and exit
+    | 	ValueCount(sourceKeys) < 1  ; target ; // done
+    | 
+    |  
+    | 	Let(
+    | 	[
+    | 
+    |        // merge this rounds key into the target
+    | 	thisKey = GetValue(sourceKeys ; 1 );
+    | 	thisValue = JSONGetElement( source; thisKey );
+    | 	firstChar = Left(thisValue; 1);
+    | 	needToCheckForNumber = Filter(firstChar ; "0123456789") = firstChar ; 
+    | 	JSONType = If( needToCheckForNumber and GetAsText(thisValue) <> GetAsNumber(thisValue)  ; JSONString ; "") ;
+    | 
+    |         newTarget = JSONSetElement ( target ; thisKey ; thisValue ; JSONType );
+    | 
+    | 	// remove this rounds key from the source
+    | 	newSource = JSONDeleteElement ( source ; thisKey )
+    | 	]; 
+    | 
+    | 	// repeat
+    | 	JSON.Merge(newTarget ; newSource ) 
+    |        ) 
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:JSONListKeys, fn:Case, fn:Left, fn:JSONGetElement, fn:ValueCount, fn:GetValue, fn:Filter, fn:If, fn:and, fn:GetAsText, fn:GetAsNumber, fn:JSONString, fn:JSONSetElement, fn:JSONDeleteElement, cf:JSON.Merge

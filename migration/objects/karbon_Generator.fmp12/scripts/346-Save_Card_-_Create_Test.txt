@@ -1,0 +1,92 @@
+# script 346: Save Card - Create Test
+# file: karbon_Generator.fmp12
+# folder: Test
+# source: ScriptCatalog/Script[@id=346]
+# steps: 21 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=343 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Perform Script [ <unknown> from file: “karbon_Generator_Kontroller” (file not open); Parameter: TestGlobals::AsJSON ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=karbon_Generator_Kontroller
+          UniversalPathList: file:karbon_Generator_Kontroller
+        refs: TestGlobals::AsJSON#10
+        Script id=286 ref=external
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $Result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $Result
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ Error.IsError ( $Result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  10    Show Custom Dialog [ Title: "Error"; Message: $Result; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  11    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $Id; Value:JSONGetElement ( $Result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “Go To Test Detail ( Id )”; Parameter: $Id ]
+        DisableStepCollapsed state=False
+        Script id=347 name="Go To Test Detail ( Id )"
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Select TestLine”; Parameter: Test_TestLine::Id ]
+        DisableStepCollapsed state=False
+        refs: Test_TestLine::Id#3
+        Script id=351 name="Select TestLine"
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    End If
+        DisableStepCollapsed state=False

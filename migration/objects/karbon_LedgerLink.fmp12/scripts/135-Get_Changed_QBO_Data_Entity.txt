@@ -1,0 +1,217 @@
+# script 135: Get Changed QBO Data ({Entity, ...  )
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO / Public
+# source: ScriptCatalog/Script[@id=135]
+# steps: 50 (20 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=58 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Get all the changes for given entitiy since a given QBO time
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} options
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    # @param {string} options.Entity the qbo Entity ex. Item, Invoice, Account
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {number} [options.StartPostion = 1] the page to get
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} [options.Since] the timestamp
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {number} [options.MaxResults = 100] the number to of records to fetch. 1000 or less
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @param {boolea} [options.Inactive = false] include InActive or not
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @returnSuccess {object} response
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    # @returnSuccess {object} response.QueryResponse
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # @returnSuccess {array} response.QueryResponse.Entity query results, this will actually be the name of the Entity ie Item, Invoice, etc.
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    # @returnSuccess {number} response.QueryResponse.startPosition
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    # @returnSuccess {number} response.QueryResponse.maxResults
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    # @returnSuccess {string} response.time
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    # @returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    # @returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Perform Script [ “_Get Changed Data With Standard Query ( startPosition )”; Parameter: Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptParameter
+        Script id=133 name="_Get Changed Data With Standard Query ( startPosition )"
+  25    Exit Script [ Result: Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    #Save for using Change Data Feed
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    # @todo add change feed option
+        DisableStepCollapsed state=False
+        Restore state=False
+  30 // Set Variable [ $entity; Value:JSONGetElement( Get(ScriptParameter) ; "Entity" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+  31 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  32 // If [ not IsEmpty ( $lastGetTimeStampUTC_FM ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  33 // Set Variable [ $currentTimestampUTC_FM; Value:GetAsTimestamp ( Get ( CurrentTimeUTCMilliseconds ) / 1000 ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsTimestamp, fn:Get, fn:CurrentTimeUTCMilliseconds
+        Name: $currentTimestampUTC_FM
+  34 // Set Variable [ $daysSinceLastGet; Value:Ceiling (
+        	( $currentTimestampUTC_FM - $lastGetTimeStampUTC_FM ) / 60 / 60 / 24
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Ceiling
+        Repetition
+          Calculation:
+            | 1
+        Name: $daysSinceLastGet
+  35 // Set Variable [ $lastGetTimeStampUTC_QBO; Value:Let ( [
+        	ts = $lastGetTimeStampUTC_FM ; /* FileMaker Timestamp */
+        	s = Seconds ( ts )
+        ] ;
+        	Year ( ts )
+        	& "-"
+        	& Right ( 0 & Month ( ts ) ; 2 )
+        	& "-"
+        	& Right ( 0 & Day ( ts ) ; 2 )
+        	& "T"
+        	& Right ( 0 & Hour ( ts ) ; 2 )
+        	& ":"
+        	& Right ( 0 & Minute ( ts ) ; 2 )
+        	& ":"
+        	& Right ( 0 & Int ( s ) ; 2 )
+        	& If ( ( s - Int ( s ) ) > 0 ;
+        		s - Int ( s )
+        	)
+        	& "Z"
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Seconds, fn:Year, fn:Right, fn:Month, fn:Day, fn:Hour, fn:Minute, fn:Int, fn:If
+        Repetition
+          Calculation:
+            | 1
+        Name: $lastGetTimeStampUTC_QBO
+  36 // End If
+        DisableStepCollapsed state=False
+  37 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  38 // Set Variable [ $parameter; Value:JSONSetElement ( "";
+        
+        	["startPostion" ; Get ( ScriptParameter ) ; JSONString ];
+        	["lastGetTimeStampUTC_QBO" ; $lastGetTimeStampUTC_QBO ; JSONString ]
+        
+         ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:Get, fn:ScriptParameter, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameter
+  39 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  40 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  41 // If [ IsEmpty ( $daysSinceLastGet )
+        or
+        $daysSinceLastGet > 30
+        or
+        /* change data capture doesn't support this entity */ 
+        not IsEmpty ( FilterValues (
+        	List ( "JournalCode" ; "TaxAgency" ; "TimeActivity" ; "TaxCode" ; "TaxRate" ) ;
+        	$entity
+        ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:or, fn:not, fn:FilterValues, fn:List
+  42 // #Intuit makes no guarentees that the Change Data Capture will work beyond 30 days
+        DisableStepCollapsed state=False
+        Restore state=False
+  43 // #So use standard Query
+        DisableStepCollapsed state=False
+        Restore state=False
+  44 // Perform Script [ “_Get Changed Data With Standard Query ( startPosition )”; Parameter: Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptParameter
+        Script id=133 name="_Get Changed Data With Standard Query ( startPosition )"
+  45 // Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  46 // Perform Script [ “_Changed Data Capture Request ( startPosition )”; Parameter: Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptParameter
+        Script id=134 name="_Changed Data Capture Request ( startPosition )"
+  47 // End If
+        DisableStepCollapsed state=False
+  48 // 
+        DisableStepCollapsed state=False
+        Restore state=False
+  49 // Exit Script [ Result: Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False

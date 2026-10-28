@@ -1,0 +1,120 @@
+# script 283: btn Save Payment
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Sales / Payments Interface / Private
+# source: ScriptCatalog/Script[@id=283]
+# steps: 25 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=568 groupCollapsed=False includeInMenu=True
+
+   1    Set Variable [ $TotalAllocated; Value:Let ( [ 
+        	paymentAmountList = List ( Payment_PaymentLine::amount ) ; 
+        	paymentAmountExpression = Substitute ( paymentAmountList ; ¶ ; "+" ) 
+        ]; 
+        	 paymentAmountExpression 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:List, Payment_PaymentLine::amount#4, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $TotalAllocated
+   2    If [ Payment::amount < GetAsNumber ( $TotalAllocated ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Payment::amount#4, fn:GetAsNumber
+   3    Show Custom Dialog [ Title: "Alert"; Message: "The total allocated cannot exceed the Payment amount."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   4    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Install OnTimer Script [ Interval: "" ]
+        DisableStepCollapsed state=False
+  10    Set Variable [ $$allow_commit; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $$allow_commit
+  11    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $PaymentId; Value:Payment::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Payment::id#1
+        Repetition
+          Calculation:
+            | 1
+        Name: $PaymentId
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #immediately send to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “Send FMData To QBO ( {Entity , FmID} )” from file: “karbon_LedgerLink”; Parameter: JSONSetElement ( "{}" ; 
+        
+        [ "Entity" ; "Payment"; JSONString] ;
+        [ "FmId" ; $PaymentId ; JSONString ]
+         ) ]
+        DisableStepCollapsed state=False
+        FileReference id=6 name=karbon_LedgerLink
+          UniversalPathList: file:karbon_LedgerLink
+        refs: fn:JSONSetElement, fn:JSONString
+        Script id=302 name="Send FMData To QBO ( {Entity , FmID} )" in=karbon_LedgerLink.fmp12
+  19    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  22    Show Custom Dialog [ Title: "Error"; Message: "Payment was not sent!¶¶" & If ( not IsEmpty($result); JSONFormatElements ( $result ) ); Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Message
+          refs: fn:If, fn:not, fn:IsEmpty, fn:JSONFormatElements
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  23    Exit Script [  ]
+        DisableStepCollapsed state=False
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False

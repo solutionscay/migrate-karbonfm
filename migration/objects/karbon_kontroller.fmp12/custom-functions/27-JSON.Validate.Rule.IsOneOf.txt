@@ -1,0 +1,36 @@
+# custom function 27: JSON.Validate.Rule.IsOneOf
+# file: karbon_kontroller.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=27]
+
+CustomFunction id=27 functionArity=2 visible=True parameters=path;theList name=JSON.Validate.Rule.IsOneOf
+  Calculation:
+    | /**
+    |  *
+    |  * A rule that test if a value is in a list
+    |  *
+    |  * @param {string} path the path to the value to test
+    |  * @param {string} theList carraige return deliminated list
+    |  *
+    |  * @returnSuccess {string} ""  / nothing
+    |  * @returnError {object} JSON.Validate.Error an error
+    |  * 
+    |  * @author Todd Geist, https://github.com/toddgeist
+    |  * @module JSON.Validate
+    |  * @see https://github.com/karbonfm/fm-json-validation
+    |  *
+    |  */
+    | 
+    | 
+    | Let(
+    | [
+    | theItem = JSONGetElement(  $JSON.Validate.This ; path  );
+    | passed =  FilterValues ( theList ; theItem ) = theItem & "¶" 
+    | ];
+    | 
+    | If(
+    | 	passed ; "" ; 
+    | 	JSON.Validate._Error ( path ; "Should be one of " & Substitute(theList; "¶"; ",") & ". Instead it was " & If(IsEmpty(theItem); "EMPTY STRING" ; theItem) )
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:FilterValues, fn:If, cf:JSON.Validate._Error, fn:Substitute, fn:IsEmpty

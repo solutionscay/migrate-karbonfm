@@ -1,0 +1,140 @@
+# script 527: Edit Task
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Activity / #Deprecated Activity - Utilities / Task
+# source: ScriptCatalog/Script[@id=527]
+# steps: 29 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=286 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Field [ UtilityTask::EntityId; Selected_Activity_ActivityEntity::EntityId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityEntity::EntityId#17
+        Field table=UtilityTask id=23 name=EntityId
+   5    Set Field [ UtilityTask::EntityTypeId; Selected_Activity_ActivityEntity::EntityTypeId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity_ActivityEntity::EntityTypeId#16
+        Field table=UtilityTask id=25 name=EntityTypeId
+   6    Set Field [ UtilityTask::Id; Selected_Activity::Id ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::Id#1
+        Field table=UtilityTask id=10 name=Id
+   7    Set Field [ UtilityTask::DueDate; Selected_Activity::DateDisplay ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::DateDisplay#56
+        Field table=UtilityTask id=9 name=DueDate
+   8    Set Field [ UtilityTask::Subject; Selected_Activity::Subject ]
+        DisableStepCollapsed state=False
+        refs: Selected_Activity::Subject#22
+        Field table=UtilityTask id=8 name=Subject
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $ActivityParty; Value:JSON.ArrayFromRelated ( Selected_Activity_ActivityParty::AsJSON ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.ArrayFromRelated, Selected_Activity_ActivityParty::AsJSON#71
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityParty
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #This should be the "assigned to" party
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $PartyToObject; Value:JSON.FilterByExpression ( $ActivityParty ; "JSONGetElement ( $item ; \"ActivityPartyRoleId\" ) = 53 " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyToObject
+  14    Set Variable [ $PartyToId; Value:JSONGetElement ( $PartyToObject; "[0]PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyToId
+  15    Set Field [ UtilityTask::PartyAssignedToId; $PartyToId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityTask id=7 name=PartyAssignedToId
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #This should be the "assigned by" party
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $PartyFromObject; Value:JSON.FilterByExpression ( $ActivityParty ; "JSONGetElement ( $item ; \"ActivityPartyRoleId\" ) = 52 " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyFromObject
+  19    Set Variable [ $PartyFromId; Value:JSONGetElement ( $PartyToObject; "[0]PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyFromId
+  20    Set Field [ UtilityTask::PartyAssignedById; $PartyFromId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityTask id=6 name=PartyAssignedById
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $PartyRegardingObject; Value:JSON.FilterByExpression ( $ActivityParty ; "JSONGetElement ( $item ; \"ActivityPartyRoleId\" ) = 63 " ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.FilterByExpression
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyRegardingObject
+  23    If [ not ( $PartyRegardingObject )="[]" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+  24    Set Variable [ $PartyRegardingId; Value:JSONGetElement ( $$PartyRegardingObject; "[0]PartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyRegardingId
+  25    Set Field [ UtilityTask::PartyRegardingId; $PartyRegardingId ]
+        DisableStepCollapsed state=False
+        Field table=UtilityTask id=12 name=PartyRegardingId
+  26    End If
+        DisableStepCollapsed state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    New Window [ Style: Card; Name: "Task"; Using layout: “Card - Utility_Task” (UtilityTask); Close: Yes; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=Yes Minimize=No Maximize=No Resize=No Styles=3222339600
+        Layout id=87 name="Card - Utility_Task"
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False

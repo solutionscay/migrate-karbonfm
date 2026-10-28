@@ -1,0 +1,132 @@
+# script 586: _Remove Time Entries From The Invoice Line
+# file: karbon_kontroller.fmp12
+# folder: API / Sales Transaction / Private
+# source: ScriptCatalog/Script[@id=586]
+# steps: 35 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=574 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $lineID; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $lineID
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # loop TimeEntries
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $TimeEntryIds; Value:SQL.GetColumn ( TimeEntry::<Field Missing> ; TimeEntry::<Field Missing> ; $lineId ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $TimeEntryIds
+  10    Set Variable [ $i; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  11    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $TimeEntryId; Value:GetValue ( $TimeEntryIds ; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $TimeEntryId
+  13    Exit Loop If [ IsEmpty( $TimeEntryId ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Field [ DBTransactions::TimeEntryId; $TimeEntryId ]
+        DisableStepCollapsed state=False
+        Field table=DBTransactions id=66 name=TimeEntryId
+  16    #in this case, we only want to edit the record if it exists
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ $TimeEntryId = TimeEntry::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Field [ TimeEntry::<Table Missing>; 1 ]
+        DisableStepCollapsed state=False
+        Field table=TimeEntry id=8 name="" ref=missing
+  19    Set Variable [ $error; Value:Error.Last("Locking the TimeEntry Record"; "") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  20    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    If [ TimeEntry::<Field Missing> ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $error; Value:_wip_API.Error.Validation ( "Can't remove a Line Item because, a related time sheet is closed" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:_wip_API.Error.Validation
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  24    Exit Loop If [ Error.IsError ( $error ) ]
+        DisableStepCollapsed state=False
+        refs: cf:Error.IsError
+  25    End If
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Set Field [ TimeEntry::<Table Missing>; "" ]
+        DisableStepCollapsed state=False
+        Field table=TimeEntry id=27 name="" ref=missing
+  29    End If
+        DisableStepCollapsed state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  32    End Loop
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False

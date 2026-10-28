@@ -1,0 +1,162 @@
+# script 370: Create AsJson Calc
+# file: karbon_Generator.fmp12
+# folder: App Modules / APIGenerator / Private / Code Generation
+# source: ScriptCatalog/Script[@id=370]
+# steps: 30 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=300 groupCollapsed=False includeInMenu=True
+
+   1    Set Variable [ $entity; Value:ApiGenerator::Entity ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGenerator::Entity#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $entity
+   2    Insert Text [ $lineTemplate ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: [ "<<propertyName>>" ; <<fieldPath>> ; <<dataType>> ]
+        Field: $lineTemplate
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Go to Portal Row
+        [ Select; First ]
+        NoInteract state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+   5    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Exit Loop If [ IsEmpty ( ApiGeneratorLine::Id ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty, ApiGeneratorLine::Id#1
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    If [ not ApiGeneratorLine::FmpIgnore and ApiGeneratorLine::FmpParam and not ApiGeneratorLine::IsObject ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, ApiGeneratorLine::FmpIgnore#11, fn:and, ApiGeneratorLine::FmpParam#29, ApiGeneratorLine::IsObject#41
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $type; Value:Substitute ( ApiGeneratorLine::type ; 
+        	[ "number" ; "JSONNumber" ] ;
+        	[ "string" ; "JSONString" ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, ApiGeneratorLine::type#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $type
+  13    Set Variable [ $propName; Value:ApiGeneratorLine::JsonPropertyName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $propName
+  14    Set Variable [ $line; Value:Substitute ( $lineTemplate ; 
+        	[ "<<propertyName>>" ; $propName ] ; 
+        	[ "<<fieldPath>>" ; ApiGeneratorLine::FmpTableName & "::" & ApiGeneratorLine::FmpFieldName ] ; 
+        	[ "<<dataType>>" ; $type ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute, ApiGeneratorLine::FmpTableName#10, ApiGeneratorLine::FmpFieldName#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $line
+  15    Set Variable [ $props; Value:List( $props ; "	" & $line ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List
+        Repetition
+          Calculation:
+            | 1
+        Name: $props
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    End If
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  20    End Loop
+        DisableStepCollapsed state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $props; Value:Substitute ( $props ; "¶" ; ";¶" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $props
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $calc; Value:List(
+        	"// Created by Generator - " & Get ( CurrentHostTimestamp ) ; 
+        	"// DO NOT format this JSON object!" ; 
+        	"JSONSetElement (  \"\"; ";
+        	" ";
+        	$props;
+        	" ";
+        	")"
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, fn:Get, fn:CurrentHostTimestamp
+        Repetition
+          Calculation:
+            | 1
+        Name: $calc
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $result; Value:<Function Missing> ( $calc ; "public.utf8-plain-text" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    Show Custom Dialog [ Title: "Done"; Message: "The AsJson calc has been copied to the clipboard."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Exit Script [ Result: $calc ]
+        DisableStepCollapsed state=False

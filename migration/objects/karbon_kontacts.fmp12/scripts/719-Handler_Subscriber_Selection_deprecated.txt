@@ -1,0 +1,216 @@
+# script 719: Handler: Subscriber Selection_deprecated
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / Subscriber Picker
+# source: ScriptCatalog/Script[@id=719]
+# steps: 53 (3 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=716 groupCollapsed=False includeInMenu=False
+
+   1    #This script is going to wait until the picker is done doing its thing, and then proceed accordingly
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #v1.01 2014-08-01: added test for user cancelation. Only go to contact if the user created a new contact. 
+        
+        v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #SAMPLE RESULT OBJECT: 
+        {
+        	"Result" : 
+        	{
+        		"CreateParty" : False
+        		"PartyCount" : 2,
+        		"PartyArray" : 
+        		[
+        			{
+        				"Id" : "123",
+        				"Name" : "Dave Graham"
+        			},
+        			{
+        				"Id" : "456",
+        				"Name" : "Lance Brandenberg"
+        			}
+        		]
+        	}
+        }
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    Perform Script [ “Contact Handler Common Tests” ]
+        DisableStepCollapsed state=False
+        Script id=63 name="Contact Handler Common Tests"
+   9    Set Variable [ $results; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $results
+  10    If [ Error.IsError ( $results ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  11    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  12    End If
+        DisableStepCollapsed state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #Init vars
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $createParty; Value:False ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:False
+        Repetition
+          Calculation:
+            | 1
+        Name: $createParty
+  17    Set Variable [ $partyCount; Value:JSONGetElement ( $results ; "Result.CountPicked" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyCount
+  18    Set Variable [ $partyArray; Value:JSONGetElement ( $results ; "Result.PartyArray" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $partyArray
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    If [ Get( ScriptResult ) = -1 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:ScriptResult
+  24    #user canceled; exit
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  26    Exit Script [ Result: -1 ]
+        DisableStepCollapsed state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    If [ $partyCount ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #a pick was made; destroy timer
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Install OnTimer Script [  ]
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #Capture the PartyIds
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $PartyIdList; Value: JSON.GetValuesAtPath ( $partyArray ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.GetValuesAtPath
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyIdList
+  36 // Set Variable [ $PartyNames; Value:JSONGetElement ( 
+        	JSONGetElement ( $partyArray ; 0 ) ; 
+        	"Name" 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $PartyNames
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Field [ UtilityDiscussion::SubscriberPartyIds; List ( UtilityDiscussion::SubscriberPartyIds ; $PartyIdList ) ]
+        DisableStepCollapsed state=False
+        refs: fn:List, UtilityDiscussion::SubscriberPartyIds#19
+        Field table=UtilityDiscussion id=19 name=SubscriberPartyIds
+  39 // Set Field [ UtilityDiscussion::SubscriberListName; $PartyNames ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=20 name=SubscriberListName
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Commit Records/Requests
+        NoInteract state=False
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45 // Go to Object [ Object Name: "supplierContact"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Exit Script [ Result: "" ]
+        DisableStepCollapsed state=False
+  51    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False

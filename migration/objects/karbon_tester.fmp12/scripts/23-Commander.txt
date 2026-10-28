@@ -1,0 +1,101 @@
+# script 23: Commander
+# file: karbon_tester.fmp12
+# folder: File Module
+# source: ScriptCatalog/Script[@id=23]
+# steps: 29 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=21 groupCollapsed=False includeInMenu=False
+
+   1    #@description - this is called by URL from the developer utility file. Variables are declared and initialized from the URL
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #@history 2018-08-13 dave@geistinteractive.com - 
+        	- Can now be called by Perform Script. Pass parameters in Let notation.
+        	- Added GetVersion command
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    If [ not IsEmpty ( Get ( ScriptParameter ) ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, fn:Get, fn:ScriptParameter
+   6    Set Variable [ $command; Value:Evaluate ( Get ( ScriptParameter ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Evaluate, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $command
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    If [ $command = "OpenDefineDB" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Open Manage Database
+        DisableStepCollapsed state=False
+  11    Else If [ $command = "OpenScripts" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Open Script Workspace
+        DisableStepCollapsed state=False
+  13    Else If [ $command = "OpenLayouts" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    Open Manage Layouts
+        DisableStepCollapsed state=False
+  15    Else If [ $command = "BringToFront" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Select Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  17    Else If [ $command = "Hide" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Adjust Window
+        [ Hide ]
+        DisableStepCollapsed state=False
+        WindowState value=Hide
+  19    Else If [ $command = "ResetPassword" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Reset Account Password [ Account Name: $AccountName; New Password: $NewPassword ]
+        DisableStepCollapsed state=False
+        ChgPwdOnNextLogin value=False
+  21    Else If [ $command = "DeleteAccount" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Delete Account [ Account Name: $AccountName ]
+        DisableStepCollapsed state=False
+  23    Else If [ $command = "DisableAccount" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Enable Account [ Account Name: $AccountName ]
+        [ Deactivate ]
+        DisableStepCollapsed state=False
+        AccountOperation value=Deactivate
+  25    Else If [ $command = "GetVersion" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Exit Script [ Result: JSONSetElement ( "{}" ; 
+        	[ "FileVersion" ; meta::FileVersion ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, meta::FileVersion#10, fn:JSONString
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

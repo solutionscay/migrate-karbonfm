@@ -1,0 +1,465 @@
+# script 570: Find Task for C3 Charts {data}
+# file: karbon_kontroller.fmp12
+# folder: API / Activity / Public
+# source: ScriptCatalog/Script[@id=570]
+# steps: 134 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=383 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Find Task for C3 Charts
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #@param {object} Task
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #@param {string} Task.AssignedToPartyId
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@param {number} [Task.CompletedInd]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@param {string} Task.Date
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #@returnSuccess {object} result - result is the data object for C3 Charts
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnSuccess {number} result.Count
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnSuccess {string} result.IdList - change this if you want to return an array of objects
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #@returnError {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #@history 2018-09-04 jeremy@geistinteractive.com - Created by Generator version 2.5.1
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #SETUP
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  28    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #Set default values
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $Defaults; Value:JSONSetElement ( $Defaults ; "ActivityPartyRoleId" ; 53 ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Defaults
+  36    Set Variable [ $Defaults; Value:JSONSetElement ( $Defaults ; "TaskInd" ; 1 ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement
+        Name: $Defaults
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $ScriptParameter; Value:JSON.Merge ( $Defaults ; Get ( ScriptParameter ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Merge, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptParameter
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #Validate the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Set Variable [ $Task; Value:JSON.Format( $ScriptParameter ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format
+        Repetition
+          Calculation:
+            | 1
+        Name: $Task
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    If [ Error.IsError ( $Task ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  44    Exit Script [ Result: $Task ]
+        DisableStepCollapsed state=False
+  45    End If
+        DisableStepCollapsed state=False
+  46    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  47    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  48    #Validation Rules
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $error; Value:JSON.Validate.This ( $Task ) & JSON.Validate.ApplyRules ( 
+        	List ( 
+        		JSON.Validate.Rule.IsRequired ( "AssignedToPartyId" ) ; 
+        		JSON.Validate.Rule.IsRequired ( "Date" ) ; 
+        		"" ; // additional tests  
+        	)
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Validate.This, cf:JSON.Validate.ApplyRules, fn:List, cf:JSON.Validate.Rule.IsRequired
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  52    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  53    End If
+        DisableStepCollapsed state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Set Variable [ $AssignedToPartyId; Value:JSONGetElement ( $Task ; "AssignedToPartyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $AssignedToPartyId
+  61    Set Variable [ $CompletedInd; Value:JSONGetElement ( $Task ; "CompletedInd" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CompletedInd
+  62    Set Variable [ $Date; Value:GetAsDate ( JSONGetElement ( $Task ; "Date" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsDate, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Date
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  65    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $ActivityPartyRoleId; Value:53 ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityPartyRoleId
+  70    Set Variable [ $TaskInd; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $TaskInd
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  73    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  74    #START QUERY
+        DisableStepCollapsed state=False
+        Restore state=False
+  75    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  78    Go to Layout [ <unknown> ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=0 name="" ref=none
+  79    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  82    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  83    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  84    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  85    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  86    Set Field [ Activity::ActivityGroupId; $ActivityGroupId ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=191 name=ActivityGroupId
+  87    Set Field [ Activity::ActivityParentId; $ActivityParentID ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=46 name=ActivityParentId
+  88    Set Field [ ActivityParty::ActivityPartyRoleId; $ActivityPartyRoleId ]
+        DisableStepCollapsed state=False
+        Field table=ActivityParty id=24 name=ActivityPartyRoleId
+  89    Set Field [ Activity::ActivityPurposeId; $ActivityPurposeId ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=99 name=ActivityPurposeId
+  90    Set Field [ Activity::ActivityTypeId; $ActivityTypeId ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=100 name=ActivityTypeId
+  91    Set Field [ ActivityParty::PartyId; $AssignedToPartyId ]
+        DisableStepCollapsed state=False
+        Field table=ActivityParty id=7 name=PartyId
+  92    Set Field [ Activity::CommentInd; $CommentInd ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=178 name=CommentInd
+  93    Set Field [ Activity::CompletedByCached_deprecated; $CompletedByCached ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=196 name=CompletedByCached_deprecated
+  94    Set Field [ Activity::AlertInd; $CompletedInd ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=107 name=AlertInd
+  95    Set Field [ Activity::CompletionAccountName_deprecated; $CompletionAccountName ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=118 name=CompletionAccountName_deprecated
+  96    Set Field [ Activity::CompletionTimestamp_deprecated; $CompletionTimestamp ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=117 name=CompletionTimestamp_deprecated
+  97    Set Field [ Activity::CreatorCached; $CreatorCached ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=197 name=CreatorCached
+  98    Set Field [ Activity::DateDisplay; $Date ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=56 name=DateDisplay
+  99    Set Field [ Activity::EmailMessageInd; $EmailMessageInd ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=74 name=EmailMessageInd
+ 100    Set Field [ Activity::EventInd; $EventInd ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=90 name=EventInd
+ 101    Set Field [ Task::FromCached; $FromCached ]
+        DisableStepCollapsed state=False
+        Field table=Task id=23 name=FromCached
+ 102    Set Field [ Task::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=Task id=1 name=Id
+ 103    Set Field [ Activity::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=1 name=Id
+ 104    Set Field [ Activity::NoteInd; $NoteInd ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=73 name=NoteInd
+ 105    Set Field [ Activity::PartiesCached; $PartiesCached ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=198 name=PartiesCached
+ 106    Set Field [ Activity::Subject; $Subject ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=22 name=Subject
+ 107    Set Field [ Activity::TaskInd; $TaskInd ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=171 name=TaskInd
+ 108    Set Field [ Activity::TemplateId; $TemplateId ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=195 name=TemplateId
+ 109    Set Field [ Activity::TimeDisplay; $Time ]
+        DisableStepCollapsed state=False
+        Field table=Activity id=76 name=TimeDisplay
+ 110    Set Field [ Task::ToCached; $ToCached ]
+        DisableStepCollapsed state=False
+        Field table=Task id=24 name=ToCached
+ 111    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 112    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 113    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 114    #PERFORM FIND
+        DisableStepCollapsed state=False
+        Restore state=False
+ 115    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 116    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 117    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 118    Set Variable [ $error; Value:Error.Last ( "while finding record" ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Error.Last
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+ 119    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 120    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 121    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+ 122    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 123    End If
+        DisableStepCollapsed state=False
+ 124    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 125    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 126    Set Variable [ $result; Value:/*JSONSetElement ( "{}" ; 
+        
+        	[ "IdList" ; Task::IdListOf ; JSONString ] ; 
+        	[ "Count" ; Get ( FoundCount ) ; JSONNumber ] 
+        )*/ ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+ 127    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 128    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 129    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+ 130    If [ Error.IsError( $error ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+ 131    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+ 132    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+ 133    Exit Script [ Result: $result ]
+        DisableStepCollapsed state=False
+ 134    End If
+        DisableStepCollapsed state=False

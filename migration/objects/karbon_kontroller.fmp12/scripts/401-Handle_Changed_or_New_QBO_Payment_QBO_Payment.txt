@@ -1,0 +1,137 @@
+# script 401: Handle Changed or New QBO Payment ( {QBO Payment} )
+# file: karbon_kontroller.fmp12
+# folder: Modules / QuickBooks Online / Payments
+# source: ScriptCatalog/Script[@id=401]
+# steps: 40 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=438 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Takes a QBO Payment and Creates a Karbon Payment
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @param {object} QBO Payment
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    #@returnSuccess {object} Payment
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #@returnSuccess {string} Payment.Id
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #@returnSuccess {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #@returnError {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #@returnError {object} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #@returnError {...}
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    ##/
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  18    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #VALIDATE INCOMING JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Set Variable [ $QBOPayment; Value:JSON.Format ( Get(ScriptParameter) ; "formatting Script Parameter" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $QBOPayment
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ Error.IsError ( $QBOPayment ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  26    Exit Script [ Result: $QBOPayment ]
+        DisableStepCollapsed state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Perform Script [ “Convert QBO Payment into Karbon Payment”; Parameter: $QBOPayment ]
+        DisableStepCollapsed state=False
+        Script id=403 name="Convert QBO Payment into Karbon Payment"
+  31    Set Variable [ $KarbonPayment; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $KarbonPayment
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Perform Script [ “Create or Update Payment { Payment }”; Parameter: $KarbonPayment ]
+        DisableStepCollapsed state=False
+        Script id=404 name="Create or Update Payment { Payment }"
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Exit Script [ Result:  Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False

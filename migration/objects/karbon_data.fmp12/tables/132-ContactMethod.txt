@@ -1,0 +1,241 @@
+# table 132: ContactMethod
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=132]
+# fields: 22
+# records: 5
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  AutoEnter allowEditing=False overwriteExistingValue=True alwaysEvaluate=True calculation=True
+    Calculation table=ContactMethod:
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+  Storage index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Number fieldType=Normal name=PhoneInd
+  Comment: Boolean; is this a phone number?
+  AutoEnter allowEditing=True constant=False calculation=False
+    (inactive) ConstantData: 0
+    Calculation table=ContactMethod (inactive):
+      | Case( IsEmpty( Self ) ; 0 ; Self )
+      refs: fn:Case, fn:IsEmpty, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Number fieldType=Normal name=AddressInd
+  Comment: Boolean; is this a address?
+  AutoEnter allowEditing=True constant=False
+    (inactive) ConstantData: 0
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Number fieldType=Normal name=NetworkAddressInd
+  Comment: Boolean; is this an Internet Address (e.g., web, e-mail, etc)?
+  AutoEnter allowEditing=True constant=False
+    (inactive) ConstantData: 0
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=21 dataType=Text fieldType=Calculated name=ContactMethodDisplay
+  Calculation table=ContactMethod:
+    | Let( 
+    | 
+    | contactMethod = 
+    | 
+    | 	Case( 
+    | 		AddressInd ;
+    | 		 	Address::AddressWide ;
+    | 
+    | 	 	NetworkAddressInd ; 
+    | 		 	NetworkAddress::Address ; 
+    | 
+    | 		PhoneInd ; 
+    | 			Phone::NumberDisplay ; 
+    | 	) 
+    | 
+    | ; 
+    | 
+    | 	Case( IsEmpty( contactMethod ) ; "<empty>" ; contactMethod ) 
+    | 
+    | )
+    refs: fn:Let, fn:Case, ContactMethod::AddressInd#9, Address::AddressWide#18, ContactMethod::NetworkAddressInd#10, NetworkAddress::Address#7, ContactMethod::PhoneInd#8, Phone::NumberDisplay#21, fn:IsEmpty
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=25 dataType=Text fieldType=Calculated name=TypeDisplay
+  Calculation table=ContactMethod:
+    | /* 
+    | 
+    | Case( 
+    | 	AddressInd ; 
+    | 		 "Address" ; 
+    | 	FaxInd  ; 
+    | 		 "Fax" ; 
+    | 	NetworkAddress::EmailAddressInd  ; 
+    | 		 "Email" ; 
+    | 	NetworkAddressInd  ; 
+    | 		 NetworkAddress::Label ; 
+    | 	PhoneInd  ; 
+    | 		 "Phone"
+    | )
+    | 
+    | */
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Text fieldType=Normal name=PartyId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=35 dataType=Text fieldType=Normal name=CreationAccountName
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Text fieldType=Normal name=ModificationAccountName
+  AutoEnter allowEditing=True value=ModificationAccountName calculation=False
+    Calculation table=ContactMethod (inactive):
+      | /*Let ( trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK"; <Field Missing>; Get ( AccountName ) ) )*/
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=38 dataType=Number fieldType=Calculated name=ModificationCount
+  Calculation table=ContactMethod:
+    | Get ( RecordModificationCount )
+    refs: fn:Get, fn:RecordModificationCount
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  AutoEnter allowEditing=True value=ModificationTimeStamp calculation=False
+    Calculation table=ContactMethod (inactive):
+      | /*Let(trigger = <Field Missing> ; If(Get(AccountName) = "SyncDeK" ; Self ; Get(CurrentHostTimeStamp)))*/
+  Validation calculation=False alwaysValidateCalculation=True type=Always
+    Calculation table=ContactMethod (inactive):
+      | /* 
+      | 
+      | If( Get(AccountName) = "SyncDeK" ; True ;
+      |     Sync_PostEdit( GetFieldName(SyncDeK_RecId) ; SyncDeK_RecId ; Get(AccountName) )
+      | )
+      | 
+      | */
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=ContactMethod:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=41 dataType=Text fieldType=Calculated name=AsJson
+  Calculation table=ContactMethod:
+    | // As of 2018-02-10 the ContactMethod is no longer being referenced. Use the AsJson in Phone, Address, and Network Address instead.
+    | 
+    | Let( [
+    | 	json = Case(
+    | 		AddressInd ; 
+    | 			JSONSetElement ( "" ; "Address" ; Address::AsJson ; JSONObject );
+    | 		PhoneInd ; 
+    | 			JSONSetElement ( "" ; "Phone" ; Phone::AsJson ; JSONObject ) ;
+    | 		NetworkAddressInd ; 
+    | 			JSONSetElement ( "" ; "NetworkAddress" ; NetworkAddress::AsJson ; JSONObject ) 
+    | 	)  ; 
+    | 	purpose = JSON.ArrayFromRelated ( ContactMethodPurpose::AsJson )
+    | ] ;
+    | 
+    | 	JSONSetElement ( json;
+    | 		[ "Id" ; Id ; JSONString ] ; 
+    | 		[ "CreationTimestamp" ; CreationTimestamp ; JSONString ] ; 
+    | 		[ "CreationAccountName" ; CreationAccountName ; JSONString ] ; 
+    | 		[ "Label" ; Label ; JSONString ] ; 
+    | 		[ "PartyId" ; PartyId ; JSONString ] ; 
+    | 		[ "Purpose" ; purpose ; JSONArray ] 
+    | 
+    | 	)
+    | )
+    refs: fn:Let, fn:Case, ContactMethod::AddressInd#9, fn:JSONSetElement, Address::AsJson#39, fn:JSONObject, ContactMethod::PhoneInd#8, Phone::AsJson#47, ContactMethod::NetworkAddressInd#10, NetworkAddress::AsJson#41, cf:JSON.ArrayFromRelated, ContactMethodPurpose::AsJson#49, ContactMethod::Id#1, fn:JSONString, ContactMethod::CreationTimestamp#36, ContactMethod::CreationAccountName#35, ContactMethod::Label#47, ContactMethod::PartyId#33, fn:JSONArray
+  Comment: As of 2018-02-10 the ContactMethod is no longer being referenced. Use the AsJson in Phone, Address, and Network Address instead.
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=46 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=ContactMethod (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=47 dataType=Text fieldType=Normal name=Label
+  Comment: A string describing how to classify this contact method (e.g., home, work)
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=48 dataType=Number fieldType=Normal name=_BillingIndCached
+  Comment: True if used for billing purposes; cached for database optimization.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=49 dataType=Number fieldType=Normal name=_MailingIndCached
+  Comment: True if used for mailing purposes; cached for database optimization.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=50 dataType=Number fieldType=Normal name=_ShippingIndCached
+  Comment: True if used for shipping purposes; cached for database optimization.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=51 dataType=Text fieldType=Normal name=Comment
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=52 dataType=Text fieldType=Normal name=CreationUserId
+  AutoEnter allowEditing=False calculation=True
+    Calculation table=ContactMethod:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=53 dataType=Text fieldType=Normal name=ModificationUserId
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=ContactMethod:
+      | meta::CurrentUserId
+      refs: meta::CurrentUserId#3
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

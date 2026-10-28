@@ -1,0 +1,41 @@
+# custom function 54: NewVersion
+# file: karbon_Build.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=54]
+
+CustomFunction id=54 functionArity=2 visible=True parameters=currentVersion;type name=NewVersion
+  Calculation:
+    | Let ( [ 
+    | 
+    | 	currentVersion = Substitute ( currentVersion ; "." ;  ¶ ) ; 
+    | 
+    | 	~MajorVersion = Case ( 
+    | 		type = "major" ; 
+    | 			GetValue ( currentVersion ; 1 ) + 1 ; 
+    | 			GetValue ( currentVersion ; 1 ) 
+    | 		) ;  
+    | 
+    | 	~MinorVersion = Case ( 
+    | 		type = "major" ; 
+    | 			0 ; 
+    | 		type = "minor" ; 
+    | 			GetValue ( currentVersion ; 2 ) + 1 ; 
+    | 			GetValue ( currentVersion ; 2 ) 
+    | 		) ;  
+    | 
+    | 	~PatchVersion = Case ( 
+    | 		type = "patch" ; 
+    | 			GetValue ( currentVersion ; 3 ) + 1 ; 
+    | 			0 
+    | 		) 
+    | 
+    | ] ; 
+    | 
+    | 	Substitute ( 
+    | 		List ( ~MajorVersion ; ~MinorVersion ; ~PatchVersion ) ; 
+    | 		¶ ; 
+    | 		"." 
+    | 	)
+    | 
+    | 
+    | )
+    refs: fn:Let, fn:Substitute, fn:Case, fn:GetValue, fn:List

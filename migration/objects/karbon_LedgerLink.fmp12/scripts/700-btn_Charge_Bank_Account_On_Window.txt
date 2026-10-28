@@ -1,0 +1,118 @@
+# script 700: _btn: Charge Bank Account On Window
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO Payments / Private
+# source: ScriptCatalog/Script[@id=700]
+# steps: 21 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=332 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+   4    #transform accountType
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $accountType; Value:If ( QBO::BankAccountAccountType = "Checking" ; "PERSONAL_CHECKING" ; "PERSONAL_SAVINGS" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, QBO::BankAccountAccountType#65
+        Repetition
+          Calculation:
+            | 1
+        Name: $accountType
+   6    Set Variable [ $phone; Value:Filter ( QBO::BankAccountPhone ; "0123456789" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Filter, QBO::BankAccountPhone#66
+        Name: $phone
+   7    Set Variable [ $bankaccount; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "accountNumber" ; QBO::BankAccountAccountNumber ; JSONString ];
+        	[ "accountType" ; $accountType ; JSONString ];
+        	[ "name" ; QBO::BankAccountName ; JSONString ];
+        	[ "phone" ;$phone ; JSONString ];
+        	[ "routingNumber" ; QBO::BankAccountRoutingNumber ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, QBO::BankAccountAccountNumber#64, fn:JSONString, QBO::BankAccountName#62, QBO::BankAccountRoutingNumber#63
+        Repetition
+          Calculation:
+            | 1
+        Name: $bankaccount
+   8    If [ $debug ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $bankaccount; Value:JSONSetElement ( "{}" ; 
+         
+        	[ "accountNumber" ; "11000000333456781" ; JSONString ];
+        	[ "accountType" ; $accountType ; JSONString ];
+        	[ "name" ; QBO::BankAccountName ; JSONString ];
+        	[ "phone" ;"2125551212" ; JSONString ];
+        	[ "routingNumber" ; "322079353" ; JSONString ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, QBO::BankAccountName#62
+        Name: $bankaccount
+  10    End If
+        DisableStepCollapsed state=False
+  11    Set Variable [ $paymentMode; Value:"WEB" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $paymentMode
+  12    Set Variable [ $bankaccountData; Value:JSONSetElement ( "{}"; 
+        
+        ["bankaccount"; $bankaccount ; JSONObject ];
+        ["amount"; QBO::BankAccountAmount ; JSONString ] ;
+        ["paymentMode" ; $paymentMode ; JSONString ]
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONObject, QBO::BankAccountAmount#67, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $bankaccountData
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14 // If [ $debug ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Perform Script [ “_clear bank account fields” ]
+        DisableStepCollapsed state=False
+        Script id=694 name="_clear bank account fields"
+  16 // End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “Debit Bank Account ( { bankaccount, amount, paymentMode})”; Parameter: $bankaccountData ]
+        DisableStepCollapsed state=False
+        Script id=691 name="Debit Bank Account ( { bankaccount, amount, paymentMode})"
+  19    Set Variable [ $result; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ QBO::BankAccountResult; $result ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=68 name=BankAccountResult

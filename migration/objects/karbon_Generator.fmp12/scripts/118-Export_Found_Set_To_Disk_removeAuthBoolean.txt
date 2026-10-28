@@ -1,0 +1,138 @@
+# script 118: Export Found Set To Disk (removeAuthBoolean)
+# file: karbon_Generator.fmp12
+# folder: App Modules / Requests / Private
+# source: ScriptCatalog/Script[@id=118]
+# steps: 31 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $removeAuth; Value:GetAsBoolean ( Get (ScriptParameter) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $removeAuth
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $folder; Value:<Function Missing> ( "Choose a folder" ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $folder
+   6    If [ IsEmpty ( $folder ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+   7    Exit Script [  ]
+        DisableStepCollapsed state=False
+   8    End If
+        DisableStepCollapsed state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  13    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $fileName; Value:Requests::name ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Requests::name#24
+        Repetition
+          Calculation:
+            | 1
+        Name: $fileName
+  16    If [ IsEmpty ( $fileName ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  17    Set Variable [ $fileName; Value:"request" & Get(RecordNumber) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:RecordNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $fileName
+  18    End If
+        DisableStepCollapsed state=False
+  19    Set Variable [ $fileName; Value:$fileName & ".json" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $fileName
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #$removeAuth will tell this calcField to remove the auth from the JSON
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $contents; Value:Requests::request.jsonFile ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Requests::request.jsonFile#29
+        Repetition
+          Calculation:
+            | 1
+        Name: $contents
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $path; Value:$folder & PathSeperator & $filename ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:PathSeperator
+        Repetition
+          Calculation:
+            | 1
+        Name: $path
+  25    Set Variable [ $result; Value:<Function Missing> ( $path ; $contents ) ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Go to Record/Request/Page
+        [ Next; Exit after last ]
+        NoInteract state=False
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  28    End Loop
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False

@@ -1,0 +1,103 @@
+# table 164: AttachableRef
+# file: karbon_LedgerLink.fmp12
+# source: BaseTableCatalog/BaseTable[@id=164]
+# fields: 11
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  Comment: Unique identifier of each record in this table
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=AttachableRef:
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=Minimal indexLanguage=Unicode_Raw maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  Comment: Date and time each record was created
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+    StrictDataType value=FourDigitYear
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=CreatedBy
+  Comment: Account name of the user who created each record
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  Comment: Date and time each record was last modified
+  AutoEnter allowEditing=False value=ModificationTimeStamp
+  Validation type=OnlyDuringDataEntry
+    StrictDataType value=FourDigitYear
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=ModifiedBy
+  Comment: Account name of the user who last modified each record
+  AutoEnter allowEditing=False value=ModificationAccountName
+  Validation type=OnlyDuringDataEntry
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=EntityType
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=EntityId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=AttachmentId
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Number fieldType=Normal name=IncludeOnSend
+  AutoEnter allowEditing=True value=ConstantData overwriteExistingValue=True constant=True calculation=True
+    ConstantData: 1
+    Calculation table=AttachableRef:
+      | GetAsBoolean ( Self )
+      refs: fn:GetAsBoolean, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Number fieldType=Normal name=qbo_lineNum
+  Comment: determines the sort order. NOT suitable for display to users due to it's auto-enter value.
+  AutoEnter allowEditing=True calculation=True
+    Calculation table=AttachableRef:
+      | /* auto-entering milliseconds ensures new records are sorted after previously entered records */
+      | Get ( CurrentTimeUTCMilliseconds )
+      refs: fn:Get, fn:CurrentTimeUTCMilliseconds
+  Validation type=Always
+    StrictDataType value=Numeric
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

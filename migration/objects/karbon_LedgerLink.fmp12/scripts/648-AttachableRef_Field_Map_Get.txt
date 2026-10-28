@@ -1,0 +1,176 @@
+# script 648: AttachableRef :: Field Map :: Get
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Supporting Resources
+# source: ScriptCatalog/Script[@id=648]
+# steps: 40 (3 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=220 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $EntityRef.type; Value:qbo_AttachableRef::EntityType ]
+        DisableStepCollapsed state=False
+        Value
+          refs: qbo_AttachableRef::EntityType#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.type
+   6    Set Variable [ $EntityRef.value; Value:qbo_AttachableRef::EntityId ]
+        DisableStepCollapsed state=False
+        Value
+          refs: qbo_AttachableRef::EntityId#7
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.value
+   7    Set Variable [ $IncludeOnSend; Value:qbo_AttachableRef::IncludeOnSend ]
+        DisableStepCollapsed state=False
+        Value
+          refs: qbo_AttachableRef::IncludeOnSend#9
+        Repetition
+          Calculation:
+            | 1
+        Name: $IncludeOnSend
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    #Karbon method
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    If [ $EntityRef.type= "SalesTransaction" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “Lookup SalesTransaction qbo_id ( fmId )”; Parameter:  $EntityRef.value ]
+        DisableStepCollapsed state=False
+        Script id=652 name="Lookup SalesTransaction qbo_id ( fmId )"
+  20    Set Variable [ $EntityRef.value; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.value
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #lookup InvoiceInd
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Perform Script [ “Lookup SalesTransaction type ( QBOId )”; Parameter:  $EntityRef.value ]
+        DisableStepCollapsed state=False
+        Script id=707 name="Lookup SalesTransaction type ( QBOId )"
+  24    Set Variable [ $InvoiceInd; Value:Get ( ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $InvoiceInd
+  25    Set Variable [ $EntityRef.type; Value:If ( $InvoiceInd ; "Invoice" ; "SalesReceipt" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.type
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    #non-Karbon method
+        DisableStepCollapsed state=False
+        Restore state=False
+  30 // If [ $EntityRef.type= "Invoice" or $EntityRef.type= "SalesReceipt" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  31 // Set Variable [ $EntityRef.value; Value:QBO.LookupQBOId ( $EntityRef.type ; $EntityRef.value) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupQBOId
+        Repetition
+          Calculation:
+            | 1
+        Name: $EntityRef.value
+  32 // End If
+        DisableStepCollapsed state=False
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Set Variable [ $json; Value:JSONSetElement ( $json ; "EntityRef.type" ; $EntityRef.type ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  36    Set Variable [ $json; Value:JSONSetElement ( $json ; "EntityRef.value" ; $EntityRef.value ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  37    Set Variable [ $json; Value:JSONSetElement ( $json ; "IncludeOnSend" ; $IncludeOnSend ; JSONBoolean) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Exit Script [ Result: $json ]
+        DisableStepCollapsed state=False

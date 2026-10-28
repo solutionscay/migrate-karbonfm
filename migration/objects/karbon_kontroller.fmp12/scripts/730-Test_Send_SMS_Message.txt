@@ -1,0 +1,64 @@
+# script 730: _Test: Send SMS Message
+# file: karbon_kontroller.fmp12
+# folder: Modules / Twilio / Public
+# source: ScriptCatalog/Script[@id=730]
+# steps: 13 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=536 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "Body" ; "You've received an SMS message from the Karbon, which was sent via FileMaker." ; JSONString ]  ;
+        	[ "To" ; "+6316815570" ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $json
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “Send SMS Message { json }”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=729 name="Send SMS Message { json }"
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+   7    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+   8    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+   9    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $Id; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False

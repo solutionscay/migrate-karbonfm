@@ -1,0 +1,121 @@
+# script 735: TEST LoadWebApp From Text Field
+# file: karbon_kontacts.fmp12
+# folder: Modules / Web Viewer Bridge
+# source: ScriptCatalog/Script[@id=735]
+# steps: 25 (2 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=729 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Perform Script [ “Export HTML File” from file: “karbon_charts” ]
+        DisableStepCollapsed state=False
+        FileReference id=21 name=karbon_charts
+          UniversalPathList: file:karbon_charts
+        Script id=372 name="Export HTML File" in=karbon_charts.fmp12
+   5    Set Variable [ $url; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $$path; Value:$url ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$path
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $webViewer; Value:"oppChart" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $webViewer
+  10 // Set Variable [ $intialProps; Value:JSONSetElement ( "" ; "callback.script" ; "openRecord" ; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $intialProps
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Variable [ $params; Value:JSONSetElement (  ""; 
+         
+        	[ "url" ; $url ; JSONString ];
+        	[ "webViewer" ; $webViewer ; JSONString ];
+        	[ "initialProps" ; $intialProps ; JSONObject ]
+         
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:JSONObject
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  16    Perform Script [ “Load WebViewer App ( {webViewer; url , initialProps } )”; Parameter: $params ]
+        DisableStepCollapsed state=False
+        Script id=745 name="Load WebViewer App ( {webViewer; url , initialProps } )"
+  17    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Perform Script [ “LoadData” ]
+        DisableStepCollapsed state=False
+        Script id=733 name=LoadData
+  20    Set Variable [ $error; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    # just makes the url display update
+        DisableStepCollapsed state=False
+        Restore state=False
+  25 // Refresh Object [ Object Name: "DisplayURL"; Repetition: 1 ]
+        DisableStepCollapsed state=False

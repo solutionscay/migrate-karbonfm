@@ -1,0 +1,291 @@
+# script 694: _wip_Button: Add Comment to Activity Discussion v2
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion
+# source: ScriptCatalog/Script[@id=694]
+# steps: 69 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=305 groupCollapsed=True includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    If [ IsEmpty ( UtilityDiscussion::Notes ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, UtilityDiscussion::Notes#9
+   3    #Do nothing
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Exit Script [ Result: 1 ]
+        DisableStepCollapsed state=False
+   5    End If
+        DisableStepCollapsed state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Freeze Window
+        DisableStepCollapsed state=False
+   8    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   9    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  10    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    If [ IsEmpty ( Selected_Discussion::Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, Selected_Discussion::Id#6
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #Create the discussion
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $json; Value:JSONSetElement ( "{}" ; 
+        	[ "EntityId" ; Activity::Id ; JSONString ]  ;
+        	[ "EntityTypeId" ; 11 ; JSONString ]  ;
+        	[ "Notes" ; UtilityDiscussion::Notes ; JSONString ]  ;
+        	[ "CreatorId" ; session::CurrentUserPartyId ; JSONString ] ;
+        	[ "SubscriberPartyIds" ; UtilityDiscussion::SubscriberPartyIds ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, Activity::Id#1, fn:JSONString, UtilityDiscussion::Notes#9, session::CurrentUserPartyId#63, UtilityDiscussion::SubscriberPartyIds#19
+        Name: $json
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Perform Script [ “Create Discussion v2” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=421 name="Create Discussion v2" in=karbon_kontroller.fmp12
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $result; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  21    If [ Error.IsError( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  22    Show Custom Dialog [ Title: "Error"; Message: "An error occurred."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  23    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $DiscussionId; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DiscussionId
+  27    Set Variable [ $ActivityCommentId; Value:JSONGetElement ( $result ; "ActivityCommentId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityCommentId
+  28    Set Field [ selector::DiscussionActivityId; $DiscussionId ]
+        DisableStepCollapsed state=False
+        Field table=selector id=35 name=DiscussionActivityId
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #Link to existing discussion
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $DiscussionId; Value:Selected_Discussion::Id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Selected_Discussion::Id#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $DiscussionId
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #Create the discussion comment
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    Set Variable [ $Param; Value:JSONSetElement( "";
+        	[ "ActivityId" ; $DiscussionId ; JSONString ];
+        	[ "CreatorId" ; session::CurrentUserPartyId; JSONString ];
+        	[ "Comment" ; UtilityDiscussion::Notes; JSONString ] ; 
+        	[ "SubscriberPartyIds" ; UtilityDiscussion::SubscriberPartyIds ; JSONString ] 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, session::CurrentUserPartyId#63, UtilityDiscussion::Notes#9, UtilityDiscussion::SubscriberPartyIds#19
+        Repetition
+          Calculation:
+            | 1
+        Name: $Param
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Perform Script [ “Create ActivityComment” from file: “karbon_kontroller”; Parameter: $Param ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=422 name="Create ActivityComment" in=karbon_kontroller.fmp12
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $ScriptResult; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $ScriptResult
+  43    If [ Error.IsError ( $ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  44    Show Custom Dialog [ Title: "Error"; Message: "There was an error adding this comment."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  45    Exit Script [ Result: -2 ]
+        DisableStepCollapsed state=False
+  46    End If
+        DisableStepCollapsed state=False
+  47    Set Variable [ $ActivityCommentId; Value:JSONGetElement ( $ScriptResult ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ActivityCommentId
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    End If
+        DisableStepCollapsed state=False
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Field [ UtilityDiscussion::Notes; "" ]
+        DisableStepCollapsed state=False
+        Field table=UtilityDiscussion id=9 name=Notes
+  52    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  53    Refresh Portal [ Object Name: "DiscussionPortal" ]
+        DisableStepCollapsed state=False
+  54 // Refresh Window
+        [ Flush cached join results ]
+        Option state=True
+        FlushSQLData state=False
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Go to Object [ Object Name: "DiscussionPortal"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  58    Go to Portal Row
+        [ First ]
+        NoInteract state=False
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+  59    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Exit Loop If [ //discussion is related to an activity
+        
+        Selected_Discussion_ActivityComment::Id = $ActivityCommentId 
+        
+        or 
+        
+        //discussion is related to an entity
+        
+        Activity_ActivityComment::Id = $ActivityCommentId ]
+        DisableStepCollapsed state=False
+        refs: Selected_Discussion_ActivityComment::Id#6, fn:or, Activity_ActivityComment::Id#6
+  61    Go to Portal Row
+        [ Select; Next; Exit after last ]
+        NoInteract state=False
+        SelectAll state=True
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  62    End Loop
+        DisableStepCollapsed state=False
+  63    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  64    Commit Records/Requests
+        [ No dialog ]
+        NoInteract state=True
+        Option state=False
+        ESSForceCommit state=False
+        DisableStepCollapsed state=False
+  65    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  66    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  67    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    #
+        DisableStepCollapsed state=False
+        Restore state=False

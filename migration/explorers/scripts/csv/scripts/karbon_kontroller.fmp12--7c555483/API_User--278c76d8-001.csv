@@ -1,0 +1,41 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/375-Get_User_Object_By_AccountName_AccountName.txt,78f92d461650e1f52ace5fdc565599e4ac7bc6ff607066648802f17b6e884cf2,scripts,karbon_kontroller.fmp12,375,Get User Object By AccountName ( AccountName ),find-query,server-query,tier2,Finds one User by exact account name on the f_User layout and returns it as JSON wrapped in a User object. It returns a bad-request error when the name is empty and a validation error when no user exists.,"f_User::AsJSON#105
+f_User::AccountName#11 (find criterion step 26)",none,none,objects/karbon_kontacts.fmp12/scripts/54-Store_UserID_On_Session.txt (step 20),none,A @todo says results are no longer wrapped in an object (see its line 41) while callers still expect the wrapper.
+karbon_kontroller.fmp12/scripts/500-Create_User.txt,c2d3932163dc9e0424533813be59067b3dcad757e5ce12621cc167be2aa4b790,scripts,karbon_kontroller.fmp12,500,Create User,data-change,server-domain,tier2,"Creates a User: starts a transaction, validates AccountName, FirstName and LastName, writes the user's account name, display name, email addresses, signature and SMTP settings, creates a Person party when no PartyId is given and links it, then returns the user JSON and ends the transaction.","DBTransactions::UserId#64
+User::AsJSON#105","DBTransactions::UserId#64 (step 104, current record)
+User::ONE#103 (step 107, related via DBTransactions (record created or locked by the ONE field set))
+User::AccountName#11 (step 116, related via DBTransactions (record created or locked by the ONE field set))
+User::DisplayName#106 (step 117, related via DBTransactions (record created or locked by the ONE field set))
+User::EmailAddress#119 (step 118, related via DBTransactions (record created or locked by the ONE field set))
+User::EmailSignature#120 (step 119, related via DBTransactions (record created or locked by the ONE field set))
+User::SmtpEmailAddress#111 (step 120, related via DBTransactions (record created or locked by the ONE field set))
+User::SmtpFullName#112 (step 121, related via DBTransactions (record created or locked by the ONE field set))
+User::SmtpServer#114 (step 122, related via DBTransactions (record created or locked by the ONE field set))
+User::SmtpServerAuthentication#115 (step 123, related via DBTransactions (record created or locked by the ONE field set))
+User::SmtpServerEncryptionType#116 (step 124, related via DBTransactions (record created or locked by the ONE field set))
+User::SmtpServerPort#117 (step 125, related via DBTransactions (record created or locked by the ONE field set))
+User::SmtpUserName#113 (step 126, related via DBTransactions (record created or locked by the ONE field set))
+User::PartyId#12 (step 154, related via DBTransactions (record created or locked by the ONE field set))","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 47)
+karbon_kontroller.fmp12/scripts/246 ""_wip_Create Person { data }"" (step 137)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 171)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 172)","objects/karbon_kontacts.fmp12/scripts/482-Create_Welcome_Initial_Parties.txt (step 67)
+objects/karbon_kontacts.fmp12/scripts/371-Save_Card_-_Utility_User.txt (step 4)
+objects/karbon_tester.fmp12/scripts/297-Create_User_-_Standard_User.txt (step 4)",none,"It stores SMTP server, user name and port; whether a password is stored elsewhere is not shown. It does not create a FileMaker login account or password, so login credentials are managed elsewhere. $Id is read at step 103 but never set."
+karbon_kontroller.fmp12/scripts/501-Get_User_Id.txt,a94f03cf8ef8929ff6c869530344adac78bd027b5aee52f015b8795c2736f2cd,scripts,karbon_kontroller.fmp12,501,Get User ( Id ),find-query,server-query,tier2,"Returns the User JSON for the id passed as the script parameter, using the SQL.GetColumn custom function.","User::AsJSON#105
+User::Id#1",none,none,none found (may be called by name),none,The SQL.GetColumn custom function wraps ExecuteSQL (not shown in this object).
+karbon_kontroller.fmp12/scripts/512-Delete_User_Id.txt,3581f32cb5804cb5a72220d38d119c8eebee3c0eefb491fa88cfff2df9846c3d,scripts,karbon_kontroller.fmp12,512,Delete User ( Id ),data-change,server-domain,tier2,Deletes a User by id inside a transaction. When DeletePartyInd is true it also deletes the linked Party. Deletes go through the Delete First Portal Row script.,"DBTransactions::UserId#64
+User::PartyId#12
+Party::Id#1
+User::Id#1","DBTransactions::UserId#64 (step 69, current record)
+User::ONE#103 (step 72, current record)
+DBTransactions::PartyId#25 (step 82, current record)
+delete: User (via script 33 Delete First Portal Row, step 109, portal row; parameter ""User"")
+delete: Party (via script 33 Delete First Portal Row, step 92, portal row; parameter ""Party"", only when DeletePartyInd = True)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 32)
+karbon_kontroller.fmp12/scripts/33 ""Delete First Portal Row (portalLayoutObjectName)"" (step 92)
+karbon_kontroller.fmp12/scripts/33 ""Delete First Portal Row (portalLayoutObjectName)"" (step 109)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 130)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 131)","objects/karbon_tester.fmp12/scripts/294-Create_Note_-_Success.txt (step 89)
+objects/karbon_tester.fmp12/scripts/328-Create_Task_-_Fail.txt (step 84)
+objects/karbon_tester.fmp12/scripts/327-Create_Note_-_Fail.txt (step 89)
+objects/karbon_tester.fmp12/scripts/347-Create_Call_-_Success.txt (step 81)
+objects/karbon_tester.fmp12/scripts/292-Create_Task_-_Success.txt (step 88)",none,"The deletes run in script 33 (Delete First Portal Row, outside this share), which deletes the first portal row of the object named in the parameter (User or Party); the row is chosen by the relationship set up through DBTransactions::UserId and PartyId."

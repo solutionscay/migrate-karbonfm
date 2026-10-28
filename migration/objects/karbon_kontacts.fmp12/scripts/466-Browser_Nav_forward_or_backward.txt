@@ -1,0 +1,211 @@
+# script 466: Browser Nav (forward or backward)
+# file: karbon_kontacts.fmp12
+# folder: Modules / BrowserNav / Public 2
+# source: ScriptCatalog/Script[@id=466]
+# steps: 37 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=464 groupCollapsed=False includeInMenu=False
+
+   1    Set Variable [ $action; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $action
+   2    Set Variable [ $CommonHistory; Value:JSONGetElement ( $$BrowserNav ; "commonHistory" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CommonHistory
+   3    Set Variable [ $hideInactiveWindow; Value:JSONGetElement ( $$BrowserNav ; "hideInactiveWindow" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $hideInactiveWindow
+   4    Set Variable [ $hName; Value:If( JSONGetElement ( $$BrowserNav ; "commonHistory" ) ; "history.common" ; "history." & Get(WindowName) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:JSONGetElement, fn:Get, fn:WindowName
+        Repetition
+          Calculation:
+            | 1
+        Name: $hName
+   5    Set Variable [ $WindowCurrent; Value:Get( WindowName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:WindowName
+        Repetition
+          Calculation:
+            | 1
+        Name: $WindowCurrent
+   6    #Get Target Window and Layout
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $WindowTarget; Value:Case(
+        $action = "Backward" ; JSONGetElement ( $$BrowserNav ; $hName & ".backward[1].windowName" ) ;
+        $action = "Forward" ; JSONGetElement ( $$BrowserNav ; $hName & ".forward[0].windowName" ) 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case, fn:JSONGetElement
+        Name: $WindowTarget
+   8    Set Variable [ $LayoutTarget; Value:Case(
+        $action = "Backward" ; JSONGetElement ( $$BrowserNav ; $hName & ".backward[1].layoutNumber" ) ;
+        $action = "Forward" ; JSONGetElement ( $$BrowserNav ; $hName & ".forward[0].layoutNumber" ) 
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Case, fn:JSONGetElement
+        Name: $LayoutTarget
+   9    If [ IsEmpty( $LayoutTarget ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  10    Beep
+        DisableStepCollapsed state=False
+  11    Else If [ $Action = "Forward" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Set Variable [ $item; Value:JSONGetElement ( $$BrowserNav ; $hName & ".forward[0]" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $item
+  13    Set Variable [ $back; Value:JSONGetElement ( $$BrowserNav ; $hName & ".backward" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $back
+  14    Set Variable [ $newBack; Value:If( 
+        IsEmpty( $back ) or $back = "[]" ; "[" & $Item & "]" ;
+        Substitute( $back ; "[" ; "[" & $Item & " , "  )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:or, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $newBack
+  15    Set Variable [ $$BrowserNav; Value:JSONFormatElements ( 
+        JSONSetElement ( 
+        JSONDeleteElement ( JSONDeleteElement ( $$browserNav  ; 
+        	$hName & ".backward" ) ; 
+        	$hName & ".forward[0]" )
+        ; $hName & ".backward" ;
+        $newBack;  JSONArray ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONDeleteElement, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $$BrowserNav
+  16    If [ $WindowCurrent ≠ $WindowTarget ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    If [ $hideInactiveWindow ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Adjust Window
+        [ Hide ]
+        DisableStepCollapsed state=False
+        WindowState value=Hide
+  19    End If
+        DisableStepCollapsed state=False
+  20    Select Window [ Name: $WindowTarget ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=False
+        Window value=ByName
+  21    End If
+        DisableStepCollapsed state=False
+  22    Go to Layout [ $LayoutTarget ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=LayoutNumberByCalc
+        Layout id=0 name="" ref=none
+  23    Else If [ $Action = "Backward" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $item; Value:JSONGetElement ( $$BrowserNav ; $hName & ".backward[0]" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $item
+  25    Set Variable [ $Forward; Value:JSONGetElement ( $$BrowserNav ; $hName & ".forward" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Forward
+  26    Set Variable [ $newForward; Value:If( 
+        IsEmpty( $Forward ) or $Forward = "[]" ; "[" & $Item & "]" ;
+        Substitute( $Forward ; "[" ; "[" & $Item & " , "  )
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:If, fn:IsEmpty, fn:or, fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $newForward
+  27    Set Variable [ $$BrowserNav; Value:JSONFormatElements ( 
+        JSONSetElement ( 
+        JSONDeleteElement ( JSONDeleteElement ( $$browserNav  ; 
+        	$hName & ".forward" ) ; 
+        	$hName & ".backward[0]" )
+        ; $hName & ".forward" ;
+        $newForward;  JSONArray ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONSetElement, fn:JSONDeleteElement, fn:JSONArray
+        Repetition
+          Calculation:
+            | 1
+        Name: $$BrowserNav
+  28    If [ $WindowCurrent ≠ $WindowTarget ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    If [ $hideInactiveWindow ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Adjust Window
+        [ Hide ]
+        DisableStepCollapsed state=False
+        WindowState value=Hide
+  31    End If
+        DisableStepCollapsed state=False
+  32    Select Window [ Name: $WindowTarget ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=False
+        Window value=ByName
+  33    End If
+        DisableStepCollapsed state=False
+  34    Go to Layout [ $LayoutTarget ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=LayoutNumberByCalc
+        Layout id=0 name="" ref=none
+  35    End If
+        DisableStepCollapsed state=False
+  36    Refresh Object [ Object Name: "BrowserNav.JSON"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  37    Exit Script [  ]
+        DisableStepCollapsed state=False

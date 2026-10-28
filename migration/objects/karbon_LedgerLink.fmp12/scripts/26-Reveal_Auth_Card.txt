@@ -1,0 +1,166 @@
+# script 26: _Reveal Auth Card
+# file: karbon_LedgerLink.fmp12
+# folder: Modules / QBO GI OAuth2  / Private
+# source: ScriptCatalog/Script[@id=26]
+# steps: 41 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=27 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    ##proxy2 replace
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Install OnTimer Script [ “_Handle Auth Close”; Interval: 1 ]
+        DisableStepCollapsed state=False
+        Script id=23 name="_Handle Auth Close"
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   7    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+   8    Set Variable [ $$jwt; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$jwt
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Perform Script [ “QBO Config” ]
+        DisableStepCollapsed state=False
+        Script id=63 name="QBO Config"
+  11    Set Variable [ $config; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $config
+  12    If [ Error.IsError ( $config ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  13    Show Custom Dialog [ Title: "Configuration Is Not Valid"; Message: "The configuration data in the QBOConfig Table is not valid. Please check the tables data and ensure there is only one record."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  14    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  15    End If
+        DisableStepCollapsed state=False
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script [ “_OAuth BaseURL” ]
+        DisableStepCollapsed state=False
+        Script id=28 name="_OAuth BaseURL"
+  18    Set Variable [ $url; Value:Get ( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $query; Value:"license=" & JSONGetElement ( $config; "license" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $query
+  21    Set Variable [ $query; Value:$query & "&companyid=" & JSONGetElement ( $config; "companyId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $query
+  22    If [ JSON.Types.GetBoolean ( $config ; "sandbox" ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.Types.GetBoolean
+  23    Set Variable [ $query; Value:$query & "&sandbox=1" ]
+        DisableStepCollapsed state=False
+        Name: $query
+  24    End If
+        DisableStepCollapsed state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    # if we are using payments then add it to the query
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $payments; Value:JSON.Types.GetBoolean ( $config ; "payments" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Types.GetBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $payments
+  28    If [ $payments ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $query; Value:$query & "&includePayments=1" ]
+        DisableStepCollapsed state=False
+        Name: $query
+  30    End If
+        DisableStepCollapsed state=False
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    Set Variable [ $url; Value:$url & "/start?" & $query ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  33    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  34    New Window [ Style: Card; Using layout: “Authorize” (QBOConfig); Height: 900; Width: 768; Top: 80; Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Layout id=26 name=Authorize
+  35    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    Set Web Viewer [ Object Name: "wc"; URL: $url ]
+        DisableStepCollapsed state=False
+        Action value=GoToURL
+        URL custom=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  40    Install OnTimer Script [ “_Watcher”; Interval: 1 ]
+        DisableStepCollapsed state=False
+        Script id=29 name=_Watcher
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False

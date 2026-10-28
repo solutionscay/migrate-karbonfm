@@ -1,0 +1,44 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_LedgerLink.fmp12/scripts/151-Pull_QBO_Changes_Into_FM_Entity.txt,c116157ec6b264a9ff03868f4da3300cd292c16d467b19a76afedc9751839bf7,scripts,karbon_LedgerLink.fmp12,151,_Pull QBO Changes Into FM ( Entity ),integration,background-job,tier2,"Pulls records changed in QuickBooks Online since the last pull for one entity: pages through 'Get Changed QBO Data' 387 records at a time, saves each page into FileMaker with 'Save QBO Records To FM', then opens the sync record and stores the new start position, timestamp, duration and record count (or the error and the position to resume from). ","QBOEntity_selected::getQBOStartPosition#27 (step 28)
+QBOEntity_selected::getQBOTimeStamp#2 (step 29)
+QBOEntity_selected::namePlural#30 (step 35)","QBO::selectedEntityName#7 (Set Field step 22, global)
+QBOEntity_selected::getError#6 (Set Field step 24, record found in step 22)
+QBO::syncLabel#42 (Set Field step 36, global)
+QBOEntity_selected::getError#6 (Set Field step 74, record found in step 69)
+QBOEntity_selected::getQBOStartPosition#27 (Set Field step 75, record found in step 69)
+QBOEntity_selected::getQBOStartPosition#27 (Set Field step 81, record found in step 69)
+QBOEntity_selected::getDuration#7 (Set Field step 82, record found in step 69)
+QBOEntity_selected::getQBOTimeStamp#2 (Set Field step 83, record found in step 69)
+QBOEntity_selected::getRecordCount#8 (Set Field step 84, record found in step 69)","karbon_LedgerLink.fmp12/scripts/135 step 41
+karbon_LedgerLink.fmp12/scripts/154 step 53
+karbon_LedgerLink.fmp12/scripts/180 step 69",objects/karbon_LedgerLink.fmp12/scripts/708-Sync_QBO_Entities_With_FM.txt,none,"The page size 387 is hard-coded (step 30). The last-pull timestamp is saved only when the whole pull succeeds; on error the start position is saved so the next run resumes. Disabled step 31 held an Inactive filter. Which entity names are valid depends on the QBOEntity table, not shown here."
+karbon_LedgerLink.fmp12/scripts/152-Push_FM_Changes_to_QBO_Entity.txt,9bd8da81ad5a5e76dc3d7972e809b96dc9e298466040696e56a931f6a98e94ba,scripts,karbon_LedgerLink.fmp12,152,_Push FM Changes to QBO ( Entity ),integration,background-job,tier2,"Pushes FileMaker records flagged for QuickBooks Online: gets the ids to send from an override script or, by default, from an SQL lookup of records whose configured 'qbo send' field is 1, sends each one with '_Send FMData To QBO', collects the errors, then stores the send counts, errors, duration and timestamp on the sync record. ","QBOEntity_selected::namePlural#30 (step 21)
+by name: SQL.GetColumn( Config(<Entity>.fields.fmId), Config(<Entity>.fields.qboSend), 1 ) (ExecuteSQL step 28)","QBO::selectedEntityName#7 (Set Field step 20, global)
+QBO::syncLabel#42 (Set Field step 37, global)
+QBOEntity_selected::sendRecordCount#10 (Set Field step 67, record found in step 63)
+QBOEntity_selected::sendError#5 (Set Field step 68, record found in step 63)
+QBOEntity_selected::sendErrorCount#31 (Set Field step 69, record found in step 63)
+QBOEntity_selected::sendSuccessCount#32 (Set Field step 70, record found in step 63)
+QBOEntity_selected::sendDuration#9 (Set Field step 72, record found in step 63)
+QBOEntity_selected::sendTimeStamp#19 (Set Field step 73, record found in step 63)","karbon_LedgerLink.fmp12/scripts/448 step 24
+karbon_LedgerLink.fmp12/scripts/289 step 47
+karbon_LedgerLink.fmp12/scripts/180 step 63",objects/karbon_LedgerLink.fmp12/scripts/708-Sync_QBO_Entities_With_FM.txt,ExecuteSQL (via cf:SQL.GetColumn) step 28,The fields used by the default lookup come from the Config() setting '<Entity>.fields.fmId' and '<Entity>.fields.qboSend' so the table and fields read are decided at run time. Returns error -2 when at least one send failed.
+karbon_LedgerLink.fmp12/scripts/243-Sync_QBO_With_FM.txt,ac6ca64ea35fcb127fe8d6e556c8833b9f7268814b53d5f8a5e89ae6b6db67c8,scripts,karbon_LedgerLink.fmp12,243,_Sync QBO With FM,orchestration,background-job,tier2,Entry point for a full QuickBooks sync: reads the ordered list of QBO entity names with an SQL query on the QBOEntity table and hands it to '_Sync QBO Entities With FM'. ,"QBOEntity::name#1 (step 10)
+QBOEntity::sortOrder#13 (step 10)",none,karbon_LedgerLink.fmp12/scripts/708 step 11,"objects/karbon_LedgerLink.fmp12/scripts/613-Sync_With_Log.txt
+objects/karbon_LedgerLink.fmp12/scripts/241-Sync_QBO_With_FM_No_Dialog.txt
+objects/karbon_LedgerLink.fmp12/scripts/242-Sync_QBO_with_FM_Show_Progress_Card.txt
+objects/karbon_LedgerLink.fmp12/scripts/284-Sync_On_Server.txt","ExecuteSQL (via cf:SQL.GetFieldName) step 10
+ExecuteSQL (via cf:SQL.GetTableName) step 10
+ExecuteSQL step 10",Comment says 'proxy2 replace': this script is a variant of 708 and is the one other sync scripts call.
+karbon_LedgerLink.fmp12/scripts/708-Sync_QBO_Entities_With_FM.txt,02fa749d637be32c9b885db723dd7f67447db0b828f4176064e0fa8dfc9b1afd,scripts,karbon_LedgerLink.fmp12,708,_Sync QBO Entities With FM,orchestration,background-job,tier1,"Runs the QuickBooks sync over a list of entities: stops when no license is stored, initializes, shows the processing layout, then for each entity pushes FileMaker changes when the entity is set to send and pulls QBO changes when set to get. A 401 from either direction stops the run; other errors are counted and returned as a single sync error at the end. ","Config::License#22 (step 12)
+Config::One#20 (step 12)
+QBOEntity_selected::send#11 (step 37)
+QBOEntity_selected::get#12 (step 53)
+Config::License#22 (ExecuteSQL via cf:SQL.GetColumn step 12)","QBO::syncLabel#42 (Set Field step 10, global)
+QBOEntity::syncLabel#29 (Set Field step 23, global)
+QBO::selectedEntityName#7 (Set Field step 36, global)
+QBOEntity_selected::getSkipped#33 (Set Field step 52, related via QBOEntity_selected)
+QBOEntity_selected::getSkipped#33 (Set Field step 57, related via QBOEntity_selected)
+QBO::syncLabel#42 (Set Field step 77, global)","karbon_LedgerLink.fmp12/scripts/152 step 39
+karbon_LedgerLink.fmp12/scripts/151 step 59","objects/karbon_LedgerLink.fmp12/scripts/243-Sync_QBO_With_FM.txt
+objects/karbon_LedgerLink.fmp12/scripts/837-Sync_this_Entity.txt",ExecuteSQL (via cf:SQL.GetColumn) step 12,"Step 55 would skip the pull after a send error and set getSkipped=1 (step 57), and a comment says 'not getting called now tg 10/03/19'; the test uses $atleastOneSendError, which is never set (only $sendError is), so that branch cannot run and the pull always happens. License check reads Config::License."

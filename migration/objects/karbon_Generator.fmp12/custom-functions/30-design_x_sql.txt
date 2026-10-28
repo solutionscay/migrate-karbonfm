@@ -1,0 +1,31 @@
+# custom function 30: design_x_sql
+# file: karbon_Generator.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=30]
+
+CustomFunction id=30 functionArity=2 visible=True parameters=sql;databaseName name=design_x_sql
+  Calculation:
+    | 
+    | 
+    | Let(
+    | [
+    | 
+    | dataBaseName = If ( IsEmpty( dataBaseName ) ; Get(FileName) ; dataBaseName );
+    | 
+    | fileIsOpen = not IsEmpty(  FilterValues( DatabaseNames ; dataBaseName  ));
+    | pluginStatus = design_PluginStatus ( "BaseElements" )
+    | 
+    | 
+    | ];
+    | 
+    | Case(
+    |    not fileIsOpen ; "ERROR: " & Quote(databaseName) & " is not open or is misspelled." ;
+    |    pluginStatus <> "enabled" ; "Base elements is " & pluginStatus;
+    | 
+    |    // if everything is ok, do it!
+    |    <Function Missing> ( sql ; "|" ; "¶" ; databaseName )
+    | 
+    | 
+    | )
+    | 
+    | )
+    refs: fn:Let, fn:If, fn:IsEmpty, fn:Get, fn:FileName, fn:not, fn:FilterValues, fn:DatabaseNames, cf:design_PluginStatus, fn:Case, fn:Quote

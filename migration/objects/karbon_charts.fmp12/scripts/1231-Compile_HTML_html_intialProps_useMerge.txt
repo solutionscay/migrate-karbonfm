@@ -1,0 +1,257 @@
+# script 1231: Compile HTML ( html, intialProps, useMerge ) 
+# file: karbon_charts.fmp12
+# folder: FM WebViewer Bridge / Public
+# source: ScriptCatalog/Script[@id=1231]
+# steps: 57 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=1218 groupCollapsed=False includeInMenu=False
+
+   1    #/##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # Compiles the Data and the hash together for each platform
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @module fm-webviewer-bridge
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} params.html the html for the widget
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {object} params.data a json object that will get inserted into the dom
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    # @param {boolean} [params.useMerge=false] perform a FM Substitute based merge
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Variable [ $params; Value:JSON.Format ( Get (ScriptParameter) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  17    If [ Error.IsError ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  18    Exit Script [ Result: $data ]
+        DisableStepCollapsed state=False
+  19    End If
+        DisableStepCollapsed state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Variable [ $html; Value:JSONGetElement ( $params ;  "html" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $html
+  22    Set Variable [ $data; Value:JSONGetElement ( $params ;  "data" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  23    Set Variable [ $useMerge; Value:GetAsBoolean( JSONGetElement ( $params ;  "useMerge" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $useMerge
+  24    Set Variable [ $export; Value:GetAsBoolean( JSONGetElement ( $params ;  "export" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetAsBoolean, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $export
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $data; Value:JSONSetElement ($data;
+        
+        	["isFM"; True; JSONBoolean];
+        	["fileName"; Get(FileName) ; JSONString ];
+        	["Version";Get(ApplicationVersion) ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:True, fn:JSONBoolean, fn:Get, fn:FileName, fn:JSONString, fn:ApplicationVersion
+        Repetition
+          Calculation:
+            | 1
+        Name: $data
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    If [ not IsEmpty ( $data ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty
+  29    Set Variable [ $checkJSON; Value:JSONFormatElements($data ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements
+        Repetition
+          Calculation:
+            | 1
+        Name: $checkJSON
+  30    If [ Left( $checkJSON; 1) ="?" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left
+  31    Insert Text [ $html ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text
+          | <html>
+          |    <body style="background-color:yellow">
+          |      <h3>Invalid Data</h3>
+          |     <p>The data that was passed to the widget wasn't valid JSON</p> 
+          | </body>
+          | </html>
+        Field: $html
+  32    Set Variable [ $html; Value:Substitute($html; "__DATA__" ; $data ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $html
+  33    Exit Script [ Result: $html ]
+        DisableStepCollapsed state=False
+  34    End If
+        DisableStepCollapsed state=False
+  35    End If
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  38    If [ $UseMerge ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $mergeTags; Value:JSONListKeys ( $data ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONListKeys
+        Repetition
+          Calculation:
+            | 1
+        Name: $mergeTags
+  40    Set Variable [ $n; Value:1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  41    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    Set Variable [ $tag; Value:GetValue ( $mergeTags ; $n ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $tag
+  43    Exit Loop If [ IsEmpty( $tag ) ]
+        DisableStepCollapsed state=False
+        refs: fn:IsEmpty
+  44    Set Variable [ $value; Value:JSONGetElement($data ; $tag ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $value
+  45    Set Variable [ $html; Value:Substitute ($html ; "__" & $tag & "__" ; $value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $html
+  46    Set Variable [ $n; Value:$n + 1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  47    End Loop
+        DisableStepCollapsed state=False
+  48    Set Variable [ $compiledHTML; Value:$html ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $compiledHTML
+  49    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Variable [ $compiledHTML; Value:Substitute ( $html ; "window.__DATA__" ; $data ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Substitute
+        Repetition
+          Calculation:
+            | 1
+        Name: $compiledHTML
+  51    End If
+        DisableStepCollapsed state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    Exit Script [ Result: $compiledHTML ]
+        DisableStepCollapsed state=False

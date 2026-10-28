@@ -1,0 +1,119 @@
+# script 98: HTTP Request With Logger
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules
+# source: ScriptCatalog/Script[@id=98]
+# steps: 27 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=91 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    # single script module
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # logs request and response from the HTTP Module
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $logdata; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $logdata
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Variable [ $request; Value:JSONFormatElements( JSONGetElement ( $logData ; "request" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+   8    Set Variable [ $curl; Value:JSONGetElement ( $logData ; "curlOptions" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $curl
+   9    Set Variable [ $request; Value:JSONSetElement( $request ; "headers.Authorization" ; "--hidden--"; JSONString ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  10    Set Variable [ $request; Value:JSONFormatElements( $request  ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+  11    Set Variable [ $response; Value:JSONFormatElements( JSONGetElement ( $logData ; "response" ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONFormatElements, fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ Get(LayoutTableName) = "QBO" and Get(RecordOpenCount) > 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LayoutTableName, fn:and, fn:RecordOpenCount
+  15    #log from here
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Field [ QBO::id_Log; "" ]
+        DisableStepCollapsed state=False
+        Field table=QBO id=32 name=id_Log
+  17    Set Field [ HTTPRequestLog::Request; $request ]
+        DisableStepCollapsed state=False
+        Field table=HTTPRequestLog id=3 name=Request
+  18    Set Field [ HTTPRequestLog::Response; $response ]
+        DisableStepCollapsed state=False
+        Field table=HTTPRequestLog id=2 name=Response
+  19    Set Field [ HTTPRequestLog::curl; $curl ]
+        DisableStepCollapsed state=False
+        Field table=HTTPRequestLog id=4 name=curl
+  20    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Go to Layout [ “HTTPRequestLog” (HTTPRequestLog) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=31 name=HTTPRequestLog
+  22    New Record/Request
+        DisableStepCollapsed state=False
+  23    Set Field [ HTTPRequestLog::Request; $request ]
+        DisableStepCollapsed state=False
+        Field table=HTTPRequestLog id=3 name=Request
+  24    Set Field [ HTTPRequestLog::Response; $response ]
+        DisableStepCollapsed state=False
+        Field table=HTTPRequestLog id=2 name=Response
+  25    Set Field [ HTTPRequestLog::curl; $curl ]
+        DisableStepCollapsed state=False
+        Field table=HTTPRequestLog id=4 name=curl
+  26    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  27    End If
+        DisableStepCollapsed state=False

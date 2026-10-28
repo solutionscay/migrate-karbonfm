@@ -1,0 +1,42 @@
+# custom function 16: JSON.GetValuesAtPath
+# file: karbon_kontroller.fmp12
+# source: CustomFunctionCatalog/CustomFunction[@id=16]
+
+CustomFunction id=16 functionArity=2 visible=True parameters=array;path name=JSON.GetValuesAtPath
+  Calculation:
+    | /**
+    |  * 
+    |  * returns list containing only the values at that path
+    |  *
+    |  * @param {array} array a valid JSON Array of objects
+    |  * @param {string} the path to the property you want to list
+    |  *
+    |  * @module fm-json-additions
+    |  * @see https://github.com/geistinteractive/fm-json-additions
+    |  * 
+    |  * @history 2017-05-16, john@e-rwu.com, fixes gh #5, #4
+    |  * @history 2017-04-01, todd@geistinteractive.com, created
+    |  *
+    |  * =====================================
+    |  */
+    | 
+    | 
+    | Let ( [
+    | 
+    | 	notValid = Left ( JSONFormatElements ( array ) ; 1 ) = "?" ;
+    | 	c = ValueCount ( JSONListValues ( array ; "" ) ) ;
+    | 	
+    | 	thisItem = JSONGetElement ( array ;  c - 1  ) ;
+    | 	newArray = JSONDeleteElement ( array ; c - 1 ) ;
+    | 	prop = JSONGetElement ( thisItem  ; path ) ;
+    | 	prop = If ( Left ( prop ; 1 ) = "?" ; ""; prop )
+    | 
+    | ];
+    | 
+    | 	Case (
+    | 		c < 1 or notValid ; "" ;
+    |         		List ( JSON.GetValuesAtPath ( newArray ; path )  ; prop  )
+    | 	) //end case
+    | 
+    | ) //end let
+    refs: fn:Let, fn:Left, fn:JSONFormatElements, fn:ValueCount, fn:JSONListValues, fn:JSONGetElement, fn:JSONDeleteElement, fn:If, fn:Case, fn:or, fn:List, cf:JSON.GetValuesAtPath

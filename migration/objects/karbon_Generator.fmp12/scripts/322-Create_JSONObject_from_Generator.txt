@@ -1,0 +1,244 @@
+# script 322: Create JSONObject from Generator
+# file: karbon_Generator.fmp12
+# folder: App Modules / JSONObjects / Public
+# source: ScriptCatalog/Script[@id=322]
+# steps: 55 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=284 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $FMTableList; Value:List( ApiGeneratorLine::FmpTableName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ApiGeneratorLine::FmpTableName#10
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMTableList
+   4    Set Variable [ $FMFieldList; Value:List( ApiGeneratorLine::FmpFieldName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ApiGeneratorLine::FmpFieldName#4
+        Repetition
+          Calculation:
+            | 1
+        Name: $FMFieldList
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $KeyList; Value:List( ApiGeneratorLine::JsonPropertyName ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ApiGeneratorLine::JsonPropertyName#21
+        Repetition
+          Calculation:
+            | 1
+        Name: $KeyList
+   7    Set Variable [ $TypeList; Value:List( ApiGeneratorLine::type ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:List, ApiGeneratorLine::type#23
+        Repetition
+          Calculation:
+            | 1
+        Name: $TypeList
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #Loop through to create the JSON record object
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $Exit; Value:ValueCount( $KeyList ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:ValueCount
+        Repetition
+          Calculation:
+            | 1
+        Name: $Exit
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $i; Value:$i + 1 ]
+        DisableStepCollapsed state=False
+        Name: $i
+  14    Exit Loop If [ $i > $Exit ]
+        DisableStepCollapsed state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    #check the type
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Set Variable [ $ThisType; Value:GetValue( $TypeList; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisType
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    If [ $ThisType = "number" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    Set Variable [ $JSONType; Value:"JSONNumber" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONType
+  21    Else If [ $ThisType = "string" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Set Variable [ $JSONType; Value:"JSONString" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONType
+  23    Else If [ $ThisType = "object" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $JSONType; Value:"JSONObject" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSONType
+  25    End If
+        DisableStepCollapsed state=False
+  26    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    #only add to JSNObject if it is of type String or Number for now...
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    If [ $JSONType = "JSONNumber" or $JSONType = "JSONString" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:or
+  29    Set Variable [ $ThisKey; Value:GetValue( $KeyList; $i ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetValue
+        Repetition
+          Calculation:
+            | 1
+        Name: $ThisKey
+  30    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Set Variable [ $JSONIndex; Value:$JSONIndex + 1 ]
+        DisableStepCollapsed state=False
+        Name: $JSONIndex
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Variable [ $Lines; Value:JSONSetElement ( $Lines ; 
+        [ "[" & $JSONIndex - 1 & "]Key" ; $ThisKey ; JSONString ];
+        [ "[" & $JSONIndex - 1 & "]JSONType" ; $JSONType ; JSONString ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Name: $Lines
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    End If
+        DisableStepCollapsed state=False
+  36    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    End Loop
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Set Variable [ $param; Value:JSONSetElement ( "{}" ; 
+        [ "SimpleName" ; ApiGenerator::APIName & " - Generated" ; JSONString ];
+        [ "JSNObjectTypeId" ; 1005 ; JSONNumber ]; //JSON Example
+        [ "JSONLines" ; $Lines ; JSONArray ]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, ApiGenerator::APIName#2, fn:JSONString, fn:JSONNumber, fn:JSONArray
+        Name: $param
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  42    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  43    Perform Script [ <unknown> from file: “karbon_Generator_Kontroller” (file not open); Parameter: $param ]
+        DisableStepCollapsed state=False
+        FileReference id=2 name=karbon_Generator_Kontroller
+          UniversalPathList: file:karbon_Generator_Kontroller
+        Script id=264 ref=external
+  44    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Set Variable [ $result; Value:Get( ScriptResult ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  46    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  47    Show Custom Dialog [ Title: "Error"; Message: $result; Default Button: “OK”, Commit: “Yes”; Button 2: “Cancel”, Commit: “No” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False: "Cancel"
+          Button 3 CommitState=False
+  48    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    Set Variable [ $JSNObjectId; Value:JSONGetElement ( $result ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $JSNObjectId
+  50    Go to Layout [ “Test Detail” (Test) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=69 name="Test Detail"
+  51    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  52    Set Field [ JSNObject::Id; $JSNObjectId ]
+        DisableStepCollapsed state=False
+        Field table=JSNObject id=3 name=Id
+  53    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    End If
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False

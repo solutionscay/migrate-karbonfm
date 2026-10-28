@@ -1,0 +1,42 @@
+source_id,source_hash,kind,file,id,name,role,fields,regular,calculated,summary,global,container,repeating,keys,logic,logic_count,target,open_question
+karbon_LedgerLink.fmp12/tables/162-meta.txt,0bda12dfb5124747d9c663ababd6fa6bef72b9e9fefd274a08afb75e8ab67669,tables,karbon_LedgerLink.fmp12,162,meta,settings-globals,2,0,1,0,2,0,0,none,"8 FileVersion | calc-stored | Calculation returning ""3.2.4"" with the semantic-versioning comment; stored in a global field, recalculated always",1,config,none
+karbon_LedgerLink.fmp12/tables/163-Attachable.txt,5d0081904bfefd4c1f713f26896fed7b67e9a3ce17e7c76a50ddfb3486453d16,tables,karbon_LedgerLink.fmp12,163,Attachable,entity,20,20,0,0,0,2,0,"Id (id 1): UUID auto-enter, unique validation; parent side of Equal predicates to AttachableRef","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+20 qbo_send | auto-calc, validate-rule | Auto-enters 1 (flag: needs sending to QuickBooks Online) on any edit unless the sync session variable is set, in which case it keeps its value; validated to 0 or 1 strictly. Formula uses GetField("""") to force re-evaluation on any change
+22 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails",7,table,QuickBooks Online attachable; Container stores the file; qbo_send auto-enter references $LL_IsUpdatingThisRecord
+karbon_LedgerLink.fmp12/tables/164-AttachableRef.txt,8c7c9b19455f47761dfffb7387eda313de06ced229f9ea5d4679b46ca0778931,tables,karbon_LedgerLink.fmp12,164,AttachableRef,join,11,11,0,0,0,0,0,"Id (id 1): UUID auto-enter, unique validation
+FK AttachmentId -> Attachable::Id
+FK EntityId -> Invoice::id","1 Id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user cannot edit) and validates it: not empty, unique, strict (no override)
+2 CreationTimestamp | auto-created, validate-rule | Stamps the record creation timestamp (not editable); validation: not empty, strict data type FourDigitYear, strict (no override)
+3 CreatedBy | auto-created, validate-rule | Stamps the account name that created the record (not editable); validated not empty, strict
+4 ModificationTimestamp | auto-modified, validate-rule | Stamps the modification timestamp on every change; the validation is only a StrictValidation flag (the SyncDeK Sync_PostEdit validation and calc are inactive)
+5 ModifiedBy | auto-modified, validate-rule | Stamps the account name that last modified the record (not editable); validated not empty, strict
+9 IncludeOnSend | auto-calc, auto-data | Constant default 1 and GetAsBoolean(Self) coercion: attach the file when sending
+12 qbo_lineNum | auto-calc, validate-rule | Auto-enters the current UTC milliseconds so new lines sort after earlier lines; validated as numeric",7,table,EntityType/EntityId polymorphic link of an attachable to a QBO entity
+karbon_LedgerLink.fmp12/tables/165-Deposit.txt,0ffe25f6f13145d2df974346552465ce46e53df68f4a540516dc9b8b6339b7de,tables,karbon_LedgerLink.fmp12,165,Deposit,entity,10,9,0,0,1,0,0,"id (id 6): UUID auto-enter, unique validation; parent side of Equal predicates to DepositLine, QBO
+qbo_Id (id 8): unique validation","6 id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user may override) and validates it: not empty, unique, strict (no override) (always) - message ""Bill id must exist and be unique.""
+7 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+8 qbo_Id | auto-data, validate-rule | Constant default (empty); validation (always, strict): unique
+10 qbo_send | auto-calc, validate-rule | Auto-enters 1 (flag: needs sending to QuickBooks Online) on any edit unless the sync session variable is set, in which case it keeps its value; validated to 0 or 1 strictly. Formula uses GetField("""") to force re-evaluation on any change
+12 date | validate-rule | Validation (always): four-digit year",5,table,"qbo_send auto-enter references $LL_IsUpdatingThisRecord; validation message says ""Bill id"" (copy-paste)"
+karbon_LedgerLink.fmp12/tables/166-DepositLine.txt,6124fa6e77bc6f4fd891c7a808c1995fc044d547744f54b377ab142a229609c3,tables,karbon_LedgerLink.fmp12,166,DepositLine,entity,15,14,0,0,1,0,0,"id (id 18): UUID auto-enter, unique validation; parent side of Equal predicates to QBO
+FK id_Deposit -> Deposit::id","7 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+8 qbo_id | auto-data | Constant default (empty)
+10 qbo_lineNum | auto-calc, validate-rule | Auto-enters the current UTC milliseconds so new lines sort after earlier lines; validated as numeric
+11 qbo_send | auto-calc, validate-rule | Auto-enters 1 (flag: needs sending to QuickBooks Online) on any edit unless the sync session variable is set, in which case it keeps its value; validated to 0 or 1 strictly. Formula uses GetField("""") to force re-evaluation on any change
+18 id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user may override) and validates it: not empty, unique, strict (no override) (always)",5,table,id_Entity holds a customer/vendor/employee id of unknown table
+karbon_LedgerLink.fmp12/tables/167-Purchase.txt,17d325d4988660070fc8c95f408f6269676b3d56e129d7186e76b811ace8dcc1,tables,karbon_LedgerLink.fmp12,167,Purchase,entity,14,13,0,0,1,0,0,"id (id 6): UUID auto-enter, unique validation; parent side of Equal predicates to PurchaseLine, QBO
+qbo_Id (id 8): unique validation","6 id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user may override) and validates it: not empty, unique, strict (no override) (always) - message ""Bill id must exist and be unique.""
+7 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+8 qbo_Id | auto-data, validate-rule | Constant default (empty); validation (always, strict): unique
+10 qbo_send | auto-calc, validate-rule | Auto-enters 1 (flag: needs sending to QuickBooks Online) on any edit unless the sync session variable is set, in which case it keeps its value; validated to 0 or 1 strictly. Formula uses GetField("""") to force re-evaluation on any change
+12 date | validate-rule | Validation (always): four-digit year",5,table,"id_Entity is a vendor, customer or employee id of unknown table; validation message says ""Bill id"""
+karbon_LedgerLink.fmp12/tables/168-PurchaseLine.txt,6ca2067ad801d9836833a5bef91b3106a8bf09eb5a7fd0e0f88e5a43afc58105,tables,karbon_LedgerLink.fmp12,168,PurchaseLine,entity,23,22,0,0,1,0,0,"id (id 18): UUID auto-enter, unique validation; parent side of Equal predicates to QBO
+FK id_Purchase -> Purchase::id","7 qbo_error | auto-data | Constant (empty) default; holds the error message returned by QuickBooks Online when a sync of the record fails
+8 qbo_id | auto-data | Constant default (empty)
+10 qbo_lineNum | auto-calc, validate-rule | Auto-enters the current UTC milliseconds so new lines sort after earlier lines; validated as numeric
+11 qbo_send | auto-calc, validate-rule | Auto-enters 1 (flag: needs sending to QuickBooks Online) on any edit unless the sync session variable is set, in which case it keeps its value; validated to 0 or 1 strictly. Formula uses GetField("""") to force re-evaluation on any change
+18 id | auto-calc, validate-rule | Generates a UUID string as the record key at creation (user may override) and validates it: not empty, unique, strict (no override) (always)",5,table,id_Customer and id_Item comments refer to ItemBasedExpenseLineDetail; other detail types are not modeled

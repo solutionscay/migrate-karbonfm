@@ -1,0 +1,206 @@
+# table 195: File
+# file: karbon_data.fmp12
+# source: BaseTableCatalog/BaseTable[@id=195]
+# fields: 23
+# records: 0
+
+Field id=1 dataType=Text fieldType=Normal name=Id
+  Comment: Unique identifier of each record in this table
+  AutoEnter allowEditing=False overwriteExistingValue=True calculation=True
+    Calculation table=File:
+      | Get( UUID )
+      refs: fn:Get, fn:UUID
+  Validation type=OnlyDuringDataEntry
+    NotEmpty value=True
+    Unique value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=Minimal indexLanguage=Unicode_Raw maxRepetition=1
+  DisplayNames enable=False
+
+Field id=2 dataType=TimeStamp fieldType=Normal name=CreationTimestamp
+  Comment: Date and time each record was created
+  AutoEnter allowEditing=False value=CreationTimeStamp
+  Validation type=OnlyDuringDataEntry
+    StrictDataType value=FourDigitYear
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=3 dataType=Text fieldType=Normal name=CreatedBy
+  Comment: Account name of the user who created each record
+  AutoEnter allowEditing=False value=CreationAccountName
+  Validation type=OnlyDuringDataEntry
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=4 dataType=TimeStamp fieldType=Normal name=ModificationTimestamp
+  Comment: Date and time each record was last modified
+  AutoEnter allowEditing=False value=ModificationTimeStamp
+  Validation type=OnlyDuringDataEntry
+    StrictDataType value=FourDigitYear
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Normal name=ModifiedBy
+  Comment: Account name of the user who last modified each record
+  AutoEnter allowEditing=False value=ModificationAccountName
+  Validation type=OnlyDuringDataEntry
+    NotEmpty value=True
+    StrictValidation value=True
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Normal name=FileName
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Normal name=Note
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Normal name=FileAccessUri
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Normal name=TempDownLoadUri
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Normal name=ContentType
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Normal name=Category
+  Comment: One of Contact Photo, Document, Image, Receipt, Signature, Sound, Other.
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=12 dataType=Text fieldType=Normal name=Tag
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Normal name=ThumbnailTempDownloadUri
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Binary fieldType=Normal name=Container
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage maxRepetition=1
+    Remote type=Open relativeToPath=karbon_data/ relativeTo=0
+      Location
+        Calculation table=File:
+          | "Container/" & Year( CreationTimestamp ) & "/" & Right ( "0" & Month( CreationTimestamp ) ; 2 ) & "/"  & Right ( "0" & Day( CreationTimestamp ) ; 2 ) & "/"
+          | 
+          | // example path "../Container/2018/09/30/filename.ext"
+          refs: fn:Year, File::CreationTimestamp#2, fn:Right, fn:Month, fn:Day
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Normal name=qbo_id
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=Minimal indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Number fieldType=Normal name=qbo_send
+  AutoEnter allowEditing=True overwriteExistingValue=True calculation=True
+    Calculation table=File:
+      | Let(
+      | [
+      | x = GetField("")
+      | 
+      | ];
+      | Case(
+      |    $LL_IsUpdatingThisRecord ; Self;
+      |    1
+      | )
+      | 
+      | )
+      refs: fn:Let, fn:GetField, fn:Case, fn:Self
+  Validation type=Always
+    Range to=1 from=0
+    StrictValidation value=True
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=22 dataType=Text fieldType=Normal name=qbo_error
+  Comment: error message returned by QBO when attempting to sync this record
+  AutoEnter allowEditing=True value=ConstantData constant=True
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=TimeStamp fieldType=Normal name=qbo_LastUpdated
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Binary fieldType=Normal name=Thumbnail
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage maxRepetition=1
+    Remote type=Open relativeToPath=karbon_data/ relativeTo=0
+      Location
+        Calculation table=File:
+          | "Thumbnail/" & Year( CreationTimestamp ) & "/" & Right ( "0" & Month( CreationTimestamp ) ; 2 ) & "/"  & Right ( "0" & Day( CreationTimestamp ) ; 2 ) & "/"
+          | 
+          | // example path "../Thumbnail/2018/09/30/filename.ext"
+          refs: fn:Year, File::CreationTimestamp#2, fn:Right, fn:Month, fn:Day
+  DisplayNames enable=False
+
+Field id=25 dataType=Number fieldType=Normal name=ONE
+  AutoEnter allowEditing=True overwriteExistingValue=True alwaysEvaluate=True constant=False calculation=True
+    (inactive) ConstantData: 1
+    Calculation table=File:
+      | // Ensures that this field always reevaluates to 1
+      | Let ( triggerOnChangesTo = Self ; 1 )
+      refs: fn:Let, fn:Self
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=File (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Number fieldType=Normal name=FileSize
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=File (inactive):
+      | Round ( GetContainerAttribute ( Container ; "filesize" ) / 1000  ; 2  ) //KB
+      refs: fn:Round, fn:GetContainerAttribute, File::Container#17
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Text fieldType=Normal name=Extension
+  AutoEnter allowEditing=True
+  Validation type=OnlyDuringDataEntry
+  Storage autoIndex=True index=None indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

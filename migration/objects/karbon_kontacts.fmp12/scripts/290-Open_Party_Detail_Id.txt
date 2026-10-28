@@ -1,0 +1,115 @@
+# script 290: Open Party Detail { Id }
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party
+# source: ScriptCatalog/Script[@id=290]
+# steps: 30 (1 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=161 groupCollapsed=True includeInMenu=False
+
+   1    #2018-07-02 Dave Graham dave@geistinteractive.com: created
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #Parameters are optional
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $parameters; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $parameters
+   5    If [ JSON.IsValid ( $parameters ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.IsValid
+   6    Set Variable [ $Id; Value:JSONGetElement ( Get ( ScriptParameter ) ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   7    End If
+        DisableStepCollapsed state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    #Todo - Support open in new window and new card window
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Go to Layout [ “Party Detail” (Party) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=50 name="Party Detail"
+  11    Adjust Window
+        [ Resize to Fit ]
+        DisableStepCollapsed state=False
+        WindowState value=ResizeToFit
+  12 // New Window [ Style: Card; Name: "Edit Contact"; Using layout: “Contact Card” (Party); Close: No; Minimize: No; Maximize: No; Resize: No; Menu Bar: No; Dim parent window: Yes; Toolbars: No ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        NewWndStyles DimParentWindow=Yes Toolbars=No MenuBar=No Style=Card Close=No Minimize=No Maximize=No Resize=No Styles=3222274064
+        Layout id=49 name="Contact Card"
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ IsEmpty ( $Id ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty
+  15    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False
+  16    End If
+        DisableStepCollapsed state=False
+  17    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    If [ Party::Id <> $Id ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: Party::Id#1
+  19    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  20    Set Field [ Party::Id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=Party id=1 name=Id
+  21    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  22    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    If [ Get ( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  25    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+  26    Show Custom Dialog [ Title: "Error"; Message: "The contact could not be found"; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  27    End If
+        DisableStepCollapsed state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Exit Script [ Result: 0 ]
+        DisableStepCollapsed state=False

@@ -1,0 +1,485 @@
+# script 619: SalesReceipt :: Field Map :: Set
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / LedgerLink / LedgerLink CONFIG / Transactions
+# source: ScriptCatalog/Script[@id=619]
+# steps: 108 (5 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=246 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # This script is repsonsible for saving the data from QBO into a FileMaker Record
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    # context QBO Layout, related to the target record
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # Returning "skip" as the script result will Skip this record and revert any changes
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} json the record just pulled from QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  11    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  12    Set Variable [ $json; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ 0 //some test ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #Exiting with "skip" at any point in this script will revert all changes
+        this lets you decide right now if you want to accept this data back into FileMaker.
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Exit Script [ Result: "skip" ]
+        DisableStepCollapsed state=False
+  17    End If
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #PARSE JSON INTO VARIABLES
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    Set Variable [ $Id; Value:JSONGetElement( $json ; "Id" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    Set Variable [ $DueDate; Value:JSONGetElement( $json ; "DueDate" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DueDate
+  27    Set Variable [ $Deposit; Value:JSONGetElement( $json ; "Deposit" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Deposit
+  28    Set Variable [ $DepositToAccountRef.value; Value:JSONGetElement( $json ; "DepositToAccountRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DepositToAccountRef.value
+  29    Set Variable [ $SalesTermRef.value; Value:JSONGetElement( $json ; "SalesTermRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesTermRef.value
+  30    Set Variable [ $CustomerRef.value; Value:JSONGetElement( $json ; "CustomerRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerRef.value
+  31    Set Variable [ $privateNote; Value:JSONGetElement( $json ; "PrivateNote" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $privateNote
+  32    Set Variable [ $BillAddr.Line1; Value:JSONGetElement( $json ; "BillAddr.Line1" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $BillAddr.Line1
+  33    Set Variable [ $BillAddr.Line2; Value:JSONGetElement( $json ; "BillAddr.Line2" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $BillAddr.Line2
+  34    Set Variable [ $BillAddr.City; Value:JSONGetElement( $json ; "BillAddr.City" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $BillAddr.City
+  35    Set Variable [ $BillAddr.CountrySubDivisionCode; Value:JSONGetElement( $json ; "BillAddr.CountrySubDivisionCode" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $BillAddr.CountrySubDivisionCode
+  36    Set Variable [ $BillAddr.PostalCode; Value:JSONGetElement( $json ; "BillAddr.PostalCode" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $BillAddr.PostalCode
+  37    Set Variable [ $BillEmail.Address; Value:JSONGetElement( $json ; "BillEmail.Address" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $BillEmail.Address
+  38    Set Variable [ $DocNumber; Value:JSONGetElement( $json ; "DocNumber" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $DocNumber
+  39    Set Variable [ $EmailStatus; Value:JSONGetElement( $json ; "EmailStatus" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $EmailStatus
+  40 // Set Variable [ $TxnTaxDetail.TxnTaxCodeRef.value; Value:JSONGetElement( $json ; "TxnTaxDetail.TxnTaxCodeRef.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TxnTaxDetail.TxnTaxCodeRef.value
+  41    Set Variable [ $TxnTaxDetail.TotalTax; Value:JSONGetElement( $json ; "TxnTaxDetail.TotalTax" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TxnTaxDetail.TotalTax
+  42    Set Variable [ $CustomerMemo.value; Value:JSONGetElement( $json ; "CustomerMemo.value" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerMemo.value
+  43    Set Variable [ $TxnDate; Value:JSONGetElement( $json ; "TxnDate" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TxnDate
+  44    Set Variable [ $ShipAddr.Line1; Value:JSONGetElement( $json ; "ShipAddr.Line1" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Name: $ShipAddr.Line1
+  45    Set Variable [ $ShipAddr.City; Value:JSONGetElement( $json ; "ShipAddr.City" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ShipAddr.City
+  46    Set Variable [ $ShipAddr.CountrySubDivisionCode; Value:JSONGetElement( $json ; "ShipAddr.CountrySubDivisionCode" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ShipAddr.CountrySubDivisionCode
+  47    Set Variable [ $ShipAddr.PostalCode; Value:JSONGetElement( $json ; "ShipAddr.PostalCode" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $ShipAddr.PostalCode
+  48    Set Variable [ $TotalAmt; Value:JSONGetElement( $json ; "TotalAmt" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $TotalAmt
+  49    Set Variable [ $Balance; Value:JSONGetElement( $json ; "Balance" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Balance
+  50    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  52    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  53    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  54    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  55    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #TRANSFORMATIONS
+        DisableStepCollapsed state=False
+        Restore state=False
+  57    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    Set Variable [ $TxnDate; Value:Date.FromISO ( $TxnDate ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Date.FromISO
+        Repetition
+          Calculation:
+            | 1
+        Name: $TxnDate
+  60    Set Variable [ $DueDate; Value:Date.FromISO ( $DueDate ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:Date.FromISO
+        Repetition
+          Calculation:
+            | 1
+        Name: $DueDate
+  61    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  62    #zeitgeist overrides customers completely so we need to use a handler here
+        DisableStepCollapsed state=False
+        Restore state=False
+  63    Perform Script [ “Lookup Customer fmID ( qboId )”; Parameter: $CustomerRef.value ]
+        DisableStepCollapsed state=False
+        Script id=609 name="Lookup Customer fmID ( qboId )"
+  64    Set Variable [ $CustomerRef.value; Value:Get(ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerRef.value
+  65 // Set Variable [ $CustomerRef.value; Value:QBO.LookupFMId ( "Customer" ; $CustomerRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $CustomerRef.value
+  66    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  67    Set Variable [ $DepositToAccountRef.value; Value:QBO.LookupFMId ( "Account" ; $DepositToAccountRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $DepositToAccountRef.value
+  68    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  69    Set Variable [ $SalesTermRef.value; Value:QBO.LookupFMId ( "Term" ; $SalesTermRef.value ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:QBO.LookupFMId
+        Repetition
+          Calculation:
+            | 1
+        Name: $SalesTermRef.value
+  70    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  71    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  72    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  73 // #create the super
+        DisableStepCollapsed state=False
+        Restore state=False
+  74 // Set Field [ <Table Missing>; 1 ]
+        DisableStepCollapsed state=False
+        Field table="" id=7 name="" ref=missing
+  75 // Set Field [ <Table Missing>; $CustomerRef.value ]
+        DisableStepCollapsed state=False
+        Field table="" id=10 name="" ref=missing
+  76    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  77    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  78    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  79    #SET INTO FIELDS
+        DisableStepCollapsed state=False
+        Restore state=False
+  80    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+  81    Set Field [ qbo_SalesReceipt::id_Term; $SalesTermRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=28 name=id_Term
+  82    Set Field [ qbo_SalesReceipt::id_Customer; $CustomerRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=7 name=id_Customer
+  83    Set Field [ qbo_SalesReceipt::id_AccountDeposit; $DepositToAccountRef.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=71 name=id_AccountDeposit
+  84    Set Field [ qbo_SalesReceipt::billAddressLine1; $BillAddr.Line1 ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=8 name=billAddressLine1
+  85    Set Field [ qbo_SalesReceipt::billAddressLine2; $BillAddr.Line2 ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=9 name=billAddressLine2
+  86    Set Field [ qbo_SalesReceipt::billAddressCity; $BillAddr.City ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=10 name=billAddressCity
+  87    Set Field [ qbo_SalesReceipt::billAddressState; $BillAddr.CountrySubDivisionCode ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=15 name=billAddressState
+  88    Set Field [ qbo_SalesReceipt::billAddressPostalCode; $BillAddr.PostalCode ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=14 name=billAddressPostalCode
+  89    Set Field [ qbo_SalesReceipt::billEmailAddress; $BillEmail.Address ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=29 name=billEmailAddress
+  90    Set Field [ qbo_SalesReceipt::emailStatus; $EmailStatus ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=72 name=emailStatus
+  91    Set Field [ qbo_SalesReceipt::docNumber; $DocNumber ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=4 name=docNumber
+  92    Set Field [ qbo_SalesReceipt::totalTax; $TxnTaxDetail.TotalTax ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=30 name=totalTax
+  93    Set Field [ qbo_SalesReceipt::customerMemo; $CustomerMemo.value ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=27 name=customerMemo
+  94    Set Field [ qbo_SalesReceipt::privateNote; $privateNote ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=6 name=privateNote
+  95    Set Field [ qbo_SalesReceipt::date; $TxnDate ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=5 name=date
+  96    Set Field [ qbo_SalesReceipt::shipAddressLine1; $ShipAddr.Line1 ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=44 name=shipAddressLine1
+  97    Set Field [ qbo_SalesReceipt::shipAddressCity; $ShipAddr.City ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=42 name=shipAddressCity
+  98    Set Field [ qbo_SalesReceipt::shipAddressState; $ShipAddr.CountrySubDivisionCode ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=47 name=shipAddressState
+  99    Set Field [ qbo_SalesReceipt::shipAddressPostalCode; $ShipAddr.PostalCode ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=46 name=shipAddressPostalCode
+ 100    Set Field [ qbo_SalesReceipt::totalAmt; $TotalAmt ]
+        DisableStepCollapsed state=False
+        Field table=qbo_SalesReceipt id=25 name=totalAmt
+ 101    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 102    #——————————————————————————————————————————————————————————————
+        DisableStepCollapsed state=False
+        Restore state=False
+ 103    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 104    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 105    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 106    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 107    #
+        DisableStepCollapsed state=False
+        Restore state=False
+ 108    #
+        DisableStepCollapsed state=False
+        Restore state=False

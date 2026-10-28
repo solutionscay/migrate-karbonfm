@@ -1,0 +1,63 @@
+# script 583: Rebuild Posted Data
+# file: karbon_kontroller.fmp12
+# folder: API / Posting Data
+# source: ScriptCatalog/Script[@id=583]
+# steps: 13 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=579 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Go to Layout [ “f_SummaryByMonth” (SumaryByMonth) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=27 name=f_SummaryByMonth
+   4    Truncate Table [ No dialog; Table: <Current Table> ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        BaseTable id=-1 name="<Current Table>"
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Go to Layout [ “f_SalesTransaction” (SalesTransaction) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=28 name=f_SalesTransaction
+   7    Show All Records
+        DisableStepCollapsed state=False
+   8    Go to Record/Request/Page
+        [ First ]
+        NoInteract state=False
+        DisableStepCollapsed state=False
+        RowPageLocation value=First
+   9    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Set Variable [ $json; Value:JSONSetElement ( ""; 
+        ["Id" ; SalesTransaction::id; JSONString];
+        ["Post" ; True; JSONBoolean]
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, SalesTransaction::id#1, fn:JSONString, fn:True, fn:JSONBoolean
+        Repetition
+          Calculation:
+            | 1
+        Name: $json
+  11    Perform Script [ “Post/Unpost Internal ( {Id, Post} )”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        Script id=576 name="Post/Unpost Internal ( {Id, Post} )"
+  12    Go to Record/Request/Page
+        [ Next; Exit after last ]
+        NoInteract state=False
+        Exit state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=Next
+  13    End Loop
+        DisableStepCollapsed state=False

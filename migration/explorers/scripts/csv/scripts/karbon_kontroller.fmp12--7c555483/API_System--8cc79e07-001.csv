@@ -1,0 +1,16 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/294-Create_System_Record_data.txt,f9bcb9a39e6bb21fcaa88c11cf5600eaf8fd452324eb5683630024bf956db3c0,scripts,karbon_kontroller.fmp12,294,Create System Record { data },data-change,server-domain,tier2,"API script that creates or updates the single System settings record from a JSON object inside a start/end transaction wrapper: area code, phone formatting, country, default tax code, merge field references, owner party id and the system e-mail user name and password. The validation rule is disabled.",none,"System::ONE#1 (Set Field step 92, related via System; creates or locks the singleton record)
+System::AreaCode#13 (Set Field step 102, related via System)
+System::AutomaticallyFormatPhoneNumbersInd#10 (Set Field step 103, related via System)
+System::CountryId#11 (Set Field step 104, related via System; set from the Country key)
+System::CountryCode#32 (Set Field step 105, related via System)
+System::CreatedByTestBatchID#44 (Set Field step 106, related via System)
+System::DefaultTaxCodeId#45 (Set Field step 107, related via System)
+System::MergeFieldReferences#17 (Set Field step 108, related via System)
+System::OwnerId#39 (Set Field step 109, related via System)
+System::SystemEmailUserName#36 (Set Field step 110, related via System)
+System::SystemEmailAccountPassword#37 (Set Field step 111, related via System)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 40; Perform Script)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 123; Perform Script)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 124; Perform Script)",none found (may be called by name),none,"secret: System::SystemEmailAccountPassword is set from the JSON key SystemEmailAccountPassword at step 111, and the whole parameter, including the password, is saved as the transaction payload by Start Transaction (called with Transaction.Payload, step 40); unlike Send Email Message, this script does not mask the password. The doc comment names System.SystemEmailAccountName while the field written is SystemEmailUserName. The Country key is written to CountryId. Validation steps 59-60 are disabled, so an empty body is accepted."
+karbon_kontroller.fmp12/scripts/502-Get_System.txt,9c633716189664b4c68d1c561355ba6db35487cd3b1fce5c7839e3d1fd290e0e,scripts,karbon_kontroller.fmp12,502,Get System,find-query,server-query,tier2,"API helper that returns the System settings record as JSON, read with an SQL lookup on System::AsJson for the singleton record (System::ONE = 1).","System::AsJson#46 (SQL.GetColumn step 1)
+System::ONE#1 (SQL.GetColumn where field step 1, value 1)",none,none,objects/karbon_kontroller.fmp12/scripts/337-Send_Email_Message.txt (step 77),none,"The JSON returned by System::AsJson may include the system e-mail account password; its content is defined in the field calculation, not in this script (the caller Send Email Message plucks SystemEmailAccountPassword from it)."

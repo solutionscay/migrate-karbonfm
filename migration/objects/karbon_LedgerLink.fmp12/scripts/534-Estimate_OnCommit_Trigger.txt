@@ -1,0 +1,70 @@
+# script 534: Estimate OnCommit Trigger
+# file: karbon_LedgerLink.fmp12
+# folder: Application Modules / Interface: All Devices / Estimate Interface
+# source: ScriptCatalog/Script[@id=534]
+# steps: 16 (6 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=525 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #flag an Estimate as modified when its related line items are modified
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Field [ Estimate::qbo_send; True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
+        Field table=Estimate id=3 name=qbo_send
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #summarize related records
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    Set Field [ Estimate::subtotal; EstimateItem::summaryTotalAmount ]
+        DisableStepCollapsed state=False
+        refs: EstimateItem::summaryTotalAmount#14
+        Field table=Estimate id=33 name=subtotal
+   8    Set Field [ Estimate::taxableSubtotal; EstimateItem::summaryTotalAmountTaxable ]
+        DisableStepCollapsed state=False
+        refs: EstimateItem::summaryTotalAmountTaxable#13
+        Field table=Estimate id=34 name=taxableSubtotal
+   9 // If [ /* tax field was not modified */
+        
+        IsEmpty ( FilterValues (
+        	Get ( ModifiedFields ) ;
+        	FieldName ( Estimate::totalTax )
+        ) )
+        
+        /* this allows the user manually enter the total tax */ ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:IsEmpty, fn:FilterValues, fn:Get, fn:ModifiedFields, cf:FieldName, Estimate::totalTax#30
+  10 // Set Field [ Estimate::totalTax; Round ( Estimate::taxableSubtotal * ( Estimate_TaxCode::percentage / 100 ) ; 2 ) ]
+        DisableStepCollapsed state=False
+        refs: fn:Round, Estimate::taxableSubtotal#34, Estimate_TaxCode::percentage#10
+        Field table=Estimate id=30 name=totalTax
+  11 // Else If [ /* at least one item is taxable */
+        EstimateItem::summaryTotalAmountTaxable ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: EstimateItem::summaryTotalAmountTaxable#13
+  12 // #at least one line must be taxable for total tax to be sent to QBO
+        DisableStepCollapsed state=False
+        Restore state=False
+  13 // Set Field [ Estimate::totalTax; "" ]
+        DisableStepCollapsed state=False
+        Field table=Estimate id=30 name=totalTax
+  14 // End If
+        DisableStepCollapsed state=False
+  15    Set Field [ Estimate::totalAmt; Estimate::subtotal + Estimate::totalTax + Estimate::shipAmt ]
+        DisableStepCollapsed state=False
+        refs: Estimate::subtotal#33, Estimate::totalTax#30, Estimate::shipAmt#41
+        Field table=Estimate id=25 name=totalAmt
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False

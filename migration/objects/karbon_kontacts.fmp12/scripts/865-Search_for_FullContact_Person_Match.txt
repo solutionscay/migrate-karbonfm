@@ -1,0 +1,271 @@
+# script 865: Search for FullContact Person Match
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Party / Create Party / Party Wizard
+# source: ScriptCatalog/Script[@id=865]
+# steps: 60 (7 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=396 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #check for minimum API requirements
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $NameFull; Value:UtilityParty::PersonFirstName & " " & UtilityParty::PersonLastName ]
+        DisableStepCollapsed state=False
+        Value
+          refs: UtilityParty::PersonFirstName#1, UtilityParty::PersonLastName#3
+        Repetition
+          Calculation:
+            | 1
+        Name: $NameFull
+   4    Set Variable [ $MinimumInputsMet; Value:not   IsEmpty ( $NameFull ) and  not (  IsEmpty ( UtilityParty::PersonEmail ) and  IsEmpty ( UtilityParty::PersonPhone ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:IsEmpty, fn:and, UtilityParty::PersonEmail#18, UtilityParty::PersonPhone#17
+        Repetition
+          Calculation:
+            | 1
+        Name: $MinimumInputsMet
+   5    If [ not $MinimumInputsMet ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not
+   6    Perform Script [ “Go to Summary” ]
+        DisableStepCollapsed state=False
+        Script id=409 name="Go to Summary"
+   7    Exit Script [  ]
+        DisableStepCollapsed state=False
+   8    End If
+        DisableStepCollapsed state=False
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Insert Calculated Result [ $json; "{}" ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $json
+  11 // Insert Calculated Result [ $emailList; UtilityParty::PersonEmail ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: UtilityParty::PersonEmail#18
+        Field: $emailList
+  12    Insert Calculated Result [ $json; JSONSetElement ( $json ; "emails" ;UtilityParty::PersonEmail ; JSONString) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, UtilityParty::PersonEmail#18, fn:JSONString
+        Field: $json
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    #we do not collect a person's address info
+        DisableStepCollapsed state=False
+        Restore state=False
+  15 // Insert Calculated Result [ $json; JSONSetElement ( $json ; "addressLine1" ; "123 Main Street" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  16 // Insert Calculated Result [ $json; JSONSetElement ( $json ; "addressLine2" ; "Unit 2" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  17 // Insert Calculated Result [ $json; JSONSetElement ( $json ; "city" ; "Denver" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  18 // Insert Calculated Result [ $json; JSONSetElement ( $json ; "postalCode" ; "80203" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  19 // Insert Calculated Result [ $json; JSONSetElement ( $json ; "region" ; "Colorado" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  20 // Insert Calculated Result [ $json; JSONSetElement ( $json ; "regionCode" ; "CO" ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Insert Calculated Result [ $json; JSONSetElement ( $json ; "family" ; UtilityParty::PersonLastName ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, UtilityParty::PersonLastName#3, fn:JSONString
+        Field: $json
+  23    Insert Calculated Result [ $json; JSONSetElement ( $json ; "given" ; UtilityParty::PersonFirstName ; JSONString ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, UtilityParty::PersonFirstName#1, fn:JSONString
+        Field: $json
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    If [ not IsEmpty ( UtilityParty::PersonPhone ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, UtilityParty::PersonPhone#17
+  26    Set Variable [ $Data; Value:JSONSetElement (  ""; 
+         
+        	[ "PhoneNumber" ; UtilityParty::PersonPhone ; JSONString ] ; 
+        	[ "Format" ;"E.164 standard format" ; JSONString ] 
+        // 	[ "CountryCode" ; "US" ; jsonstring ] 
+         
+        )
+        
+        
+        // #TODO: support international phones  ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, UtilityParty::PersonPhone#17, fn:JSONString
+        Name: $Data
+  27    Perform Script [ “Phone Lookup” from file: “karbon_kontroller”; Parameter: $Data ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=533 name="Phone Lookup" in=karbon_kontroller.fmp12
+  28    Set Variable [ $result; Value:Get ( ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $result
+  29    If [ Error.IsError ( $result ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError
+  30    #Error, go to Summary
+        DisableStepCollapsed state=False
+        Restore state=False
+  31    Perform Script [ “Go to Summary” ]
+        DisableStepCollapsed state=False
+        Script id=409 name="Go to Summary"
+  32    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  33    End If
+        DisableStepCollapsed state=False
+  34    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  35    Insert Calculated Result [ $phoneList; JSONGetElement ( $result ; "PhoneNumber" ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field: $phoneList
+  36    Insert Calculated Result [ $json; JSONSetElement ( $json ; "phones" ; $phoneList ; JSONString) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:JSONSetElement, fn:JSONString
+        Field: $json
+  37    End If
+        DisableStepCollapsed state=False
+  38    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  39    Perform Script [ “FullContact Person Enrich” from file: “karbon_kontroller”; Parameter: $json ]
+        DisableStepCollapsed state=False
+        FileReference id=1 name=karbon_kontroller
+          UniversalPathList: file:karbon_kontroller
+        Script id=746 name="FullContact Person Enrich" in=karbon_kontroller.fmp12
+  40    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  41    Insert Calculated Result [ $result; Get ( ScriptResult ) ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        refs: fn:Get, fn:ScriptResult
+        Field: $result
+  42    If [ Error.IsError( $result )or JSONGetElement ( $result ; "status" )=404 //profile not found ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:Error.IsError, fn:or, fn:JSONGetElement
+  43    Insert Calculated Result [ $error; $result ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Field: $error
+  44    #Error, go to Summary
+        DisableStepCollapsed state=False
+        Restore state=False
+  45    Perform Script [ “Go to Summary” ]
+        DisableStepCollapsed state=False
+        Script id=409 name="Go to Summary"
+  46    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  47    End If
+        DisableStepCollapsed state=False
+  48    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    Set Field [ UtilityParty::FullContactPersonAvatarURL; JSONGetElement ( $result ; "avatar" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=49 name=FullContactPersonAvatarURL
+  51    Insert from URL [ UtilityParty::FullContactPersonAvatar; UtilityParty::FullContactPersonAvatarURL ]
+        [ Select; No dialog ]
+        NoInteract state=True
+        DontEncodeURL state=False
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        VerifySSLCertificates state=False
+        refs: UtilityParty::FullContactPersonAvatarURL#49
+        Field table=UtilityParty id=53 name=FullContactPersonAvatar
+  52    Set Field [ UtilityParty::FullContactPersonGender; JSONGetElement ( $result ; "gender" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=43 name=FullContactPersonGender
+  53    Set Field [ UtilityParty::FullContactPersonFullName; JSONGetElement ( $result ; "fullName" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=47 name=FullContactPersonFullName
+  54    Set Field [ UtilityParty::FullContactPersonBio; JSONGetElement ( $result ; "bio" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=52 name=FullContactPersonBio
+  55    Set Field [ UtilityParty::FullContactPersonLinkedInURL; JSONGetElement ( $result ; "linkedin" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=45 name=FullContactPersonLinkedInURL
+  56    Set Field [ UtilityParty::FullContactPersonTwitter; JSONGetElement ( $result ; "twitter" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=51 name=FullContactPersonTwitter
+  57    Set Field [ UtilityParty::FullContactPersonJobTitle; JSONGetElement ( $result ; "title" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:JSONGetElement
+        Field table=UtilityParty id=54 name=FullContactPersonJobTitle
+  58    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  59    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  60    Perform Script [ “Go to FullContact Person Slide” ]
+        DisableStepCollapsed state=False
+        Script id=864 name="Go to FullContact Person Slide"

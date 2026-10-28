@@ -1,0 +1,86 @@
+# script 1: Send Request
+# file: karbon_Generator.fmp12
+# folder: App Modules / Requests / Private
+# source: ScriptCatalog/Script[@id=1]
+# steps: 21 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Perform Script [ “Clear Response” ]
+        DisableStepCollapsed state=False
+        Script id=30 name="Clear Response"
+   4    Pause/Resume Script [ Duration (seconds): .2 ]
+        DisableStepCollapsed state=False
+        PauseTime value=ForDuration
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $request; Value:Requests::requestJSON ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Requests::requestJSON#15
+        Repetition
+          Calculation:
+            | 1
+        Name: $request
+   7    Perform Script [ “HTTP ( {request} )”; Parameter: Requests::requestJSON ]
+        DisableStepCollapsed state=False
+        refs: Requests::requestJSON#15
+        Script id=6 name="HTTP ( {request} )"
+   8    Set Variable [ $response; Value:Get (ScriptResult) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptResult
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+   9    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    Perform Script [ “Set Response Into Fields”; Parameter: $response ]
+        DisableStepCollapsed state=False
+        Script id=26 name="Set Response Into Fields"
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Set Variable [ $id; Value:Requests::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Requests::id#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $id
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Go to Layout [ “RequestHistory” (RequestHistory) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=27 name=RequestHistory
+  16    New Record/Request
+        DisableStepCollapsed state=False
+  17    Set Field [ RequestHistory::request; $request ]
+        DisableStepCollapsed state=False
+        Field table=RequestHistory id=1 name=request
+  18    Set Field [ RequestHistory::idRequest; $id ]
+        DisableStepCollapsed state=False
+        Field table=RequestHistory id=8 name=idRequest
+  19    Set Field [ RequestHistory::response; $response ]
+        DisableStepCollapsed state=False
+        Field table=RequestHistory id=2 name=response
+  20    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  21    Go to Object [ Object Name: "ResponseBody"; Repetition: 1 ]
+        DisableStepCollapsed state=False

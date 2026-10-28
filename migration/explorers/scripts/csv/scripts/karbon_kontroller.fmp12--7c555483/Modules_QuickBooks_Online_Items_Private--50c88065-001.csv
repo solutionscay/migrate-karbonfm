@@ -1,0 +1,38 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/410-Convert_QBO_Item_Into_Karbon_Item.txt,286433ba1c2dbab54f17297a6e560f89f9e02c7fe9c11cf229487465fc2be7d9,scripts,karbon_kontroller.fmp12,410,Convert QBO Item Into Karbon Item,integration,external-adapter,tier2,"Converts a QBO Item JSON object into the JSON shape Karbon's Item API expects: parses the QBO fields, looks up the Karbon Item id and the three QBO account ids through ""Lookup FMId { QBOId, Entity }"", converts the start date from ISO, and returns a JSON with keys such as id, qbo_id, itemType and the account references (only when not empty).",none,none,"karbon_kontroller.fmp12/scripts/271 ""Lookup FMId { QBOId, Entity }"" (step 72)
+karbon_kontroller.fmp12/scripts/271 ""Lookup FMId { QBOId, Entity }"" (step 80)
+karbon_kontroller.fmp12/scripts/271 ""Lookup FMId { QBOId, Entity }"" (step 89)
+karbon_kontroller.fmp12/scripts/271 ""Lookup FMId { QBOId, Entity }"" (step 98)",karbon_kontroller.fmp12/scripts/409-Handle_Changed_or_New_QBO_Item_QBO_Item.txt,none,"A sample QBO payload is stored in $EXAMPLE (step 6) and the lines that use it are disabled (steps 24, 28). Result key itemType maps from QBO Type."
+karbon_kontroller.fmp12/scripts/432-Handle_Item_Push_to_QBO.txt,26d8af3bab7e7973eba67411eb9f4bee770a48b0e1b27df98a55194e8f959c36,scripts,karbon_kontroller.fmp12,432,Handle Item Push to QBO,integration,external-adapter,tier2,"Pushes one Karbon Item to QuickBooks Online inside a transaction: locks the Item record by FmId, reads the current QBO copy through the LedgerLink Read script when the item already has a qbo_id, converts the Karbon Item into a QBO Item (Convert Karbon Item into QBO Item), sends it through LedgerLink's Send FMData To QBO, then stores the returned QBO id in Item::qbo_id and clears Item::qbo_send.","DBTransactions::ItemId#36 (step 64)
+Item::qbo_id#2 (step 73)","DBTransactions::ItemId#36 (step 65, current record (transaction scratch record))
+Item::ONE#36 (step 68, related via Item (locks/creates the record))
+Item::qbo_id#2 (step 110, record found in step 68)
+Item::qbo_send#34 (step 119, record found in step 68)","karbon_kontroller.fmp12/scripts/28 ""Start Transaction ( TransactionPayload )"" (step 30)
+karbon_LedgerLink.fmp12/scripts/1 ""Read({Entity, QBOId })"" (step 78, in=karbon_LedgerLink.fmp12)
+karbon_kontroller.fmp12/scripts/444 ""Convert Karbon Item into QBO Item ( {$CurrentQBOData} )"" (step 89)
+karbon_LedgerLink.fmp12/scripts/292 ""Send FMData To QBO ({Entity , Data})"" (step 99, in=karbon_LedgerLink.fmp12)
+karbon_kontroller.fmp12/scripts/29 ""Save Transaction Result ( {result} )"" (step 137)
+karbon_kontroller.fmp12/scripts/31 ""End Transaction ( {error}  )"" (step 138)","karbon_LedgerLink.fmp12/scripts/631-Handle_Item_Push.txt (step 8, call through data source DataSourceControllerFile, ref=external)","Perform Script in karbon_LedgerLink: Read({Entity, QBOId }) - QBO read (step 78)
+Perform Script in karbon_LedgerLink: Send FMData To QBO ({Entity , Data}) - QBO write (step 99)",Called by LedgerLink 631 Handle Item Push by name only. $fmQBOIsUpdatingThisRecord (step 118) is a local variable; if it is meant to stop a trigger it will not be seen by other scripts.
+karbon_kontroller.fmp12/scripts/444-Convert_Karbon_Item_into_QBO_Item_CurrentQBOData.txt,6374f65bbf3e544758c2463022c72902b03bd5cf3ab5dd2cba19ac809d5a6723,scripts,karbon_kontroller.fmp12,444,Convert Karbon Item into QBO Item ( {$CurrentQBOData} ),integration,external-adapter,tier2,"Builds the QBO Item JSON for the current Karbon Item: starts from the freshly read QBO data (with MetaData, sparse, domain and Line removed), reads the Item fields, converts the three account references to QBO ids (Lookup QBOId), converts the start date to ISO and sets each QBO key. Returns the JSON.","Item::qtyOnHand#13 (step 40)
+Item::name#7 (step 41)
+Item::sku#29 (step 42)
+Item::level#24 (step 43)
+Item::description#5 (step 44)
+Item::purchaseCost#8 (step 45)
+Item::trackQtyOnHand#20 (step 46)
+Item::taxable#19 (step 47)
+Item::active#4 (step 48)
+Item::fullyQualifiedName#30 (step 49)
+Item::incomeAccountRef.value#31 (step 50)
+Item::invStartDate#27 (step 51)
+Item::unitPrice#22 (step 52)
+Item::expenseAccountRef.value#32 (step 53)
+Item::itemType#21 (step 54)
+Item::purchaseDesc#9 (step 55)
+Item::assetAccountRef.value#33 (step 56)",none,"karbon_kontroller.fmp12/scripts/327 ""Lookup QBOId { FMId, Entity }"" (step 83)
+karbon_kontroller.fmp12/scripts/327 ""Lookup QBOId { FMId, Entity }"" (step 93)
+karbon_kontroller.fmp12/scripts/327 ""Lookup QBOId { FMId, Entity }"" (step 103)",karbon_kontroller.fmp12/scripts/432-Handle_Item_Push_to_QBO.txt,none,"The line that reads Item::qbo_id into $Id is disabled (steps 38-39), so ""Id"" is added only when it is already in CurrentQBOData. Several steps are disabled (9 total)."
+karbon_kontroller.fmp12/scripts/519-Get_Item_Object_Id.txt,0fc160704cff152f825837c86ddd9c5a30436eb1d450b4e852794ba17db84070,scripts,karbon_kontroller.fmp12,519,Get Item Object (Id),find-query,server-query,tier2,Returns the JSON of one Item: runs SQL.GetColumn to read Item::AsJSON where Item::id equals the script parameter.,"Item::AsJSON#38 (step 1)
+Item::id#1 (step 1)",none,none,"karbon_tester.fmp12/scripts/319-Create_Item_-_Success.txt
+karbon_tester.fmp12/scripts/323-Create_Item_-_Fail.txt","SQL.GetColumn custom function (step 1), probably ExecuteSQL",SQL.GetColumn is a custom function and probably wraps ExecuteSQL; its text is not in this object.

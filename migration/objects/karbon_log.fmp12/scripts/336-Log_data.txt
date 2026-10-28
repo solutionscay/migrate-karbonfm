@@ -1,0 +1,103 @@
+# script 336: Log ( data )
+# file: karbon_log.fmp12
+# folder: API / Public
+# source: ScriptCatalog/Script[@id=336]
+# steps: 21 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=337 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $Logs; Value:Get ( ScriptParameter ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Logs
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    If [ JSON.IsValid ( $Logs ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: cf:JSON.IsValid
+   7    Set Variable [ $LogEntryArray; Value:Let(
+        [
+        
+        j =JSONGetElement ( $Logs; "" ); //remmove white space
+        notArray = Left(j;1) & Right(j;1) <> "[]"
+        
+        ];
+        
+        Case(
+           notArray; "[" & j & "]";
+           j
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:JSONGetElement, fn:Left, fn:Right, fn:Case
+        Name: $LogEntryArray
+   8    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Variable [ $LogEntryArray; Value:JSONSetElement ( "";
+        
+        ["[0].level" ; "warning"; JSONString];
+        
+        ["[0].message" ; "No Log Metadata: " & $Logs ; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString
+        Repetition
+          Calculation:
+            | 1
+        Name: $LogEntryArray
+  10    End If
+        DisableStepCollapsed state=False
+  11    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #local for debugging and using session level
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    If [ not IsEmpty ( Settings::SessionLogLevelWriteToDB ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:not, fn:IsEmpty, Settings::SessionLogLevelWriteToDB#8
+  15    Perform Script [ “_Log ( data )”; Parameter: $LogEntryArray ]
+        DisableStepCollapsed state=False
+        Script id=343 name="_Log ( data )"
+  16    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Script on Server [ “_Log ( data )”; Parameter: $LogEntryArray ]
+        WaitForCompletion state=False
+        DisableStepCollapsed state=False
+        Script id=343 name="_Log ( data )"
+  18    End If
+        DisableStepCollapsed state=False
+  19    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #
+        DisableStepCollapsed state=False
+        Restore state=False

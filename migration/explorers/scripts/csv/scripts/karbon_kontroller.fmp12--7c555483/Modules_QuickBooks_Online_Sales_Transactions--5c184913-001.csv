@@ -1,0 +1,24 @@
+source_id,source_hash,kind,file,id,name,type,owner,tier,purpose,reads,writes,calls,callers,external,open_question
+karbon_kontroller.fmp12/scripts/461-Delete_a_SalesTransaction_From_QBO_data.txt,8b75a2cb9c89703c192d61f9ca7114ff0d61dc70a7526d7623ea58627e9d7359,scripts,karbon_kontroller.fmp12,461,Delete a SalesTransaction From QBO { data },integration,server-domain,tier1,"Deletes a SalesTransaction in QuickBooks Online (invoice or sales receipt) through the LedgerLink delete script, then blanks its QBO id, document number, tax, paid and balance fields and sets status back to Draft. The Karbon record is kept. Refuses when the transaction date is on or before the book close date. Runs inside the start/end transaction wrapper.","DBTransactions::SalesTransactionId#93
+SalesTransaction::id#1
+SalesTransaction::date#5
+System::BookCloseDate#62
+SalesTransaction::qbo_id#2
+SalesTransaction::InvoiceInd#73","DBTransactions::SalesTransactionId#93 (step 59, current record)
+SalesTransaction::ONE#67 (step 73, related via SalesTransaction)
+SalesTransaction::qbo_id#2 (step 89, related via SalesTransaction)
+SalesTransaction::docNumber#4 (step 90, related via SalesTransaction)
+SalesTransaction::status#68 (step 91, related via SalesTransaction; value ""Draft"")
+SalesTransaction::totalTax#30 (step 92, related via SalesTransaction)
+SalesTransaction::totalPaid#58 (step 93, related via SalesTransaction)
+SalesTransaction::balance#26 (step 94, related via SalesTransaction)","karbon_kontroller.fmp12/scripts/28 (step 53)
+karbon_LedgerLink.fmp12/scripts/635 (step 81, other file karbon_LedgerLink)
+karbon_kontroller.fmp12/scripts/29 (step 108)
+karbon_kontroller.fmp12/scripts/31 (step 109)",karbon_kontacts.fmp12/scripts/609-btn_Remove_Sales_Transaction_From_QBO.txt step 5,QuickBooks Online delete through karbon_LedgerLink script 635 (step 81),"Step 58 only reconnects when DBTransactions already holds a different id; the invalid-id check (step 60) is inside that branch. Status text ""Draft"" is a hard-coded domain status. Book close rule (step 68) is a business rule to keep."
+karbon_kontroller.fmp12/scripts/596-Send_a_Sales_Transaction_To_QBO_FMId.txt,ac9605eb82ea744934ecf2cb17001e5961a3a8af9cba20e634a9a462a1997d04,scripts,karbon_kontroller.fmp12,596,Send a Sales Transaction To QBO (FMId),orchestration,external-adapter,tier1,"Sends a sales transaction to QuickBooks Online by FM id as Invoice or SalesReceipt (by InvoiceInd), then sends each of its attachments that are flagged qbo_send, stopping at the first error.","SalesTransaction::InvoiceInd#73 (SQL.GetColumn, step 31)
+SalesTransaction::id#1 (step 31)
+FileAttachment::AttachmentId#8 (step 46)
+FileAttachment::EntityId#7 (step 46)
+File::qbo_send#20 (step 54)
+File::Id#1 (step 54)",none,"karbon_LedgerLink.fmp12/scripts/302 (step 33, other file karbon_LedgerLink)
+karbon_LedgerLink.fmp12/scripts/302 (step 57, other file karbon_LedgerLink)",karbon_kontroller.fmp12/scripts/599-Lock_Unlock_Sales_Transaction.txt step 39,none,"Step 36 exits with $error, which is not set at that point; the failure from the first send is lost and an empty result returns. Attachments are sent only after the transaction is in QBO."

@@ -1,0 +1,249 @@
+# script 1234: Load WebViewer App ( {webViewer; url  } )
+# file: karbon_charts.fmp12
+# folder: FM WebViewer Bridge / Public / NEW
+# source: ScriptCatalog/Script[@id=1234]
+# steps: 56 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=1235 groupCollapsed=False includeInMenu=False
+
+   1    # /##
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    # waits for the app to load.
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    # @module fm-webviewer-bridge
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    # @param {object} params
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    # @param {string} params.url
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    # @param {string} params.webViewer
+        DisableStepCollapsed state=False
+        Restore state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    # @return {object} error
+        DisableStepCollapsed state=False
+        Restore state=False
+  12    # @return {number} error.errorCode
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  14    # #/
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+  17    Allow User Abort [ Off ]
+        Set state=False
+        DisableStepCollapsed state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    Set Variable [ $params; Value: Get (ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $params
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    #no errors yet, just set it to 0
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Insert Text [ $error ]
+        [ Select ]
+        SelectAll state=True
+        DisableStepCollapsed state=False
+        Text: {"errorCode" : 0 }
+        Field: $error
+  23    #Substitute($parameter; "#"; "h^" )
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  26    ##other scripts may use this to check if things are still loading
+        DisableStepCollapsed state=False
+        Restore state=False
+  27    Set Variable [ $$WebVeiwer.Loading; Value:True ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:True
+        Repetition
+          Calculation:
+            | 1
+        Name: $$WebVeiwer.Loading
+  28    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  29    Set Variable [ $url; Value:JSONGetElement ( $params ;  "url" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $url
+  30    Set Variable [ $webViewer; Value:JSONGetElement ( $params ;  "webViewer" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $webViewer
+  31    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  32    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  33    Set Web Viewer [ Object Name: $webViewer; Action: Reset ]
+        DisableStepCollapsed state=False
+        Action value=Reset
+        URL custom=False
+          Calculation:
+            | $url
+  34    Pause/Resume Script [ Duration (seconds): .1 ]
+        DisableStepCollapsed state=False
+        PauseTime value=ForDuration
+  35    Set Web Viewer [ Object Name: $webViewer; URL: $url ]
+        DisableStepCollapsed state=False
+        Action value=GoToURL
+        URL custom=False
+  36    Loop [ Flush: Always ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  37    If [ $$WebViewer.LoadApp.Cancel = True ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:True
+  38    Set Variable [ $$WebViewer.LoadApp.Cancel; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$WebViewer.LoadApp.Cancel
+  39    Set Variable [ $error; Value:JSONSetElement ("";
+        
+           ["descriptor"; "App Laod Cancelled" ; JSONString];
+           ["script"; Get(ScriptName); JSONString];
+           ["data" ; Get(ScriptParameter) ; ""];
+           ["errorCode" ; -2 ; JSONNumber ];
+           ["type" ; "FM WebVeiwer Bridge"; JSONString]
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONSetElement, fn:JSONString, fn:Get, fn:ScriptName, fn:ScriptParameter, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  40    Exit Loop If [ GetAsBoolean (JSONGetElement ( $error ; "errorCode" )) ]
+        DisableStepCollapsed state=False
+        refs: fn:GetAsBoolean, fn:JSONGetElement
+  41    End If
+        DisableStepCollapsed state=False
+  42    Set Variable [ $content; Value:GetLayoutObjectAttribute ( $webViewer ; "content" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:GetLayoutObjectAttribute
+        Repetition
+          Calculation:
+            | 1
+        Name: $content
+  43    Exit Loop If [ $content = "<Unsupported Type>"
+        
+        
+        
+        
+        /* weird , but this is what is returned from web viewer when GoDraw fully loads on Mac
+        */ ]
+        DisableStepCollapsed state=False
+  44    Exit Loop If [ PatternCount ( $content ; "</html>" ) ]
+        DisableStepCollapsed state=False
+        refs: fn:PatternCount
+  45    Set Variable [ $n; Value:$n+1 ]
+        DisableStepCollapsed state=False
+        Name: $n
+  46    Exit Loop If [ $n > 10 ]
+        DisableStepCollapsed state=False
+  47    Pause/Resume Script [ Duration (seconds): .5 ]
+        DisableStepCollapsed state=False
+        PauseTime value=ForDuration
+  48    End Loop
+        DisableStepCollapsed state=False
+  49    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  50    If [ $n > 10 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  51    Set Variable [ $error; Value:Let(
+        [
+        descriptor = "Time Out Error. The webviewer "& Quote($webViewer) & " wasn't able to load this url, " & Quote($url) 
+        ];
+        
+        
+        JSONSetElement ("";
+        
+           ["descriptor"; descriptor ; JSONString];
+           ["script"; Get(ScriptName); JSONString];
+           ["data" ; Get(ScriptParameter) ; ""];
+           ["errorCode" ; -2 ; JSONNumber ];
+           ["type" ; "FM WebVeiwer Bridge"; JSONString]
+        
+        )
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, fn:Quote, fn:JSONSetElement, fn:JSONString, fn:Get, fn:ScriptName, fn:ScriptParameter, fn:JSONNumber
+        Repetition
+          Calculation:
+            | 1
+        Name: $error
+  52    End If
+        DisableStepCollapsed state=False
+  53    Set Variable [ $$WebVeiwer.Loading; Value:"" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $$WebVeiwer.Loading
+  54    Exit Script [ Result: $error ]
+        DisableStepCollapsed state=False
+  55    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  56    #
+        DisableStepCollapsed state=False
+        Restore state=False

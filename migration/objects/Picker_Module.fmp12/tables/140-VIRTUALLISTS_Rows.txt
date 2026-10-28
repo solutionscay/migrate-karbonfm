@@ -1,0 +1,346 @@
+# table 140: VIRTUALLISTS_Rows
+# file: Picker Module.fmp12
+# source: BaseTableCatalog/BaseTable[@id=140]
+# fields: 38
+# records: 200
+
+Field id=12 dataType=Text fieldType=Calculated name=Address.RowData
+  Calculation table=VIRTUALLISTS_Rows:
+    | GetValue ( Picker::AddressRows ; n )
+    refs: fn:GetValue, Picker::AddressRows#20, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=30 dataType=Text fieldType=Calculated name=Email.ContactMethodId
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Email.Result ; "ContactMethodId" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Email.Result#29
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=31 dataType=Text fieldType=Calculated name=Email.EmailAddress
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Email.Result ; "EmailAddress" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Email.Result#29
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=32 dataType=Text fieldType=Calculated name=Email.Label
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Email.Result ; "Label" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Email.Result#29
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=33 dataType=Text fieldType=Calculated name=Email.PartyId
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Email.Result ; "PartyId" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Email.Result#29
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=34 dataType=Text fieldType=Calculated name=Email.PartyName
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Email.Result ; "PartyName" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Email.Result#29
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=28 dataType=Text fieldType=Calculated name=Email.Keys
+  Calculation table=VIRTUALLISTS_Rows:
+    | // get the JSON keys from the first index in the array
+    | JSONListKeys ( GetValue ( Picker::Email.Found ; 1 ) ; "" )
+    refs: fn:JSONListKeys, fn:GetValue, Picker::Email.Found#36
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=29 dataType=Text fieldType=Calculated name=Email.Result
+  Calculation table=VIRTUALLISTS_Rows:
+    | /* 
+    | 
+    | @desc Get this JSON object in the list
+    | 
+    | @history 2018-07-16 dave@geistinteractive.com - created
+    | 
+    | @sample:
+    | 
+    | {
+    | 	"ContactMethodId" : "1D8544F3-A9B8-4B76-BD6D-318944663689",
+    | 	"EmailAddress" : "Dukes_bball@intuit.com",
+    | 	"Label" : "",
+    | 	"PartyId" : "9E75DCD0-C1B5-4B20-B4D9-3466E74C9EDA",
+    | 	"PartyName" : "Dukes Basketball Camp"
+    | }
+    | 
+    | */
+    | 
+    | 
+    | 
+    | GetValue ( Picker::Email.Found ; n )
+    refs: fn:GetValue, Picker::Email.Found#36, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=19 dataType=Text fieldType=Calculated name=json_SchemaPicker_Field
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Picker::Schema_FieldArray; n - 1 )
+    refs: fn:JSONGetElement, Picker::Schema_FieldArray#34, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=24 dataType=Text fieldType=Calculated name=json_SchemaPicker_Field_FieldName
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( json_SchemaPicker_Field ; "FieldName" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::json_SchemaPicker_Field#19
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=15 dataType=Text fieldType=Calculated name=json_SchemaPicker_File
+  Calculation table=VIRTUALLISTS_Rows:
+    | Let([
+    | 
+    | ThisObject = JSONGetElement ( Picker::Schema_FileArray; n - 1 );
+    | ThisName = JSONGetElement ( ThisObject ; "FileName" )
+    | 
+    | ];
+    | 
+    | ThisName
+    | 
+    | )
+    refs: fn:Let, fn:JSONGetElement, Picker::Schema_FileArray#31, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=26 dataType=Text fieldType=Calculated name=json_SchemaPicker_Script
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Picker::Schema_ScriptsArray; n - 1 )
+    refs: fn:JSONGetElement, Picker::Schema_ScriptsArray#35, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=27 dataType=Text fieldType=Calculated name=json_SchemaPicker_Script_ScriptName
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( json_SchemaPicker_Script ; "ScriptName" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::json_SchemaPicker_Script#26
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=17 dataType=Text fieldType=Calculated name=json_SchemaPicker_Table
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Picker::Schema_TableArray; n - 1 )
+    refs: fn:JSONGetElement, Picker::Schema_TableArray#32, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=20 dataType=Text fieldType=Calculated name=json_SchemaPicker_Table_TableName
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( json_SchemaPicker_Table ; "TableName" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::json_SchemaPicker_Table#17
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=18 dataType=Text fieldType=Calculated name=json_SchemaPicker_TableOccurence
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Picker::Schema_TableOccurenceArray; n - 1 )
+    refs: fn:JSONGetElement, Picker::Schema_TableOccurenceArray#33, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=23 dataType=Text fieldType=Calculated name=json_SchemaPicker_TableOccurence_TableOccurenceName
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement( json_SchemaPicker_TableOccurence; "TableOccurenceName" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::json_SchemaPicker_TableOccurence#18
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=14 dataType=Text fieldType=Calculated name=json_SchemaPickerKeys
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONListKeys ( Picker::Results ; "Result.SchemaArray[0]" )
+    refs: fn:JSONListKeys, Picker::Results#2
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=16 dataType=Text fieldType=Calculated name=json_SchemaPickerResult
+  Calculation table=VIRTUALLISTS_Rows:
+    | GetValue ( JSONListValues ( Picker::Results ; "Result.SchemaArray" ) ; n )
+    refs: fn:GetValue, fn:JSONListValues, Picker::Results#2, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=1 dataType=Number fieldType=Normal name=n
+  Comment: this MUST be a stored Number series starting at 1 going to atleast 500
+  AutoEnter allowEditing=True
+    Serial increment=1 nextValue=201 generate=OnCreation
+  Validation type=OnlyDuringDataEntry
+  Storage index=All indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=9 dataType=Text fieldType=Calculated name=Party.PickerField1
+  Calculation table=VIRTUALLISTS_Rows:
+    | Let ( 
+    | 	RowData = JSONGetElement ( RowData ; GetValue ( Party.PickerKeys ; 1 ) ) 
+    | ; 
+    | 	If ( Left ( Party.PickerResult ; 1 ) = "?" ; "" ; Party.PickerResult )
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:GetValue, VIRTUALLISTS_Rows::Party.PickerKeys#11, fn:If, fn:Left, VIRTUALLISTS_Rows::Party.PickerResult#10
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=8 dataType=Text fieldType=Calculated name=Party.PickerField2
+  Calculation table=VIRTUALLISTS_Rows:
+    | Let ( 
+    | 	RowData = JSONGetElement ( RowData ; GetValue ( Party.PickerKeys ; 2 ) ) 
+    | ; 
+    | 	If ( Left ( Party.PickerResult ; 1 ) = "?" ; "" ; Party.PickerResult )
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:GetValue, VIRTUALLISTS_Rows::Party.PickerKeys#11, fn:If, fn:Left, VIRTUALLISTS_Rows::Party.PickerResult#10
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=7 dataType=Text fieldType=Calculated name=Party.PickerField3
+  Calculation table=VIRTUALLISTS_Rows:
+    | Let ( 
+    | 	RowData = JSONGetElement ( RowData ; GetValue ( Party.PickerKeys ; 3 ) ) 
+    | ; 
+    | 	If ( Left ( Party.PickerResult ; 1 ) = "?" ; "" ; Party.PickerResult )
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:GetValue, VIRTUALLISTS_Rows::Party.PickerKeys#11, fn:If, fn:Left, VIRTUALLISTS_Rows::Party.PickerResult#10
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=6 dataType=Text fieldType=Calculated name=Party.PickerField4
+  Calculation table=VIRTUALLISTS_Rows:
+    | Let ( 
+    | 	RowData = JSONGetElement ( RowData ; GetValue ( Party.PickerKeys ; 4 ) ) 
+    | ; 
+    | 	If ( Left ( Party.PickerResult ; 1 ) = "?" ; "" ; Party.PickerResult )
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:GetValue, VIRTUALLISTS_Rows::Party.PickerKeys#11, fn:If, fn:Left, VIRTUALLISTS_Rows::Party.PickerResult#10
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=5 dataType=Text fieldType=Calculated name=Party.PickerField5
+  Calculation table=VIRTUALLISTS_Rows:
+    | Let ( 
+    | 	RowData = JSONGetElement ( RowData ; GetValue ( Party.PickerKeys ; 5 ) ) 
+    | ; 
+    | 	If ( Left ( Party.PickerResult ; 1 ) = "?" ; "" ; Party.PickerResult )
+    | )
+    refs: fn:Let, fn:JSONGetElement, fn:GetValue, VIRTUALLISTS_Rows::Party.PickerKeys#11, fn:If, fn:Left, VIRTUALLISTS_Rows::Party.PickerResult#10
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=11 dataType=Text fieldType=Calculated name=Party.PickerKeys
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONListKeys ( Picker::Results ; "Result.PartyArray[0]" )
+    refs: fn:JSONListKeys, Picker::Results#2
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=10 dataType=Text fieldType=Calculated name=Party.PickerResult
+  Calculation table=VIRTUALLISTS_Rows:
+    | GetValue ( JSONListValues ( Picker::Results ; "Result.PartyArray" ) ; n )
+    refs: fn:GetValue, fn:JSONListValues, Picker::Results#2, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=13 dataType=Number fieldType=Normal name=z_xJoin
+  AutoEnter allowEditing=True calculation=False
+    Calculation table=VIRTUALLISTS_Rows (inactive):
+      | 1
+  Validation type=OnlyDuringDataEntry
+  Storage indexLanguage=English global=True maxRepetition=1
+  DisplayNames enable=False
+
+Field id=36 dataType=Text fieldType=Calculated name=Email.EmailOrganizationName
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Email.Result ; "OrganizationName" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Email.Result#29
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=37 dataType=Text fieldType=Calculated name=Phone.ClientInd
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Phone.Result ; "IsClient" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Phone.Result#44
+  Comment: True if this phone belongs to a client
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=38 dataType=Text fieldType=Calculated name=Phone.Id
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Phone.Result ; "PhoneId" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Phone.Result#44
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=39 dataType=Text fieldType=Calculated name=Phone.Keys
+  Calculation table=VIRTUALLISTS_Rows:
+    | // get the JSON keys from the first index in the array
+    | JSONListKeys ( GetValue ( Picker::Phone.Found ; 1 ) ; "" )
+    refs: fn:JSONListKeys, fn:GetValue, Picker::Phone.Found#39
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=40 dataType=Text fieldType=Calculated name=Phone.Number
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Phone.Result ; "Phone" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Phone.Result#44
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=41 dataType=Text fieldType=Calculated name=Phone.OrganizationName
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Phone.Result ; "OrganizationName" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Phone.Result#44
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=42 dataType=Text fieldType=Calculated name=Phone.PartyId
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Phone.Result ; "PartyId" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Phone.Result#44
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=43 dataType=Text fieldType=Calculated name=Phone.PartyName
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Phone.Result ; "PartyName" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Phone.Result#44
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=44 dataType=Text fieldType=Calculated name=Phone.Result
+  Calculation table=VIRTUALLISTS_Rows:
+    | /* 
+    | 
+    | @desc Get this JSON object in the list
+    | 
+    | @history 2019-04-02 barbara@geistinteractive.com - created
+    | 
+    | @sample:
+    | 
+    | {
+    | 	"ContactMethodId" : "1D8544F3-A9B8-4B76-BD6D-318944663689",
+    | 	"Phone" : "+12125551212",
+    | 	"Label" : "",
+    | 	"PartyId" : "9E75DCD0-C1B5-4B20-B4D9-3466E74C9EDA",
+    | 	"PartyName" : "Dukes Basketball Camp"
+    | }
+    | 
+    | */
+    | 
+    | 
+    | 
+    | GetValue ( Picker::Phone.Found ; n )
+    refs: fn:GetValue, Picker::Phone.Found#39, VIRTUALLISTS_Rows::n#1
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+
+Field id=45 dataType=Text fieldType=Calculated name=Phone.Type
+  Calculation table=VIRTUALLISTS_Rows:
+    | JSONGetElement ( Phone.Result ; "Type" )
+    refs: fn:JSONGetElement, VIRTUALLISTS_Rows::Phone.Result#44
+  Storage storeCalculationResults=False indexLanguage=English maxRepetition=1
+  DisplayNames enable=False
+

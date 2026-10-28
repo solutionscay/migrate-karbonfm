@@ -1,0 +1,129 @@
+# script 26: Set Response Into Fields
+# file: karbon_Generator.fmp12
+# folder: App Modules / Requests / Private
+# source: ScriptCatalog/Script[@id=26]
+# steps: 23 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=69 groupCollapsed=False includeInMenu=False
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    Set Variable [ $response; Value:Get(ScriptParameter) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $response
+   4    Set Field [ Requests::responseJSON; jsonPrettyPrint ( $response  ; "   ") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonPrettyPrint
+        Field table=Requests id=16 name=responseJSON
+   5    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   6    Set Variable [ $responseHeadersJSON; Value:jsonPrettyPrint(jsonGet($response; "headers"); "  ") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonPrettyPrint, cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $responseHeadersJSON
+   7    Set Variable [ $contentType; Value:Let(
+        [
+        contentType = jsonGet( $responseHeadersJSON ; "Content-Type");
+        contentType = If( IsEmpty( contentType ) ; jsonGet( $responseHeadersJSON ; "content-type"); contentType);
+        contentType = If( IsEmpty( contentType ) ; jsonGet( $responseHeadersJSON ; "content-Type"); contentType);
+        contentType = If( IsEmpty( contentType ) ; jsonGet( $responseHeadersJSON ; "Content-type"); contentType)
+        
+        ];
+        
+        contentType
+        
+        
+        ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Let, cf:jsonGet, fn:If, fn:IsEmpty
+        Repetition
+          Calculation:
+            | 1
+        Name: $contentType
+   8    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Set Field [ Requests::ResponseCode; jsonGet($response; "code") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=5 name=ResponseCode
+  10    Set Field [ Requests::responseStatus; jsonGet($response; "status") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonGet
+        Field table=Requests id=17 name=responseStatus
+  11    Set Field [ Requests::ResponseHeaders; jsonPrettyPrint($responseHeadersJSON; "  ") ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonPrettyPrint
+        Field table=Requests id=4 name=ResponseHeaders
+  12    Set Variable [ $body; Value:jsonGet($response; "body") ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:jsonGet
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  13    Set Variable [ $source; Value:"Request" ]
+        DisableStepCollapsed state=False
+        Repetition
+          Calculation:
+            | 1
+        Name: $source
+  14    Set Variable [ $sourceID; Value:Requests::id ]
+        DisableStepCollapsed state=False
+        Value
+          refs: Requests::id#6
+        Repetition
+          Calculation:
+            | 1
+        Name: $sourceID
+  15    If [ Left($body;1) = "{" or Left($body;1) = "[" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Left, fn:or
+  16    Set Field [ Requests::ResponseBodyRaw; jsonPrettyPrint(
+         $body ; "  "
+        ) ]
+        DisableStepCollapsed state=False
+        refs: cf:jsonPrettyPrint
+        Field table=Requests id=3 name=ResponseBodyRaw
+  17    Else If [ $contentType = "text/html" ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Set Variable [ $body; Value:Base64Decode ( $body ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:Base64Decode
+        Repetition
+          Calculation:
+            | 1
+        Name: $body
+  19    Set Field [ Requests::ResponseBodyRaw; $body ]
+        DisableStepCollapsed state=False
+        Field table=Requests id=3 name=ResponseBodyRaw
+  20    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Set Field [ Requests::ResponseBodyRaw; $body ]
+        DisableStepCollapsed state=False
+        Field table=Requests id=3 name=ResponseBodyRaw
+  22    End If
+        DisableStepCollapsed state=False
+  23    #
+        DisableStepCollapsed state=False
+        Restore state=False

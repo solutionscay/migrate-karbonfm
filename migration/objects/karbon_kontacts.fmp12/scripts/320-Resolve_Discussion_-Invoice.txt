@@ -1,0 +1,96 @@
+# script 320: Resolve Discussion -Invoice
+# file: karbon_kontacts.fmp12
+# folder: Application Modules / Discussion / Private_deprecated
+# source: ScriptCatalog/Script[@id=320]
+# steps: 24 (0 disabled)
+# options: includeInMenu=True SiriShortcutVisible=False runFullAccess=False
+# folder group: id=686 groupCollapsed=False includeInMenu=True
+
+   1    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    Set Error Capture [ On ]
+        Set state=True
+        DisableStepCollapsed state=False
+   3    Set Variable [ $Data; Value:JSON.Format ( Get( ScriptParameter ) ; "" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: cf:JSON.Format, fn:Get, fn:ScriptParameter
+        Repetition
+          Calculation:
+            | 1
+        Name: $Data
+   4    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   5    Set Variable [ $Id; Value:JSONGetElement ( $data ; "EntityId" ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:JSONGetElement
+        Repetition
+          Calculation:
+            | 1
+        Name: $Id
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ Get( WindowStyle ) = 3 //Card ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:WindowStyle
+   8    Close Window [ Current Window ]
+        DisableStepCollapsed state=False
+        LimitToWindowsOfCurrentFile state=True
+        Window value=Current
+   9    End If
+        DisableStepCollapsed state=False
+  10    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  11    Go to Layout [ “Invoice - View Only” (Invoice) ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=SelectedLayout
+        Layout id=143 name="Invoice - View Only"
+  12    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Enter Find Mode [  ]
+        DisableStepCollapsed state=False
+        Pause state=False
+        Restore state=False
+  14    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  15    Set Field [ SalesTransaction::id; $Id ]
+        DisableStepCollapsed state=False
+        Field table=SalesTransaction id=1 name=id
+  16    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  17    Perform Find [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  19    If [ Get( LastError ) = 0 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  20    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  21    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  22    Go to Layout [ original layout ]
+        DisableStepCollapsed state=False
+        LayoutDestination value=OriginalLayout
+  23    Show Custom Dialog [ Title: "Error"; Message: "The Invoice can not be found."; Default Button: “OK”, Commit: “Yes” ]
+        DisableStepCollapsed state=False
+        Buttons
+          Button 1 CommitState=True: "OK"
+          Button 2 CommitState=False
+          Button 3 CommitState=False
+  24    End If
+        DisableStepCollapsed state=False

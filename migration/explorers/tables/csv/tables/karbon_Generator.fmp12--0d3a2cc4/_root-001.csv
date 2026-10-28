@@ -1,0 +1,168 @@
+source_id,source_hash,kind,file,id,name,role,fields,regular,calculated,summary,global,container,repeating,keys,logic,logic_count,target,open_question
+karbon_Generator.fmp12/tables/129-Requests.txt,d0172fb4577b1e809ba3a7f33f58424e5fbe006b3081f73c899808429e188614,tables,karbon_Generator.fmp12,129,Requests,entity,28,15,11,0,2,0,0,"id | auto-enter UUID; parent side of Equal to Headers::idRequest, QueryParameters::idRequest, RequestHistory::idRequest, FieldMap::idSource and FieldMap::idSources","8 url | calc-unstored | concatenates urlEntry and the query string to give the full URL
+20 requestJSONFileMakerCalcModify | calc-unstored | builds FileMaker script text (a Let with JSON modify steps) for the request: method, url, basic auth when includeAuth is on, query parameters, headers and body (quoted when uoteData is on); uses custom function jsonModifyStep
+19 requestJSONDisplay | calc-unstored | copy of requestJSON for display: removes auth and the Authorization header when includeAuth is off, then pretty-prints
+15 requestJSON | calc-unstored | builds the complete request JSON object (method, url, query, headers, auth user/password, data, dataQuoted flag) with the jsonO/jsonOp custom functions and pretty-prints it; passed to the HTTP script
+29 request.jsonFile | calc-unstored | builds the export file JSON: request name, notes and requestJSON; removes auth and the Authorization header when the script sets $removeAuth
+12 queryJSON | calc-unstored | joins the QueryParameters::pairJSON values into a JSON object text, ""{}"" when there are none
+7 query | calc-unstored | joins the related QueryParameters::pair values into a ""?a=b&c=d"" query string, empty when there are none
+27 jsonPathResult | calc-unstored | reads jsonPath from ResponseBodyRaw and pretty-prints it; returns the whole raw body when the path gives nothing
+22 includeAuth | auto-data | default constant '1'
+6 id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)
+13 headersJSON | calc-unstored | joins the Headers::pairJSON values into a JSON object text, ""{}"" when there are none
+11 headers | calc-unstored | list of the related Headers::pairs values, empty when there are none
+31 requestJSONFileMakerCalcModifyNative | calc-unstored | same as requestJSONFileMakerCalcModify but builds native JSONSetElement script steps (JSONSetElement_Step custom functions)",13,table,The Generator file is developer tooling (API/script/test code generation); confirm whether it is migrated or retired. Most of its tables have 0 records in the DDR. basicAuthUser and basicAuthPassword are stored per request (secret).
+karbon_Generator.fmp12/tables/131-QueryParameters.txt,c1f6703cf4c1b46b4e8c6e1a628363cc2fdf28715ad738dfd312e068dc2e2250,tables,karbon_Generator.fmp12,131,QueryParameters,entity,7,3,4,0,0,0,0,idRequest | FK -> Requests::id,"4 pair | calc-stored | name=value text of the query parameter
+5 pairJSON | calc-stored | uses a function that is missing in the DDR (<Function Missing>) on name and value; presumably builds a JSON pair; formula cannot be read
+6 pairJSONModify | calc-unstored | builds a jsonModifyStep script step setting query.<name> to the value
+7 pairJSONSetElement | calc-unstored | builds a JSONSetElement_Step script step setting query.<name> to the value",4,table,none
+karbon_Generator.fmp12/tables/132-Headers.txt,8b8bfdce1c3549fbf7c80b9d9a04802c62f6696c651f56560f0dd7f889d0742e,tables,karbon_Generator.fmp12,132,Headers,entity,9,3,6,0,0,0,0,idRequest | FK -> Requests::id,"4 pairs | calc-stored | name:value text of the header
+5 pairJSON | calc-stored | uses a function that is missing in the DDR (<Function Missing>) on name and value; presumably builds a JSON pair; formula cannot be read
+6 pairJSONModify | calc-unstored | builds a jsonModifyStep step setting headers.<name>; empty for Authorization when IncludeAuth is off
+7 needsMimeType | calc-stored | true when the header name is Content-Type or Accept
+8 IncludeAuth | calc-unstored | reads Requests::includeAuth through the relationship
+9 pairJSONSetElement | calc-unstored | builds a JSONSetElement_Step step setting headers.<name>; empty for Authorization when IncludeAuth is off",6,table,none
+karbon_Generator.fmp12/tables/133-RequestHistory.txt,6ba0650b8fefacad2041d8903e2e4c011a1e7d0c3ff75ffef6500073ee290d94,tables,karbon_Generator.fmp12,133,RequestHistory,log-audit,7,4,3,0,0,0,0,idRequest | FK -> Requests::id,"3 url | calc-stored | reads ""url"" from the request JSON
+4 method | calc-unstored | reads ""method"" from the request JSON
+5 createdAt | auto-created | auto-entered CreationTimeStamp
+7 responseCode | calc-stored | reads ""code"" from the response JSON",4,table,none
+karbon_Generator.fmp12/tables/135-FieldMap.txt,0b36ff0b1efd2bdaf9fddea2a1dc5756fc443141b948900f198beb1d48568dc9,tables,karbon_Generator.fmp12,135,FieldMap,entity,14,8,5,0,1,0,0,"id | auto-enter UUID; parent side of Equal to FieldMapItems::idFieldMap and of a self-join to FieldMap::idSource
+idSource | FK -> Requests::id (Equal, also self-join to FieldMap::id)","1 id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)
+8 setFieldXML | calc-unstored | builds FileMaker script text: comment banners, then the parse-JSON-into-variables steps from FieldMapItems::parseIntoVarsStep, the transformation placeholders and the set-field steps from FieldMapItems::SetIntoVarsStepXML
+11 readFieldXML | calc-unstored | builds FileMaker script text: comment banners, then the read-field-into-$vars steps from FieldMapItems::readIntoVarsStep, transformation placeholders and the build-into-JSON steps from FieldMapItems::buildIntoJSON
+15 idSources | calc-stored | idSource and idSourceParentRequest on two lines; lets a request match a field map by either id
+16 setFieldXMLNative | calc-unstored | same as setFieldXML but uses the native JSON functions (parseIntoVarsStepNative)
+17 readFieldXMLNative | calc-unstored | same as readFieldXML but uses the native JSON builder (buildIntoJSONNative)",6,table,idSources (idSource and idSourceParentRequest joined by a return) is the right key of a relationship from Requests::id; confirm what a field map hangs off (a request or a parent field map).
+karbon_Generator.fmp12/tables/136-FieldMapItems.txt,e4ed2c9c8654fa412cce4f70baf590e4de2f7ad07c5e9216c8026ff3d4486684,tables,karbon_Generator.fmp12,136,FieldMapItems,entity,16,8,8,0,0,0,0,"id | auto-enter UUID (no relationship parent evidence beyond FieldMap)
+idFieldMap | FK -> FieldMap::id","1 id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)
+7 parseIntoVarsStep | calc-unstored | builds a script step that sets $<path> to jsonGet($json; path); empty when ignore is set
+8 SetIntoVarsStepXML | calc-unstored | builds a Set Field script step from tableName::fieldName to $<path>; empty when ignore is set
+10 tableName | auto-calc | takes the table name from FieldMap::table (the references to fieldName and ignore only force re-evaluation); overwrites existing value
+12 readIntoVarsStep | calc-stored | builds a script step that sets $<path> from tableName::fieldName; empty when ignore is set
+13 buildIntoJSON | calc-unstored | builds a script step that sets $json with jsonModify($json; path; $path); empty when ignore is set
+14 isArray | calc-stored | true when the value is a JSON array (jsonIsArray)
+15 displayJSON | calc-unstored | pretty-printed value when it is an array, otherwise empty
+16 parseIntoVarsStepNative | calc-unstored | same as parseIntoVarsStep but uses native JSONGetElement
+18 buildIntoJSONNative | calc-unstored | same as buildIntoJSON but uses native JSONSetElement",10,table,none
+karbon_Generator.fmp12/tables/137-CONNECTOR.txt,089d96174dc4330346057e62fbf1d670757f3edfaf3b8922da0f528f60e90318,tables,karbon_Generator.fmp12,137,CONNECTOR,utility,1,0,0,0,1,0,0,none,none,0,drop-candidate,none
+karbon_Generator.fmp12/tables/138-SELECTOR.txt,2881c6af9c0c973b9b44acca73a25f9ff5d585035399b8b732de9eae8a0fd7d2,tables,karbon_Generator.fmp12,138,SELECTOR,utility,13,0,2,0,11,0,0,none,"10 empty | calc-stored | constant empty text (stored calculation)
+17 ONE | calc-stored | constant 1 stored calculation (helper)",2,session-state,"All fields are globals that carry the selected record ids (ApiGeneratorId, ApiGeneratorLineId, TestLineId and others) used as left keys of relationships; none is a key of this table."
+karbon_Generator.fmp12/tables/139-Files.txt,0e9ae791952323f91259446e9d2716a1ffb2fb25c7bb9278f3818c5a55d708a9,tables,karbon_Generator.fmp12,139,Files,staging,2,1,0,0,1,0,0,none,none,0,drop-candidate,none
+karbon_Generator.fmp12/tables/140-Tables.txt,eb16681ebe8a63430dc42bda43cd8577b6bc29cd2c9d7ccd0744b1d675f0038e,tables,karbon_Generator.fmp12,140,Tables,staging,2,1,0,0,1,0,0,none,none,0,drop-candidate,none
+karbon_Generator.fmp12/tables/141-SCHEMA.txt,710c2f94ef9148eac008b9113bd7aa559b42b7539afcffe6704ef5275b4d3aa3,tables,karbon_Generator.fmp12,141,SCHEMA,settings-globals,2,0,0,0,2,0,0,none,none,0,session-state,none
+karbon_Generator.fmp12/tables/142-Fields.txt,10fb9663a14fe9a87ad75adbc2ef68d32ff3b8d8aac2afeb0cfd97fca5053759,tables,karbon_Generator.fmp12,142,Fields,staging,6,5,0,0,1,0,0,"NaturalKey | unique validation, auto-enter FileName-TableName-FieldName
+Id | auto-enter UUID (no relationship evidence)","5 Id | auto-calc | auto-enters a new UUID, Get(UUID) (only fills an empty field; user can edit)
+6 NaturalKey | auto-calc, validate-rule | joins FileName, TableName and FieldName with hyphens as a natural key; overwrites; validation (only during data entry): unique",2,table,Snapshot of schema fields used by the generator; confirm it is a rebuildable cache.
+karbon_Generator.fmp12/tables/143-meta.txt,4d32317f8957866abe46a1281ef109eece1b5f86b7c778d9a2804f701767a07c,tables,karbon_Generator.fmp12,143,meta,settings-globals,2,0,1,0,1,0,0,none,"5 FileVersion | calc-unstored | constant text ""2.5.6"" (file version)",1,config,none
+karbon_Generator.fmp12/tables/144-VIRTUALLIST.txt,3b67ffc884b4de94316d5ab9dbf05311e0a9b7e7314f70c9ba3ad6629b1490a0,tables,karbon_Generator.fmp12,144,VIRTUALLIST,utility,11,2,8,0,1,0,0,none,"3 FileName | calc-unstored | returns value n of the global variable $$VL_Files (virtual list column)
+5 TableName | calc-unstored | returns value n of the global variable $$VL_TableName (virtual list column)
+6 FieldName | calc-unstored | returns value n of the global variable $$VL_FieldName (virtual list column)
+7 ScriptName | calc-unstored | returns value n of the global variable $$VL_ScriptName (virtual list column)
+8 ScriptId | calc-unstored | returns value n of the global variable $$VL_ScriptId (virtual list column)
+11 TableOccurenceName | calc-unstored | returns value n of the global variable $$VL_TableOccurenceName (virtual list column)
+12 TableFileName | calc-unstored | returns value n of the global variable $$VL_TableFileName (virtual list column)
+13 FieldValue | calc-unstored | returns value n of the global variable $$VL_FieldValue (virtual list column)",8,drop-candidate,Virtual list over $$VL_* variables; confirm UI is rebuilt without it.
+karbon_Generator.fmp12/tables/145-Generators.txt,4974ce9ccb5ce8ae6685a3e469793ef92dda263ec35886e1cb518d42b5c8ea86,tables,karbon_Generator.fmp12,145,Generators,entity,13,10,2,0,1,0,0,id | auto-enter UUID; parent side of Equal to GeneratorTokens::idGenerator,"1 name | auto-calc | normalises the generator name: lower case, spaces become hyphens, keeps only a-z, 0-9 and hyphen; overwrites the entry
+5 asJSON | calc-unstored | builds the generator JSON (name, order, version, description, clipType, prompts from GeneratorTokens::asJSON)
+12 id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)
+13 clipAsCalc | calc-stored | turns the clip text into a FileMaker List( ""..."" ) calculation: escapes quotes and breaks each line",4,table,The Generator file is developer tooling (API/script/test code generation); confirm whether it is migrated or retired. Most of its tables have 0 records in the DDR.
+karbon_Generator.fmp12/tables/146-GeneratorTokens.txt,b7b6050c2a64f927bd71016c368ec812cf956c1d5bbabfc518400f176da4b290,tables,karbon_Generator.fmp12,146,GeneratorTokens,entity,9,7,2,0,0,0,0,"id | auto-enter UUID
+idGenerator | FK -> Generators::id","1 id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)
+5 displayToken | calc-stored | [[name]] token text for display
+7 asJSON | calc-stored | builds the token JSON (name, helpText, value, example)",3,table,none
+karbon_Generator.fmp12/tables/147-GLOBALS.txt,2e3aac8bf69d7a0248473599cbe33e25c9ed1c2a2625b4729a1d575ffcbbc78a,tables,karbon_Generator.fmp12,147,GLOBALS,settings-globals,30,0,1,0,29,0,0,none,"2 Generator_NewName | auto-calc | normalises the new generator name like Generators::name (lower case, hyphens, a-z0-9); overwrites; global
+4 Maps_JSONPathResult | calc-unstored | reads Maps_JSONPath from Maps_JSON and pretty-prints; returns the whole JSON when the path is empty",2,session-state,none
+karbon_Generator.fmp12/tables/148-RESOURCES.txt,79a72c5d52e6a8b5a2ca3575c795400f74bd7bd42e24d7974fd5e4b9b59b01ed,tables,karbon_Generator.fmp12,148,RESOURCES,settings-globals,6,4,1,0,1,0,0,none,"6 GenerateLegacyStyleCode | auto-calc | converts the field to a boolean with GetAsBoolean (normalises empty to 0); overwrites
+7 UseLegacy | calc-unstored | true when the FileMaker version is below 16 or GenerateLegacyStyleCode is on",2,config,"Fields jsonCustomFunctionXML, HTTPScript and HTTPScriptNative hold stored code templates (text, not global); confirm where those templates live in the target."
+karbon_Generator.fmp12/tables/149-ApiGenerator.txt,6959fefd5e66129b2a808fccf318773482273786373543b3c2f5c4e969dab5ee,tables,karbon_Generator.fmp12,149,ApiGenerator,entity,16,12,1,0,3,0,0,"id | auto-enter UUID; parent side of Equal to ApiGeneratorLine::ApiGeneratorId, ApiGeneratorLine::ChildSchemaId and SELECTOR::ApiGeneratorId","1 id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)
+2 APIName | validate-rule | validation (only during data entry): not empty, message ""Please enter the script name for this API.""
+18 APIType | validate-rule | validation (only during data entry): not empty, value list id=8 name=""API Type"", no user override, message ""Please select a valid type""
+19 Entity | validate-rule | validation (only during data entry): not empty, no user override, message ""A valid entity is required. This is usually the table name this API's context is based on.""
+20 z_Constant | calc-stored | constant 1 stored calculation, used as the join key for filtered portals (IsObject, selected, FmpIgnore)",5,table,The Generator file is developer tooling (API/script/test code generation); confirm whether it is migrated or retired. Most of its tables have 0 records in the DDR. z_Constant is a constant 1 used by several filtered relationships to ApiGeneratorLine.
+karbon_Generator.fmp12/tables/150-ApiGeneratorLine.txt,640a1361bfb48c2a82d5ff10ba7e2918392cea3c6c0046eb38724dda37fdc2e8,tables,karbon_Generator.fmp12,150,ApiGeneratorLine,entity,28,26,2,0,0,0,0,"Id | auto-enter UUID; parent side of ApiGeneratorLine::ParentObjectId self-join and ApiGeneratorLineValueOption::IdAPIGeneratorLine
+ApiGeneratorId | FK -> ApiGenerator::id
+ParentObjectId | FK -> ApiGeneratorLine::Id (self)
+ChildSchemaId | FK -> ApiGenerator::id","1 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)
+26 JsonPathOut | auto-calc | sets the JSON out path to JsonPropertyName when PluckInd is on; overwrites
+27 JsonPathIn | auto-calc | sets the JSON in path to <ApiGenerator::Entity>/<JsonPropertyName>; overwrites
+33 SchemaId | calc-unstored | full path of the line: the parent line property names and own Id joined with ""/""
+41 IsObject | calc-stored | true when type is ""object""",5,table,none
+karbon_Generator.fmp12/tables/151-ApiGeneratorLineValueOption.txt,8e2c2409638fc9ee0c9ecfd69e645c62cb9522fea95f8386022b28a2b3a8cfad,tables,karbon_Generator.fmp12,151,ApiGeneratorLineValueOption,entity,4,4,0,0,0,0,0,"id | auto-enter UUID
+IdAPIGeneratorLine | FK -> ApiGeneratorLine::Id","1 id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user can edit)",1,table,none
+karbon_Generator.fmp12/tables/154-JSNObject.txt,c17193ab90ab5d3148931656d3a215d2ae55b6b52f75864a66632063ff341ef1,tables,karbon_Generator.fmp12,154,JSNObject,entity,13,11,2,0,0,0,0,"Id | auto-enter UUID; parent side of JSNObjectLine::JSONObjectId; referenced by Test::JSNObjectIdCached and TestLine::JSNObjectId
+JSNObjectTypeId | FK -> JSNObjectType::Id","1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+3 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user cannot edit)
+4 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+5 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+6 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)
+16 AsJSON | calc-stored | record as JSON: Entity, Id, JSNObjectTypeId, SimpleName (comment: not the object text, the record itself)
+18 AsJSONWithLines | calc-unstored | AsJSON plus the related line AsJSON values as a JSONLines array",8,table,The Generator file is developer tooling (API/script/test code generation); confirm whether it is migrated or retired. Most of its tables have 0 records in the DDR. Sync hooks to SyncDeK in the switched-off modification calculations are remnants.
+karbon_Generator.fmp12/tables/155-JSNObjectLine.txt,9369eb4872bfd14a632113fbe5a3f37257e8fe8c174ad7d3643edd937199e4d8,tables,karbon_Generator.fmp12,155,JSNObjectLine,entity,12,11,1,0,0,0,0,"Id | auto-enter UUID; also joined 1:1 from JSNObjectLineRuntime::Id
+JSONObjectId | FK -> JSNObject::Id","1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+3 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user cannot edit)
+4 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+5 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+6 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)
+17 AsJSON | calc-stored | record as JSON: Id, Key, Value, JSONType, RunTimeInd (boolean), JSONObjectId",7,table,none
+karbon_Generator.fmp12/tables/156-JSNObjectType.txt,688f7af72b9a07a40686ce56d5fab75e4c5e0af53585a96ba741af3389152541,tables,karbon_Generator.fmp12,156,JSNObjectType,lookup,8,8,0,0,0,0,0,"Id | serial, next value 1001; parent side of JSNObject::JSNObjectTypeId","1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+3 Id | auto-serial | serial number, next value 1001, increment 1, generated OnCreation
+4 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+5 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+6 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)",6,table,none
+karbon_Generator.fmp12/tables/157-JSNObjectLineRuntime.txt,682e2eabe2c783f4c8b070ceade07521071d930cf7976f001f811844a056c85a,tables,karbon_Generator.fmp12,157,JSNObjectLineRuntime,entity,15,15,0,0,0,0,0,Id | auto-enter UUID; Equal relationship JSNObjectLineRuntime::Id = JSNObjectLine::Id (1:1 extension of JSNObjectLine),"1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+3 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user cannot edit)
+4 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+5 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+6 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)",6,table,Id is generated here and is also the join to JSNObjectLine::Id; which side owns the id?
+karbon_Generator.fmp12/tables/158-Script.txt,e23d06567e81a63426bcbc0197568ec66474bd199a56866cb3fe1e38ac3d0984,tables,karbon_Generator.fmp12,158,Script,staging,5,5,0,0,0,0,0,"NaturalKey | unique validation, auto-enter FileName-ScriptName-ScriptId
+Id | auto-enter UUID (no relationship evidence)","1 Id | auto-calc | auto-enters a new UUID, Get(UUID) (only fills an empty field; user cannot edit)
+5 NaturalKey | auto-calc, validate-rule | joins FileName, ScriptName and ScriptId with hyphens as a natural key; overwrites; validation (only during data entry): unique",2,table,Snapshot of scripts used by the generator; confirm it is a rebuildable cache.
+karbon_Generator.fmp12/tables/159-Test.txt,7e9263e3d4c0a1042043ec040dc926ef354a84c29451f0d9bb60655c5f2bb1a6,tables,karbon_Generator.fmp12,159,Test,entity,22,19,3,0,0,0,0,"Id | auto-enter UUID; parent side of TestLine::TestId
+TestGroupId | FK -> TestGroup::Id
+JSNObjectIdCached | FK -> JSNObject::Id
+TestLineId | FK -> TestLine::Id
+ScriptIdCached | FK -> external file table (relationship target is external)","1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+3 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user cannot edit)
+4 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+5 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+6 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)
+16 AsJSON | calc-stored | test record as JSON built from $-variables (ActiveInd, CustomerRequestId, Entity, FileName, Id, ScriptId, ScriptName, TestGroupId, TestName, Type); not formatted on purpose
+18 LastResultFailInd | calc-unstored | true when the sum of related TestLine::LastResultFailInd is above 0
+19 LastResultPassInd | calc-unstored | true when the number of related test lines equals the sum of their LastResultPassInd",9,table,ScriptIdCached joins to a table in a file outside this DDR set; which one?
+karbon_Generator.fmp12/tables/160-TestLine.txt,ca63cd4dafae908c32bdad5c736c985e17a79da517362d9ec733c1434214bac4,tables,karbon_Generator.fmp12,160,TestLine,entity,26,25,1,0,0,0,0,"Id | auto-enter UUID; parent side of TestLineResult::TestLineId and Test::TestLineId
+TestId | FK -> Test::Id
+JSNObjectId | FK -> JSNObject::Id
+LineTypeId | FK -> TestLineType::Id","1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+3 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user cannot edit)
+4 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+5 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+6 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)
+22 SQL_Result | auto-calc | empty when SQL_FieldJSONInd is on, otherwise keeps itself; overwrites
+27 SQL_GetFromResultValue | calc-unstored | reads key SQL_GetFromResultKey from the related ActualTest::LastResult JSON",8,table,none
+karbon_Generator.fmp12/tables/161-TestLineResult.txt,904be0d2753d0f00abc294f756562be394aa3e2e1294aab696c9710411b79570,tables,karbon_Generator.fmp12,161,TestLineResult,log-audit,13,13,0,0,0,0,0,"Id | auto-enter UUID
+TestLineId | FK -> TestLine::Id","1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+3 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user cannot edit)
+4 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+5 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+6 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)
+10 HasKeyInd | auto-data | default constant '1'",7,table,none
+karbon_Generator.fmp12/tables/162-TestGroup.txt,75b3b29d171c158367d880ce1b1cddcb6c4b62f4e4b5ad926755a89d68530fed,tables,karbon_Generator.fmp12,162,TestGroup,lookup,7,7,0,0,0,0,0,Id | auto-enter UUID; parent side of Test::TestGroupId,"1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+3 Id | auto-calc | auto-enters a new UUID, Get(UUID) (overwrites an existing value; user cannot edit)
+4 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+5 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+6 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)",6,table,none
+karbon_Generator.fmp12/tables/164-TestGlobals.txt,50e992644800c977c02a36c6c37810416966f74b41764316e55887bab75a369b,tables,karbon_Generator.fmp12,164,TestGlobals,settings-globals,11,0,1,0,11,0,0,none,"10 AsJSON | calc-unstored | test descriptor as JSON built from the global fields (TestGroupName, TestGroupId, ScriptId, ScriptName, Entity, FileName, TestName, Subject, Type, TestLineType); global",1,session-state,none
+karbon_Generator.fmp12/tables/165-TestLineType.txt,4819fe5d58abe6db10611405227822e1f93ca5319d63d738021f4517c535952a,tables,karbon_Generator.fmp12,165,TestLineType,lookup,9,9,0,0,0,0,0,"Id | serial, next value 1004; parent side of TestLine::LineTypeId","1 CreationAccountName | auto-created | auto-entered CreationAccountName, user cannot edit
+2 CreationTimestamp | auto-created | auto-entered CreationTimeStamp, user cannot edit
+4 Id | auto-serial | serial number, next value 1004, increment 1, generated OnCreation
+5 ModificationAccountName | auto-modified | auto-entered ModificationAccountName on each change; its old auto-enter calculation is switched off
+6 ModificationTimestamp | auto-modified, validate-rule (always) | auto-entered ModificationTimeStamp on each change; its old auto-enter calculation is switched off; validation (always): no user override; its validation calculation is switched off (commented-out sync hook)
+7 ONE | auto-calc | always evaluates to 1 (IsEmpty(Self) or not IsEmpty(Self)); constant-true helper (overwrites an existing value; user can edit)",6,table,none

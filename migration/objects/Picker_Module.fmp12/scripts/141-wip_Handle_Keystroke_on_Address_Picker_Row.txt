@@ -1,0 +1,162 @@
+# script 141: _wip_Handle Keystroke on Address Picker Row
+# file: Picker Module.fmp12
+# folder: Modules / Address Autocomplete / API / Private / Triggers
+# source: ScriptCatalog/Script[@id=141]
+# steps: 30 (0 disabled)
+# options: includeInMenu=False SiriShortcutVisible=False runFullAccess=False
+# folder group: id=134 groupCollapsed=True includeInMenu=False
+
+   1    #v1.0 2014-07-31: Initial release
+        DisableStepCollapsed state=False
+        Restore state=False
+   2    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   3    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   4    Set Variable [ $typedNavigationKey; Value:/* FilterValues is great to see if an item exists in a list */
+        
+        not IsEmpty( FilterValues (
+        
+        	List( 
+        		9 /* tab */ 
+        	;	29 /* up arrow */
+        	;	31 /* down arrow */
+        	
+        	)
+        
+        ; 
+        
+        	Code( Get ( TriggerKeystroke ) )
+        
+        ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:IsEmpty, fn:FilterValues, fn:List, fn:Code, fn:Get, fn:TriggerKeystroke
+        Name: $typedNavigationKey
+   5    Set Variable [ $typedSelectionKey; Value:/* FilterValues is great to see if an item exists in a list */
+        
+        not IsEmpty( FilterValues (
+        
+        	List( 
+        		32 /* space bar */ 
+        	;	10 /* enter */
+        	;	13 /* return */
+        	
+        	)
+        
+        ; 
+        
+        	Code( Get ( TriggerKeystroke ) )
+        
+        ) ) ]
+        DisableStepCollapsed state=False
+        Value
+          refs: fn:not, fn:IsEmpty, fn:FilterValues, fn:List, fn:Code, fn:Get, fn:TriggerKeystroke
+        Name: $typedSelectionKey
+   6    #
+        DisableStepCollapsed state=False
+        Restore state=False
+   7    If [ $typedNavigationKey ]
+        DisableStepCollapsed state=False
+        Restore state=False
+   8    #The user typed a navigation character; go forward or back as appropriate
+        DisableStepCollapsed state=False
+        Restore state=False
+   9    Go to Record/Request/Page [ Let( 
+        
+        $recNum = 
+        
+        Case( 
+        
+        	Get ( TriggerModifierKeys ) = 1 // shift key is pressed
+        	or Get ( TriggerModifierKeys ) = 3 // shift + caps lock is pressed
+        	or Code( Get ( TriggerKeystroke ) ) = 29  // up arrow
+        
+        ; 
+        
+        	Get( RecordNumber ) - 1 // go back
+        ;	Get( RecordNumber ) + 1 // otherwise go forward
+        
+        ) 
+        
+        ; 
+        
+        $recNum 
+        
+        ) ]
+        [ No dialog ]
+        NoInteract state=True
+        DisableStepCollapsed state=False
+        RowPageLocation value=ByCalculation
+        refs: fn:Let, fn:Case, fn:Get, fn:TriggerModifierKeys, fn:or, fn:Code, fn:TriggerKeystroke, fn:RecordNumber
+  10    If [ Get( LastError ) ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:LastError
+  11    If [ $recNum < 1 
+        
+        // only go to search field on shift+tab. Arrow keys should be bound to record nav.
+        and Code( Get ( TriggerKeystroke ) ) <> 29 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:and, fn:Code, fn:Get, fn:TriggerKeystroke
+  12    #navigated past first record; go to search field
+        DisableStepCollapsed state=False
+        Restore state=False
+  13    Go to Field [ Picker::Search_Field ]
+        SelectAll state=False
+        DisableStepCollapsed state=False
+        Field table=Picker id=1 name=Search_Field
+  14    Else If [ $recNum > Get ( FoundCount )
+        
+        // only go to new contact button on tab keypress. Arrow keys should be bound to record nav.
+        and Code( Get ( TriggerKeystroke ) ) <> 31 ]
+        DisableStepCollapsed state=False
+        Restore state=False
+        refs: fn:Get, fn:FoundCount, fn:and, fn:Code, fn:TriggerKeystroke
+  15    #navigated past last record; go to execute button
+        DisableStepCollapsed state=False
+        Restore state=False
+  16    Go to Object [ Object Name: "executeButton"; Repetition: 1 ]
+        DisableStepCollapsed state=False
+  17    Else [  ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  18    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  19    End If
+        DisableStepCollapsed state=False
+  20    End If
+        DisableStepCollapsed state=False
+  21    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  22    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  23    Else If [ $typedSelectionKey ]
+        DisableStepCollapsed state=False
+        Restore state=False
+  24    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  25    Perform Script [ “Select Address” ]
+        DisableStepCollapsed state=False
+        Script id=118 name="Select Address"
+  26    Exit Script [ Result: False ]
+        DisableStepCollapsed state=False
+        refs: fn:False
+  27    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  28    End If
+        DisableStepCollapsed state=False
+  29    #
+        DisableStepCollapsed state=False
+        Restore state=False
+  30    Exit Script [ Result: True ]
+        DisableStepCollapsed state=False
+        refs: fn:True
