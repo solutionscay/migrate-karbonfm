@@ -43,9 +43,10 @@ Written by the reconcile pass over 00-08 (2026-10-27) and rerun over 00-09 on 20
 - Money storage (OD-04-02, closed): integer minor units. The 22 money columns in 04 are INTEGER cents (customer 4, employee 2, item 2, opportunity 1, payment 1, payment_line 1, sales_line 3, sales_transaction 7, vendor 1). Arithmetic in Rust on integers; conversion only at the UI and import edges (BR-IMPORT-01, half away from zero). BR-SALES-01 changed: unit prices are cents, so the source's 7-decimal unit price is not kept. 02 R-02/S-03, 03 tests and validation matrix, 05 money contract, 01 D-18 updated.
 - Twilio SMS/chat (OD-05-02, closed; EXT-05): dropped, out of scope, removed like QuickBooks (03 "Removed: Twilio SMS/chat"). 04: tables chat, chat_consent, chat_message, 2 indexes and 3 system_setting Twilio columns removed; 04 appendix: 3 tables, 51 fields, 12 relationships marked removed. 07 appendix: 15 scripts and 24 table-logic lines marked removed. 06 appendix: 6 layouts marked removed. 08 appendix: 3 table rows removed. activity.chat_ind, activity_type 9 and phone.sms_ind stay as data.
 - Tax ids (organization.federal_tax_id_number, vendor.tax_id): plain TEXT, no encryption, masking or extra access rule (demo). Recorded in 01 D-09, 04, 07 BR-IMPORT-02 and an 08 field-level policy row; the security-review question on them is closed.
-- UI stack (owner decision, 2026-10-28): server-rendered HTML, no React or TypeScript. Tauri 2 window on a local axum server (askama, htmx, Alpine.js for small bits, Tailwind + DaisyUI, Chart.js; rusqlite with plain SQL). 05: every one of the 53 commands has a route (3 are internal) and returns a page or an htmx fragment. 06: every screen UI-01..UI-22 has a page route; UI-21 is the static chat mock, UI-22 the host-mode login. 08: AP-01/02/03/09/10 rewritten for routes; new AP-13 (local server guard, I1) and AP-14 (host mode, I7); tests T-08-14, T-08-15. 03: I1 scope updated; new optional increment I7 (host mode: login, LAN only) with OP-ADMIN-06/07 and BR-ADMIN-06. OD-05-01 closed; OD-08-02 opened (host mode details). 02: React/TypeScript items removed from the stack, the risks and the spikes; new R-07..R-09 and S-05.
+- UI stack (owner decision, 2026-10-28): server-rendered HTML, no React or TypeScript. Tauri 2 window on a local axum server on 127.0.0.1 (askama, htmx, Alpine.js for small bits, Tailwind + DaisyUI, Chart.js; rusqlite with plain SQL). 05: every one of the 51 commands has a route (3 are internal) and returns a page or an htmx fragment. 06: every screen UI-01..UI-21 has a page route; UI-21 is the static chat mock. 08: AP-01/02/03/09/10 rewritten for routes; new AP-13 (local server guard, I1); test T-08-14. OD-05-01 closed. 02: React/TypeScript items removed from the stack, the risks and the spikes; new R-07, R-08 and S-05.
+- Owner change (2026-10-28): no LAN sharing. The host-mode increment I7 and everything added for it are removed (AP-14, BR-ADMIN-06, OP-ADMIN-06/07, UI-22, T-08-15, OD-08-02, the LAN risk). The app is single-user on one computer; the server listens on 127.0.0.1 only.
 
-## Check results (2026-10-28, over 00-09, after the UI-stack decision)
+## Check results (2026-10-28, over 00-09, after the LAN-sharing removal)
 
 - unknown ids: 0
 - ODs missing from their owner: 0
@@ -71,5 +72,6 @@ Written by the reconcile pass over 00-08 (2026-10-27) and rerun over 00-09 on 20
 - OPs without a route in the 05 catalog: 0
 - screens without a page route: 0
 - ops with no rule in 07: 0
+- host-mode / LAN wording left (owner change 2026-10-28): 0
 
-The 5 `table.column` references reported on 2026-10-27 are relationship rows that say "has no target column"; the check now skips them. The UI-stack checks (React/TypeScript/IPC wording, routes per command, page per screen, rule per command) were added on 2026-10-28.
+The 5 `table.column` references reported on 2026-10-27 are relationship rows that say "has no target column"; the check now skips them. The UI-stack checks were added on 2026-10-28, and the host-mode/LAN check after the owner dropped LAN sharing the same day.

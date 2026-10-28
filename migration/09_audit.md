@@ -12,7 +12,7 @@ Labels follow the skill: **fact** (from an object file), **inference**, **produc
 | Graph rows (`meaning`, `fk_candidate`) | 30 sampled, **2 wrong (6.7%)**. A full re-derivation of all 683 relationships found about 8 wrong rows. None feeds a foreign key in 04. 4 cells fixed. |
 | Layout rows (hide rules, conditional formats) | 30 lines sampled, **0 wrong (0%)**. Line counts match the objects on all 382 layouts. |
 | Script `callers` cells | 30 sampled (15 from the panes that shared the overwritten `callers.json`), **1 wrong (3.3%)**, and not from those panes. A sweep of all 309 `none found` cells found 2 more with a live caller. 3 cells and 2 appendix rows fixed. |
-| Gaps the plan still does not understand | **57 listed** (59 at the audit; OD-04-02 and OD-05-02 were decided by the owner on 2026-10-28): 30 unanswered D- questions, 14 open OD- decisions (3 new from this audit), 13 object gap groups (G-01 to G-13). |
+| Gaps the plan still does not understand | **56 listed** (59 at the audit; OD-04-02, OD-05-01 and OD-05-02 were closed by owner decisions on 2026-10-28): 30 unanswered D- questions, 13 open OD- decisions (3 new from this audit), 13 object gap groups (G-01 to G-13). |
 | Blocks the plan? | Nothing blocks I1, I2 or I4. **I5 (sales) should not start** until the Accounting owner confirms or replaces the defaults of OD-07-05, OD-07-06 and OD-07-07. The I3 recompute of retainer balances also waits on OD-07-07. See "What should block". |
 
 ## Method
@@ -131,9 +131,9 @@ All 30 have a recorded default in `01_discovery_answers.md`. The plan uses those
 
 `00_app_summary.md` still lists OD-00-01 to OD-00-06 as open. OD-00-04, -05 and -06 are settled by D-01, D-02 and D-05. OD-00-01, -02 and -03 are D-32, D-31 and D-13.
 
-### 3b. Open decisions (14)
+### 3b. Open decisions (13)
 
-OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were decided by the owner on 2026-10-28 and are no longer gaps (03). The UI-stack decision of the same day (server-rendered HTML, no TypeScript) closed OD-05-01 and opened OD-08-02 for the later host mode, so the count stays 14.
+OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were decided by the owner on 2026-10-28 and are no longer gaps (03). The UI-stack decision of the same day (server-rendered HTML, no TypeScript) closed OD-05-01, so 13 remain.
 
 | Id | Decision | Affects |
 |---|---|---|
@@ -150,7 +150,6 @@ OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were de
 | **OD-07-06** (new) | How total_tax is computed with QBO out | BR-SALES-02, invoice and receipt totals, I5 |
 | **OD-07-07** (new) | Retainer balance: posted only (default) or all transactions | BR-SALES-06, BR-IMPORT-01 recompute, I3 and I5 |
 | OD-08-01 | Optional passcode or SQLCipher | 08, I1 |
-| OD-08-02 (new, 2026-10-28) | Host mode: TLS on the LAN, shared login or per-person accounts | AP-14, BR-ADMIN-06, I7 |
 
 ### 3c. Object gaps: unresolved targets and `objects/unresolved.tsv`
 
@@ -172,7 +171,7 @@ The catalogs mark 86 targets `unresolved` (tables 7, layouts 28, value lists 6, 
 | G-12 | Out-of-scope files (LedgerLink 84, Generator 63, tester 23, Build 8, ZeitGeist 2, dev 2, konnector 2) | `objects/unresolved.tsv` | 184 | none (D-01, D-02) |
 | G-13 | **PostSalesTransactions** is a function missing from the DDR (plugin or deleted custom function) that gates every post. The plan assumes it is on. | `objects/karbon_kontroller.fmp12/scripts/576-Post_Unpost_Internal_Id_Post.txt` step 39 | 0 | BR-SALES-06, BR-SALES-15, D-24 |
 
-Gap count: 30 + 14 + 13 = **57** (59 at the audit, before the 2026-10-28 owner decisions). The 488 rows sum as 1 + 15 + 17 + 85 + 74 + 38 + 74 + 184.
+Gap count: 30 + 13 + 13 = **56** (59 at the audit, before the 2026-10-28 owner decisions). The 488 rows sum as 1 + 15 + 17 + 85 + 74 + 38 + 74 + 184.
 
 ## What should block
 

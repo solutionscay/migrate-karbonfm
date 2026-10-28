@@ -14,7 +14,7 @@ One domain list for every artifact: `PARTY`, `CONTACT`, `ACTIVITY`, `SALES`, `FI
 | SALES | Opportunities, sales transactions (invoices, sales receipts), lines, payments, items, posting |
 | FILE | Files and file attachments |
 | TEMPLATE | Templates and merge fields |
-| ADMIN | Setup, single local user, system settings, reference seeds, logging, host mode (later, I7) |
+| ADMIN | Setup, single local user, system settings, reference seeds, logging |
 | INTEG | Outbound integrations: SMTP email, address suggestions, enrichment; accounting (QBO) stub. Twilio SMS/chat is removed (owner, 2026-10-28; OD-05-02) |
 | IMPORT | Per-install import of a FileMaker export |
 
@@ -130,7 +130,7 @@ Templates and merge fields.
 
 ## Domain invariants and operations: ADMIN
 
-Setup, single local user, system settings, reference seeds, logging, host mode (later, I7).
+Setup, single local user, system settings, reference seeds, logging.
 
 | Rule id | Tier | Invariant | Started by (commands) | Object files | Semantic tests | Open question |
 |---|---|---|---|---|---|---|
@@ -139,7 +139,6 @@ Setup, single local user, system settings, reference seeds, logging, host mode (
 | BR-ADMIN-03 | tier2 | Errors are logged with the operation, the error code and a masked payload to the local log file. | OP-ADMIN-05 | `objects/karbon_log.fmp12/scripts/336-Log_data.txt`; `objects/karbon_log.fmp12/scripts/343-Log_data.txt` | secrets masked in log lines | D-30 |
 | BR-ADMIN-04 | tier1 | There is one user per install. Every command acts as that user: creator roles, From parties, audit stamps. This replaces the session binding of the FileMaker account to a Karbon user. | OP-ADMIN-04, all write commands | `objects/karbon_kontacts.fmp12/scripts/54-Store_UserID_On_Session.txt`; `objects/karbon_kontroller.fmp12/scripts/375-Get_User_Object_By_AccountName_AccountName.txt` | stamps use the local user id | D-04, D-35 |
 | BR-ADMIN-05 | tier2 | System settings hold the owner organization, book close date, default tax code, country and area code, phone formatting, and the system email account (without its password, which is in the keychain). | OP-ADMIN-03 | `objects/karbon_data.fmp12/tables/165-System.txt`; `objects/karbon_kontroller.fmp12/scripts/502-Get_System.txt` | settings round trip; password never returned | D-09 |
-| BR-ADMIN-06 | tier2 | Host mode is off by default. The owner turns it on from the desktop window and sets a password (host_mode_set); the setting lives in the app config file, not in SQLite, so an imported database never turns it on. With host mode on, the server also listens on the LAN, accepts clients from private network addresses only, and every LAN request needs a logged-in session (host_session). A LAN session acts as the single local user (BR-ADMIN-04) until OD-08-02 decides on accounts. Import, backup, secrets in settings and host mode itself are desktop-window only. Product decision (owner, 2026-10-28): a later, optional increment (I7), like FileMaker network sharing; not in I1. | OP-ADMIN-06, OP-ADMIN-07 | new (no FileMaker object) | off by default; login required; public address refused; desktop-only routes refused for a LAN session | OD-08-02 |
 
 ## Domain invariants and operations: INTEG
 
@@ -211,8 +210,6 @@ Every rule is owned by the Rust command layer (`src/commands/<domain>.rs`), call
 | OP-ADMIN-03 | `settings_get_update` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-03 | creation/modification stamps (BR-PARTY-07) | BR-ADMIN-05 |
 | OP-ADMIN-04 | `current_user` | Rust command layer | read transaction | AP-01 | read only | BR-ADMIN-04 |
 | OP-ADMIN-05 | `log_write` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01 | creation/modification stamps (BR-PARTY-07) | BR-ADMIN-03 |
-| OP-ADMIN-06 | `host_mode_set` | Rust command layer | config file and keychain write; no SQLite transaction | AP-01, AP-13, AP-14 | log line | BR-ADMIN-06 |
-| OP-ADMIN-07 | `host_session` | Rust command layer | in-memory session store; no SQLite transaction | AP-14 | log line per failed login | BR-ADMIN-06 |
 | OP-INTEG-01 | `email_send` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-02, AP-03, AP-08 | creation/modification stamps (BR-PARTY-07) | BR-ACTIVITY-08, BR-ACTIVITY-09, BR-INTEG-01 |
 | OP-INTEG-02 | `address_suggest` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-02, AP-03, AP-12 | creation/modification stamps (BR-PARTY-07) | BR-INTEG-02 |
 | OP-INTEG-03 | `party_enrich` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-02, AP-03, AP-12 | creation/modification stamps (BR-PARTY-07) | BR-INTEG-02 |

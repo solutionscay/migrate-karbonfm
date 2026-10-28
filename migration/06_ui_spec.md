@@ -297,7 +297,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Use case and users: System settings, user email settings, integrations, book close date; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/70-Admin_Dashboard.txt`, `objects/karbon_kontacts.fmp12/layouts/71-Admin_User_List.txt`, `objects/karbon_kontacts.fmp12/layouts/128-Admin_Integrations.txt`, `objects/karbon_kontacts.fmp12/layouts/134-Admin_User_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/122-Card_-_Utility_User.txt`, `objects/karbon_log.fmp12/layouts/20-Settings.txt`
 - Page: `GET /settings` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `GET /settings; PUT /settings` (OP-ADMIN-03 `settings_get_update`), `internal: request extractor used by every handler, no route` (OP-ADMIN-04 `current_user`); later (I7): host mode section `PUT /settings/host-mode` (OP-ADMIN-06 `host_mode_set`, desktop window only)
+- Fragments and actions: `GET /settings; PUT /settings` (OP-ADMIN-03 `settings_get_update`), `internal: request extractor used by every handler, no route` (OP-ADMIN-04 `current_user`)
 - Rules shown or enforced: BR-ADMIN-04, BR-ADMIN-05
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; WCAG 2.1 AA contrast (D-38).
@@ -309,7 +309,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Use case and users: Import wizard and rejected-row report; the single local user (ROLE-OWNER).
 - Source layouts: new screen (no FileMaker layout)
 - Page: `GET /import` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /import/folder (desktop window only: opens the native folder dialog); POST /import; GET /import/{batch_id}/status` (OP-IMPORT-01 `import_filemaker_export`), `GET /import/{batch_id}` (OP-IMPORT-02 `import_report_get`)
+- Fragments and actions: `POST /import/folder (opens the native folder dialog); POST /import; GET /import/{batch_id}/status` (OP-IMPORT-01 `import_filemaker_export`), `GET /import/{batch_id}` (OP-IMPORT-02 `import_report_get`)
 - Rules shown or enforced: BR-IMPORT-01, BR-IMPORT-02, BR-PARTY-06
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; WCAG 2.1 AA contrast (D-38).
@@ -351,25 +351,13 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Keyboard/focus/labels: every control labeled; disabled controls announced as disabled; WCAG 2.1 AA contrast (D-38).
 - Destructive action confirmation: none
 
-### UI-22 Login (host mode, later)
-
-- Readiness: behavior-ready (new screen, no FileMaker layout)
-- Use case and users: A browser on another computer on the LAN logs in to a host-mode session (I7, AP-14). The desktop window never shows it.
-- Source layouts: new screen (no FileMaker layout); nearest source analogue is FileMaker network sharing
-- Page: `GET /login (host mode only)`
-- Fragments and actions: `POST /login`, `POST /logout` (OP-ADMIN-07 `host_session`); host mode is turned on in UI-17 with `PUT /settings/host-mode` (OP-ADMIN-06 `host_mode_set`)
-- Rules shown or enforced: BR-ADMIN-06
-- States: empty / validation (wrong password) / locked out after repeated failures / error
-- Keyboard/focus/labels: every control labeled; full keyboard operation; WCAG 2.1 AA contrast (D-38).
-- Destructive action confirmation: none
-
 ### QBO controls not built (owner, 2026-10-27; D-02)
 
 The kontacts layouts carry QuickBooks buttons and fields that the target does not build: Send Invoice/SalesReceipt to QBO, Refresh From QBO, Remove Sales Transaction From QBO, View in QBO (UI-12, UI-13), the QBO authorize web viewer and the Using QBO switch on Admin Integrations (UI-17), and qbo_error / qbo_send displays. UI-17 shows one read-only line for the accounting stub (OP-INTEG-04 `accounting_integration_status`: "not implemented").
 
 ### UI-18 Import (implementation-ready)
 
-- Step 1: choose the folder that holds the FileMaker export. The button posts to `/import/folder`; the app opens the native folder dialog itself (desktop window only; AP-09) and returns a fragment with the tables found and row counts.
+- Step 1: choose the folder that holds the FileMaker export. The button posts to `/import/folder`; the app opens the native folder dialog itself (AP-09) and returns a fragment with the tables found and row counts.
 - Step 2: choose which `user` row is "me" (BR-ADMIN-04), or create one.
 - Step 3: run; a progress fragment, polled by htmx every second, shows each table; cancel rolls back the whole import.
 - Step 4: report: rows loaded per table, rows rejected with reasons (import_rejected_row), files copied, caches recomputed. Export the report as CSV.

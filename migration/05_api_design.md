@@ -7,9 +7,9 @@ There is no remote server (D-36). The app runs its own **axum** HTTP server on 1
 | Item | Value |
 |---|---|
 | Explorer CSVs used | scripts, tables, graph, layouts, value-lists, menus (explorers/*/csv) |
-| Selected interface style and reason | HTTP routes on a local axum server that return HTML pages and htmx fragments (owner decision, 2026-10-28): one in-process server, all logic in Rust, no JavaScript build; loopback only in desktop mode (AP-13) |
-| Consumers/clients/integrations | the app's own window; a LAN browser only in host mode (I7, AP-14); outbound SMTP and optional HTTPS integrations from Rust |
-| Authentication mechanism | desktop mode: no login (single local user, D-04); a per-launch session cookie proves the request comes from the app window (AP-13); OD-08-01 optional app lock. Host mode: login (OP-ADMIN-07, AP-14) |
+| Selected interface style and reason | HTTP routes on a local axum server that return HTML pages and htmx fragments (owner decision, 2026-10-28): one in-process server, all logic in Rust, no JavaScript build; 127.0.0.1 only (AP-13) |
+| Consumers/clients/integrations | the app's own window only (127.0.0.1); outbound SMTP and optional HTTPS integrations from Rust |
+| Authentication mechanism | no login (single local user on one computer, D-04); a per-launch session cookie proves the request comes from the app window (AP-13); OD-08-01 optional app lock |
 | Authorization design reference | `08_auth_roles.md` (AP-01..AP-12) |
 | Unavailable/open contracts | QBO is a stub only (EXT-04, OP-INTEG-04; out of scope, D-02); SMS/chat removed (EXT-05, out of scope, owner 2026-10-28; OD-05-02); binding generation closed: no TypeScript client (owner, 2026-10-28; OD-05-01) |
 
@@ -66,21 +66,19 @@ There is no remote server (D-36). The app runs its own **axum** HTTP server on 1
 | INTEG: Address suggestions (optional) | OP-INTEG-02 | `GET /address-suggestions?q=` (`address_suggest`) | form fields of the entity | suggestion list fragment | `objects/Picker_Module.fmp12/scripts/115-HTTP_request.txt`; `objects/Picker_Module.fmp12/scripts/117-Get_Smarty_Street_Address_Suggestions.txt`; `objects/Picker_Module.fmp12/scripts/198-Get_Google_Places_Address_Suggestions.txt`; `objects/Picker_Module.fmp12/scripts/200-Select_Google_Place_Address.txt` (+2) | one SQLite transaction | AP-01, AP-02, AP-03, AP-12 | Validation, NotFound |
 | INTEG: FullContact enrichment (optional) | OP-INTEG-03 | `POST /parties/{id}/enrich` (`party_enrich`) | form fields of the entity | enrichment preview fragment | `objects/karbon_kontroller.fmp12/scripts/746-FullContact_Person_Enrich.txt`; `objects/karbon_kontroller.fmp12/scripts/754-FullContact_Company_Enrich.txt`; `objects/karbon_kontacts.fmp12/scripts/865-Search_for_FullContact_Person_Match.txt`; `objects/karbon_kontacts.fmp12/scripts/868-Search_for_FullContact_Company_Match.txt` | one SQLite transaction | AP-01, AP-02, AP-03, AP-12 | Validation, NotFound |
 | INTEG: Stub: accounting (QBO) integration, not implemented; no-op | OP-INTEG-04 | `GET /integrations/accounting` (`accounting_integration_status`) | form fields of the entity | one status line fragment ("not implemented") | new (D-34) | one SQLite transaction | AP-01 | Validation, NotFound |
-| IMPORT: Import a FileMaker export into a new database | OP-IMPORT-01 | `POST /import/folder (desktop window only: opens the native folder dialog); POST /import; GET /import/{batch_id}/status` (`import_filemaker_export`) | form {folder handle from the native dialog, me_user_id?} | import step fragment; status fragment polled by htmx | new (D-34) | one SQLite transaction | AP-01, AP-09 | Validation, NotFound |
-| ADMIN: Turn host mode on or off and set its password (later, I7) | OP-ADMIN-06 | `GET /settings/host-mode; PUT /settings/host-mode (desktop window only)` (`host_mode_set`) | form {enabled, password} | host mode settings fragment | new (owner, 2026-10-28) | app config file and keychain; no SQLite write | AP-01, AP-13, AP-14 | Validation |
-| ADMIN: Log in and out of a host-mode session (later, I7) | OP-ADMIN-07 | `GET /login; POST /login; POST /logout (host mode only)` (`host_session`) | form {password} | login page, then redirect to / | new (owner, 2026-10-28) | session store in memory; no SQLite write | AP-14 | Validation, Unauthorized |
+| IMPORT: Import a FileMaker export into a new database | OP-IMPORT-01 | `POST /import/folder (opens the native folder dialog); POST /import; GET /import/{batch_id}/status` (`import_filemaker_export`) | form {folder handle from the native dialog, me_user_id?} | import step fragment; status fragment polled by htmx | new (D-34) | one SQLite transaction | AP-01, AP-09 | Validation, NotFound |
 | IMPORT: Read the rejected-row report of an import | OP-IMPORT-02 | `GET /import/{batch_id}` (`import_report_get`) | query {batch_id} | import report page; GET /import/{batch_id}/rejected.csv | new (D-34) | read only | AP-01 | Validation, NotFound |
 
 No generic per-table CRUD route exists. Full source-script list per command: `05_api_design_appendix.md`.
 
 ## Route conventions
 
-- **Pages and fragments.** Each screen of 06 has a page route (`GET`). A request with the `HX-Request` header gets only the fragment; without it, the same handler wraps the fragment in the base layout, so every URL also works as a full page (back button, reload, host mode).
+- **Pages and fragments.** Each screen of 06 has a page route (`GET`). A request with the `HX-Request` header gets only the fragment; without it, the same handler wraps the fragment in the base layout, so every URL also works as a full page (back button, reload).
 - **Methods.** Reads are `GET`; creates `POST`; changes `PUT` or `PATCH`; deletes `DELETE` (htmx `hx-put`, `hx-patch`, `hx-delete`). A form without htmx falls back to `POST` with a `_method` field.
 - **Input.** Forms are parsed into a typed struct with axum `Form` (serde, `deny_unknown_fields`). Money fields arrive as dollar text and are parsed to i64 cents in the handler (OD-04-02); a bad value re-renders the form with the field error.
 - **Output.** Handlers return askama templates. Out-of-band swaps (`hx-swap-oob`) refresh dependent fragments, for example the invoice totals after a line change. `HX-Redirect` moves to a new page after a create or delete.
 - **Static assets.** `GET /static/*` serves the vendored htmx, Alpine.js and Chart.js files and the built Tailwind/DaisyUI CSS, embedded in the binary.
-- **Guards.** Every route except `GET /session/{token}` and the static files needs the session cookie, a matching `Host` header and, for non-GET methods, a matching `Origin` (AP-13). Routes marked "desktop window only" refuse a host-mode session (AP-14).
+- **Guards.** Every route except `GET /session/{token}` and the static files needs the session cookie, a matching `Host` header and, for non-GET methods, a matching `Origin` (AP-13).
 
 ## Query/read contracts
 
@@ -140,8 +138,6 @@ No generic per-table CRUD route exists. Full source-script list per command: `05
 | `address_suggest` | BR-INTEG-02 | typed form struct (axum `Form`, serde, deny_unknown_fields) | Rust command | all rows of the operation | BR-PARTY-07 stamps | T-08-02, T-08-03, T-08-12 |
 | `party_enrich` | BR-INTEG-02 | typed form struct (axum `Form`, serde, deny_unknown_fields) | Rust command | all rows of the operation | BR-PARTY-07 stamps | T-08-02, T-08-03, T-08-12 |
 | `accounting_integration_status` | BR-INTEG-03 | typed form struct (axum `Form`, serde, deny_unknown_fields) | Rust command | all rows of the operation | BR-PARTY-07 stamps | validation tests |
-| `host_mode_set` | BR-ADMIN-06 | typed form struct (axum `Form`, serde, deny_unknown_fields) | Rust command | config file and keychain only | log line | T-08-15 |
-| `host_session` | BR-ADMIN-06 | typed form struct (axum `Form`, serde, deny_unknown_fields) | Rust command | none (in-memory session) | log line per failed login | T-08-15 |
 | `import_filemaker_export` | BR-PARTY-06; BR-IMPORT-01; BR-IMPORT-02 | typed form struct (axum `Form`, serde, deny_unknown_fields) | Rust command | all rows of the operation | BR-PARTY-07 stamps | T-08-09 |
 
 There are no bulk mutations. `Replace Field Contents` has no translation (07).
@@ -155,65 +151,62 @@ There are no bulk mutations. `Replace Field Contents` has no translation (07).
 | Assign/revoke roles | none | n/a | n/a | n/a |
 | Provision/rotate service principal | none | n/a: no service principal | n/a | n/a |
 | Store/rotate integration secrets | OS keychain | settings_get_update writes secrets | AP-03 | T-08-03 |
-| Host-mode login (later, I7) | the app: password hash in the OS keychain | host_mode_set sets the password; host_session logs a LAN browser in | AP-14 | T-08-15 |
 
 ## Authorization matrix
 
 | Operation | Policy ids (08) | Access channel | Deny behavior |
 |---|---|---|---|
-| `party_create_person` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_create_organization` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_update` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_delete` | AP-01, AP-07, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_search` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_find_by_contact` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_relation_create` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_relation_update` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_relation_delete` | AP-01, AP-07, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_role_add` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_create_wizard` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `contact_method_save` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `contact_method_set_primary` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `contact_method_toggle_purpose` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `contact_method_delete` | AP-01, AP-07, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `activity_create` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `activity_update` | AP-01, AP-08, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `activity_delete` | AP-01, AP-07, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `activity_party_set` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `task_set_complete` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `discussion_create` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `discussion_comment_add` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `activity_list` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `notification_list_mark_read` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `opportunity_save` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `opportunity_set_status` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `opportunity_status_totals` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `invoice_save` | AP-01, AP-04, AP-05, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `sales_receipt_save` | AP-01, AP-04, AP-05, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `sales_transaction_lock` | AP-01, AP-04, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `sales_transaction_delete` | AP-01, AP-04, AP-05, AP-07, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `sales_lines_remove` | AP-01, AP-04, AP-05, AP-07, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `payment_save` | AP-01, AP-06, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `item_save` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `sales_summary_by_month` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `file_add` | AP-01, AP-09, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `file_attach` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `file_detach` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `template_merge` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `merge_fields_save` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `setup_welcome` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `reference_seed` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `settings_get_update` | AP-01, AP-03, AP-13 | HTTP from the app window only (AP-13); refused for a host-mode session (AP-14) | error fragment with HTTP status |
-| `current_user` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `log_write` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `email_send` | AP-01, AP-02, AP-03, AP-08, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `address_suggest` | AP-01, AP-02, AP-03, AP-12, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `party_enrich` | AP-01, AP-02, AP-03, AP-12, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `accounting_integration_status` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
-| `import_filemaker_export` | AP-01, AP-09, AP-13 | HTTP from the app window only (AP-13); refused for a host-mode session (AP-14) | error fragment with HTTP status |
-| `host_mode_set` | AP-01, AP-13, AP-14 | HTTP from the app window only (AP-13); refused for a host-mode session (AP-14) | error fragment with HTTP status |
-| `host_session` | AP-14 | a LAN browser in host mode | login page with an error |
-| `import_report_get` | AP-01, AP-13 | HTTP from the app window (AP-13); a logged-in LAN browser in host mode (AP-14) | error fragment with HTTP status |
+| `party_create_person` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_create_organization` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_update` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_delete` | AP-01, AP-07, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_search` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_find_by_contact` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_relation_create` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_relation_update` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_relation_delete` | AP-01, AP-07, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_role_add` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_create_wizard` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `contact_method_save` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `contact_method_set_primary` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `contact_method_toggle_purpose` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `contact_method_delete` | AP-01, AP-07, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `activity_create` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `activity_update` | AP-01, AP-08, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `activity_delete` | AP-01, AP-07, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `activity_party_set` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `task_set_complete` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `discussion_create` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `discussion_comment_add` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `activity_list` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `notification_list_mark_read` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `opportunity_save` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `opportunity_set_status` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `opportunity_status_totals` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `invoice_save` | AP-01, AP-04, AP-05, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `sales_receipt_save` | AP-01, AP-04, AP-05, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `sales_transaction_lock` | AP-01, AP-04, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `sales_transaction_delete` | AP-01, AP-04, AP-05, AP-07, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `sales_lines_remove` | AP-01, AP-04, AP-05, AP-07, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `payment_save` | AP-01, AP-06, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `item_save` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `sales_summary_by_month` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `file_add` | AP-01, AP-09, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `file_attach` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `file_detach` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `template_merge` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `merge_fields_save` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `setup_welcome` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `reference_seed` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `settings_get_update` | AP-01, AP-03, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `current_user` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `log_write` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `email_send` | AP-01, AP-02, AP-03, AP-08, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `address_suggest` | AP-01, AP-02, AP-03, AP-12, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `party_enrich` | AP-01, AP-02, AP-03, AP-12, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `accounting_integration_status` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `import_filemaker_export` | AP-01, AP-09, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
+| `import_report_get` | AP-01, AP-13 | HTTP from the app window (AP-13) | error fragment with HTTP status |
 
 ## External integrations
 
@@ -264,7 +257,7 @@ Two-step destructive routes (AP-07): the first request without `confirm` returns
 | Concern | Contract |
 |---|---|
 | Validation/domain errors | `CommandError { code, message, field? }`, code in Validation, NotFound, Locked, BookClosed, AlreadySent, ConfirmationRequired, Integration, Storage, Internal (D-25). The handler renders it: Validation re-renders the form with field errors (422); NotFound 404; Locked, BookClosed, AlreadySent 409 with an error fragment; ConfirmationRequired 200 with the confirmation dialog; the rest 500 with a generic message and a log line |
-| Authentication/authorization denial | unknown routes 404; no session cookie 401; wrong `Host` or `Origin` 403 (AP-13); a desktop-only route from a host-mode session 403 (AP-14) |
+| Authentication/authorization denial | unknown routes 404; no session cookie 401; wrong `Host` or `Origin` 403 (AP-13) |
 | Conflict/locking/retry | single user, single writer: SQLite `BEGIN IMMEDIATE`, busy_timeout 5 s; no optimistic locking needed |
 | Partial external failure/compensation | email send: the DB marks sent only after SMTP success; no other external writes |
 | Idempotency | post/unpost and role add are idempotent (BR-SALES-06, BR-PARTY-05); create forms carry a server-issued UUID in a hidden field, so a resubmitted form is a no-op |
@@ -272,7 +265,7 @@ Two-step destructive routes (AP-07): the first request without `confirm` returns
 | Audit actor/reason/correlation | creation/modification stamps (BR-PARTY-07); log line per error with command name (BR-ADMIN-03) |
 | Sensitive-field logging/masking | secrets never logged (AP-03, D-30); tax ids are ordinary text fields with no masking (owner, 2026-10-28; D-09) |
 | Money values | every money field of every command input and output is an integer number of cents (`i64`); the route handler parses dollar text from the form into cents, and the templates format cents as dollars; no command takes or returns a decimal (OD-04-02, owner 2026-10-28) |
-| Local server | axum on 127.0.0.1, random free port, desktop mode only on loopback (AP-13); host mode binds the LAN only when turned on (AP-14) |
+| Local server | axum on 127.0.0.1 only, random free port (AP-13); nothing listens on another interface; the app is single-user on one computer |
 
 ## Traceability and tests
 
