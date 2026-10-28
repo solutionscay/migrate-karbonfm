@@ -1,5 +1,7 @@
 # API Design Appendix: command to source scripts
 
+Each command is reached through the route given in `05_api_design.md`.
+
 | Operation | Command | Source script | Explorer purpose |
 |---|---|---|---|
 | OP-PARTY-01 | `party_create_person` | `objects/karbon_kontroller.fmp12/scripts/246-wip_Create_Person_data.txt` | Work-in-progress create of a person party: validates the JSON, fails when the party already exists, creates the Person record, sets its name, birth, gender and other attributes, then calls Create Part |
@@ -165,6 +167,8 @@
 | OP-ADMIN-04 | `current_user` | `objects/karbon_kontacts.fmp12/scripts/54-Store_UserID_On_Session.txt` | Binds the logged-in FileMaker account to a Karbon user: reads Get(AccountName), asks karbon_kontroller "Get User Object By AccountName" (375), then in the session record stores the user id, party id,  |
 | OP-ADMIN-05 | `log_write` | `objects/karbon_log.fmp12/scripts/336-Log_data.txt` | Public logging entry point of the vendored log module: accepts log entry JSON (object or array), wraps non-array into an array, replaces non-JSON with a warning entry, then calls _Log either in the sa |
 | OP-ADMIN-05 | `log_write` | `objects/karbon_log.fmp12/scripts/343-Log_data.txt` | Writes log entries: reads the default or session log level, and for every entry in the passed array whose severity is at or above that level creates a Log record holding the entry JSON. Sets the defau |
+| OP-ADMIN-06 | `host_mode_set` | new (no FileMaker object; owner, 2026-10-28) | Turns host mode (LAN sharing, I7) on or off and sets its password. |
+| OP-ADMIN-07 | `host_session` | new (no FileMaker object; owner, 2026-10-28) | Logs a LAN browser in and out of a host-mode session. |
 | OP-INTEG-01 | `email_send` | `objects/karbon_kontroller.fmp12/scripts/521-Send_Email_Message_Activity_json.txt` | Sends an email message activity. Inside a transaction it checks the record, marks it sent and not alert, reads the From, To, Cc and Bcc addresses from the activity parties (roles 54-57), the subject a |
 | OP-INTEG-01 | `email_send` | `objects/karbon_kontroller.fmp12/scripts/337-Send_Email_Message.txt` | Private API script that sends one e-mail through an SMTP server: takes an EmailMessage JSON, fills missing SMTP settings from the System record (when UseSystemSmtpSettings) or from the user profile wi |
 | OP-INTEG-01 | `email_send` | `objects/karbon_kontacts.fmp12/scripts/333-Send_Utility_Email_Message.txt` | Sends the email being edited: stops when the draft is not validated, asks the user for their SMTP password when they send from their own address, always adds the logged-in user as the From party (user |

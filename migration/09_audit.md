@@ -133,7 +133,7 @@ All 30 have a recorded default in `01_discovery_answers.md`. The plan uses those
 
 ### 3b. Open decisions (14)
 
-OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were decided by the owner on 2026-10-28 and are no longer gaps (03).
+OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were decided by the owner on 2026-10-28 and are no longer gaps (03). The UI-stack decision of the same day (server-rendered HTML, no TypeScript) closed OD-05-01 and opened OD-08-02 for the later host mode, so the count stays 14.
 
 | Id | Decision | Affects |
 |---|---|---|
@@ -141,7 +141,6 @@ OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were de
 | OD-03-01 | FileMaker export format and container export | I3, BR-IMPORT-01 |
 | OD-04-01 | needs-profile foreign keys as constraints | 04 (15 FKs), I3 |
 | OD-04-03 | Repeating fields | 04 |
-| OD-05-01 | Generated TypeScript bindings | 05 |
 | OD-06-01 | Visual design (no screenshots) | every inventory-only screen in 06 |
 | OD-07-01 | Hard party delete: the uncascaded children (reworded, A-01) | BR-PARTY-01, OP-PARTY-04, I2 |
 | OD-07-02 | Non-US phone prefix | BR-CONTACT-04 |
@@ -151,6 +150,7 @@ OD-04-02 (money storage: integer cents) and OD-05-02 (SMS/chat: dropped) were de
 | **OD-07-06** (new) | How total_tax is computed with QBO out | BR-SALES-02, invoice and receipt totals, I5 |
 | **OD-07-07** (new) | Retainer balance: posted only (default) or all transactions | BR-SALES-06, BR-IMPORT-01 recompute, I3 and I5 |
 | OD-08-01 | Optional passcode or SQLCipher | 08, I1 |
+| OD-08-02 (new, 2026-10-28) | Host mode: TLS on the LAN, shared login or per-person accounts | AP-14, BR-ADMIN-06, I7 |
 
 ### 3c. Object gaps: unresolved targets and `objects/unresolved.tsv`
 

@@ -2049,64 +2049,64 @@ One line per logic-bearing field, from the table explorer `logic` column.
 
 | Object file | File | Name | Category | Tier | Disposition |
 |---|---|---|---|---|---|
-| `objects/Picker_Module.fmp12/custom-functions/10-kContactName.txt` | Picker Module.fmp12 | kContactName | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/11-JSON.ArrayFromList.txt` | Picker Module.fmp12 | JSON.ArrayFromList | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/12-JSON.GetValuesAtPath.txt` | Picker Module.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/13-JSON.Merge.txt` | Picker Module.fmp12 | JSON.Merge | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/14-wip_API.Error.BadRequest.txt` | Picker Module.fmp12 | _wip_API.Error.BadRequest | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/15-wip_API.Error.Validation.txt` | Picker Module.fmp12 | _wip_API.Error.Validation | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/16-Custom.Error.txt` | Picker Module.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/17-Date.FromISO.txt` | Picker Module.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/18-Date.ToISO.txt` | Picker Module.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/10-kContactName.txt` | Picker Module.fmp12 | kContactName | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/11-JSON.ArrayFromList.txt` | Picker Module.fmp12 | JSON.ArrayFromList | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/12-JSON.GetValuesAtPath.txt` | Picker Module.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/13-JSON.Merge.txt` | Picker Module.fmp12 | JSON.Merge | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/14-wip_API.Error.BadRequest.txt` | Picker Module.fmp12 | _wip_API.Error.BadRequest | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/15-wip_API.Error.Validation.txt` | Picker Module.fmp12 | _wip_API.Error.Validation | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/16-Custom.Error.txt` | Picker Module.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/17-Date.FromISO.txt` | Picker Module.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/18-Date.ToISO.txt` | Picker Module.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/Picker_Module.fmp12/custom-functions/19-Error.txt` | Picker Module.fmp12 | Error | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/Picker_Module.fmp12/custom-functions/20-Error.Description.txt` | Picker Module.fmp12 | Error.Description | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/Picker_Module.fmp12/custom-functions/21-Error.IsError.txt` | Picker Module.fmp12 | Error.IsError | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/Picker_Module.fmp12/custom-functions/22-Error.Last.txt` | Picker Module.fmp12 | Error.Last | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/Picker_Module.fmp12/custom-functions/23-FilterValuesByExpression.txt` | Picker Module.fmp12 | FilterValuesByExpression | list | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/24-IsValidEmailFormat.txt` | Picker Module.fmp12 | IsValidEmailFormat | text | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/25-JSON.ArrayConcat.txt` | Picker Module.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/26-JSON.ArrayFromRelated.txt` | Picker Module.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/27-JSON.ArrayLength.txt` | Picker Module.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/28-JSON.ArraySort.txt` | Picker Module.fmp12 | JSON.ArraySort | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/29-JSON.ContainsProperty.txt` | Picker Module.fmp12 | JSON.ContainsProperty | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/30-JSON.FilterByExpression.txt` | Picker Module.fmp12 | JSON.FilterByExpression | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/31-JSON.Format.txt` | Picker Module.fmp12 | JSON.Format | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/33-JSON.IsValid.txt` | Picker Module.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/35-JSON.Pluck.txt` | Picker Module.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/36-JSON.Pluck.From.txt` | Picker Module.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/37-JSON.Pluck.Prop.txt` | Picker Module.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/38-JSON.Push.txt` | Picker Module.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/39-JSON.Transform.txt` | Picker Module.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/40-JSON.Transform.ISODates.txt` | Picker Module.fmp12 | JSON.Transform.ISODates | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/41-JSON.Transform.This.txt` | Picker Module.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/42-JSON.Validate._Error.txt` | Picker Module.fmp12 | JSON.Validate._Error | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/43-JSON.Validate.ApplyRules.txt` | Picker Module.fmp12 | JSON.Validate.ApplyRules | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/44-JSON.Validate.Rule.IsNumeric.txt` | Picker Module.fmp12 | JSON.Validate.Rule.IsNumeric | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/45-JSON.Validate.Rule.IsOneOf.txt` | Picker Module.fmp12 | JSON.Validate.Rule.IsOneOf | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/46-JSON.Validate.Rule.IsRequired.txt` | Picker Module.fmp12 | JSON.Validate.Rule.IsRequired | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/47-JSON.Validate.This.txt` | Picker Module.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/48-ListIncludes.txt` | Picker Module.fmp12 | ListIncludes | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/49-RemoveDuplicates.txt` | Picker Module.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/50-SQL.GetColumn.txt` | Picker Module.fmp12 | SQL.GetColumn | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/51-SQL.GetColumn2Fields.txt` | Picker Module.fmp12 | SQL.GetColumn2Fields | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/52-SQL.GetColumnStatement.txt` | Picker Module.fmp12 | SQL.GetColumnStatement | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/53-SQL.GetFieldName.txt` | Picker Module.fmp12 | SQL.GetFieldName | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/54-SQL.GetRecordsAsJSON.txt` | Picker Module.fmp12 | SQL.GetRecordsAsJSON | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/55-SQL.GetTableName.txt` | Picker Module.fmp12 | SQL.GetTableName | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/56-SQL.RecordExists.txt` | Picker Module.fmp12 | SQL.RecordExists | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/57-Time.FromISO.txt` | Picker Module.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/58-Time.ToISO.txt` | Picker Module.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/59-Timestamp.FromISO.txt` | Picker Module.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/60-Timestamp.ToISO.txt` | Picker Module.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/61-Transaction.Payload.txt` | Picker Module.fmp12 | Transaction.Payload | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/62-Transaction.Storage.Get.txt` | Picker Module.fmp12 | Transaction.Storage.Get | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/63-Transaction.Storage.Push.txt` | Picker Module.fmp12 | Transaction.Storage.Push | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/64-Transaction.Storage.Set.txt` | Picker Module.fmp12 | Transaction.Storage.Set | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/65-WriteNumber.txt` | Picker Module.fmp12 | WriteNumber | number | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/67-CustomList.txt` | Picker Module.fmp12 | CustomList | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/7-kContactID.txt` | Picker Module.fmp12 | kContactID | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/8-AddRemoveListItems.txt` | Picker Module.fmp12 | AddRemoveListItems | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/Picker_Module.fmp12/custom-functions/9-IsInList.txt` | Picker Module.fmp12 | IsInList | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/23-FilterValuesByExpression.txt` | Picker Module.fmp12 | FilterValuesByExpression | list | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/24-IsValidEmailFormat.txt` | Picker Module.fmp12 | IsValidEmailFormat | text | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/25-JSON.ArrayConcat.txt` | Picker Module.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/26-JSON.ArrayFromRelated.txt` | Picker Module.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/27-JSON.ArrayLength.txt` | Picker Module.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/28-JSON.ArraySort.txt` | Picker Module.fmp12 | JSON.ArraySort | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/29-JSON.ContainsProperty.txt` | Picker Module.fmp12 | JSON.ContainsProperty | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/30-JSON.FilterByExpression.txt` | Picker Module.fmp12 | JSON.FilterByExpression | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/31-JSON.Format.txt` | Picker Module.fmp12 | JSON.Format | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/33-JSON.IsValid.txt` | Picker Module.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/35-JSON.Pluck.txt` | Picker Module.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/36-JSON.Pluck.From.txt` | Picker Module.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/37-JSON.Pluck.Prop.txt` | Picker Module.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/38-JSON.Push.txt` | Picker Module.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/39-JSON.Transform.txt` | Picker Module.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/40-JSON.Transform.ISODates.txt` | Picker Module.fmp12 | JSON.Transform.ISODates | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/41-JSON.Transform.This.txt` | Picker Module.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/42-JSON.Validate._Error.txt` | Picker Module.fmp12 | JSON.Validate._Error | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/43-JSON.Validate.ApplyRules.txt` | Picker Module.fmp12 | JSON.Validate.ApplyRules | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/44-JSON.Validate.Rule.IsNumeric.txt` | Picker Module.fmp12 | JSON.Validate.Rule.IsNumeric | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/45-JSON.Validate.Rule.IsOneOf.txt` | Picker Module.fmp12 | JSON.Validate.Rule.IsOneOf | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/46-JSON.Validate.Rule.IsRequired.txt` | Picker Module.fmp12 | JSON.Validate.Rule.IsRequired | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/47-JSON.Validate.This.txt` | Picker Module.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/48-ListIncludes.txt` | Picker Module.fmp12 | ListIncludes | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/49-RemoveDuplicates.txt` | Picker Module.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/50-SQL.GetColumn.txt` | Picker Module.fmp12 | SQL.GetColumn | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/51-SQL.GetColumn2Fields.txt` | Picker Module.fmp12 | SQL.GetColumn2Fields | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/52-SQL.GetColumnStatement.txt` | Picker Module.fmp12 | SQL.GetColumnStatement | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/53-SQL.GetFieldName.txt` | Picker Module.fmp12 | SQL.GetFieldName | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/54-SQL.GetRecordsAsJSON.txt` | Picker Module.fmp12 | SQL.GetRecordsAsJSON | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/55-SQL.GetTableName.txt` | Picker Module.fmp12 | SQL.GetTableName | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/56-SQL.RecordExists.txt` | Picker Module.fmp12 | SQL.RecordExists | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/57-Time.FromISO.txt` | Picker Module.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/58-Time.ToISO.txt` | Picker Module.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/59-Timestamp.FromISO.txt` | Picker Module.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/60-Timestamp.ToISO.txt` | Picker Module.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/61-Transaction.Payload.txt` | Picker Module.fmp12 | Transaction.Payload | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/62-Transaction.Storage.Get.txt` | Picker Module.fmp12 | Transaction.Storage.Get | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/63-Transaction.Storage.Push.txt` | Picker Module.fmp12 | Transaction.Storage.Push | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/64-Transaction.Storage.Set.txt` | Picker Module.fmp12 | Transaction.Storage.Set | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/65-WriteNumber.txt` | Picker Module.fmp12 | WriteNumber | number | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/67-CustomList.txt` | Picker Module.fmp12 | CustomList | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/7-kContactID.txt` | Picker Module.fmp12 | kContactID | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/8-AddRemoveListItems.txt` | Picker Module.fmp12 | AddRemoveListItems | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/Picker_Module.fmp12/custom-functions/9-IsInList.txt` | Picker Module.fmp12 | IsInList | list | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_Build.fmp12/custom-functions/1-Custom.Error.txt` | karbon_Build.fmp12 | Custom.Error | utility | tier3 | retire with its file (D-01, D-03) |
 | `objects/karbon_Build.fmp12/custom-functions/10-JSON.ArrayConcat.txt` | karbon_Build.fmp12 | JSON.ArrayConcat | json-xml | tier3 | retire with its file (D-01, D-03) |
 | `objects/karbon_Build.fmp12/custom-functions/11-JSON.ArrayFromRelated.txt` | karbon_Build.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | retire with its file (D-01, D-03) |
@@ -2319,272 +2319,272 @@ One line per logic-bearing field, from the table explorer `logic` column.
 | `objects/karbon_LedgerLink.fmp12/custom-functions/73-TableName.txt` | karbon_LedgerLink.fmp12 | TableName | utility | tier3 | removed: QuickBooks Online out of scope (D-02) |
 | `objects/karbon_LedgerLink.fmp12/custom-functions/74-QBO.OpenInvoices.txt` | karbon_LedgerLink.fmp12 | QBO.OpenInvoices | integration | tier1 | removed: QuickBooks Online out of scope (D-02) |
 | `objects/karbon_LedgerLink.fmp12/custom-functions/8-Error.Description.txt` | karbon_LedgerLink.fmp12 | Error.Description | utility | tier3 | removed: QuickBooks Online out of scope (D-02) |
-| `objects/karbon_charts.fmp12/custom-functions/1-Custom.Error.txt` | karbon_charts.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/10-JSON.ArrayConcat.txt` | karbon_charts.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/11-JSON.ArrayFromRelated.txt` | karbon_charts.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/12-JSON.ArrayLength.txt` | karbon_charts.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/13-JSON.ArraySort.txt` | karbon_charts.fmp12 | JSON.ArraySort | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/14-JSON.ContainsProperty.txt` | karbon_charts.fmp12 | JSON.ContainsProperty | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/15-JSON.FilterByExpression.txt` | karbon_charts.fmp12 | JSON.FilterByExpression | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/16-JSON.GetValuesAtPath.txt` | karbon_charts.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/17-JSON.Merge.txt` | karbon_charts.fmp12 | JSON.Merge | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/18-JSON.Pluck.txt` | karbon_charts.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/19-JSON.Pluck.From.txt` | karbon_charts.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/2-Date.FromISO.txt` | karbon_charts.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/20-JSON.Pluck.Prop.txt` | karbon_charts.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/21-JSON.Transform.txt` | karbon_charts.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/22-JSON.Transform.ISODates.txt` | karbon_charts.fmp12 | JSON.Transform.ISODates | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/23-JSON.Transform.This.txt` | karbon_charts.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/1-Custom.Error.txt` | karbon_charts.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/10-JSON.ArrayConcat.txt` | karbon_charts.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/11-JSON.ArrayFromRelated.txt` | karbon_charts.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/12-JSON.ArrayLength.txt` | karbon_charts.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/13-JSON.ArraySort.txt` | karbon_charts.fmp12 | JSON.ArraySort | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/14-JSON.ContainsProperty.txt` | karbon_charts.fmp12 | JSON.ContainsProperty | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/15-JSON.FilterByExpression.txt` | karbon_charts.fmp12 | JSON.FilterByExpression | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/16-JSON.GetValuesAtPath.txt` | karbon_charts.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/17-JSON.Merge.txt` | karbon_charts.fmp12 | JSON.Merge | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/18-JSON.Pluck.txt` | karbon_charts.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/19-JSON.Pluck.From.txt` | karbon_charts.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/2-Date.FromISO.txt` | karbon_charts.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/20-JSON.Pluck.Prop.txt` | karbon_charts.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/21-JSON.Transform.txt` | karbon_charts.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/22-JSON.Transform.ISODates.txt` | karbon_charts.fmp12 | JSON.Transform.ISODates | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/23-JSON.Transform.This.txt` | karbon_charts.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_charts.fmp12/custom-functions/24-JSON.Validate._Error.txt` | karbon_charts.fmp12 | JSON.Validate._Error | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_charts.fmp12/custom-functions/25-JSON.Validate.ApplyRules.txt` | karbon_charts.fmp12 | JSON.Validate.ApplyRules | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_charts.fmp12/custom-functions/26-JSON.Validate.Rule.IsNumeric.txt` | karbon_charts.fmp12 | JSON.Validate.Rule.IsNumeric | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_charts.fmp12/custom-functions/27-JSON.Validate.Rule.IsOneOf.txt` | karbon_charts.fmp12 | JSON.Validate.Rule.IsOneOf | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_charts.fmp12/custom-functions/28-JSON.Validate.Rule.IsRequired.txt` | karbon_charts.fmp12 | JSON.Validate.Rule.IsRequired | domain-rule | tier3 | review against 07 rules (domain-rule) |
-| `objects/karbon_charts.fmp12/custom-functions/29-JSON.Validate.This.txt` | karbon_charts.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/3-Date.ToISO.txt` | karbon_charts.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/30-ListIncludes.txt` | karbon_charts.fmp12 | ListIncludes | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/31-RemoveDuplicates.txt` | karbon_charts.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/32-SQL.GetColumnStatement.txt` | karbon_charts.fmp12 | SQL.GetColumnStatement | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/33-SQL.GetColumn2Fields.txt` | karbon_charts.fmp12 | SQL.GetColumn2Fields | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/34-SQL.GetFieldName.txt` | karbon_charts.fmp12 | SQL.GetFieldName | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/35-SQL.GetRecordsAsJSON.txt` | karbon_charts.fmp12 | SQL.GetRecordsAsJSON | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/36-SQL.GetTableName.txt` | karbon_charts.fmp12 | SQL.GetTableName | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/37-SQL.RecordExists.txt` | karbon_charts.fmp12 | SQL.RecordExists | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/38-Time.FromISO.txt` | karbon_charts.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/39-Time.ToISO.txt` | karbon_charts.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/29-JSON.Validate.This.txt` | karbon_charts.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/3-Date.ToISO.txt` | karbon_charts.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/30-ListIncludes.txt` | karbon_charts.fmp12 | ListIncludes | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/31-RemoveDuplicates.txt` | karbon_charts.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/32-SQL.GetColumnStatement.txt` | karbon_charts.fmp12 | SQL.GetColumnStatement | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/33-SQL.GetColumn2Fields.txt` | karbon_charts.fmp12 | SQL.GetColumn2Fields | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/34-SQL.GetFieldName.txt` | karbon_charts.fmp12 | SQL.GetFieldName | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/35-SQL.GetRecordsAsJSON.txt` | karbon_charts.fmp12 | SQL.GetRecordsAsJSON | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/36-SQL.GetTableName.txt` | karbon_charts.fmp12 | SQL.GetTableName | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/37-SQL.RecordExists.txt` | karbon_charts.fmp12 | SQL.RecordExists | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/38-Time.FromISO.txt` | karbon_charts.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/39-Time.ToISO.txt` | karbon_charts.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_charts.fmp12/custom-functions/4-Error.txt` | karbon_charts.fmp12 | Error | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_charts.fmp12/custom-functions/40-Timestamp.FromISO.txt` | karbon_charts.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/41-Timestamp.ToISO.txt` | karbon_charts.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/42-wip_API.Error.BadRequest.txt` | karbon_charts.fmp12 | _wip_API.Error.BadRequest | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/43-SQL.GetColumn.txt` | karbon_charts.fmp12 | SQL.GetColumn | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/44-wip_API.Error.Validation.txt` | karbon_charts.fmp12 | _wip_API.Error.Validation | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/45-JSON.IsValid.txt` | karbon_charts.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/46-Transaction.Payload.txt` | karbon_charts.fmp12 | Transaction.Payload | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/47-JSON.Format.txt` | karbon_charts.fmp12 | JSON.Format | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/48-JSON.Push.txt` | karbon_charts.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/40-Timestamp.FromISO.txt` | karbon_charts.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/41-Timestamp.ToISO.txt` | karbon_charts.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/42-wip_API.Error.BadRequest.txt` | karbon_charts.fmp12 | _wip_API.Error.BadRequest | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/43-SQL.GetColumn.txt` | karbon_charts.fmp12 | SQL.GetColumn | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/44-wip_API.Error.Validation.txt` | karbon_charts.fmp12 | _wip_API.Error.Validation | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/45-JSON.IsValid.txt` | karbon_charts.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/46-Transaction.Payload.txt` | karbon_charts.fmp12 | Transaction.Payload | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/47-JSON.Format.txt` | karbon_charts.fmp12 | JSON.Format | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/48-JSON.Push.txt` | karbon_charts.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_charts.fmp12/custom-functions/5-Error.Description.txt` | karbon_charts.fmp12 | Error.Description | text | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_charts.fmp12/custom-functions/50-Transaction.Storage.Set.txt` | karbon_charts.fmp12 | Transaction.Storage.Set | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/51-Transaction.Storage.Get.txt` | karbon_charts.fmp12 | Transaction.Storage.Get | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/52-Transaction.Storage.Push.txt` | karbon_charts.fmp12 | Transaction.Storage.Push | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/53-clip_GetFMObjectType.txt` | karbon_charts.fmp12 | clip_GetFMObjectType | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/54-clip_GetFMxml.txt` | karbon_charts.fmp12 | clip_GetFMxml | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/55-clip_Set.txt` | karbon_charts.fmp12 | clip_Set | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/50-Transaction.Storage.Set.txt` | karbon_charts.fmp12 | Transaction.Storage.Set | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/51-Transaction.Storage.Get.txt` | karbon_charts.fmp12 | Transaction.Storage.Get | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/52-Transaction.Storage.Push.txt` | karbon_charts.fmp12 | Transaction.Storage.Push | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/53-clip_GetFMObjectType.txt` | karbon_charts.fmp12 | clip_GetFMObjectType | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/54-clip_GetFMxml.txt` | karbon_charts.fmp12 | clip_GetFMxml | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/55-clip_Set.txt` | karbon_charts.fmp12 | clip_Set | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_charts.fmp12/custom-functions/6-Error.IsError.txt` | karbon_charts.fmp12 | Error.IsError | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/karbon_charts.fmp12/custom-functions/7-Error.Last.txt` | karbon_charts.fmp12 | Error.Last | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_charts.fmp12/custom-functions/8-FilterValuesByExpression.txt` | karbon_charts.fmp12 | FilterValuesByExpression | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_charts.fmp12/custom-functions/9-IsValidEmailFormat.txt` | karbon_charts.fmp12 | IsValidEmailFormat | text | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/10-FilterValuesByExpression.txt` | karbon_data.fmp12 | FilterValuesByExpression | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/11-IsValidEmailFormat.txt` | karbon_data.fmp12 | IsValidEmailFormat | text | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/12-JSON.ArrayConcat.txt` | karbon_data.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/13-JSON.ArrayFromRelated.txt` | karbon_data.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/14-JSON.ArrayLength.txt` | karbon_data.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/15-JSON.ArraySort.txt` | karbon_data.fmp12 | JSON.ArraySort | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/16-JSON.ContainsProperty.txt` | karbon_data.fmp12 | JSON.ContainsProperty | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/17-JSON.FilterByExpression.txt` | karbon_data.fmp12 | JSON.FilterByExpression | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/18-JSON.GetValuesAtPath.txt` | karbon_data.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/19-JSON.Merge.txt` | karbon_data.fmp12 | JSON.Merge | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/20-JSON.Pluck.txt` | karbon_data.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/21-JSON.Pluck.From.txt` | karbon_data.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/22-JSON.Pluck.Prop.txt` | karbon_data.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/23-JSON.Transform.txt` | karbon_data.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/24-JSON.Transform.ISODates.txt` | karbon_data.fmp12 | JSON.Transform.ISODates | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/25-JSON.Transform.This.txt` | karbon_data.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/8-FilterValuesByExpression.txt` | karbon_charts.fmp12 | FilterValuesByExpression | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_charts.fmp12/custom-functions/9-IsValidEmailFormat.txt` | karbon_charts.fmp12 | IsValidEmailFormat | text | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/10-FilterValuesByExpression.txt` | karbon_data.fmp12 | FilterValuesByExpression | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/11-IsValidEmailFormat.txt` | karbon_data.fmp12 | IsValidEmailFormat | text | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/12-JSON.ArrayConcat.txt` | karbon_data.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/13-JSON.ArrayFromRelated.txt` | karbon_data.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/14-JSON.ArrayLength.txt` | karbon_data.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/15-JSON.ArraySort.txt` | karbon_data.fmp12 | JSON.ArraySort | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/16-JSON.ContainsProperty.txt` | karbon_data.fmp12 | JSON.ContainsProperty | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/17-JSON.FilterByExpression.txt` | karbon_data.fmp12 | JSON.FilterByExpression | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/18-JSON.GetValuesAtPath.txt` | karbon_data.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/19-JSON.Merge.txt` | karbon_data.fmp12 | JSON.Merge | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/20-JSON.Pluck.txt` | karbon_data.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/21-JSON.Pluck.From.txt` | karbon_data.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/22-JSON.Pluck.Prop.txt` | karbon_data.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/23-JSON.Transform.txt` | karbon_data.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/24-JSON.Transform.ISODates.txt` | karbon_data.fmp12 | JSON.Transform.ISODates | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/25-JSON.Transform.This.txt` | karbon_data.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_data.fmp12/custom-functions/26-JSON.Validate._Error.txt` | karbon_data.fmp12 | JSON.Validate._Error | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_data.fmp12/custom-functions/27-JSON.Validate.ApplyRules.txt` | karbon_data.fmp12 | JSON.Validate.ApplyRules | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_data.fmp12/custom-functions/28-JSON.Validate.Rule.IsNumeric.txt` | karbon_data.fmp12 | JSON.Validate.Rule.IsNumeric | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_data.fmp12/custom-functions/29-JSON.Validate.Rule.IsOneOf.txt` | karbon_data.fmp12 | JSON.Validate.Rule.IsOneOf | domain-rule | tier3 | review against 07 rules (domain-rule) |
-| `objects/karbon_data.fmp12/custom-functions/3-Custom.Error.txt` | karbon_data.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/3-Custom.Error.txt` | karbon_data.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_data.fmp12/custom-functions/30-JSON.Validate.Rule.IsRequired.txt` | karbon_data.fmp12 | JSON.Validate.Rule.IsRequired | domain-rule | tier3 | review against 07 rules (domain-rule) |
-| `objects/karbon_data.fmp12/custom-functions/31-JSON.Validate.This.txt` | karbon_data.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/32-ListIncludes.txt` | karbon_data.fmp12 | ListIncludes | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/33-RemoveDuplicates.txt` | karbon_data.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/34-SQL.GetColumn.txt` | karbon_data.fmp12 | SQL.GetColumn | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/35-SQL.GetColumn2Fields.txt` | karbon_data.fmp12 | SQL.GetColumn2Fields | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/36-SQL.GetColumnStatement.txt` | karbon_data.fmp12 | SQL.GetColumnStatement | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/37-SQL.GetFieldName.txt` | karbon_data.fmp12 | SQL.GetFieldName | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/38-SQL.GetRecordsAsJSON.txt` | karbon_data.fmp12 | SQL.GetRecordsAsJSON | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/39-SQL.GetTableName.txt` | karbon_data.fmp12 | SQL.GetTableName | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/4-Date.FromISO.txt` | karbon_data.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/40-SQL.RecordExists.txt` | karbon_data.fmp12 | SQL.RecordExists | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/41-Time.FromISO.txt` | karbon_data.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/42-Time.ToISO.txt` | karbon_data.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/43-Timestamp.FromISO.txt` | karbon_data.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/44-Timestamp.ToISO.txt` | karbon_data.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/45-JSON.IsValid.txt` | karbon_data.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/46-JSON.Push.txt` | karbon_data.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/48-CleanText.txt` | karbon_data.fmp12 | CleanText | text | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_data.fmp12/custom-functions/5-Date.ToISO.txt` | karbon_data.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/31-JSON.Validate.This.txt` | karbon_data.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/32-ListIncludes.txt` | karbon_data.fmp12 | ListIncludes | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/33-RemoveDuplicates.txt` | karbon_data.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/34-SQL.GetColumn.txt` | karbon_data.fmp12 | SQL.GetColumn | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/35-SQL.GetColumn2Fields.txt` | karbon_data.fmp12 | SQL.GetColumn2Fields | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/36-SQL.GetColumnStatement.txt` | karbon_data.fmp12 | SQL.GetColumnStatement | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/37-SQL.GetFieldName.txt` | karbon_data.fmp12 | SQL.GetFieldName | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/38-SQL.GetRecordsAsJSON.txt` | karbon_data.fmp12 | SQL.GetRecordsAsJSON | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/39-SQL.GetTableName.txt` | karbon_data.fmp12 | SQL.GetTableName | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/4-Date.FromISO.txt` | karbon_data.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/40-SQL.RecordExists.txt` | karbon_data.fmp12 | SQL.RecordExists | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/41-Time.FromISO.txt` | karbon_data.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/42-Time.ToISO.txt` | karbon_data.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/43-Timestamp.FromISO.txt` | karbon_data.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/44-Timestamp.ToISO.txt` | karbon_data.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/45-JSON.IsValid.txt` | karbon_data.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/46-JSON.Push.txt` | karbon_data.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/48-CleanText.txt` | karbon_data.fmp12 | CleanText | text | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_data.fmp12/custom-functions/5-Date.ToISO.txt` | karbon_data.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_data.fmp12/custom-functions/6-Error.txt` | karbon_data.fmp12 | Error | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/karbon_data.fmp12/custom-functions/7-Error.Description.txt` | karbon_data.fmp12 | Error.Description | text | tier3 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/karbon_data.fmp12/custom-functions/8-Error.IsError.txt` | karbon_data.fmp12 | Error.IsError | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/karbon_data.fmp12/custom-functions/9-Error.Last.txt` | karbon_data.fmp12 | Error.Last | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontacts.fmp12/custom-functions/1-Custom.Error.txt` | karbon_kontacts.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/10-JSON.Transform.This.txt` | karbon_kontacts.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt` | karbon_kontacts.fmp12 | JSON.Transform.ISODates | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/12-JSON.Transform.txt` | karbon_kontacts.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/13-JSON.Pluck.Prop.txt` | karbon_kontacts.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/14-JSON.Pluck.From.txt` | karbon_kontacts.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/15-JSON.Pluck.txt` | karbon_kontacts.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/16-JSON.Merge.txt` | karbon_kontacts.fmp12 | JSON.Merge | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/17-JSON.GetValuesAtPath.txt` | karbon_kontacts.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/18-JSON.FilterByExpression.txt` | karbon_kontacts.fmp12 | JSON.FilterByExpression | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/19-JSON.ContainsProperty.txt` | karbon_kontacts.fmp12 | JSON.ContainsProperty | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/1-Custom.Error.txt` | karbon_kontacts.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/10-JSON.Transform.This.txt` | karbon_kontacts.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/11-JSON.Transform.ISODates.txt` | karbon_kontacts.fmp12 | JSON.Transform.ISODates | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/12-JSON.Transform.txt` | karbon_kontacts.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/13-JSON.Pluck.Prop.txt` | karbon_kontacts.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/14-JSON.Pluck.From.txt` | karbon_kontacts.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/15-JSON.Pluck.txt` | karbon_kontacts.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/16-JSON.Merge.txt` | karbon_kontacts.fmp12 | JSON.Merge | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/17-JSON.GetValuesAtPath.txt` | karbon_kontacts.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/18-JSON.FilterByExpression.txt` | karbon_kontacts.fmp12 | JSON.FilterByExpression | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/19-JSON.ContainsProperty.txt` | karbon_kontacts.fmp12 | JSON.ContainsProperty | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontacts.fmp12/custom-functions/2-Error.txt` | karbon_kontacts.fmp12 | Error | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontacts.fmp12/custom-functions/20-JSON.ArraySort.txt` | karbon_kontacts.fmp12 | JSON.ArraySort | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/21-JSON.ArrayLength.txt` | karbon_kontacts.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/22-JSON.ArrayFromRelated.txt` | karbon_kontacts.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/23-JSON.ArrayConcat.txt` | karbon_kontacts.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/24-Date.ToISO.txt` | karbon_kontacts.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/25-Date.FromISO.txt` | karbon_kontacts.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/26-JSON.Validate.This.txt` | karbon_kontacts.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/20-JSON.ArraySort.txt` | karbon_kontacts.fmp12 | JSON.ArraySort | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/21-JSON.ArrayLength.txt` | karbon_kontacts.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/22-JSON.ArrayFromRelated.txt` | karbon_kontacts.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/23-JSON.ArrayConcat.txt` | karbon_kontacts.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/24-Date.ToISO.txt` | karbon_kontacts.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/25-Date.FromISO.txt` | karbon_kontacts.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/26-JSON.Validate.This.txt` | karbon_kontacts.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontacts.fmp12/custom-functions/27-JSON.Validate.Rule.IsRequired.txt` | karbon_kontacts.fmp12 | JSON.Validate.Rule.IsRequired | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_kontacts.fmp12/custom-functions/28-JSON.Validate.Rule.IsOneOf.txt` | karbon_kontacts.fmp12 | JSON.Validate.Rule.IsOneOf | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_kontacts.fmp12/custom-functions/29-JSON.Validate.Rule.IsNumeric.txt` | karbon_kontacts.fmp12 | JSON.Validate.Rule.IsNumeric | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_kontacts.fmp12/custom-functions/3-Error.Description.txt` | karbon_kontacts.fmp12 | Error.Description | text | tier3 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/karbon_kontacts.fmp12/custom-functions/30-JSON.Validate.ApplyRules.txt` | karbon_kontacts.fmp12 | JSON.Validate.ApplyRules | domain-rule | tier3 | review against 07 rules (domain-rule) |
 | `objects/karbon_kontacts.fmp12/custom-functions/31-JSON.Validate._Error.txt` | karbon_kontacts.fmp12 | JSON.Validate._Error | domain-rule | tier3 | review against 07 rules (domain-rule) |
-| `objects/karbon_kontacts.fmp12/custom-functions/32-SQL.RecordExists.txt` | karbon_kontacts.fmp12 | SQL.RecordExists | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/33-SQL.GetTableName.txt` | karbon_kontacts.fmp12 | SQL.GetTableName | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/34-SQL.GetRecordsAsJSON.txt` | karbon_kontacts.fmp12 | SQL.GetRecordsAsJSON | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/35-SQL.GetFieldName.txt` | karbon_kontacts.fmp12 | SQL.GetFieldName | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/36-SQL.GetColumn2Fields.txt` | karbon_kontacts.fmp12 | SQL.GetColumn2Fields | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/37-SQL.GetColumnStatement.txt` | karbon_kontacts.fmp12 | SQL.GetColumnStatement | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/38-RemoveDuplicates.txt` | karbon_kontacts.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/39-ListIncludes.txt` | karbon_kontacts.fmp12 | ListIncludes | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/32-SQL.RecordExists.txt` | karbon_kontacts.fmp12 | SQL.RecordExists | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/33-SQL.GetTableName.txt` | karbon_kontacts.fmp12 | SQL.GetTableName | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/34-SQL.GetRecordsAsJSON.txt` | karbon_kontacts.fmp12 | SQL.GetRecordsAsJSON | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/35-SQL.GetFieldName.txt` | karbon_kontacts.fmp12 | SQL.GetFieldName | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/36-SQL.GetColumn2Fields.txt` | karbon_kontacts.fmp12 | SQL.GetColumn2Fields | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/37-SQL.GetColumnStatement.txt` | karbon_kontacts.fmp12 | SQL.GetColumnStatement | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/38-RemoveDuplicates.txt` | karbon_kontacts.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/39-ListIncludes.txt` | karbon_kontacts.fmp12 | ListIncludes | list | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontacts.fmp12/custom-functions/4-Error.IsError.txt` | karbon_kontacts.fmp12 | Error.IsError | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontacts.fmp12/custom-functions/40-IsValidEmailFormat.txt` | karbon_kontacts.fmp12 | IsValidEmailFormat | text | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/41-FilterValuesByExpression.txt` | karbon_kontacts.fmp12 | FilterValuesByExpression | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/42-SQL.GetColumn.txt` | karbon_kontacts.fmp12 | SQL.GetColumn | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/43-JSON.IsValid.txt` | karbon_kontacts.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/44-JSON.Format.txt` | karbon_kontacts.fmp12 | JSON.Format | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/45-JSON.Push.txt` | karbon_kontacts.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/47-IsInList.txt` | karbon_kontacts.fmp12 | IsInList | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/48-IsNotInList.txt` | karbon_kontacts.fmp12 | IsNotInList | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/40-IsValidEmailFormat.txt` | karbon_kontacts.fmp12 | IsValidEmailFormat | text | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/41-FilterValuesByExpression.txt` | karbon_kontacts.fmp12 | FilterValuesByExpression | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/42-SQL.GetColumn.txt` | karbon_kontacts.fmp12 | SQL.GetColumn | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/43-JSON.IsValid.txt` | karbon_kontacts.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/44-JSON.Format.txt` | karbon_kontacts.fmp12 | JSON.Format | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/45-JSON.Push.txt` | karbon_kontacts.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/47-IsInList.txt` | karbon_kontacts.fmp12 | IsInList | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/48-IsNotInList.txt` | karbon_kontacts.fmp12 | IsNotInList | list | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontacts.fmp12/custom-functions/5-Error.Last.txt` | karbon_kontacts.fmp12 | Error.Last | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontacts.fmp12/custom-functions/55-BrowserNav.SaveNavHistory.txt` | karbon_kontacts.fmp12 | BrowserNav.SaveNavHistory | ui | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/56-BrowserNav.Tooltip.txt` | karbon_kontacts.fmp12 | BrowserNav.Tooltip | ui | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/6-Timestamp.ToISO.txt` | karbon_kontacts.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/61-CleanText.txt` | karbon_kontacts.fmp12 | CleanText | text | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/62-AddDollarFormat.txt` | karbon_kontacts.fmp12 | AddDollarFormat | number | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/63-Triggers.AreAllowed.txt` | karbon_kontacts.fmp12 | Triggers.AreAllowed | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/64-Triggers.Disable.txt` | karbon_kontacts.fmp12 | Triggers.Disable | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/65-Triggers.Enable.txt` | karbon_kontacts.fmp12 | Triggers.Enable | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/66-AddRemoveListItems.txt` | karbon_kontacts.fmp12 | AddRemoveListItems | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/7-Timestamp.FromISO.txt` | karbon_kontacts.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/8-Time.ToISO.txt` | karbon_kontacts.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontacts.fmp12/custom-functions/9-Time.FromISO.txt` | karbon_kontacts.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/1-Custom.Error.txt` | karbon_kontroller.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/10-JSON.ArrayConcat.txt` | karbon_kontroller.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/11-JSON.ArrayFromRelated.txt` | karbon_kontroller.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/12-JSON.ArrayLength.txt` | karbon_kontroller.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/13-JSON.ArraySort.txt` | karbon_kontroller.fmp12 | JSON.ArraySort | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/14-JSON.ContainsProperty.txt` | karbon_kontroller.fmp12 | JSON.ContainsProperty | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/15-JSON.FilterByExpression.txt` | karbon_kontroller.fmp12 | JSON.FilterByExpression | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/16-JSON.GetValuesAtPath.txt` | karbon_kontroller.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/17-JSON.Merge.txt` | karbon_kontroller.fmp12 | JSON.Merge | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/18-JSON.Pluck.txt` | karbon_kontroller.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/19-JSON.Pluck.From.txt` | karbon_kontroller.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/2-Date.FromISO.txt` | karbon_kontroller.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/20-JSON.Pluck.Prop.txt` | karbon_kontroller.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/21-JSON.Transform.txt` | karbon_kontroller.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/22-JSON.Transform.ISODates.txt` | karbon_kontroller.fmp12 | JSON.Transform.ISODates | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/23-JSON.Transform.This.txt` | karbon_kontroller.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/24-JSON.Validate._Error.txt` | karbon_kontroller.fmp12 | JSON.Validate._Error | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/25-JSON.Validate.ApplyRules.txt` | karbon_kontroller.fmp12 | JSON.Validate.ApplyRules | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/26-JSON.Validate.Rule.IsNumeric.txt` | karbon_kontroller.fmp12 | JSON.Validate.Rule.IsNumeric | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/27-JSON.Validate.Rule.IsOneOf.txt` | karbon_kontroller.fmp12 | JSON.Validate.Rule.IsOneOf | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/28-JSON.Validate.Rule.IsRequired.txt` | karbon_kontroller.fmp12 | JSON.Validate.Rule.IsRequired | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/29-JSON.Validate.This.txt` | karbon_kontroller.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/3-Date.ToISO.txt` | karbon_kontroller.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/30-ListIncludes.txt` | karbon_kontroller.fmp12 | ListIncludes | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/31-RemoveDuplicates.txt` | karbon_kontroller.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/32-SQL.GetColumnStatement.txt` | karbon_kontroller.fmp12 | SQL.GetColumnStatement | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/33-SQL.GetColumn2Fields.txt` | karbon_kontroller.fmp12 | SQL.GetColumn2Fields | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/34-SQL.GetFieldName.txt` | karbon_kontroller.fmp12 | SQL.GetFieldName | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/35-SQL.GetRecordsAsJSON.txt` | karbon_kontroller.fmp12 | SQL.GetRecordsAsJSON | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/36-SQL.GetTableName.txt` | karbon_kontroller.fmp12 | SQL.GetTableName | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/37-SQL.RecordExists.txt` | karbon_kontroller.fmp12 | SQL.RecordExists | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/38-Time.FromISO.txt` | karbon_kontroller.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/39-Time.ToISO.txt` | karbon_kontroller.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/55-BrowserNav.SaveNavHistory.txt` | karbon_kontacts.fmp12 | BrowserNav.SaveNavHistory | ui | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/56-BrowserNav.Tooltip.txt` | karbon_kontacts.fmp12 | BrowserNav.Tooltip | ui | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/6-Timestamp.ToISO.txt` | karbon_kontacts.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/61-CleanText.txt` | karbon_kontacts.fmp12 | CleanText | text | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/62-AddDollarFormat.txt` | karbon_kontacts.fmp12 | AddDollarFormat | number | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/63-Triggers.AreAllowed.txt` | karbon_kontacts.fmp12 | Triggers.AreAllowed | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/64-Triggers.Disable.txt` | karbon_kontacts.fmp12 | Triggers.Disable | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/65-Triggers.Enable.txt` | karbon_kontacts.fmp12 | Triggers.Enable | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/66-AddRemoveListItems.txt` | karbon_kontacts.fmp12 | AddRemoveListItems | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/7-Timestamp.FromISO.txt` | karbon_kontacts.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/8-Time.ToISO.txt` | karbon_kontacts.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontacts.fmp12/custom-functions/9-Time.FromISO.txt` | karbon_kontacts.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/1-Custom.Error.txt` | karbon_kontroller.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/10-JSON.ArrayConcat.txt` | karbon_kontroller.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/11-JSON.ArrayFromRelated.txt` | karbon_kontroller.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/12-JSON.ArrayLength.txt` | karbon_kontroller.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/13-JSON.ArraySort.txt` | karbon_kontroller.fmp12 | JSON.ArraySort | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/14-JSON.ContainsProperty.txt` | karbon_kontroller.fmp12 | JSON.ContainsProperty | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/15-JSON.FilterByExpression.txt` | karbon_kontroller.fmp12 | JSON.FilterByExpression | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/16-JSON.GetValuesAtPath.txt` | karbon_kontroller.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/17-JSON.Merge.txt` | karbon_kontroller.fmp12 | JSON.Merge | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/18-JSON.Pluck.txt` | karbon_kontroller.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/19-JSON.Pluck.From.txt` | karbon_kontroller.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/2-Date.FromISO.txt` | karbon_kontroller.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/20-JSON.Pluck.Prop.txt` | karbon_kontroller.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/21-JSON.Transform.txt` | karbon_kontroller.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/22-JSON.Transform.ISODates.txt` | karbon_kontroller.fmp12 | JSON.Transform.ISODates | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/23-JSON.Transform.This.txt` | karbon_kontroller.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/24-JSON.Validate._Error.txt` | karbon_kontroller.fmp12 | JSON.Validate._Error | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/25-JSON.Validate.ApplyRules.txt` | karbon_kontroller.fmp12 | JSON.Validate.ApplyRules | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/26-JSON.Validate.Rule.IsNumeric.txt` | karbon_kontroller.fmp12 | JSON.Validate.Rule.IsNumeric | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/27-JSON.Validate.Rule.IsOneOf.txt` | karbon_kontroller.fmp12 | JSON.Validate.Rule.IsOneOf | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/28-JSON.Validate.Rule.IsRequired.txt` | karbon_kontroller.fmp12 | JSON.Validate.Rule.IsRequired | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/29-JSON.Validate.This.txt` | karbon_kontroller.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/3-Date.ToISO.txt` | karbon_kontroller.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/30-ListIncludes.txt` | karbon_kontroller.fmp12 | ListIncludes | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/31-RemoveDuplicates.txt` | karbon_kontroller.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/32-SQL.GetColumnStatement.txt` | karbon_kontroller.fmp12 | SQL.GetColumnStatement | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/33-SQL.GetColumn2Fields.txt` | karbon_kontroller.fmp12 | SQL.GetColumn2Fields | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/34-SQL.GetFieldName.txt` | karbon_kontroller.fmp12 | SQL.GetFieldName | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/35-SQL.GetRecordsAsJSON.txt` | karbon_kontroller.fmp12 | SQL.GetRecordsAsJSON | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/36-SQL.GetTableName.txt` | karbon_kontroller.fmp12 | SQL.GetTableName | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/37-SQL.RecordExists.txt` | karbon_kontroller.fmp12 | SQL.RecordExists | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/38-Time.FromISO.txt` | karbon_kontroller.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/39-Time.ToISO.txt` | karbon_kontroller.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontroller.fmp12/custom-functions/4-Error.txt` | karbon_kontroller.fmp12 | Error | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontroller.fmp12/custom-functions/40-Timestamp.FromISO.txt` | karbon_kontroller.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/41-Timestamp.ToISO.txt` | karbon_kontroller.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/42-wip_API.Error.BadRequest.txt` | karbon_kontroller.fmp12 | _wip_API.Error.BadRequest | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/43-SQL.GetColumn.txt` | karbon_kontroller.fmp12 | SQL.GetColumn | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/44-wip_API.Error.Validation.txt` | karbon_kontroller.fmp12 | _wip_API.Error.Validation | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/45-JSON.IsValid.txt` | karbon_kontroller.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/46-Transaction.Payload.txt` | karbon_kontroller.fmp12 | Transaction.Payload | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/47-JSON.Format.txt` | karbon_kontroller.fmp12 | JSON.Format | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/48-JSON.Push.txt` | karbon_kontroller.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/40-Timestamp.FromISO.txt` | karbon_kontroller.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/41-Timestamp.ToISO.txt` | karbon_kontroller.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/42-wip_API.Error.BadRequest.txt` | karbon_kontroller.fmp12 | _wip_API.Error.BadRequest | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/43-SQL.GetColumn.txt` | karbon_kontroller.fmp12 | SQL.GetColumn | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/44-wip_API.Error.Validation.txt` | karbon_kontroller.fmp12 | _wip_API.Error.Validation | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/45-JSON.IsValid.txt` | karbon_kontroller.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/46-Transaction.Payload.txt` | karbon_kontroller.fmp12 | Transaction.Payload | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/47-JSON.Format.txt` | karbon_kontroller.fmp12 | JSON.Format | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/48-JSON.Push.txt` | karbon_kontroller.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontroller.fmp12/custom-functions/5-Error.Description.txt` | karbon_kontroller.fmp12 | Error.Description | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontroller.fmp12/custom-functions/50-Transaction.Storage.Set.txt` | karbon_kontroller.fmp12 | Transaction.Storage.Set | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/51-Transaction.Storage.Get.txt` | karbon_kontroller.fmp12 | Transaction.Storage.Get | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/52-Transaction.Storage.Push.txt` | karbon_kontroller.fmp12 | Transaction.Storage.Push | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/53-IsInList.txt` | karbon_kontroller.fmp12 | IsInList | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/54-IsNotInList.txt` | karbon_kontroller.fmp12 | IsNotInList | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/55-JSON.FilterPropertyByExpression.txt` | karbon_kontroller.fmp12 | JSON.FilterPropertyByExpression | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/56-JSON.Error.Invalid.txt` | karbon_kontroller.fmp12 | JSON.Error.Invalid | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/50-Transaction.Storage.Set.txt` | karbon_kontroller.fmp12 | Transaction.Storage.Set | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/51-Transaction.Storage.Get.txt` | karbon_kontroller.fmp12 | Transaction.Storage.Get | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/52-Transaction.Storage.Push.txt` | karbon_kontroller.fmp12 | Transaction.Storage.Push | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/53-IsInList.txt` | karbon_kontroller.fmp12 | IsInList | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/54-IsNotInList.txt` | karbon_kontroller.fmp12 | IsNotInList | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/55-JSON.FilterPropertyByExpression.txt` | karbon_kontroller.fmp12 | JSON.FilterPropertyByExpression | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/56-JSON.Error.Invalid.txt` | karbon_kontroller.fmp12 | JSON.Error.Invalid | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontroller.fmp12/custom-functions/57-Log.Entry.txt` | karbon_kontroller.fmp12 | Log.Entry | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontroller.fmp12/custom-functions/58-Log.Reset.txt` | karbon_kontroller.fmp12 | Log.Reset | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/59-Log.Data.txt` | karbon_kontroller.fmp12 | Log.Data | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/58-Log.Reset.txt` | karbon_kontroller.fmp12 | Log.Reset | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/59-Log.Data.txt` | karbon_kontroller.fmp12 | Log.Data | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontroller.fmp12/custom-functions/6-Error.IsError.txt` | karbon_kontroller.fmp12 | Error.IsError | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontroller.fmp12/custom-functions/62-wip_CleanText.txt` | karbon_kontroller.fmp12 | _wip_CleanText | text | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/63-wip_BubbleSort_SlideValue.txt` | karbon_kontroller.fmp12 | _wip_BubbleSort_SlideValue | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/64-wip_BubbleSort.txt` | karbon_kontroller.fmp12 | _wip_BubbleSort | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/62-wip_CleanText.txt` | karbon_kontroller.fmp12 | _wip_CleanText | text | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/63-wip_BubbleSort_SlideValue.txt` | karbon_kontroller.fmp12 | _wip_BubbleSort_SlideValue | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/64-wip_BubbleSort.txt` | karbon_kontroller.fmp12 | _wip_BubbleSort | list | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_kontroller.fmp12/custom-functions/7-Error.Last.txt` | karbon_kontroller.fmp12 | Error.Last | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_kontroller.fmp12/custom-functions/8-FilterValuesByExpression.txt` | karbon_kontroller.fmp12 | FilterValuesByExpression | list | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_kontroller.fmp12/custom-functions/9-IsValidEmailFormat.txt` | karbon_kontroller.fmp12 | IsValidEmailFormat | text | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/1-Custom.Error.txt` | karbon_log.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/10-JSON.ArrayConcat.txt` | karbon_log.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/11-JSON.ArrayFromRelated.txt` | karbon_log.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/12-JSON.ArrayLength.txt` | karbon_log.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/13-JSON.ArraySort.txt` | karbon_log.fmp12 | JSON.ArraySort | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/14-JSON.ContainsProperty.txt` | karbon_log.fmp12 | JSON.ContainsProperty | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/15-JSON.FilterByExpression.txt` | karbon_log.fmp12 | JSON.FilterByExpression | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/16-JSON.GetValuesAtPath.txt` | karbon_log.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/17-JSON.Merge.txt` | karbon_log.fmp12 | JSON.Merge | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/18-JSON.Pluck.txt` | karbon_log.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/19-JSON.Pluck.From.txt` | karbon_log.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/2-Date.FromISO.txt` | karbon_log.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/20-JSON.Pluck.Prop.txt` | karbon_log.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/21-JSON.Transform.txt` | karbon_log.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/22-JSON.Transform.ISODates.txt` | karbon_log.fmp12 | JSON.Transform.ISODates | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/23-JSON.Transform.This.txt` | karbon_log.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/24-JSON.Validate._Error.txt` | karbon_log.fmp12 | JSON.Validate._Error | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/25-JSON.Validate.ApplyRules.txt` | karbon_log.fmp12 | JSON.Validate.ApplyRules | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/26-JSON.Validate.Rule.IsNumeric.txt` | karbon_log.fmp12 | JSON.Validate.Rule.IsNumeric | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/27-JSON.Validate.Rule.IsOneOf.txt` | karbon_log.fmp12 | JSON.Validate.Rule.IsOneOf | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/28-JSON.Validate.Rule.IsRequired.txt` | karbon_log.fmp12 | JSON.Validate.Rule.IsRequired | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/29-JSON.Validate.This.txt` | karbon_log.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/3-Date.ToISO.txt` | karbon_log.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/30-ListIncludes.txt` | karbon_log.fmp12 | ListIncludes | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/31-RemoveDuplicates.txt` | karbon_log.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/32-SQL.GetColumnStatement.txt` | karbon_log.fmp12 | SQL.GetColumnStatement | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/33-SQL.GetColumn2Fields.txt` | karbon_log.fmp12 | SQL.GetColumn2Fields | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/34-SQL.GetFieldName.txt` | karbon_log.fmp12 | SQL.GetFieldName | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/35-SQL.GetRecordsAsJSON.txt` | karbon_log.fmp12 | SQL.GetRecordsAsJSON | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/36-SQL.GetTableName.txt` | karbon_log.fmp12 | SQL.GetTableName | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/37-SQL.RecordExists.txt` | karbon_log.fmp12 | SQL.RecordExists | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/38-Time.FromISO.txt` | karbon_log.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/39-Time.ToISO.txt` | karbon_log.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/8-FilterValuesByExpression.txt` | karbon_kontroller.fmp12 | FilterValuesByExpression | list | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_kontroller.fmp12/custom-functions/9-IsValidEmailFormat.txt` | karbon_kontroller.fmp12 | IsValidEmailFormat | text | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/1-Custom.Error.txt` | karbon_log.fmp12 | Custom.Error | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/10-JSON.ArrayConcat.txt` | karbon_log.fmp12 | JSON.ArrayConcat | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/11-JSON.ArrayFromRelated.txt` | karbon_log.fmp12 | JSON.ArrayFromRelated | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/12-JSON.ArrayLength.txt` | karbon_log.fmp12 | JSON.ArrayLength | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/13-JSON.ArraySort.txt` | karbon_log.fmp12 | JSON.ArraySort | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/14-JSON.ContainsProperty.txt` | karbon_log.fmp12 | JSON.ContainsProperty | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/15-JSON.FilterByExpression.txt` | karbon_log.fmp12 | JSON.FilterByExpression | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/16-JSON.GetValuesAtPath.txt` | karbon_log.fmp12 | JSON.GetValuesAtPath | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/17-JSON.Merge.txt` | karbon_log.fmp12 | JSON.Merge | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/18-JSON.Pluck.txt` | karbon_log.fmp12 | JSON.Pluck | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/19-JSON.Pluck.From.txt` | karbon_log.fmp12 | JSON.Pluck.From | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/2-Date.FromISO.txt` | karbon_log.fmp12 | Date.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/20-JSON.Pluck.Prop.txt` | karbon_log.fmp12 | JSON.Pluck.Prop | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/21-JSON.Transform.txt` | karbon_log.fmp12 | JSON.Transform | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/22-JSON.Transform.ISODates.txt` | karbon_log.fmp12 | JSON.Transform.ISODates | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/23-JSON.Transform.This.txt` | karbon_log.fmp12 | JSON.Transform.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/24-JSON.Validate._Error.txt` | karbon_log.fmp12 | JSON.Validate._Error | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/25-JSON.Validate.ApplyRules.txt` | karbon_log.fmp12 | JSON.Validate.ApplyRules | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/26-JSON.Validate.Rule.IsNumeric.txt` | karbon_log.fmp12 | JSON.Validate.Rule.IsNumeric | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/27-JSON.Validate.Rule.IsOneOf.txt` | karbon_log.fmp12 | JSON.Validate.Rule.IsOneOf | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/28-JSON.Validate.Rule.IsRequired.txt` | karbon_log.fmp12 | JSON.Validate.Rule.IsRequired | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/29-JSON.Validate.This.txt` | karbon_log.fmp12 | JSON.Validate.This | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/3-Date.ToISO.txt` | karbon_log.fmp12 | Date.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/30-ListIncludes.txt` | karbon_log.fmp12 | ListIncludes | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/31-RemoveDuplicates.txt` | karbon_log.fmp12 | RemoveDuplicates | list | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/32-SQL.GetColumnStatement.txt` | karbon_log.fmp12 | SQL.GetColumnStatement | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/33-SQL.GetColumn2Fields.txt` | karbon_log.fmp12 | SQL.GetColumn2Fields | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/34-SQL.GetFieldName.txt` | karbon_log.fmp12 | SQL.GetFieldName | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/35-SQL.GetRecordsAsJSON.txt` | karbon_log.fmp12 | SQL.GetRecordsAsJSON | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/36-SQL.GetTableName.txt` | karbon_log.fmp12 | SQL.GetTableName | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/37-SQL.RecordExists.txt` | karbon_log.fmp12 | SQL.RecordExists | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/38-Time.FromISO.txt` | karbon_log.fmp12 | Time.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/39-Time.ToISO.txt` | karbon_log.fmp12 | Time.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_log.fmp12/custom-functions/4-Error.txt` | karbon_log.fmp12 | Error | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_log.fmp12/custom-functions/40-Timestamp.FromISO.txt` | karbon_log.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/41-Timestamp.ToISO.txt` | karbon_log.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/42-wip_API.Error.BadRequest.txt` | karbon_log.fmp12 | _wip_API.Error.BadRequest | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/43-SQL.GetColumn.txt` | karbon_log.fmp12 | SQL.GetColumn | integration | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/44-wip_API.Error.Validation.txt` | karbon_log.fmp12 | _wip_API.Error.Validation | integration | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/45-JSON.IsValid.txt` | karbon_log.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/46-Transaction.Payload.txt` | karbon_log.fmp12 | Transaction.Payload | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/47-JSON.Format.txt` | karbon_log.fmp12 | JSON.Format | json-xml | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/48-JSON.Push.txt` | karbon_log.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/40-Timestamp.FromISO.txt` | karbon_log.fmp12 | Timestamp.FromISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/41-Timestamp.ToISO.txt` | karbon_log.fmp12 | Timestamp.ToISO | date-time | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/42-wip_API.Error.BadRequest.txt` | karbon_log.fmp12 | _wip_API.Error.BadRequest | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/43-SQL.GetColumn.txt` | karbon_log.fmp12 | SQL.GetColumn | integration | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/44-wip_API.Error.Validation.txt` | karbon_log.fmp12 | _wip_API.Error.Validation | integration | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/45-JSON.IsValid.txt` | karbon_log.fmp12 | JSON.IsValid | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/46-Transaction.Payload.txt` | karbon_log.fmp12 | Transaction.Payload | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/47-JSON.Format.txt` | karbon_log.fmp12 | JSON.Format | json-xml | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/48-JSON.Push.txt` | karbon_log.fmp12 | JSON.Push | json-xml | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_log.fmp12/custom-functions/5-Error.Description.txt` | karbon_log.fmp12 | Error.Description | utility | tier3 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_log.fmp12/custom-functions/50-Transaction.Storage.Set.txt` | karbon_log.fmp12 | Transaction.Storage.Set | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/51-Transaction.Storage.Get.txt` | karbon_log.fmp12 | Transaction.Storage.Get | utility | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/52-Transaction.Storage.Push.txt` | karbon_log.fmp12 | Transaction.Storage.Push | utility | tier3 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/50-Transaction.Storage.Set.txt` | karbon_log.fmp12 | Transaction.Storage.Set | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/51-Transaction.Storage.Get.txt` | karbon_log.fmp12 | Transaction.Storage.Get | utility | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/52-Transaction.Storage.Push.txt` | karbon_log.fmp12 | Transaction.Storage.Push | utility | tier3 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_log.fmp12/custom-functions/6-Error.IsError.txt` | karbon_log.fmp12 | Error.IsError | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
 | `objects/karbon_log.fmp12/custom-functions/7-Error.Last.txt` | karbon_log.fmp12 | Error.Last | utility | tier2 | BR-ADMIN-03 (Rust error enum and log) |
-| `objects/karbon_log.fmp12/custom-functions/8-FilterValuesByExpression.txt` | karbon_log.fmp12 | FilterValuesByExpression | list | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
-| `objects/karbon_log.fmp12/custom-functions/9-IsValidEmailFormat.txt` | karbon_log.fmp12 | IsValidEmailFormat | text | tier2 | replaced by the Rust/TypeScript standard library (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/8-FilterValuesByExpression.txt` | karbon_log.fmp12 | FilterValuesByExpression | list | tier2 | replaced by the Rust standard library and crates (D-22) |
+| `objects/karbon_log.fmp12/custom-functions/9-IsValidEmailFormat.txt` | karbon_log.fmp12 | IsValidEmailFormat | text | tier2 | replaced by the Rust standard library and crates (D-22) |
 | `objects/karbon_tester.fmp12/custom-functions/1-TestDescription.txt` | karbon_tester.fmp12 | TestDescription | utility | tier2 | retire with its file (D-01, D-03) |
 | `objects/karbon_tester.fmp12/custom-functions/10-Assert._helper.txt` | karbon_tester.fmp12 | Assert._helper | utility | tier2 | retire with its file (D-01, D-03) |
 | `objects/karbon_tester.fmp12/custom-functions/11-JSON.ContainsProperty.txt` | karbon_tester.fmp12 | JSON.ContainsProperty | json-xml | tier2 | retire with its file (D-01, D-03) |

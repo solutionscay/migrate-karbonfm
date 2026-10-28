@@ -7,32 +7,33 @@
 | Source implementations/files | core: karbon_kontacts, karbon_kontroller, karbon_data; supporting: Picker Module, karbon_log, karbon_charts (D-01). Out: Generator, Build, tester, dev (D-01), ZeitGeist, konnector (D-03), LedgerLink/QuickBooks Online removed, stub only (owner, 2026-10-27; D-02); Twilio SMS/chat removed (owner, 2026-10-28; OD-05-02) |
 | DDR export and `objects/index.tsv` | DDR of 2026-10-27, FileMaker 26.0.3; 4,768 objects; verify passes for 9 explorers (00) |
 | In-scope workflows/data/history | 9 domains (PARTY, CONTACT, ACTIVITY, SALES, FILE, TEMPLATE, ADMIN, INTEG, IMPORT); all records of the user's export, with stamps (D-39) |
-| Target stack/architecture decision | Tauri 2 + Rust + SQLite + React/TypeScript (02; D-36) |
+| Target stack/architecture decision | Tauri 2 window on a local Rust axum server; server-rendered HTML: askama templates, htmx, Alpine.js (small bits only), Tailwind + DaisyUI, Chart.js; SQLite via rusqlite with plain SQL, no ORM; no React or TypeScript (02; D-36; owner, 2026-10-28) |
 | Parallel-operation/cutover model | per-install import, repeatable; no server cutover, no write-back (D-34, D-40) |
-| Unavailable evidence/open decisions | OD-02-02, OD-04-01, OD-04-03, OD-05-01, OD-06-01, OD-07-01, OD-07-02, OD-07-03, OD-07-04, OD-07-05, OD-07-06, OD-07-07, OD-08-01, OD-03-01 |
+| Unavailable evidence/open decisions | OD-02-02, OD-04-01, OD-04-03, OD-06-01, OD-07-01, OD-07-02, OD-07-03, OD-07-04, OD-07-05, OD-07-06, OD-07-07, OD-08-01, OD-08-02, OD-03-01 |
 
 A new DDR export needs a new explode and new catalogs; `catalog_contract.py verify` fails on a catalog made from the old one.
 
 ## Release increments
 
-Increments set build order. The app is released to users after I5 (I6 can follow), because the domains share core tables (party, activity, sales_transaction) and FileMaker gets no write-back, so a partial release would make users keep two systems of record (D-34).
+Increments set build order. The app is released to users after I5 (I6 can follow; I7 host mode is optional and later), because the domains share core tables (party, activity, sales_transaction) and FileMaker gets no write-back, so a partial release would make users keep two systems of record (D-34).
 
 | Increment | Outcome | Object files (first source per command) | Schema/operations/UI | Authorization | Dependencies | Size | Exit evidence | Rollback |
 |---|---|---|---|---|---|---|---|---|
-| I1 | Foundation: app shell, schema, seeds, settings, setup | `objects/karbon_kontacts.fmp12/scripts/482-Create_Welcome_Initial_Parties.txt`; `objects/karbon_kontroller.fmp12/scripts/375-Get_User_Object_By_AccountName_AccountName.txt`; `objects/karbon_kontroller.fmp12/scripts/502-Get_System.txt`; `objects/karbon_kontroller.fmp12/scripts/660-Update_Activity_Types.txt` (+1 more, 05 appendix) | 5 commands (OP-ADMIN-01, OP-ADMIN-02, OP-ADMIN-03, OP-ADMIN-04, OP-ADMIN-05); UI UI-01, UI-17 | AP-01, AP-02, AP-03, AP-10, AP-11 | none | M | app starts on macOS and Linux; schema applies; setup creates the user; secrets in keychain; T-08-01..03, 10 | discard the build; no user data exists before release |
+| I1 | Foundation: Tauri window on the local axum server (127.0.0.1, per-launch session cookie), askama base layout with the vendored htmx, Alpine.js, Chart.js and the Tailwind/DaisyUI CSS embedded, schema, seeds, settings, setup. No host mode (that is I7) | `objects/karbon_kontacts.fmp12/scripts/482-Create_Welcome_Initial_Parties.txt`; `objects/karbon_kontroller.fmp12/scripts/375-Get_User_Object_By_AccountName_AccountName.txt`; `objects/karbon_kontroller.fmp12/scripts/502-Get_System.txt`; `objects/karbon_kontroller.fmp12/scripts/660-Update_Activity_Types.txt` (+1 more, 05 appendix) | 5 commands (OP-ADMIN-01, OP-ADMIN-02, OP-ADMIN-03, OP-ADMIN-04, OP-ADMIN-05); UI UI-01, UI-17 | AP-01, AP-02, AP-03, AP-10, AP-11, AP-13 | none | M | app starts on macOS and Linux; schema applies; setup creates the user; secrets in keychain; T-08-01..03, 10, 14; route tests render every I1 page | discard the build; no user data exists before release |
 | I2 | Parties and contact methods | `objects/karbon_kontacts.fmp12/scripts/393-Create_Parties.txt`; `objects/karbon_kontroller.fmp12/scripts/182-Set_Primary_Phone_Id_PartyId.txt`; `objects/karbon_kontroller.fmp12/scripts/185-Toggle_Contact_Method_Purpose_ContactMethodId_ContactMethodP.txt`; `objects/karbon_kontroller.fmp12/scripts/186-Get_Party_data.txt` (+11 more, 05 appendix) | 15 commands (OP-PARTY-01, OP-PARTY-02, OP-PARTY-03, OP-PARTY-04, OP-PARTY-05, OP-PARTY-06, OP-PARTY-07, OP-PARTY-08, OP-PARTY-09, OP-PARTY-10, OP-PARTY-11, OP-CONTACT-01, OP-CONTACT-02, OP-CONTACT-03, OP-CONTACT-04); UI UI-03, UI-04, UI-05, UI-06 | AP-07 | I1 | L | party and contact rules pass (BR-PARTY-*, BR-CONTACT-*); T-08-07 | discard the build; no user data exists before release |
 | I3 | Import of a FileMaker export | new | 2 commands (OP-IMPORT-01, OP-IMPORT-02); UI UI-18 | AP-09 | I2 | L | a real export imports with a report; rerun gives the same counts; T-08-09, T-08-13 | discard the build; no user data exists before release |
-| I4 | Activities, discussions, email, templates, files | `objects/karbon_kontroller.fmp12/scripts/376-Create_ActivityParty_json.txt`; `objects/karbon_kontroller.fmp12/scripts/377-Create_Activity.txt`; `objects/karbon_kontroller.fmp12/scripts/421-Create_Discussion_v2.txt`; `objects/karbon_kontroller.fmp12/scripts/422-Create_ActivityComment.txt` (+11 more, 05 appendix) | 15 commands (OP-ACTIVITY-01, OP-ACTIVITY-02, OP-ACTIVITY-03, OP-ACTIVITY-04, OP-ACTIVITY-05, OP-ACTIVITY-06, OP-ACTIVITY-07, OP-ACTIVITY-08, OP-ACTIVITY-09, OP-INTEG-01, OP-TEMPLATE-01, OP-TEMPLATE-02, OP-FILE-01, OP-FILE-02, OP-FILE-03); UI UI-02, UI-07, UI-08, UI-09, UI-16, UI-19 | AP-08 | I2 | XL | activity, email, template and file rules pass; SMTP contract test; T-08-08 | discard the build; no user data exists before release |
+| I4 | Activities, discussions, email, templates, files | `objects/karbon_kontroller.fmp12/scripts/376-Create_ActivityParty_json.txt`; `objects/karbon_kontroller.fmp12/scripts/377-Create_Activity.txt`; `objects/karbon_kontroller.fmp12/scripts/421-Create_Discussion_v2.txt`; `objects/karbon_kontroller.fmp12/scripts/422-Create_ActivityComment.txt` (+11 more, 05 appendix) | 15 commands (OP-ACTIVITY-01, OP-ACTIVITY-02, OP-ACTIVITY-03, OP-ACTIVITY-04, OP-ACTIVITY-05, OP-ACTIVITY-06, OP-ACTIVITY-07, OP-ACTIVITY-08, OP-ACTIVITY-09, OP-INTEG-01, OP-TEMPLATE-01, OP-TEMPLATE-02, OP-FILE-01, OP-FILE-02, OP-FILE-03); UI UI-02, UI-07, UI-08, UI-09, UI-16, UI-19, UI-21 (static chat mock) | AP-08 | I2 | XL | activity, email, template and file rules pass; SMTP contract test; T-08-08 | discard the build; no user data exists before release |
 | I5 | Opportunities and sales | `objects/karbon_kontroller.fmp12/scripts/395-Create_or_Update_Invoice_invoice.txt`; `objects/karbon_kontroller.fmp12/scripts/404-Create_or_Update_Payment_Payment.txt`; `objects/karbon_kontroller.fmp12/scripts/412-Create_or_Update_Item_Item.txt`; `objects/karbon_kontroller.fmp12/scripts/428-Create_or_Update_SalesReceipt_SalesReceipt.txt` (+7 more, 05 appendix) | 11 commands (OP-SALES-01, OP-SALES-02, OP-SALES-03, OP-SALES-04, OP-SALES-05, OP-SALES-06, OP-SALES-07, OP-SALES-08, OP-SALES-09, OP-SALES-10, OP-SALES-11); UI UI-10, UI-11, UI-12, UI-13, UI-14, UI-15, UI-20 | AP-04, AP-05, AP-06 | I2, I4 | XL | sales rules pass with money fixtures; T-08-04..06; PDF matches totals | discard the build; no user data exists before release |
 | I6 | Optional integrations and packaging | `objects/Picker_Module.fmp12/scripts/115-HTTP_request.txt`; `objects/karbon_kontroller.fmp12/scripts/746-FullContact_Person_Enrich.txt` | 3 commands (OP-INTEG-02, OP-INTEG-03, OP-INTEG-04); UI none | AP-12 | I4 | M | integrations off by default; T-08-02, T-08-12; signed installers | discard the build; no user data exists before release |
+| I7 | Optional, later: host mode (LAN sharing, like FileMaker network sharing): the same server also listens on the LAN with a login (owner, 2026-10-28) | new | 2 commands (OP-ADMIN-06, OP-ADMIN-07); UI UI-22, host mode section of UI-17 | AP-14 | I5, OD-08-02 | M | off by default; login required; public addresses refused; desktop-only routes refused for a LAN session; T-08-15 | turn host mode off; the server returns to loopback only |
 
 Each increment implements its command-layer invariants and the negative tests of its policies before its screens are wired.
 
 ## Foundation gates
 
-- [ ] Rust stable and Node LTS versions pinned; CI builds macOS (universal) and Linux on every commit; cargo test, clippy, Vitest, tsc gates.
+- [ ] Rust stable pinned; the Tailwind standalone CLI with the DaisyUI plugin and the vendored htmx, Alpine.js and Chart.js files pinned by version (no Node toolchain, S-05); CI builds macOS (universal) and Linux on every commit; gates: cargo test (rules and routes), clippy, askama templates compile.
 - [ ] Schema 04 applied by refinery migrations; source ids kept; timezone policy D-05; containers D-17.
-- [ ] Single-user setup and the capability allowlist exist before any data command (AP-01, BR-ADMIN-01).
+- [ ] Single-user setup, the route list and the local server guard (session cookie, Host and Origin checks) exist before any data command (AP-01, AP-13, BR-ADMIN-01).
 - [ ] Audit stamps (BR-PARTY-07) and log masking (AP-03, D-30) in place.
 - [ ] Backup: the app copies the database and file store to a user-chosen folder (VACUUM INTO); restore tested.
 - [ ] Source-to-target traceability kept (04 appendix, 07 appendix, 05 appendix).
@@ -43,12 +44,13 @@ Every tier1 rule and every policy lands in exactly one increment (the first that
 
 | Increment | Business rule ids (07) | Authorization policy ids (08) | Discovery answers (D-) |
 |---|---|---|---|
-| I1 | BR-PARTY-07, BR-ADMIN-01, BR-ADMIN-02, BR-ADMIN-03, BR-ADMIN-04, BR-ADMIN-05 | AP-01, AP-02, AP-03, AP-10, AP-11 | D-04, D-08, D-09, D-19, D-30, D-35, D-36 |
+| I1 | BR-PARTY-07, BR-ADMIN-01, BR-ADMIN-02, BR-ADMIN-03, BR-ADMIN-04, BR-ADMIN-05 | AP-01, AP-02, AP-03, AP-10, AP-11, AP-13 | D-04, D-08, D-09, D-19, D-30, D-35, D-36 |
 | I2 | BR-PARTY-01, BR-PARTY-02, BR-PARTY-03, BR-PARTY-04, BR-PARTY-05, BR-PARTY-06, BR-PARTY-08, BR-PARTY-09, BR-PARTY-10, BR-PARTY-11, BR-CONTACT-01, BR-CONTACT-02, BR-CONTACT-03, BR-CONTACT-04, BR-CONTACT-05 | AP-07 | D-07, D-15, D-16, D-39 |
 | I3 | BR-IMPORT-01, BR-IMPORT-02 | AP-09 | D-05, D-09, D-16, D-17, D-34, D-39, D-40 |
 | I4 | BR-ACTIVITY-01, BR-ACTIVITY-02, BR-ACTIVITY-03, BR-ACTIVITY-04, BR-ACTIVITY-05, BR-ACTIVITY-06, BR-ACTIVITY-07, BR-ACTIVITY-08, BR-ACTIVITY-09, BR-ACTIVITY-10, BR-ACTIVITY-11, BR-FILE-01, BR-FILE-02, BR-FILE-03, BR-TEMPLATE-01, BR-TEMPLATE-02, BR-INTEG-01 | AP-08 | D-14, D-17, D-21, D-29 |
 | I5 | BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-04, BR-SALES-05, BR-SALES-06, BR-SALES-07, BR-SALES-08, BR-SALES-09, BR-SALES-10, BR-SALES-11, BR-SALES-12, BR-SALES-13, BR-SALES-14, BR-SALES-15, BR-SALES-16, BR-SALES-17 | AP-04, AP-05, AP-06 | D-02, D-07, D-13, D-18, D-20, D-24 |
 | I6 | BR-INTEG-02, BR-INTEG-03 | AP-12 | D-14, D-36 |
+| I7 | BR-ADMIN-06 | AP-14 | D-35, D-36 |
 
 ## UI implementation
 
@@ -74,6 +76,8 @@ Every tier1 rule and every policy lands in exactly one increment (the first that
 | UI-18 Import | implementation-ready | OP-IMPORT-01, OP-IMPORT-02 | loading/empty/error; typed errors; WCAG AA | new | workflow test in 06 |
 | UI-19 Files | inventory-only | OP-FILE-01, OP-FILE-02, OP-FILE-03 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/142-Card_-_FilesList.txt`, `objects/karbon_kontacts.fmp12/layouts/185-Thumbnails.txt` | design pass first (OD-06-01) |
 | UI-20 Invoice PDF and charts | inventory-only | OP-SALES-04, OP-SALES-03, OP-SALES-11 | loading/empty/error; typed errors; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/103-SalesLine_pdf.txt`, `objects/karbon_charts.fmp12/layouts/25-SalesOpp_Chart.txt` | design pass first (OD-06-01) |
+| UI-21 Chat (static mock) | implementation-ready (static) | none: one template with sample data, no database access | populated only; banner "SMS is not available"; WCAG AA | `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt` | route test: page renders, no form posts |
+| UI-22 Login (host mode, I7) | behavior-ready | OP-ADMIN-07 | validation/lockout/error; WCAG AA | new | T-08-15 |
 
 Inventory-only screens are not scheduled as complete until a design pass or screenshots exist (OD-06-01).
 
@@ -138,8 +142,8 @@ No inbound endpoint exists (05).
 - Semantic fixtures for each tier1 rule (07 "Semantic tests" column), built from the object files and non-secret sample data, run as cargo tests against an in-memory SQLite.
 - Unit tests for the money rules (BR-SALES-01, 02, 06, 07) on integer cents (OD-04-02), including the half-cent rounding of the unit price and of the import conversion.
 - Integration tests: transaction rollback on a failing second write (D-08), idempotent retries, SMTP against a local test server.
-- Authorization tests T-08-01..T-08-13 through the IPC layer.
-- UI tests (Vitest + Testing Library) only for behavior-ready screens; WebDriver smoke tests on Linux; macOS manual checklist (R-03).
+- Authorization tests T-08-01..T-08-15 through HTTP to the local server.
+- Route tests in Rust for every page and fragment: call the axum router in process against an in-memory database, then check the status, `HX-*` headers and the HTML (scraper crate: fields, labels, error messages, totals). WebDriver smoke tests on Linux through tauri-driver; macOS manual checklist (R-03).
 - Import rehearsal on at least one real export (R-04) with the validation matrix, then a rerun into a fresh database.
 - Business reconciliation: the user compares totals in the import report with FileMaker before switching.
 
@@ -210,7 +214,7 @@ Dropped columns:
 
 ## Removed: Twilio SMS/chat (owner decision, 2026-10-28)
 
-Twilio SMS and chat are out of scope (OD-05-02, D-14): delivery status and inbound messages need a reachable server, and the desktop client has none. Removed from every Step 5 artifact, as QuickBooks was. No increment, command or screen carries them.
+Twilio SMS and chat are out of scope (OD-05-02, D-14): delivery status and inbound messages need a reachable server, and the desktop client has none. Removed from every Step 5 artifact, as QuickBooks was. No increment or command carries them; the chat screen stays only as a static mock with sample data (UI-21, owner 2026-10-28), with no Twilio, table or command.
 
 | What | Removed | Where recorded |
 |---|---|---|
@@ -218,7 +222,7 @@ Twilio SMS and chat are out of scope (OD-05-02, D-14): delivery status and inbou
 | Columns | system_setting.twilio_account_sid, twilio_format_option, twilio_sms_from_phone_number (TwilioAuthToken was already excluded, D-09) | 04 and its appendix |
 | Relationships | 12 chat relationships (karbon_data, kontacts, kontroller) | 04 appendix |
 | Scripts | 15: send SMS, chat activity and message create, status update, phone lookup and its request helper (9, before "deferred"), and 6 chat-screen scripts | 07 appendix ("removed") |
-| Layouts | the Chat screen (kontacts 184, before "deferred") and 5 chat script-context layouts | 06 appendix |
+| Layouts | 5 chat script-context layouts; the Chat screen (kontacts 184) becomes the static mock UI-21 | 06, 06 appendix |
 | Integration | EXT-05 changed from "deferred" to "removed" | 05, 08, this file |
 | Rules | BR-FILE-03 (chat-message attachments), BR-IMPORT-01 (chat rows not imported) | 07 |
 | Discovery | D-14 SMS part answered; OD-05-02 closed | 01, this file |
@@ -231,6 +235,7 @@ Kept as data: activity.chat_ind, activity_type 9 (SMS) and phone.sms_ind, so imp
 |---|---|---|
 | Money storage (OD-04-02) | Integer minor units: every money column is an INTEGER of cents; Rust integer arithmetic; conversion only at the UI and import edges. The source's 7-decimal unit price is not kept (BR-SALES-01). | 04, 02 R-02/S-03, 05, 07, this file |
 | Chat / Twilio SMS (OD-05-02, EXT-05) | Dropped, out of scope (section above). | 01, 04-08, this file |
+| UI stack | Server-rendered HTML for simplicity, no React or TypeScript: Rust + axum serves askama templates; htmx for interaction; Alpine.js only for small client-side bits; Tailwind + DaisyUI; Chart.js; rusqlite with plain SQL (no ORM); Tauri 2 wraps the local server in a desktop window. LAN access from a browser is a later optional increment (I7 host mode: login, LAN only), not I1. The SMS chat screen stays as a static mock (UI-21). OD-05-01 closed. | 02, 03, 05, 06, 07, 08 |
 | Tax ids (organization.federal_tax_id_number, vendor.tax_id) | Plain TEXT, no encryption, masking or extra access rule; this is a demo. Closes the security-review question on them (D-09). | 01, 04, 07 BR-IMPORT-02, 08 |
 
 ## Risk and decision register
@@ -241,7 +246,7 @@ Kept as data: activity.chat_ind, activity_type 9 (SMS) and phone.sms_ind, so imp
 | OD-04-01 | needs-profile foreign keys (15 in the core schema) are enforced only after the import profile passes; decide whether to add them as constraints for new installs with no import. | D-16 | medium | decide before the increment that needs it | Tech lead / open |
 | OD-04-02 | Money storage. **Decided (owner, 2026-10-28):** integer minor units. Every money column is an INTEGER of cents; arithmetic in Rust on integers; conversion only at the UI and import edges (04, BR-SALES-01, BR-IMPORT-01). | D-18 | n/a | 22 money columns in 04 | Owner / closed |
 | OD-04-03 | Repeating fields, if any reach the core tables, become child rows or JSON. | D-27 | medium | decide before the increment that needs it | Tech lead / open |
-| OD-05-01 | Whether commands use typed bindings generated from Rust (specta/tauri-specta) or hand-written TypeScript types. | D-36 | medium | decide before the increment that needs it | Tech lead / open |
+| OD-05-01 | Typed bindings for a TypeScript frontend. **Closed (owner, 2026-10-28):** no TypeScript; templates are Rust (askama), so there is nothing to generate. | D-36 | n/a | n/a | Owner / closed |
 | OD-05-02 | SMS/chat without a server. **Decided (owner, 2026-10-28):** dropped, out of scope; it cannot work in the desktop client without a server. Removed like QuickBooks (section above). | D-14 | n/a | removed from 04-08 | Owner / closed |
 | OD-06-01 | Visual design and density: no screenshots exist; every inventory-only screen needs a design pass or screenshots. | D-37 | medium | decide before the increment that needs it | Product owner / open |
 | OD-07-01 | Hard party delete: the DDR cascades it to contact methods, relations, roles and the person/organization row; decide what happens to the uncascaded activity parties, attachments, opportunities and sales transactions (corrected by audit A-01, 09). | D-12 | medium | decide before the increment that needs it | Domain expert / open |
@@ -252,8 +257,9 @@ Kept as data: activity.chat_ind, activity_type 9 (SMS) and phone.sms_ind, so imp
 | OD-07-06 | How total_tax is computed with QBO out; default: entered and kept as imported (BR-SALES-02; audit A-11, 09). | D-18 | high | decide before I5 | Accounting owner / open |
 | OD-07-07 | Retainer balance: locked transactions only (default) or all transactions (BR-SALES-06; audit A-14, 09). | D-18 | medium | decide before I5 | Accounting owner / open |
 | OD-08-01 | Optional app passcode or encrypted database (SQLCipher) for a shared or unencrypted machine. | D-04 | medium | decide before the increment that needs it | Product owner / open |
+| OD-08-02 | Host mode details: plain HTTP or TLS (self-signed) on the LAN; one shared login or one account per person; how many LAN sessions. | owner, 2026-10-28 | medium | decide before I7 | Product owner / open |
 | OD-03-01 | FileMaker export format for the import: one CSV/XLSX per table with field names in the header (default), or FileMaker XML (FMPXMLRESULT); and how container files are exported. | D-34 | medium | decide before the increment that needs it | Operator / open |
-| R-01..R-06 | technical risks | 02 | see 02 | spikes S-01..S-04 | Tech lead / open |
+| R-01..R-09 | technical risks | 02 | see 02 | spikes S-01..S-05 | Tech lead / open |
 
 ## Completion gate
 

@@ -18,7 +18,7 @@
 --     SHA-256 of a file stored in the app data directory (D-17).
 --   * Money (owner decision, 2026-10-28; OD-04-02): every money column is an INTEGER of cents (minor units, USD).
 --     Arithmetic is in Rust on integers (i64); SQL SUM() over these columns is exact. Values are converted only at the
---     edges: the UI parses and formats dollars, and the import converts the FileMaker decimal to cents, rounding half
+--     edges: the HTML layer parses and formats dollars (form parsing in the axum handlers, formatting in the askama templates), and the import converts the FileMaker decimal to cents, rounding half
 --     away from zero as FileMaker Round() does (BR-IMPORT-01). Unit prices are cents too, so the source's 7-decimal
 --     unit price is not kept (BR-SALES-01). The 22 money columns carry the comment "money: integer cents".
 --   * Globals, summary fields, unstored calculations, JSON serializers and join anchors (ONE, z_xJoin) have no
@@ -1147,7 +1147,7 @@ CREATE VIEW sales_summary_by_month AS
 
 -- ---------------------------------------------------------------------------
 -- Authorization: none in the database. One local user (D-04, D-35); the Rust command layer is the only writer
--- (08 AP-01). The webview has no SQL access.
+-- (08 AP-01), called only by the axum route handlers. The HTML pages have no SQL access.
 -- ---------------------------------------------------------------------------
 
 COMMIT;

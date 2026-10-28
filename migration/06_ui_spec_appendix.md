@@ -332,7 +332,7 @@
 | `objects/karbon_kontacts.fmp12/layouts/177-Party_Find.txt` | karbon_kontacts.fmp12 | Party Find | utility | page | 5 | 1 | 3 | 8 | UI-03 |
 | `objects/karbon_kontacts.fmp12/layouts/178-Customer_Find.txt` | karbon_kontacts.fmp12 | Customer Find | utility | page | 5 | 1 | 3 | 8 | UI-03 |
 | `objects/karbon_kontacts.fmp12/layouts/180-UtilityDiscussion.txt` | karbon_kontacts.fmp12 | UtilityDiscussion | utility | unresolved | 0 | 0 | 0 | 0 | retire by the D-11 default (no reference found; confirm) |
-| `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt` | karbon_kontacts.fmp12 | Chat | form | page | 11 | 3 | 5 | 7 | removed: Twilio SMS/chat, out of scope (owner, 2026-10-28; OD-05-02) |
+| `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt` | karbon_kontacts.fmp12 | Chat | form | page | 11 | 3 | 5 | 7 | UI-21: static mock with sample data (owner, 2026-10-28); no Twilio, no table, no command (OD-05-02) |
 | `objects/karbon_kontacts.fmp12/layouts/185-Thumbnails.txt` | karbon_kontacts.fmp12 | Thumbnails | dialog | modal | 0 | 0 | 0 | 3 | UI-19 |
 | `objects/karbon_kontacts.fmp12/layouts/186-Customer_Detail_sliderDesign.txt` | karbon_kontacts.fmp12 | Customer Detail#sliderDesign | form | drop-candidate | 48 | 3 | 4 | 68 | retire: no reference / developer (D-11) |
 | `objects/karbon_kontacts.fmp12/layouts/187-Card_-_Manage_Subscribers.txt` | karbon_kontacts.fmp12 | Card - Manage Subscribers | dialog | modal | 1 | 0 | 0 | 6 | UI-09 |

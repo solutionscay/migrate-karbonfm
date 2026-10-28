@@ -1,6 +1,6 @@
 # Identity and Authorization Contract
 
-One user per install, data local to the machine, no server (D-04, D-35, D-36). There is no login, no role hierarchy and no record predicate to port: every FileMaker file has only Admin ([Full Access]) and an inactive [Guest] (karbon_tester adds Bots). Authorization in the target is the protection of the data and of the commands inside one desktop app: what the webview may call, what leaves the machine, and which destructive or locked operations are refused.
+One user per install, data local to the machine, no remote server (D-04, D-35, D-36). The app serves its own HTML from a local axum server on 127.0.0.1 inside the desktop process (owner, 2026-10-28). In desktop mode there is no login, no role hierarchy and no record predicate to port: every FileMaker file has only Admin ([Full Access]) and an inactive [Guest] (karbon_tester adds Bots). Authorization in the target is the protection of the data and of the commands inside one desktop app: who may reach the local server (AP-13), what leaves the machine, and which destructive or locked operations are refused. Host mode (I7, later and optional) lets a browser on the LAN open the app after a login (AP-14).
 
 ## Authority and evidence
 
@@ -27,7 +27,7 @@ One user per install, data local to the machine, no server (D-04, D-35, D-36). T
 
 | Source privilege set/rule | Target role/capability | Permission boundary | Explicit denies | Source evidence | Approval owner |
 |---|---|---|---|---|---|
-| [Full Access] | ROLE-OWNER: every command of 05 | the commands in the capability allowlist (AP-01) | AP-04, AP-05, AP-07, AP-08 still refuse | `objects/karbon_data.fmp12/privilege-sets/1-Full_Access.txt` | Product owner |
+| [Full Access] | ROLE-OWNER: every command of 05 | the commands behind the registered routes (AP-01) | AP-04, AP-05, AP-07, AP-08 still refuse | `objects/karbon_data.fmp12/privilege-sets/1-Full_Access.txt` | Product owner |
 | [Data Entry Only], [Read-Only Access] | none | n/a | n/a | built-in, held by no active account | n/a |
 | Bot | none | n/a | n/a | `objects/karbon_tester.fmp12/privilege-sets/4-Bot.txt` | n/a |
 
@@ -67,14 +67,15 @@ No ownership predicate exists in the source; none is invented (single user).
 
 ## Operation, script, and value-list access
 
-Every 05 command is allowed to ROLE-OWNER through the capability allowlist (AP-01). Retired scripts (Commander, Re-login, Perform Script By Name) have no command (AP-10).
+Every 05 command is allowed to ROLE-OWNER through its registered route (AP-01, AP-13). Retired scripts (Commander, Re-login, Perform Script By Name) have no command (AP-10).
 
 ## Route/layout and access-channel matrix
 
 | Route/page/channel | Source layout/extended privilege | Allowed | Underlying rules | Direct-access test |
 |---|---|---|---|---|
-| All UI routes (06 UI-01..UI-20) | layouts of kontacts, Picker | ROLE-OWNER | command rules | calling a command directly from devtools still hits AP-04..AP-08 |
-| fmapp, fmwebdirect, fmxml, fmrest, fmphp, fmxdbc, fmurlscript, fmreauthenticate10, fmextscriptaccess | `objects/*/extended-privileges/` | none | no server (D-36) | no listener exists (AP-10) |
+| All page and fragment routes (06 UI-01..UI-21, routes in 05) | layouts of kontacts, Picker | ROLE-OWNER from the app window (AP-13) | command rules | a hand-made request with the session cookie still hits AP-04..AP-08 in the command |
+| Host-mode LAN browser (later, I7; 06 UI-22 login) | fmwebdirect / FileMaker network sharing (the nearest source analogue) | a logged-in LAN session, off by default (AP-14) | command rules; desktop-only routes refused | T-08-15 |
+| fmapp, fmwebdirect, fmxml, fmrest, fmphp, fmxdbc, fmurlscript, fmreauthenticate10, fmextscriptaccess | `objects/*/extended-privileges/` | none | no remote server (D-36) | loopback listener only (AP-10, AP-13) |
 
 ## UI visibility and exceptions
 
@@ -86,7 +87,7 @@ Hide rules gate no sensitive data in the core layouts (the explorers found none 
 |---|---|---|---|---|
 | session table, meta::CurrentUserId, Get(AccountName) | binds the account to a Karbon user (`objects/karbon_kontacts.fmp12/scripts/54-Store_UserID_On_Session.txt`) | app state: the single user id | no (single user) | read from user table at start |
 | $$allow_commit | payment commit guard | removed (AP-06) | no | n/a |
-| selector, Utility* globals, VirtualList | UI staging | frontend component state (D-23) | no | n/a |
+| selector, Utility* globals, VirtualList | UI staging | form fields and Alpine.js state on the page (D-23) | no | n/a |
 
 ## Privilege bypass and application-level permissions
 
@@ -111,50 +112,55 @@ Hide rules gate no sensitive data in the core layouts (the explorers found none 
 
 | Policy id | Name | Rule | Applies to | Mechanism | Test |
 |---|---|---|---|---|---|
-| AP-01 | Command-only data access | The webview has no SQL, file-system or shell access. Only the registered Tauri commands of 05 read or write SQLite; each command validates its input and runs its own transaction. | all commands | Tauri capability file allowlists exactly the 05 commands; no sql/fs/shell plugin permission is granted to the window | T-08-01 |
-| AP-02 | Default-deny capabilities and network | No Tauri plugin permission except the scoped file dialog and the OS keychain bridge. Outbound network calls happen only in Rust, only to the SMTP host and the integration hosts the user enabled. | OP-INTEG-01..03 | capability file; Rust HTTP client with a host allowlist | T-08-02 |
-| AP-03 | Secrets never reach the UI or SQLite | SMTP passwords and API keys are written to the OS keychain by OP-ADMIN-03 and read only inside Rust commands; settings queries return a has_secret flag, never the value. | OP-ADMIN-03, OP-INTEG-01..03 | keychain crate; serializer omits secret fields | T-08-03 |
+| AP-01 | Command-only data access | The page receives HTML only and has no SQL, file-system or shell access. Only the commands of 07, called by the registered axum routes of 05, read or write SQLite; each route parses a typed form and each command runs its own transaction. | all commands | router lists exactly the 05 routes (unknown path 404); no Tauri IPC permission and no sql/fs/shell plugin is granted to the window | T-08-01 |
+| AP-02 | Default-deny capabilities and network | The window gets no Tauri IPC permission at all: native dialogs and the keychain are used from Rust only. Outbound network calls happen only in Rust, only to the SMTP host and the integration hosts the user enabled. | OP-INTEG-01..03 | capability file; Rust HTTP client with a host allowlist | T-08-02 |
+| AP-03 | Secrets never reach the UI or SQLite | SMTP passwords and API keys are written to the OS keychain by OP-ADMIN-03 and read only inside Rust commands; the settings page renders a has_secret flag, never the value, and a secret field is write-only. | OP-ADMIN-03, OP-INTEG-01..03 | keychain crate; templates have no secret field to render | T-08-03 |
 | AP-04 | Book-close lock | Commands that unlock, change or delete a sales transaction refuse when its date <= system_setting.book_close_date (BR-SALES-04). | OP-SALES-04..08 | command precondition | T-08-04 |
 | AP-05 | Posted transactions are immutable | A locked transaction (locked_ind = 1) cannot be changed or deleted (BR-SALES-05). | OP-SALES-04, 05, 07, 08 | command precondition | T-08-05 |
 | AP-06 | Payments only through payment_save | Payment and payment-line rows are written only by OP-SALES-09, which checks BR-SALES-09; replaces the $$allow_commit commit guard. | OP-SALES-09 | no other command writes payment tables | T-08-06 |
-| AP-07 | Destructive actions need confirmation | Hard party delete, transaction delete, activity discard, relation delete and contact-method delete require confirm = true; without it the command returns ConfirmationRequired with a summary of what would be deleted. | OP-PARTY-04, OP-PARTY-09, OP-CONTACT-04, OP-ACTIVITY-03, OP-SALES-07, OP-SALES-08 | two-step command (05 Confirmations) | T-08-07 |
+| AP-07 | Destructive actions need confirmation | Hard party delete, transaction delete, activity discard, relation delete and contact-method delete require confirm = true; without it the command returns ConfirmationRequired and the route renders a confirmation dialog with a summary of what would be deleted. | OP-PARTY-04, OP-PARTY-09, OP-CONTACT-04, OP-ACTIVITY-03, OP-SALES-07, OP-SALES-08 | two-step command (05 Confirmations) | T-08-07 |
 | AP-08 | Sent email is read-only | An email message marked sent cannot be edited or re-sent (BR-ACTIVITY-08). | OP-ACTIVITY-02, OP-INTEG-01 | command precondition | T-08-08 |
-| AP-09 | File access is scoped | Stored files live only in the app data directory; the import and file_add read only paths the user picked in a native dialog; no command takes a free path or URL from the UI except the enrichment photo download (BR-FILE-01 limits apply). | OP-FILE-01, OP-IMPORT-01 | dialog-returned paths only; canonicalize and check prefix | T-08-09 |
-| AP-10 | No remote command entry | The app registers no URL scheme handler or IPC listener that runs commands (the fmp:// Commander script is not migrated). | none | no deep-link plugin | T-08-10 |
+| AP-09 | File access is scoped | Stored files live only in the app data directory. file_add takes an uploaded multipart body, never a path. The import folder is chosen in a native dialog that the server opens in the desktop process (desktop window only); the route gets back a handle, not a path. No route takes a free path or URL from the page except the enrichment photo download (BR-FILE-01 limits apply). | OP-FILE-01, OP-IMPORT-01 | upload body or dialog handle only; canonicalize and check prefix | T-08-09 |
+| AP-10 | No remote command entry | The app registers no URL scheme handler and no IPC listener that runs commands (the fmp:// Commander script is not migrated). Its only listener is the axum server: on 127.0.0.1 in desktop mode (AP-13), on the LAN only in host mode (AP-14). | none | no deep-link plugin; server bind address from AP-13/AP-14 | T-08-10 |
 | AP-11 | Optional app lock | Open: an optional passcode or encrypted database (OD-08-01). Default: none; the OS account protects the data. | app start | OD-08-01 | T-08-11 |
+| AP-13 | Local server accepts only the app window | The server binds 127.0.0.1 on a random free port. At start the window opens `/session/{one-time token}`, which sets an HttpOnly, SameSite=Strict session cookie and redirects. Every route needs that cookie; the `Host` header must be `127.0.0.1:<port>` (DNS rebinding); a non-GET request needs a matching `Origin`. Another local process or a web page in a browser gets 401 or 403. | all routes | axum middleware; the token is random per launch and works once | T-08-14 |
+| AP-14 | Host mode: login, LAN only (later, I7) | Off by default. When the owner turns it on (OP-ADMIN-06, desktop window only), the server also binds the LAN address; it refuses clients outside private ranges (10/8, 172.16/12, 192.168/16, link-local, IPv6 ULA); every LAN request needs a session from the login page (OP-ADMIN-07; password hash in the keychain, argon2id; lockout after repeated failures). Desktop-only routes (import, backup, secrets in settings, host mode) refuse a LAN session. Transport security and per-person accounts are open (OD-08-02). | OP-ADMIN-06, OP-ADMIN-07, all routes in host mode | middleware: client address filter, session check, desktop-only route list | T-08-15 |
 | AP-12 | Integrations off by default | Each optional integration is enabled by the user in settings, with its key stored by AP-03; a disabled integration makes no network call. | OP-INTEG-02, OP-INTEG-03 | settings flag checked in the command | T-08-12 |
 
 ## Negative authorization tests
 
 | Test id | Identity/role | Attempt | Expected | Layer | Evidence |
 |---|---|---|---|---|---|
-| T-08-01 | webview script | call an unregistered command or the SQL plugin | rejected by Tauri capabilities | IPC | AP-01 |
+| T-08-01 | page script | request an unregistered route, or call Tauri IPC or the SQL plugin | 404; IPC not available to the window | HTTP, IPC | AP-01 |
 | T-08-02 | command | HTTP call to a host not enabled | refused, logged | Rust HTTP client | AP-02 |
-| T-08-03 | webview | read settings | no secret value in the payload | serializer | AP-03 |
+| T-08-03 | page | open the settings page | no secret value in the HTML | template | AP-03 |
 | T-08-04 | ROLE-OWNER | unlock a transaction dated on the close date | BookClosed error | command | AP-04 |
 | T-08-05 | ROLE-OWNER | edit or delete a locked transaction | Locked error | command | AP-05 |
 | T-08-06 | ROLE-OWNER | write payment rows through invoice_save | not possible: no field accepted | command input schema | AP-06 |
 | T-08-07 | ROLE-OWNER | hard delete without confirm | ConfirmationRequired | command | AP-07 |
 | T-08-08 | ROLE-OWNER | edit a sent email | AlreadySent error | command | AP-08 |
-| T-08-09 | webview | file_add with a path outside the dialog result | refused | command | AP-09 |
-| T-08-10 | other process | open an fmp:// or custom URL | nothing handles it | OS | AP-10 |
+| T-08-09 | page | file_add or import with a path in the form instead of an upload or dialog handle | refused | route | AP-09 |
+| T-08-10 | other process | open an fmp:// or custom URL; connect to the app port from the LAN with host mode off | nothing handles it; connection refused (loopback bind) | OS, socket | AP-10 |
 | T-08-11 | n/a | app lock (if OD-08-01 adopts it) | locked until passcode | app start | AP-11 |
 | T-08-12 | ROLE-OWNER | address suggestion with the integration disabled | no network call | command | AP-12 |
 | T-08-13 | import | export containing SSN/card columns | columns absent after import | import | BR-IMPORT-02 |
+| T-08-14 | other local process / web page | request a route without the session cookie, with a foreign `Host`, or a POST with a foreign `Origin` | 401 / 403; nothing changes | HTTP middleware | AP-13 |
+| T-08-15 | LAN browser (host mode) | request a page without login; log in from a public address; open import or settings secrets from a LAN session | redirect to login; refused; 403 | HTTP middleware | AP-14 |
 
 ## Open decisions and unavailable evidence
 
 | ID | Missing/conflicting evidence | Security impact | Required proof/owner | Status |
 |---|---|---|---|---|
 | OD-08-01 | Optional app passcode or encrypted database (SQLCipher) for a shared or unencrypted machine. | data at rest on a shared machine | Product owner | open |
+| OD-08-02 | Host mode (I7) details: plain HTTP on the LAN or TLS with a self-signed certificate; one shared login or one account per person (which changes BR-ADMIN-04 and the audit stamps); how many LAN sessions at once. | password and data readable on the LAN without TLS; audit stamps name one user | Product owner | open; decide before I7 |
 
 ## Completion gate
 
 - [x] Every privilege-set dimension maps to target enforcement (built-in sets only; ROLE-OWNER or retired).
 - [x] Every extended privilege has a retirement decision (no server).
-- [x] Every command defaults deny outside the capability allowlist, with conditional rules AP-04..AP-08.
+- [x] Every request defaults deny outside the registered routes and the session check (AP-01, AP-13), with conditional rules AP-04..AP-08.
 - [x] Field restrictions (secrets) are enforced before serialization (AP-03).
 - [x] Record predicates reference real target columns (sales_transaction.date, sales_transaction.locked_ind, system_setting.book_close_date).
 - [x] Hide/CF rules are secondary UI evidence only.
 - [x] Identity provisioning covers the single user, retired accounts and the absence of service principals.
-- [x] Negative tests go through the IPC layer, not only the UI.
+- [x] Negative tests go through HTTP to the local server, not only the UI.
