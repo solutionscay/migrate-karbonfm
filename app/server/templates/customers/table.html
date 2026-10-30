@@ -1,0 +1,64 @@
+{# The swappable part of the customers list: toolbar state, rows and pager. htmx replaces #customer-table with it. #}
+<form class="flex flex-wrap items-center gap-2 px-4 py-3 border-b hairline"
+      hx-get="/customers" hx-target="#customer-table" hx-push-url="true" hx-trigger="input changed delay:250ms from:input[name=q], change from:select">
+  <label class="flex items-center gap-2 h-8 px-2.5 w-72 rounded-field border hairline bg-base-200/50 focus-within:border-primary">
+    <svg class="i muted"><use href="#i-search"/></svg>
+    <input name="q" value="{{ query.q }}" class="bg-transparent outline-none w-full text-[13px]" placeholder="Search name, contact or email" aria-label="Search customers" autocomplete="off">
+  </label>
+  <input type="hidden" name="status" value="{{ query.status() }}">
+  {% for (key, label) in [("all", "All"), ("overdue", "Overdue"), ("retainer", "On retainer"), ("inactive", "Inactive")] %}
+  <a class="filter-chip {% if query.status() == *key %}on{% endif %}" href="{{ query.href(1, key) }}"
+     hx-get="{{ query.href(1, key) }}" hx-target="#customer-table" hx-push-url="true">
+    {% if *key == "overdue" %}<span class="w-1.5 h-1.5 rounded-full bg-error"></span>{% endif %}{{ label }}</a>
+  {% endfor %}
+  <div class="ml-auto flex items-center gap-2 text-[12px] muted">
+    Sort
+    <select name="sort" class="select select-sm w-52 text-[12.5px]" aria-label="Sort by">
+      <option value="balance" {% if query.sort() == "balance" %}selected{% endif %}>Balance due, high → low</option>
+      <option value="name" {% if query.sort() == "name" %}selected{% endif %}>Name A → Z</option>
+    </select>
+  </div>
+</form>
+<div class="overflow-x-auto">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>Customer</th><th>Email / phone</th><th>Status</th>
+        <th class="r">Balance due</th><th class="r">Retainer balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><div class="flex items-center gap-3"><span class="av {% if row.org %}org{% endif %} c{{ row.color }}">{{ row.initials }}</span><div class="min-w-0"><div class="font-medium truncate">{{ row.name }}</div><div class="text-[12px] muted truncate">{% if row.contact.is_empty() %}{% if row.org %}Organization{% else %}Person{% endif %}{% else %}{{ row.contact }}{% endif %}</div></div></div></td>
+        <td><div class="truncate max-w-[240px]">{{ row.email }}</div><div class="text-[12px] muted num">{{ row.phone }}</div></td>
+        <td><div class="flex gap-1.5">
+          {% if row.current %}<span class="chip ok"><span class="dot"></span>Current</span>{% else %}<span class="chip"><span class="dot"></span>Inactive</span>{% endif %}
+          {% if row.overdue %}<span class="chip bad"><span class="dot"></span>Overdue</span>{% endif %}
+          {% if row.has_retainer %}<span class="chip info">Retainer</span>{% endif %}
+        </div></td>
+        <td class="r num font-medium {% if row.overdue %}text-error{% endif %}">{% if row.has_balance %}{{ row.balance }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td class="r num">{% if row.has_retainer %}{{ row.retainer }}{% else %}<span class="muted">—</span>{% endif %}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center muted py-10">No customers match.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<nav class="flex items-center gap-3 px-4 py-2.5 border-t hairline text-[12px] muted" aria-label="Pages">
+  <span class="num">{% if matched > 0 %}{{ first }}–{{ last }} of {{ matched }}{% else %}0 customers{% endif %}</span>
+  <div class="ml-auto join">
+    {% if page > 1 %}
+    <a class="join-item btn btn-sm btn-quiet" href="{{ query.href(page - 1, query.status()) }}" hx-get="{{ query.href(page - 1, query.status()) }}" hx-target="#customer-table" hx-push-url="true" aria-label="Previous page"><svg class="i i-sm"><use href="#i-chevron-left"/></svg></a>
+    {% else %}
+    <button class="join-item btn btn-sm btn-quiet" disabled aria-label="Previous page"><svg class="i i-sm"><use href="#i-chevron-left"/></svg></button>
+    {% endif %}
+    <span class="join-item btn btn-sm btn-quiet pointer-events-none num">Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}
+    <a class="join-item btn btn-sm btn-quiet" href="{{ query.href(page + 1, query.status()) }}" hx-get="{{ query.href(page + 1, query.status()) }}" hx-target="#customer-table" hx-push-url="true" aria-label="Next page"><svg class="i i-sm"><use href="#i-chevron-right"/></svg></a>
+    {% else %}
+    <button class="join-item btn btn-sm btn-quiet" disabled aria-label="Next page"><svg class="i i-sm"><use href="#i-chevron-right"/></svg></button>
+    {% endif %}
+  </div>
+</nav>

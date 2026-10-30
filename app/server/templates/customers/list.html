@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Customers · KarbonFM{% endblock %}
+{% block content %}
+<div class="flex items-end justify-between gap-4 mb-5">
+  <div>
+    <div class="eyebrow mb-1.5">Contacts</div>
+    <h1 class="page-title">Customers</h1>
+  </div>
+  <div class="flex gap-2">
+    <button class="btn btn-sm btn-primary" hx-get="/customers/new" hx-target="#modal-body"><svg class="i i-sm"><use href="#i-plus"/></svg>New customer</button>
+  </div>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+  <div class="panel kpi"><div class="kpi-label">Customers</div><div class="kpi-value num">{{ totals.customers }}</div><div class="text-[12px] muted mt-1">{{ totals.current }} current · {{ totals.customers - totals.current }} inactive</div></div>
+  <div class="panel kpi"><div class="kpi-label">Balance due</div><div class="kpi-value num">{{ totals.balance_due }}</div><div class="text-[12px] muted mt-1">across {{ totals.with_balance }} customers</div></div>
+  <div class="panel kpi"><div class="kpi-label">Overdue</div><div class="kpi-value num text-error">{{ totals.overdue }}</div><div class="text-[12px] muted mt-1">{{ totals.overdue_customers }} customers, oldest {{ totals.oldest_overdue_days }} days</div></div>
+  <div class="panel kpi"><div class="kpi-label">Retainer balance</div><div class="kpi-value num">{{ totals.retainer }}</div><div class="text-[12px] muted mt-1">held for {{ totals.with_retainer }} customers</div></div>
+</div>
+
+<section class="panel overflow-hidden" id="customer-table">
+  {{ table|safe }}
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}KarbonFM{% endblock %}</title>
+  <script src="/assets/theme-init.js"></script>
+  <link href="/assets/app.css" rel="stylesheet">
+  <script src="/assets/vendor/htmx-2.0.4.min.js"></script>
+  <script src="/assets/app.js"></script>
+  <script defer src="/assets/vendor/alpine-3.14.8.min.js"></script>
+  {% block head %}{% endblock %}
+</head>
+<body x-data>
+  {% include "partials/icons.html" %}
+  <div class="app">
+    {% include "partials/sidebar.html" %}
+    <div class="main">
+      {% include "partials/topbar.html" %}
+      <main class="content">
+        <div class="page">
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+    </div>
+  </div>
+  {% include "partials/palette.html" %}
+  {# One modal for the whole app: htmx loads a dialog body into it, app.js opens it. #}
+  <dialog id="modal" class="modal" aria-labelledby="modal-title">
+    <div class="modal-box p-0 max-w-md" id="modal-body"></div>
+    <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+  </dialog>
+</body>
+</html>

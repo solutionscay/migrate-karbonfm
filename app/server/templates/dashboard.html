@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · KarbonFM{% endblock %}
+{% block head %}<script src="/assets/vendor/chart-4.4.7.umd.min.js"></script>{% endblock %}
+{% block content %}
+<div class="flex items-end justify-between gap-4 mb-5">
+  <div>
+    <div class="eyebrow mb-1.5">Dashboard</div>
+    <h1 class="page-title">Good day, {{ owner_first_name }}</h1>
+  </div>
+  <button class="btn btn-sm btn-quiet" data-print><svg class="i i-sm"><use href="#i-printer"/></svg>Print</button>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+  <div class="panel kpi"><div class="kpi-label">Revenue this month</div><div class="kpi-value num">{{ revenue_this_month }}</div><div class="text-[12px] muted mt-1">posted sales</div></div>
+  <div class="panel kpi"><div class="kpi-label">Balance due</div><div class="kpi-value num">{{ balance_due }}</div><div class="text-[12px] muted mt-1">{{ open_invoices }} open invoices</div></div>
+  <div class="panel kpi"><div class="kpi-label">Open pipeline</div><div class="kpi-value num">{{ pipeline }}</div><div class="text-[12px] muted mt-1">{{ open_opportunities }} opportunities</div></div>
+  <a class="panel kpi hover:border-primary" href="/customers?status=overdue"><div class="kpi-label">Overdue</div><div class="kpi-value num text-error">View</div><div class="text-[12px] muted mt-1">customers with overdue invoices</div></a>
+</div>
+
+<section class="panel">
+  <div class="panel-head">
+    <div class="panel-title">Revenue, last 12 months</div>
+    <span class="ml-auto text-[12px] muted">from posted sales transactions</span>
+  </div>
+  <div class="p-4 h-72"><canvas data-revenue-chart="{{ chart_json }}" aria-label="Monthly revenue chart" role="img"></canvas></div>
+</section>
+{% endblock %}

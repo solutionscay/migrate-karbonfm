@@ -1,0 +1,25 @@
+{# Body of the shared <dialog id="modal">. The form posts with htmx; the server answers with this body again
+   (with an error) or with an empty body and an HX-Trigger that closes the dialog and shows a toast. #}
+<form hx-post="/customers/new" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">New customer</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3">
+    {% if let Some(error) = error %}
+    <div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ error }}</div>
+    {% endif %}
+    <label class="block">
+      <span class="text-[12px] muted">Name</span>
+      <input name="name" value="{{ name }}" class="input input-sm w-full mt-1" autofocus autocomplete="off">
+    </label>
+    <label class="block">
+      <span class="text-[12px] muted">Email (optional)</span>
+      <input name="email" value="{{ email }}" class="input input-sm w-full mt-1" autocomplete="off">
+    </label>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">Save customer</button>
+  </div>
+</form>

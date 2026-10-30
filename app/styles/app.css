@@ -1,0 +1,37 @@
+/* KarbonFM stylesheet source. Built by tools/build-css.sh with the Tailwind standalone CLI
+   and the vendored DaisyUI plugin (no Node, S-05). Output: server/assets/app.css. */
+@import "tailwindcss" source(none);
+@source "../server/templates";
+@source "../server/assets/app.js";
+
+/* The two Karbon themes are defined in karbon.css; DaisyUI's built-in themes are not needed. */
+@plugin "./vendor/daisyui.mjs" {
+  themes: false;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("vendor/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("vendor/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@import "./karbon.css";
+
+/* Print: only the page content, on white, without the app shell. Used by window.print (S-01, S-02). */
+@media print {
+  @page { margin: 14mm; }
+  html, body { height: auto; background: white; }
+  .sidebar, .topbar, .no-print, [data-print], .palette-backdrop, dialog { display: none !important; }
+  .app { display: block; height: auto; overflow: visible; }
+  .main, .content { overflow: visible; }
+  .page { max-width: none; padding: 0; }
+  .paper, .panel { box-shadow: none; border-color: #ddd; }
+  .print-sheet { border: 0; padding: 0; max-width: none; }
+}
