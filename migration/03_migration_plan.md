@@ -141,7 +141,7 @@ I3 and S-04 are deferred: no source export; the demo runs on 04_demo_seed.sql. T
 ## Test strategy
 
 - Semantic fixtures for each tier1 rule (07 "Semantic tests" column), built from the object files and non-secret sample data, run as cargo tests against an in-memory SQLite.
-- Unit tests for the money rules (BR-SALES-01, 02, 06, 07, 18) on integer cents (OD-04-02), including half-cent rounding of line amounts and tax and of the import conversion. The demo seed is a fixture: loading it reproduces every balance shown in design/.
+- Unit tests for the money rules (BR-SALES-01, 02, 06, 07, 18) on integer cents (OD-04-02), including half-cent rounding of line amounts and tax and of the import conversion. The demo seed is a fixture: loading it reproduces every balance shown in design/. The form and template edges, the rounding and the seed reproduction are in crates/money (`cargo test`, S-03); the import conversion is added with I3.
 - Integration tests: transaction rollback on a failing second write (D-08), idempotent retries, SMTP against a local test server.
 - Authorization tests T-08-01..T-08-14 through HTTP to the local server.
 - Route tests in Rust for every page and fragment: call the axum router in process against an in-memory database, then check the status, `HX-*` headers and the HTML (scraper crate: fields, labels, error messages, totals). WebDriver smoke tests on Windows and Linux through tauri-driver; macOS manual checklist (R-03).
@@ -234,7 +234,7 @@ Kept as data: activity.chat_ind, activity_type 9 (SMS) and phone.sms_ind, so imp
 
 | Decision | Answer | Where recorded |
 |---|---|---|
-| Money storage (OD-04-02) | Integer minor units: every money column is an INTEGER of cents; Rust integer arithmetic; conversion only at the UI and import edges. The source's 7-decimal unit price is not kept (BR-SALES-01). | 04, 02 R-02/S-03, 05, 07, this file |
+| Money storage (OD-04-02) | Integer minor units: every money column is an INTEGER of cents; Rust integer arithmetic; conversion only at the UI and import edges. The source's 7-decimal unit price is not kept (BR-SALES-01). Edges built in crates/money (S-03, 2026-10-30): dollar form text with more than 2 decimals or commas that do not group thousands is a field error, never rounded; templates show `$1,234.56`. Quantities are exact fixed-point at 4 decimals: `sales_line.qty` stays NUMERIC (SQLite stores 1.5 as REAL), so it is read as `CAST(qty AS TEXT)` and parsed, never multiplied as f64; a quantity typed with more decimals is a field error. | 04, 02 R-02/S-03, 05, 07, spikes/S-03.md, this file |
 | Chat / Twilio SMS (OD-05-02, EXT-05) | Dropped, out of scope (section above). | 01, 04-08, this file |
 | UI stack | Server-rendered HTML for simplicity, no React or TypeScript: Rust + axum serves askama templates; htmx for interaction; Alpine.js only for small client-side bits; Tailwind + DaisyUI; Chart.js; rusqlite with plain SQL (no ORM); Tauri 2 wraps the local server in a desktop window. Single user on one computer: the local server listens on 127.0.0.1 only; no LAN sharing (owner change, 2026-10-28). The SMS chat screen stays as a static mock (UI-21). OD-05-01 closed. | 02, 03, 05, 06, 07, 08 |
 | Tax ids (organization.federal_tax_id_number, vendor.tax_id) | Plain TEXT, no encryption, masking or extra access rule; this is a demo. Closes the security-review question on them (D-09). | 01, 04, 07 BR-IMPORT-02, 08 |
