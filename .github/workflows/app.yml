@@ -1,0 +1,118 @@
+# KarbonFM desktop app (app/): CSS, checks and unsigned bundles on macOS, Windows and Linux from one codebase
+# (02 recommendations; 03 Foundation gates; spikes S-01 and S-05). No Node toolchain anywhere.
+name: app
+
+on:
+  push:
+    paths: ["app/**", "migration/04_*.sql", ".github/workflows/app.yml"]
+  pull_request:
+    paths: ["app/**", "migration/04_*.sql", ".github/workflows/app.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  TAURI_CLI_VERSION: "2.12.4"
+
+defaults:
+  run:
+    shell: bash
+    working-directory: app
+
+jobs:
+  # S-05: the Tailwind standalone CLI with the vendored DaisyUI plugin builds the same CSS on every platform,
+  # and the committed server/assets/app.css is what it builds.
+  css:
+    name: css (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build CSS (Tailwind standalone CLI + DaisyUI plugin)
+        run: ./tools/build-css.sh
+      - name: Committed CSS is up to date
+        run: git diff --exit-code -- server/assets/app.css
+
+  build:
+    name: build (${{ matrix.name }})
+    needs: css
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS universal
+            os: macos-latest
+            rust-targets: aarch64-apple-darwin x86_64-apple-darwin
+            tauri-args: --target universal-apple-darwin --bundles app,dmg
+            bundle-dir: app/target/universal-apple-darwin/release/bundle
+          - name: Windows x64
+            os: windows-latest
+            rust-targets: x86_64-pc-windows-msvc
+            tauri-args: --bundles msi,nsis
+            bundle-dir: app/target/release/bundle
+          - name: Linux x64
+            os: ubuntu-22.04
+            rust-targets: x86_64-unknown-linux-gnu
+            tauri-args: --bundles appimage,deb
+            bundle-dir: app/target/release/bundle
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Linux webview and bundling packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libssl-dev xdg-utils
+
+      # rust-toolchain.toml pins the compiler; rustup installs it on first use in app/.
+      - name: Rust toolchain and targets
+        run: |
+          rustup toolchain install
+          rustup target add ${{ matrix.rust-targets }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app
+
+      - name: Cache the Tauri CLI
+        id: tauri-cli
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/cargo-tauri*
+          key: tauri-cli-${{ env.TAURI_CLI_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+      - name: Install the Tauri CLI
+        if: steps.tauri-cli.outputs.cache-hit != 'true'
+        run: cargo install tauri-cli --version "${TAURI_CLI_VERSION}" --locked
+
+      - name: Format
+        run: cargo fmt --all --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Test (rules, routes, templates)
+        run: cargo test --workspace --locked
+
+      - name: Bundle (unsigned, OD-02-02)
+        working-directory: app/desktop
+        run: cargo tauri build ${{ matrix.tauri-args }} --ci
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KarbonFM-${{ runner.os }}
+          path: |
+            ${{ matrix.bundle-dir }}/dmg/*.dmg
+            ${{ matrix.bundle-dir }}/msi/*.msi
+            ${{ matrix.bundle-dir }}/nsis/*.exe
+            ${{ matrix.bundle-dir }}/appimage/*.AppImage
+            ${{ matrix.bundle-dir }}/deb/*.deb
+          if-no-files-found: error
+          retention-days: 14
