@@ -85,11 +85,7 @@ fn paid(db: &Connection, txn: &Txn) -> Cents {
         return txn.stored.total_amt;
     }
     let sum: i64 = db
-        .query_row(
-            "SELECT COALESCE(SUM(amount), 0) FROM payment_line WHERE id_invoice = ?1",
-            [&txn.id],
-            |r| r.get(0),
-        )
+        .query_row("SELECT COALESCE(SUM(amount), 0) FROM payment_line WHERE id_invoice = ?1", [&txn.id], |r| r.get(0))
         .unwrap();
     Cents(sum)
 }
@@ -109,11 +105,7 @@ fn every_stored_line_and_total_recomputes() {
         for (line, amount, amount_taxable) in &lines {
             assert_eq!(line.amount().unwrap(), *amount, "line amount on {}", txn.id);
             let expected_taxable = if line.taxable { *amount } else { Cents::ZERO };
-            assert_eq!(
-                *amount_taxable, expected_taxable,
-                "amount_taxable on {}",
-                txn.id
-            );
+            assert_eq!(*amount_taxable, expected_taxable, "amount_taxable on {}", txn.id);
         }
         let only_lines: Vec<Line> = lines.iter().map(|(l, _, _)| *l).collect();
         let computed = totals(&only_lines, txn.tax_rate_bp, txn.ship_amt, paid(&db, txn)).unwrap();
@@ -129,31 +121,20 @@ fn every_customer_balance_and_retainer_balance_recomputes() {
     for txn in transactions(&db) {
         *balance.entry(txn.customer.clone()).or_default() += txn.stored.balance;
         if txn.locked {
-            retainer
-                .entry(txn.customer.clone())
-                .or_default()
-                .push(txn.stored.retainer);
+            retainer.entry(txn.customer.clone()).or_default().push(txn.stored.retainer);
         }
     }
-    let mut stmt = db
-        .prepare("SELECT id, balance, retainer_balance_cached, retainer_adjustment FROM customer")
-        .unwrap();
-    let customers: Vec<(String, i64, i64, i64)> = stmt
-        .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))
-        .unwrap()
-        .map(Result::unwrap)
-        .collect();
+    let mut stmt =
+        db.prepare("SELECT id, balance, retainer_balance_cached, retainer_adjustment FROM customer").unwrap();
+    let customers: Vec<(String, i64, i64, i64)> =
+        stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?))).unwrap().map(Result::unwrap).collect();
     assert_eq!(customers.len(), 14);
     for (id, stored_balance, stored_retainer, adjustment) in customers {
         let expected_balance = balance.get(&id).copied().unwrap_or_default();
         assert_eq!(Cents(stored_balance), expected_balance, "balance of {id}");
         let posted = retainer.get(&id).cloned().unwrap_or_default();
         let expected_retainer = retainer_balance(posted, Cents(adjustment)).unwrap();
-        assert_eq!(
-            Cents(stored_retainer),
-            expected_retainer,
-            "retainer balance of {id}"
-        );
+        assert_eq!(Cents(stored_retainer), expected_retainer, "retainer balance of {id}");
     }
 }
 
@@ -161,35 +142,15 @@ fn every_customer_balance_and_retainer_balance_recomputes() {
 #[test]
 fn customers_screen_figures() {
     let db = demo_db();
-    assert_eq!(
-        sum_cents(&db, "SELECT SUM(balance) FROM customer").to_string(),
-        "$29,619.05"
-    );
-    let overdue =
-        "FROM sales_transaction WHERE invoice_ind = 1 AND balance > 0 AND due_date < '2026-10-28'";
-    assert_eq!(
-        sum_cents(&db, &format!("SELECT SUM(balance) {overdue}")).to_string(),
-        "$4,457.40"
-    );
-    let overdue_customers: i64 = db
-        .query_row(
-            &format!("SELECT COUNT(DISTINCT id_customer) {overdue}"),
-            [],
-            |r| r.get(0),
-        )
-        .unwrap();
+    assert_eq!(sum_cents(&db, "SELECT SUM(balance) FROM customer").to_string(), "$29,619.05");
+    let overdue = "FROM sales_transaction WHERE invoice_ind = 1 AND balance > 0 AND due_date < '2026-10-28'";
+    assert_eq!(sum_cents(&db, &format!("SELECT SUM(balance) {overdue}")).to_string(), "$4,457.40");
+    let overdue_customers: i64 =
+        db.query_row(&format!("SELECT COUNT(DISTINCT id_customer) {overdue}"), [], |r| r.get(0)).unwrap();
     assert_eq!(overdue_customers, 3);
-    assert_eq!(
-        sum_cents(&db, "SELECT SUM(retainer_balance_cached) FROM customer").to_string(),
-        "$4,450.00"
-    );
-    let holders: i64 = db
-        .query_row(
-            "SELECT COUNT(*) FROM customer WHERE retainer_balance_cached > 0",
-            [],
-            |r| r.get(0),
-        )
-        .unwrap();
+    assert_eq!(sum_cents(&db, "SELECT SUM(retainer_balance_cached) FROM customer").to_string(), "$4,450.00");
+    let holders: i64 =
+        db.query_row("SELECT COUNT(*) FROM customer WHERE retainer_balance_cached > 0", [], |r| r.get(0)).unwrap();
     assert_eq!(holders, 4);
 }
 
@@ -197,12 +158,7 @@ fn customers_screen_figures() {
 #[test]
 fn customer_and_invoice_screen_figures() {
     let db = demo_db();
-    let hp = |col: &str| {
-        sum_cents(
-            &db,
-            &format!("SELECT {col} FROM customer WHERE id = 'r-hp'"),
-        )
-    };
+    let hp = |col: &str| sum_cents(&db, &format!("SELECT {col} FROM customer WHERE id = 'r-hp'"));
     assert_eq!(hp("balance").to_string(), "$3,057.15");
     assert_eq!(hp("retainer_balance_cached").to_string(), "$1,500.00");
     // Revenue in the last 12 months: the non-retainer line amounts.
@@ -217,21 +173,9 @@ fn customer_and_invoice_screen_figures() {
 
     // The mockup shows the subtotal before the retainer credit and the credit below it.
     let inv = lines(&db, "t-inv-1048");
-    let before_retainer: Cents = inv
-        .iter()
-        .filter(|(l, _, _)| !l.retainer)
-        .map(|(_, a, _)| *a)
-        .sum();
-    let credit: Cents = inv
-        .iter()
-        .filter(|(l, _, _)| l.retainer)
-        .map(|(_, a, _)| *a)
-        .sum();
-    let t = transactions(&db)
-        .into_iter()
-        .find(|t| t.id == "t-inv-1048")
-        .unwrap()
-        .stored;
+    let before_retainer: Cents = inv.iter().filter(|(l, _, _)| !l.retainer).map(|(_, a, _)| *a).sum();
+    let credit: Cents = inv.iter().filter(|(l, _, _)| l.retainer).map(|(_, a, _)| *a).sum();
+    let t = transactions(&db).into_iter().find(|t| t.id == "t-inv-1048").unwrap().stored;
     assert_eq!(before_retainer.to_string(), "$3,550.00");
     assert_eq!(t.taxable_subtotal.to_string(), "$130.00");
     assert_eq!(t.total_tax.to_string(), "$7.15");

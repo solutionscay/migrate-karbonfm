@@ -129,12 +129,7 @@ mod tests {
     #[test]
     fn sqlite_real_text_round_trips() {
         // CAST(qty AS TEXT) of the REAL SQLite stores for these inputs.
-        for (text, units) in [
-            ("1.5", 15_000),
-            ("0.1", 1_000),
-            ("1.3333", 13_333),
-            ("2", 20_000),
-        ] {
+        for (text, units) in [("1.5", 15_000), ("0.1", 1_000), ("1.3333", 13_333), ("2", 20_000)] {
             assert_eq!(q(text), Ok(units));
         }
     }

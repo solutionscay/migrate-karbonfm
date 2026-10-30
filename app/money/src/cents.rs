@@ -262,14 +262,8 @@ mod tests {
 
     #[test]
     fn parse_error_messages_read_as_field_errors() {
-        assert_eq!(
-            Cents::parse("1.234").unwrap_err().to_string(),
-            "Use at most 2 decimal places."
-        );
-        assert_eq!(
-            Cents::parse("abc").unwrap_err().to_string(),
-            "Enter a number, like 1,234.56."
-        );
+        assert_eq!(Cents::parse("1.234").unwrap_err().to_string(), "Use at most 2 decimal places.");
+        assert_eq!(Cents::parse("abc").unwrap_err().to_string(), "Enter a number, like 1,234.56.");
     }
 
     #[test]
@@ -277,10 +271,7 @@ mod tests {
         assert_eq!(Cents(100) + Cents(-250), Cents(-150));
         assert_eq!(Cents(100) - Cents(250), Cents(-150));
         assert_eq!(-Cents(5), Cents(-5));
-        assert_eq!(
-            [Cents(1), Cents(2), Cents(3)].into_iter().sum::<Cents>(),
-            Cents(6)
-        );
+        assert_eq!([Cents(1), Cents(2), Cents(3)].into_iter().sum::<Cents>(), Cents(6));
         assert_eq!(Cents(i64::MAX).checked_add(Cents(1)), None);
     }
 

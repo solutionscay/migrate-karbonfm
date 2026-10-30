@@ -25,12 +25,8 @@ impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ParseError::Empty => f.write_str("Enter a value."),
-            ParseError::NoDigits | ParseError::InvalidCharacter => {
-                f.write_str("Enter a number, like 1,234.56.")
-            }
-            ParseError::BadGrouping => {
-                f.write_str("Commas must separate thousands, like 1,234.56.")
-            }
+            ParseError::NoDigits | ParseError::InvalidCharacter => f.write_str("Enter a number, like 1,234.56."),
+            ParseError::BadGrouping => f.write_str("Commas must separate thousands, like 1,234.56."),
             ParseError::TooManyDecimals { max } => {
                 write!(f, "Use at most {max} decimal places.")
             }
@@ -75,9 +71,7 @@ pub(crate) fn parse_scaled(input: &str, scale: u32, dollar: bool) -> Result<i64,
         Some((i, f)) => (i, f),
         None => (rest, ""),
     };
-    if !int_part.chars().all(|c| c.is_ascii_digit() || c == ',')
-        || !frac_part.chars().all(|c| c.is_ascii_digit())
-    {
+    if !int_part.chars().all(|c| c.is_ascii_digit() || c == ',') || !frac_part.chars().all(|c| c.is_ascii_digit()) {
         return Err(ParseError::InvalidCharacter);
     }
     if int_part.is_empty() && frac_part.is_empty() {
@@ -102,10 +96,7 @@ pub(crate) fn parse_scaled(input: &str, scale: u32, dollar: bool) -> Result<i64,
         .chain(frac_part.bytes())
         .chain(std::iter::repeat_n(b'0', scale as usize - frac_part.len()));
     for b in digits {
-        value = value
-            .checked_mul(10)
-            .and_then(|v| v.checked_sub(i64::from(b - b'0')))
-            .ok_or(ParseError::Overflow)?;
+        value = value.checked_mul(10).and_then(|v| v.checked_sub(i64::from(b - b'0'))).ok_or(ParseError::Overflow)?;
     }
     if negative {
         Ok(value)
@@ -142,9 +133,6 @@ mod tests {
     fn scale_zero_rejects_any_decimal() {
         assert_eq!(parse_scaled("5", 0, false), Ok(5));
         assert_eq!(parse_scaled("5.", 0, false), Ok(5));
-        assert_eq!(
-            parse_scaled("5.0", 0, false),
-            Err(ParseError::TooManyDecimals { max: 0 })
-        );
+        assert_eq!(parse_scaled("5.0", 0, false), Err(ParseError::TooManyDecimals { max: 0 }));
     }
 }

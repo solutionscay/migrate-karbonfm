@@ -72,12 +72,7 @@ pub struct Totals {
 
 /// Computes the transaction totals from its lines, tax rate, shipping and the
 /// sum of the payments applied to it.
-pub fn totals(
-    lines: &[Line],
-    tax_rate_bp: i64,
-    ship_amt: Cents,
-    paid: Cents,
-) -> Result<Totals, Overflow> {
+pub fn totals(lines: &[Line], tax_rate_bp: i64, ship_amt: Cents, paid: Cents) -> Result<Totals, Overflow> {
     let add = |a: Cents, b: Cents| a.checked_add(b).ok_or(Overflow);
     let mut t = Totals::default();
     for line in lines {
@@ -102,9 +97,7 @@ pub fn retainer_balance(
     posted_retainer_amounts: impl IntoIterator<Item = Cents>,
     adjustment: Cents,
 ) -> Result<Cents, Overflow> {
-    posted_retainer_amounts
-        .into_iter()
-        .try_fold(adjustment, |acc, a| acc.checked_add(a).ok_or(Overflow))
+    posted_retainer_amounts.into_iter().try_fold(adjustment, |acc, a| acc.checked_add(a).ok_or(Overflow))
 }
 
 /// Why Apply Retainer is refused (BR-SALES-18). A locked invoice is refused by
@@ -127,10 +120,7 @@ pub fn available_retainer(
 }
 
 /// The amount of the retainer credit line: -min(balance due, available retainer).
-pub fn apply_retainer_amount(
-    balance_due: Cents,
-    available: Cents,
-) -> Result<Cents, ApplyRetainerRefused> {
+pub fn apply_retainer_amount(balance_due: Cents, available: Cents) -> Result<Cents, ApplyRetainerRefused> {
     if balance_due <= Cents::ZERO {
         return Err(ApplyRetainerRefused::NothingDue);
     }
@@ -149,12 +139,7 @@ mod tests {
     }
 
     fn line(q: &str, unit: i64, taxable: bool) -> Line {
-        Line {
-            qty: qty(q),
-            unit_price: Cents(unit),
-            taxable,
-            retainer: false,
-        }
+        Line { qty: qty(q), unit_price: Cents(unit), taxable, retainer: false }
     }
 
     // The examples of BR-SALES-01 in 07.
@@ -211,12 +196,7 @@ mod tests {
             line("1", 45_000, false),
             line("6", 9_500, false),
             line("4", 3_250, true),
-            Line {
-                qty: qty("1"),
-                unit_price: Cents(-50_000),
-                taxable: false,
-                retainer: true,
-            },
+            Line { qty: qty("1"), unit_price: Cents(-50_000), taxable: false, retainer: true },
         ];
         let t = totals(&lines, 550, Cents::ZERO, Cents(100_000)).unwrap();
         assert_eq!(
@@ -236,17 +216,8 @@ mod tests {
     #[test]
     fn tax_is_rounded_once_on_the_subtotal_not_per_line() {
         // Three taxable lines of 100 at 5.5%: per-line tax would be 3 x 6 = 18.
-        let lines = [
-            line("1", 100, true),
-            line("1", 100, true),
-            line("1", 100, true),
-        ];
-        assert_eq!(
-            totals(&lines, 550, Cents::ZERO, Cents::ZERO)
-                .unwrap()
-                .total_tax,
-            Cents(17)
-        );
+        let lines = [line("1", 100, true), line("1", 100, true), line("1", 100, true)];
+        assert_eq!(totals(&lines, 550, Cents::ZERO, Cents::ZERO).unwrap().total_tax, Cents(17));
     }
 
     #[test]
@@ -268,40 +239,21 @@ mod tests {
     // The examples of BR-SALES-18 in 07.
     #[test]
     fn br_sales_18_examples() {
-        assert_eq!(
-            apply_retainer_amount(Cents(255_715), Cents(200_000)),
-            Ok(Cents(-200_000))
-        );
-        assert_eq!(
-            apply_retainer_amount(Cents(30_000), Cents(200_000)),
-            Ok(Cents(-30_000))
-        );
-        assert_eq!(
-            apply_retainer_amount(Cents(30_000), Cents::ZERO),
-            Err(ApplyRetainerRefused::NoRetainerAvailable)
-        );
-        assert_eq!(
-            apply_retainer_amount(Cents::ZERO, Cents(200_000)),
-            Err(ApplyRetainerRefused::NothingDue)
-        );
+        assert_eq!(apply_retainer_amount(Cents(255_715), Cents(200_000)), Ok(Cents(-200_000)));
+        assert_eq!(apply_retainer_amount(Cents(30_000), Cents(200_000)), Ok(Cents(-30_000)));
+        assert_eq!(apply_retainer_amount(Cents(30_000), Cents::ZERO), Err(ApplyRetainerRefused::NoRetainerAvailable));
+        assert_eq!(apply_retainer_amount(Cents::ZERO, Cents(200_000)), Err(ApplyRetainerRefused::NothingDue));
     }
 
     #[test]
     fn two_drafts_cannot_use_the_same_deposit() {
         let balance = Cents(200_000);
-        let first = apply_retainer_amount(Cents(150_000), available_retainer(balance, []).unwrap())
-            .unwrap();
+        let first = apply_retainer_amount(Cents(150_000), available_retainer(balance, []).unwrap()).unwrap();
         assert_eq!(first, Cents(-150_000));
         let left = available_retainer(balance, [first]).unwrap();
         assert_eq!(left, Cents(50_000));
-        assert_eq!(
-            apply_retainer_amount(Cents(150_000), left),
-            Ok(Cents(-50_000))
-        );
+        assert_eq!(apply_retainer_amount(Cents(150_000), left), Ok(Cents(-50_000)));
         let none_left = available_retainer(balance, [first, Cents(-50_000)]).unwrap();
-        assert_eq!(
-            apply_retainer_amount(Cents(150_000), none_left),
-            Err(ApplyRetainerRefused::NoRetainerAvailable)
-        );
+        assert_eq!(apply_retainer_amount(Cents(150_000), none_left), Err(ApplyRetainerRefused::NoRetainerAvailable));
     }
 }
