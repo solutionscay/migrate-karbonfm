@@ -100,14 +100,14 @@ async fn dashboard_has_the_chart_data() {
 }
 
 #[tokio::test]
-async fn invoice_totals_match_the_seed() {
-    let (status, html) = get("/invoices/INV-1048").await;
-    assert_eq!(status, StatusCode::OK);
-    for expected in ["Halden &#38; Pryce Architects", "$3,050.00", "$7.15", "$3,057.15", "$2,057.15", "data-print"] {
-        assert!(html.contains(expected), "missing {expected}");
-    }
-    let (status, _) = get("/invoices/NOPE").await;
+async fn invoice_lives_at_sales() {
+    // S-01's /invoices/{doc} is replaced by /sales/{doc} (S-02; totals tested in tests/invoice_pdf.rs).
+    let (status, _) = get("/invoices/INV-1048").await;
     assert_eq!(status, StatusCode::NOT_FOUND);
+    let (status, html) = get("/").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"href="/sales/INV-1048""#), "the nav links to the invoice");
+    assert!(!html.contains("/invoices/"));
 }
 
 #[tokio::test]

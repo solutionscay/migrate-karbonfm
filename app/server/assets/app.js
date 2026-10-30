@@ -119,7 +119,7 @@ document.addEventListener("alpine:init", () => {
       { group: "Go to", label: "Dashboard", icon: "dashboard", href: "/", hint: "" },
       { group: "Go to", label: "Customers", icon: "users", href: "/customers", hint: "" },
       { group: "Customers", label: "Overdue customers", icon: "users", href: "/customers?status=overdue", hint: "Filter" },
-      { group: "Sales", label: "INV-1048 · Halden & Pryce", icon: "receipt", href: "/invoices/INV-1048", hint: "Invoice" },
+      { group: "Sales", label: "INV-1048 · Halden & Pryce", icon: "receipt", href: "/sales/INV-1048", hint: "Invoice" },
       { group: "Actions", label: "Toggle dark mode", icon: "moon", action: "theme", hint: "⌘ ⇧ L" },
     ],
     get results() {
