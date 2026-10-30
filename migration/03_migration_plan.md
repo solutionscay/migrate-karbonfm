@@ -32,9 +32,9 @@ Each increment implements its command-layer invariants and the negative tests of
 
 ## Foundation gates
 
-- [ ] Rust stable pinned; the Tailwind standalone CLI with the DaisyUI plugin and the vendored htmx, Alpine.js and Chart.js files pinned by version (no Node toolchain, S-05); CI builds macOS (universal), Windows (x64) and Linux (x64) on every commit from one codebase (owner, 2026-10-28; D-37); demo builds are unsigned (OD-02-02); gates: cargo test (rules and routes), clippy, askama templates compile.
+- [ ] Rust stable pinned; the Tailwind standalone CLI with the DaisyUI plugin and the vendored htmx, Alpine.js and Chart.js files pinned by version (no Node toolchain, S-05); CI builds macOS (universal), Windows (x64) and Linux (x64) on every commit from one codebase (owner, 2026-10-28; D-37); demo builds are unsigned (OD-02-02); gates: cargo test (rules and routes), clippy, askama templates compile. Started by S-01/S-05 (2026-10-30, branch `spike/s01-s05`): `app/` workspace (karbon-server, karbon-desktop), Rust 1.90.0 in `app/rust-toolchain.toml`, Tailwind CLI 4.1.11 + DaisyUI 5.0.43, htmx 2.0.4, Alpine.js 3.14.8, Chart.js 4.4.7 vendored, `.github/workflows/app.yml`; open until the workflow passes on all three platforms.
 - [ ] Schema 04 applied by refinery migrations; source ids kept; timezone policy D-05; containers D-17.
-- [ ] Single-user setup, the route list and the local server guard (session cookie, Host and Origin checks) exist before any data command (AP-01, AP-13, BR-ADMIN-01).
+- [ ] Single-user setup, the route list and the local server guard (session cookie, Host and Origin checks) exist before any data command (AP-01, AP-13, BR-ADMIN-01). The Host and Origin checks exist since S-01 (`app/server/src/web.rs`, `origin_guard`); the session cookie does not yet.
 - [ ] Audit stamps (BR-PARTY-07) and log masking (AP-03, D-30) in place.
 - [ ] Backup: the app copies the database and file store to a user-chosen folder (VACUUM INTO); restore tested.
 - [ ] Source-to-target traceability kept (04 appendix, 07 appendix, 05 appendix).

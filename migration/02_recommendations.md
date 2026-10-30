@@ -27,7 +27,7 @@ Confirms 04 (SQLite dialect, D-36) and 05 (axum routes returning HTML, owner dec
 |---|---|---|---|
 | Architecture/deployment unit | one Tauri 2 codebase built for each platform: macOS universal binary (.app/.dmg), Windows x64 (.msi and NSIS .exe; WebView2 bootstrapper), Linux AppImage and .deb (owner, 2026-10-28; D-37). At start it runs an axum server on 127.0.0.1 (random free port) inside the same process and opens one window on it | Electron app | owner choice; one process, loopback only, no network surface |
 | Runtime/framework | Rust (stable): axum on tokio; one module per domain (PARTY, CONTACT, ACTIVITY, SALES, FILE, TEMPLATE, ADMIN, INTEG, IMPORT) with `commands/<domain>.rs` (the rules, 07) and `routes/<domain>.rs` (the handlers, 05) | Node.js main process | type-safe handlers and commands, single writer to SQLite |
-| UI/rendering/client | **Server-rendered HTML** (owner, 2026-10-28): askama templates compiled into the binary; htmx for interaction (requests return HTML fragments that htmx swaps in); Alpine.js only for small client-side bits (open/close, tabs, a confirm toggle); Tailwind CSS + DaisyUI for styling; Chart.js for charts. No React, no TypeScript, no JavaScript build step | none | see "UI stack" below |
+| UI/rendering/client | **Server-rendered HTML** (owner, 2026-10-28): askama templates compiled into the binary; htmx for interaction (requests return HTML fragments that htmx swaps in); Alpine.js only for small client-side bits (open/close, tabs, a confirm toggle); Tailwind CSS + DaisyUI for styling; Chart.js for charts. No React, no TypeScript, no JavaScript build step. Pages get a Content-Security-Policy that allows only the local server; the standard Alpine.js build needs `'unsafe-eval'` (S-01; the Alpine CSP build would remove it) | none | see "UI stack" below |
 | Database/data access | SQLite through rusqlite (bundled) with plain SQL, no ORM; WAL, foreign_keys on; refinery migrations | tauri-plugin-sql | the plugin would give the page SQL access, which AP-01 forbids |
 | API/server-operation style | axum routes (05): a full page for a normal request, an HTML fragment for an htmx request (`HX-Request` header); typed errors rendered as error fragments (D-25) | JSON API | the only client is the app's own HTML |
 | Background jobs/events | none (D-10); the long import reports progress through a status fragment that htmx polls | server-sent events | no server schedules; polling is the simplest |
@@ -35,7 +35,7 @@ Confirms 04 (SQLite dialect, D-36) and 05 (axum routes returning HTML, owner dec
 | Static assets | htmx, Alpine.js, Chart.js and the built Tailwind/DaisyUI CSS are vendored at pinned versions and embedded in the binary; no CDN | CDN links | the app works offline |
 | Authentication/identity provider | none; single local user on one computer (D-04); the local server listens on 127.0.0.1 only and is protected by a per-launch session cookie (AP-13); optional passcode (OD-08-01) | OS login only | owner answer |
 | Hosting/compliance | none; data stays on the machine (D-36); keys in the OS keychain (D-09) | n/a | no PCI data stored (D-09) |
-| Document/PDF generation | invoice askama template (the only print output, owner, 2026-10-28; D-38) printed to PDF by the webview, or `printpdf` in Rust (spike S-02) | headless Chromium | print support differs between the three webviews (WebKitGTK on Linux most of all) |
+| Document/PDF generation | invoice askama template (the only print output, owner, 2026-10-28; D-38) printed to PDF by the webview, or `printpdf` in Rust (spike S-02). `window.print()` does nothing in WKWebView on macOS (S-01), so the page posts `/print` and the server calls the window's native print (Tauri `WebviewWindow::print`); the page keeps no IPC permission | headless Chromium | print support differs between the three webviews (WebKitGTK on Linux most of all); WKWebView prints at the window's width, so a print layout must fit the page width (S-01) |
 | Integrations and secrets | lettre (SMTP), reqwest with rustls (HTTPS), keyring crate (Keychain / Secret Service) | nodemailer, keytar | all outbound from Rust (AP-02) |
 | Authorization enforcement | route guards (session, Host and Origin checks, AP-13) + command preconditions (08) | n/a | default deny |
 | Testing/observability/deployment | cargo test with an in-memory SQLite per rule fixture; route tests that call the axum router in process and check the HTML with the `scraper` crate; WebDriver (tauri-driver) smoke tests on Windows and Linux; tracing to a rotating log file (D-30); GitHub Actions matrix build | Playwright on Electron | tauri-driver has no macOS WebDriver; macOS UI checks are manual (risk R-03) |
@@ -77,14 +77,14 @@ Per-install import, not a cutover (D-34). Increments in 03 set build order; the 
 
 | Claim affecting choice | Primary source/version | Access date | Fact or inference |
 |---|---|---|---|
-| Tauri 2 is stable and builds for macOS, Windows and Linux with the system webview (WKWebView, WebView2, WebKitGTK) | Tauri 2.x documentation (tauri.app) | not re-checked online on 2026-10-28; from model knowledge | inference until re-verified (spike S-01) |
-| A Tauri window can load a localhost URL served by the same process, with no IPC permission granted to it | Tauri 2 security/capabilities docs | same | inference until re-verified (spike S-01) |
-| axum, askama and rusqlite build on stable Rust and embed into a Tauri app | docs.rs | same | inference until re-verified |
-| The Tailwind standalone CLI can build DaisyUI styles without Node | Tailwind and DaisyUI docs | same | inference until re-verified (spike S-05) |
+| Tauri 2 is stable and builds for macOS, Windows and Linux with the system webview (WKWebView, WebView2, WebKitGTK) | Tauri 2.12.5 (wry 0.57.1), tauri-cli 2.12.4 | 2026-10-30 | fact on macOS 26 (S-01: window, universal .app/.dmg); Windows and Linux wait for CI (`.github/workflows/app.yml`) |
+| A Tauri window can load a localhost URL served by the same process, with no IPC permission granted to it | Tauri 2.12.5: `WebviewUrl::External`, `capabilities: []` | 2026-10-30 | fact on macOS (S-01) |
+| axum, askama and rusqlite build on stable Rust and embed into a Tauri app | axum 0.8.9, askama 0.14.0, rusqlite 0.37.0 (bundled), Rust 1.90.0 | 2026-10-30 | fact on macOS (S-01) |
+| The Tailwind standalone CLI can build DaisyUI styles without Node | Tailwind CLI 4.1.11 + daisyui.mjs 5.0.43 | 2026-10-30 | fact on macOS (S-05); Windows and Linux wait for CI |
 | tauri-driver WebDriver testing works on Linux and Windows, not macOS | Tauri testing docs | same | inference until re-verified |
 | keyring supports macOS Keychain, Windows Credential Manager and Linux Secret Service | crates.io / docs.rs | same | inference until re-verified |
 
-Re-check these against the current releases before I1 starts (spikes S-01, S-05).
+Re-check these against the current releases before I1 starts (spikes S-01, S-05). S-01 and S-05 ran on macOS on 2026-10-30 (`spikes/S-01.md`, `spikes/S-05.md`); the Windows and Linux rows stay open until the CI workflow has run.
 
 ## Risks, spikes, and decisions
 
@@ -92,14 +92,14 @@ The React and TypeScript items are gone with the 2026-10-28 decision: the TanSta
 
 | Risk/unknown | Impact | Proof/spike | Owner | Decision deadline |
 |---|---|---|---|---|
-| R-01 Webview differences between the three platforms (WKWebView, WebView2, WebKitGTK: rendering, print, fonts) | UI defects on one platform, most likely Linux | S-01: a Tauri window on the local axum server with an htmx-paged DaisyUI table, a `<dialog>` modal, a Chart.js chart and print-to-PDF, on macOS, Windows 11, Ubuntu LTS and Fedora (owner, 2026-10-28; D-37) | Tech lead | before I1 |
+| R-01 Webview differences between the three platforms (WKWebView, WebView2, WebKitGTK: rendering, print, fonts) | UI defects on one platform, most likely Linux | macOS passed 2026-10-30 (`spikes/S-01.md`): table, dialog, chart and print work; print goes through the server because `window.print()` is a no-op in WKWebView. Windows and Linux: CI builds only, UI not yet checked. S-01: a Tauri window on the local axum server with an htmx-paged DaisyUI table, a `<dialog>` modal, a Chart.js chart and print-to-PDF, on macOS, Windows 11, Ubuntu LTS and Fedora (owner, 2026-10-28; D-37) | Tech lead | before I1 |
 | R-02 Money conversion at the edges | wrong cents from dollar input or from the FileMaker decimal export | Closed as a storage risk: money is INTEGER cents (owner, 2026-10-28; OD-04-02), so sums are exact. S-03 tests only the edges: dollar parsing in the form handlers, formatting in the templates, and import rounding half away from zero, including 7-decimal unit prices (BR-SALES-01, BR-IMPORT-01) | Tech lead | before I5 for the form and template edges; the import edge waits for I3 (I3 deferred: no source export; the demo runs on 04_demo_seed.sql) |
 | R-03 No macOS WebDriver | manual UI testing on macOS | route tests cover the HTML on all three platforms in process; Windows and Linux WebDriver smoke tests + macOS checklist | Tech lead | I1 |
 | R-04 FileMaker export shape per install | import fails on real data | S-04: export one real file set (OD-03-01) and dry-run the importer | Operator | deferred: no source export; the demo runs on 04_demo_seed.sql (was: before I3) |
 | R-05 Code signing / notarization | macOS Gatekeeper and Windows SmartScreen warn on an unsigned app | Closed for the demo: unsigned builds on all three platforms (owner, 2026-10-28; OD-02-02); on macOS the user opens it with right-click > Open, on Windows with "More info" > "Run anyway". Apple Developer ID with notarization and a Windows code-signing certificate only for a real release | Product owner | closed |
 | R-06 PDF generation quality | invoices print badly | S-02: webview print vs printpdf | Tech lead | before I5 |
 | R-07 Local server reachable by other local processes or by web pages (cross-site requests, DNS rebinding) | another program reads or changes data | AP-13: bind 127.0.0.1 only, per-launch session cookie (HttpOnly, SameSite=Strict), Host and Origin checks on every request; T-08-14 | Tech lead | I1 |
-| R-08 Tailwind/DaisyUI build without Node | CSS build breaks or needs Node in CI | S-05: build the DaisyUI theme with the Tailwind standalone CLI in CI on macOS, Windows and Linux | Tech lead | before I1 |
+| R-08 Tailwind/DaisyUI build without Node | CSS build breaks or needs Node in CI | passed on macOS 2026-10-30 (`spikes/S-05.md`); the CI job `css` checks Windows and Linux. S-05: build the DaisyUI theme with the Tailwind standalone CLI in CI on macOS, Windows and Linux | Tech lead | before I1 |
 
 ## Rejected alternative
 
