@@ -4,8 +4,11 @@ mod customers;
 mod dashboard;
 mod invoices;
 
+use crate::web::AppError;
 use crate::AppState;
-use axum::routing::get;
+use axum::extract::State;
+use axum::http::StatusCode;
+use axum::routing::{get, post};
 use axum::Router;
 
 pub fn router() -> Router<AppState> {
@@ -14,6 +17,16 @@ pub fn router() -> Router<AppState> {
         .route("/customers", get(customers::list))
         .route("/customers/new", get(customers::new_dialog).post(customers::create))
         .route("/invoices/{doc_number}", get(invoices::page))
+        .route("/print", post(print))
+}
+
+/// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a
+/// browser) it answers 501 and the page falls back to window.print().
+async fn print(State(state): State<AppState>) -> Result<StatusCode, AppError> {
+    match &state.print {
+        Some(print) => print().map(|()| StatusCode::NO_CONTENT).map_err(AppError::Internal),
+        None => Ok(StatusCode::NOT_IMPLEMENTED),
+    }
 }
 
 /// Which sidebar link is current; the layout marks it with aria-current.

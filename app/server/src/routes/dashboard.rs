@@ -54,7 +54,8 @@ pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppErro
     )?;
     let months: Vec<(String, i64)> = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<Result<_, _>>()?;
     const NAMES: [&str; 12] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    let labels: Vec<&str> = months.iter().map(|(m, _)| NAMES[m.parse::<usize>().unwrap_or(1).clamp(1, 12) - 1]).collect();
+    let labels: Vec<&str> =
+        months.iter().map(|(m, _)| NAMES[m.parse::<usize>().unwrap_or(1).clamp(1, 12) - 1]).collect();
     let revenue: Vec<f64> = months.iter().map(|(_, cents)| *cents as f64 / 100.0).collect();
     let this_month = months.last().map(|(_, c)| *c).unwrap_or(0);
 

@@ -8,7 +8,7 @@ pub fn usd(cents: i64) -> String {
     let dollars = (abs / 100).to_string();
     let mut grouped = String::with_capacity(dollars.len() + dollars.len() / 3);
     for (i, ch) in dollars.chars().enumerate() {
-        if i > 0 && (dollars.len() - i) % 3 == 0 {
+        if i > 0 && (dollars.len() - i).is_multiple_of(3) {
             grouped.push(',');
         }
         grouped.push(ch);

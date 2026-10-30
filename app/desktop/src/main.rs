@@ -1,6 +1,7 @@
 // No console window on Windows in release builds.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::sync::Arc;
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 fn main() {
@@ -11,10 +12,17 @@ fn main() {
             std::fs::create_dir_all(&data_dir)?;
             let db = karbon_server::db::open_demo(Some(&data_dir.join("karbonfm-demo.db")))?;
 
-            // The local server: 127.0.0.1 on a free port, inside this process.
+            // The local server: 127.0.0.1 on a free port, inside this process. Its print route opens the
+            // window's native print dialog (window.print() does nothing in WKWebView on macOS).
+            let handle = app.handle().clone();
+            let print: karbon_server::PrintHook = Arc::new(move || {
+                let window = handle.get_webview_window("main").ok_or("no main window")?;
+                window.print().map_err(|e| e.to_string())
+            });
+            let state = karbon_server::AppState::new(db).with_print(print);
             let (listener, addr) = tauri::async_runtime::block_on(karbon_server::bind())?;
             tauri::async_runtime::spawn(async move {
-                if let Err(e) = karbon_server::serve(listener, karbon_server::AppState::new(db)).await {
+                if let Err(e) = karbon_server::serve(listener, state).await {
                     eprintln!("local server stopped: {e}");
                 }
             });

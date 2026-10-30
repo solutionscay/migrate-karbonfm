@@ -142,7 +142,11 @@ pub fn load_table<'a>(conn: &rusqlite::Connection, query: &'a ListQuery) -> Resu
         _ => "ORDER BY balance DESC, retainer DESC, name COLLATE NOCASE",
     };
     let q = query.q.trim();
-    let matched: i64 = conn.query_row(&format!("{CUSTOMERS_SQL} {filter}").replacen("SELECT * FROM c", "SELECT COUNT(*) FROM c", 1), [q], |r| r.get(0))?;
+    let matched: i64 = conn.query_row(
+        &format!("{CUSTOMERS_SQL} {filter}").replacen("SELECT * FROM c", "SELECT COUNT(*) FROM c", 1),
+        [q],
+        |r| r.get(0),
+    )?;
     let pages = ((matched + PAGE_SIZE - 1) / PAGE_SIZE).max(1);
     let page = query.page.clamp(1, pages);
     let mut stmt = conn.prepare(&format!("{CUSTOMERS_SQL} {filter} {order} LIMIT ?2 OFFSET ?3"))?;
@@ -198,7 +202,11 @@ fn load_totals(conn: &rusqlite::Connection) -> Result<Totals, AppError> {
     })?)
 }
 
-pub async fn list(State(state): State<AppState>, headers: HeaderMap, Query(query): Query<ListQuery>) -> Result<Html<String>, AppError> {
+pub async fn list(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Query(query): Query<ListQuery>,
+) -> Result<Html<String>, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
     let table = load_table(&conn, &query)?;
     if is_htmx(&headers) {

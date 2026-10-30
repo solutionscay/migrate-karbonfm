@@ -23,9 +23,15 @@
   document.addEventListener("karbon-close-dialog", () => document.getElementById("modal").close());
   document.addEventListener("karbon-toast", (e) => window.karbonToast(e.detail.value));
 
-  // Print buttons: the webview's print dialog, which also saves as PDF.
-  document.addEventListener("click", (e) => {
-    if (e.target.closest("[data-print]")) window.print();
+  // Print buttons: the native print dialog (it also saves as PDF). In the desktop app the server opens it, because
+  // window.print() does nothing in WKWebView on macOS; in a plain browser the server answers 501 and we print here.
+  document.addEventListener("click", async (e) => {
+    if (!e.target.closest("[data-print]")) return;
+    try {
+      const res = await fetch("/print", { method: "POST" });
+      if (res.status === 204) return;
+    } catch (_) {}
+    window.print();
   });
 })();
 

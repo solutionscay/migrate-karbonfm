@@ -9,6 +9,23 @@ use askama::Template;
 use axum::extract::{Path, State};
 use axum::response::Html;
 
+/// The sales_transaction row and its customer, money in cents.
+struct Header {
+    id: String,
+    date: String,
+    due_date: String,
+    terms: String,
+    status: String,
+    customer: String,
+    party_id: String,
+    subtotal: i64,
+    tax_bp: i64,
+    tax: i64,
+    total: i64,
+    balance: i64,
+    memo: String,
+}
+
 struct Line {
     description: String,
     qty: String,
@@ -40,9 +57,7 @@ struct InvoicePage {
 
 pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>) -> Result<Html<String>, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
-    let (id, date, due_date, terms, status, customer, party_id, subtotal, tax_bp, tax, total, balance, memo): (
-        String, String, String, String, String, String, String, i64, i64, i64, i64, i64, String,
-    ) = conn.query_row(
+    let h = conn.query_row(
         "SELECT st.id, st.date, COALESCE(st.due_date, ''), COALESCE(i.id_term, ''), COALESCE(st.status, ''),
                 p.name_cached, p.id, COALESCE(st.subtotal, 0), COALESCE(st.tax_rate_bp, 0), COALESCE(st.total_tax, 0),
                 COALESCE(st.total_amt, 0), COALESCE(st.balance, 0), COALESCE(st.customer_memo, '')
@@ -51,12 +66,25 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
          WHERE st.doc_number = ?1 AND COALESCE(st.deleted, 0) = 0",
         [&doc_number],
         |r| {
-            Ok((
-                r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?, r.get(6)?, r.get(7)?, r.get(8)?,
-                r.get(9)?, r.get(10)?, r.get(11)?, r.get(12)?,
-            ))
+            Ok(Header {
+                id: r.get(0)?,
+                date: r.get(1)?,
+                due_date: r.get(2)?,
+                terms: r.get(3)?,
+                status: r.get(4)?,
+                customer: r.get(5)?,
+                party_id: r.get(6)?,
+                subtotal: r.get(7)?,
+                tax_bp: r.get(8)?,
+                tax: r.get(9)?,
+                total: r.get(10)?,
+                balance: r.get(11)?,
+                memo: r.get(12)?,
+            })
         },
     )?;
+    let Header { id, date, due_date, terms, status, customer, party_id, subtotal, tax_bp, tax, total, balance, memo } =
+        h;
 
     // Billing address: the billing contact method of the customer, if any.
     let bill_to: Vec<String> = conn
@@ -71,7 +99,8 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
                 let city: Option<String> = r.get(2)?;
                 let st: Option<String> = r.get(3)?;
                 let zip: Option<String> = r.get(4)?;
-                let last = format!("{}, {} {}", city.unwrap_or_default(), st.unwrap_or_default(), zip.unwrap_or_default());
+                let last =
+                    format!("{}, {} {}", city.unwrap_or_default(), st.unwrap_or_default(), zip.unwrap_or_default());
                 Ok([l1, l2, Some(last)].into_iter().flatten().filter(|s| !s.trim().is_empty()).collect())
             },
         )
