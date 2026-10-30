@@ -1,0 +1,54 @@
+{# The invoice document (design/invoice.html, the paper), read only. src/pdf.rs draws the same layout. #}
+<article class="paper inv-doc print-sheet">
+  <header class="inv-head">
+    <div>
+      <div class="inv-seller">
+        <span class="inv-logo" aria-hidden="true">{{ initial }}</span>
+        <div><div class="inv-seller-name">{{ inv.seller.name }}</div><div class="inv-small muted">{{ inv.seller.tagline }}</div></div>
+      </div>
+      <div class="inv-small muted inv-seller-contact">{{ inv.seller.address }}<br>{{ inv.seller.contact }}</div>
+    </div>
+    <div class="inv-head-total">
+      <div class="eyebrow">Invoice {{ inv.doc_number }}</div>
+      <div class="inv-big num">{{ inv.total_before_retainer() }}</div>
+      <div class="inv-small muted">Total</div>
+    </div>
+  </header>
+
+  <div class="inv-meta">
+    <div><div class="muted">Bill to</div><div class="inv-strong">{{ inv.customer }}</div><div class="muted">{% for l in inv.bill_to %}{{ l }}{% if !loop.last %}<br>{% endif %}{% endfor %}</div></div>
+    <div><div class="muted">Invoice date</div><div class="num">{{ date_text }}</div>{% if !inv.terms.is_empty() %}<div class="muted inv-gap">Terms</div><div>{{ inv.terms }}</div>{% endif %}</div>
+    <div><div class="muted">Due date</div><div class="num">{{ due_text }}</div></div>
+    <div><div class="muted">Tax</div><div>{{ inv.tax_rate_label() }}</div></div>
+  </div>
+
+  <table class="inv-lines">
+    <thead>
+      <tr><th>Description</th><th class="inv-c-item">Item</th><th class="r inv-c-qty">Qty</th><th class="r inv-c-rate">Rate</th><th class="c inv-c-tax">Tax</th><th class="r inv-c-amount">Amount</th></tr>
+    </thead>
+    <tbody>
+      {% for l in inv.item_lines() %}
+      <tr>
+        <td class="inv-strong">{{ l.description }}</td>
+        <td class="mono inv-item muted">{{ l.item }}</td>
+        <td class="r num">{{ l.qty_text() }}</td>
+        <td class="r num">{{ l.rate }}</td>
+        <td class="c inv-small muted">{% if l.taxable %}Yes{% endif %}</td>
+        <td class="r num inv-strong">{{ l.amount }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="inv-end">
+    <dl class="inv-totals">
+      <dt class="muted">Subtotal</dt><dd class="num">{{ inv.subtotal_before_retainer() }}</dd>
+      <dt class="muted">Sales tax ({{ inv.tax_rate_label() }} on taxable)</dt><dd class="num">{{ inv.totals.total_tax }}</dd>
+      <dt class="inv-rule inv-bold">Total</dt><dd class="num inv-rule inv-bold">{{ inv.total_before_retainer() }}</dd>
+      {% if inv.retainer().0 != 0 %}<dt class="muted">Retainer applied</dt><dd class="num">−{{ -inv.retainer() }}</dd>{% endif %}
+      {% if inv.paid().0 != 0 %}<dt class="muted">Payments</dt><dd class="num">−{{ inv.paid() }}</dd>{% endif %}
+      <dt class="inv-rule inv-bold inv-balance">Balance due</dt><dd class="num inv-rule inv-bold inv-balance inv-primary">{{ inv.balance() }}</dd>
+    </dl>
+    {% if !inv.memo.is_empty() %}<div class="inv-memo inv-small muted">{{ inv.memo }}</div>{% endif %}
+  </div>
+</article>

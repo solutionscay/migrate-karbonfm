@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ inv.doc_number }} · KarbonFM{% endblock %}
+{% block head %}<link href="/assets/invoice.css" rel="stylesheet">{% endblock %}
+{% block content %}
+<div class="no-print">
+  <div class="inv-crumbs muted"><svg class="i i-sm"><use href="#i-arrow-left"/></svg>{{ inv.customer }} <span>/</span> Invoices</div>
+  <div class="flex flex-wrap items-center gap-3 mb-5">
+    <h1 class="page-title mono inv-title">{{ inv.doc_number }}</h1>
+    {% if !inv.status.is_empty() %}<span class="chip {{ status_class }}"><span class="dot"></span>{{ inv.status }}</span>{% endif %}
+    {% if !due_text.is_empty() %}<span class="inv-due muted">Due {{ due_text }}</span>{% endif %}
+    <div class="ml-auto flex gap-2">
+      {# S-02 compares the two PDF paths: the webview's print dialog and the PDF generated in Rust. #}
+      <button class="btn btn-sm btn-quiet" data-print><svg class="i i-sm"><use href="#i-printer"/></svg>Print (webview)</button>
+      <a class="btn btn-sm btn-primary" href="/sales/{{ inv.doc_number }}/invoice.pdf"><svg class="i i-sm"><use href="#i-download"/></svg>PDF</a>
+    </div>
+  </div>
+</div>
+{% include "sales/document.html" %}
+{% endblock %}

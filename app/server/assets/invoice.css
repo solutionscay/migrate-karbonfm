@@ -1,0 +1,58 @@
+/* The invoice document (UI-12 view, printed by the webview for S-02). Plain CSS on the Karbon tokens, so the
+   document needs no new Tailwind classes. Sizes follow design/invoice.html. */
+.inv-crumbs { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; font-size: 12.5px; }
+.inv-title { font-size: 21px; }
+.inv-due { font-size: 12.5px; }
+
+.inv-doc { padding: 32px; font-size: 13px; }
+.inv-small { font-size: 12px; }
+.inv-strong { font-weight: 500; }
+.inv-bold { font-weight: 600; }
+.inv-primary { color: var(--color-primary); }
+
+.inv-head { display: flex; justify-content: space-between; gap: 24px; }
+.inv-seller { display: flex; align-items: center; gap: 10px; }
+.inv-logo { width: 32px; height: 32px; border-radius: var(--radius-field); display: grid; place-items: center; color: white;
+  font-size: 13px; font-weight: 600; background: linear-gradient(145deg, oklch(70% .17 48), oklch(55% .19 35));
+  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.inv-seller-name { font-weight: 600; }
+.inv-seller-contact { margin-top: 12px; line-height: 1.625; }
+.inv-head-total { text-align: right; }
+.inv-big { font-size: 26px; font-weight: 600; letter-spacing: -0.025em; margin-top: 4px; }
+
+.inv-meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 32px; padding-bottom: 24px;
+  border-bottom: 1px solid var(--k-line); font-size: 12.5px; }
+.inv-meta > div > .muted:first-child { margin-bottom: 4px; }
+.inv-gap { margin-top: 12px; margin-bottom: 4px; }
+
+.inv-lines { width: 100%; margin-top: 16px; border-collapse: collapse; }
+.inv-lines th { font-size: 11.5px; font-weight: 500; color: var(--k-muted); text-align: left; padding: 8px 0; }
+.inv-lines td { padding: 8px 8px 8px 0; border-top: 1px solid var(--k-line); vertical-align: top; }
+.inv-lines td:last-child { padding-right: 0; }
+.inv-lines .r { text-align: right; }
+.inv-lines .c { text-align: center; }
+.inv-c-item { width: 9rem; }
+.inv-c-qty { width: 4rem; }
+.inv-c-rate { width: 6rem; }
+.inv-c-tax { width: 3rem; }
+.inv-c-amount { width: 7rem; }
+.inv-item { font-size: 12px; }
+
+.inv-end { margin-top: 24px; }
+.inv-totals { width: 20rem; margin-left: auto; display: grid; grid-template-columns: 1fr auto; row-gap: 8px; }
+.inv-totals dd { text-align: right; }
+.inv-rule { padding-top: 8px; border-top: 1px solid var(--k-line); }
+.inv-balance { font-size: 15px; }
+.inv-memo { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--k-line); }
+
+/* Print (S-02): US Letter; the table header repeats on each page, a row never splits, and the totals and memo
+   stay together. WebKit has no @page margin boxes, so there is no "Page n of N" footer on this path. */
+@media print {
+  @page { size: letter; margin: 14mm; }
+  /* app.css prints with the light palette but leaves the accent; in dark mode it would print the dark accent. */
+  [data-theme] { --color-primary: oklch(58% 0.185 40); }
+  .inv-doc { padding: 0; }
+  .inv-lines thead { display: table-header-group; }
+  .inv-lines tr { break-inside: avoid; page-break-inside: avoid; }
+  .inv-end { break-inside: avoid; page-break-inside: avoid; }
+}
