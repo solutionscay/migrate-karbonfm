@@ -110,3 +110,54 @@ async fn pdf_routes() {
     assert_eq!(get("/sales/INV-0000").await.0, StatusCode::NOT_FOUND);
     assert_eq!(get("/sales/INV-0000/invoice.pdf").await.0, StatusCode::NOT_FOUND);
 }
+
+/// The Host and Origin guard (AP-13, S-01) covers the invoice routes and the print hook: GET needs the server's
+/// own Host (no DNS rebinding); POST also needs its own Origin (no cross-site writes).
+#[tokio::test]
+async fn origin_guard_covers_the_invoice_routes_and_the_print_hook() {
+    use std::sync::{Arc, Mutex};
+    const HOST: &str = "127.0.0.1:4321";
+    const ORIGIN: &str = "http://127.0.0.1:4321";
+    let calls = Arc::new(Mutex::new(0));
+    let guarded = || {
+        let counter = calls.clone();
+        router(AppState::new(db::open_demo(None).unwrap()).with_origin(ORIGIN).with_print(Arc::new(move || {
+            *counter.lock().unwrap() += 1;
+            Ok(())
+        })))
+    };
+    let send = |req: Request<Body>| async { guarded().oneshot(req).await.unwrap().status() };
+    let req = |method: &str, uri: &str, host: Option<&str>, origin: Option<&str>| {
+        let mut r = Request::builder().method(method).uri(uri);
+        if let Some(h) = host {
+            r = r.header(header::HOST, h);
+        }
+        if let Some(o) = origin {
+            r = r.header(header::ORIGIN, o);
+        }
+        r.body(Body::empty()).unwrap()
+    };
+
+    for uri in ["/sales/INV-1048", "/sales/INV-1048/invoice.pdf", "/sales/FIXTURE-60/invoice.pdf?engine=printpdf"] {
+        assert_eq!(send(req("GET", uri, Some(HOST), None)).await, StatusCode::OK, "{uri}");
+        // A link or the webview's own navigation may carry the page's Origin; it is the same origin.
+        assert_eq!(send(req("GET", uri, Some(HOST), Some(ORIGIN))).await, StatusCode::OK, "{uri}");
+        assert_eq!(send(req("GET", uri, Some("evil.example:4321"), None)).await, StatusCode::MISDIRECTED_REQUEST);
+        assert_eq!(send(req("GET", uri, Some("localhost:4321"), None)).await, StatusCode::MISDIRECTED_REQUEST);
+        assert_eq!(send(req("GET", uri, None, None)).await, StatusCode::MISDIRECTED_REQUEST, "no Host");
+        // Writes to a read-only route are refused by the guard before the router answers 405.
+        assert_eq!(send(req("POST", uri, Some(HOST), Some("https://evil.example"))).await, StatusCode::FORBIDDEN);
+        assert_eq!(send(req("POST", uri, Some(HOST), Some(ORIGIN))).await, StatusCode::METHOD_NOT_ALLOWED);
+    }
+
+    assert_eq!(send(req("POST", "/print", Some(HOST), Some("https://evil.example"))).await, StatusCode::FORBIDDEN);
+    assert_eq!(send(req("POST", "/print", Some(HOST), Some("null"))).await, StatusCode::FORBIDDEN, "sandboxed page");
+    assert_eq!(send(req("POST", "/print", Some(HOST), None)).await, StatusCode::FORBIDDEN, "no Origin");
+    assert_eq!(
+        send(req("POST", "/print", Some("evil.example:4321"), Some(ORIGIN))).await,
+        StatusCode::MISDIRECTED_REQUEST
+    );
+    assert_eq!(*calls.lock().unwrap(), 0, "no refused request reached the window");
+    assert_eq!(send(req("POST", "/print", Some(HOST), Some(ORIGIN))).await, StatusCode::NO_CONTENT);
+    assert_eq!(*calls.lock().unwrap(), 1);
+}
