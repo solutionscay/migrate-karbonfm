@@ -152,3 +152,29 @@ fn built_css_has_the_daisyui_components_and_karbon_themes() {
         assert!(css.contains(needle), "app.css is missing {needle}; run tools/build-css.sh");
     }
 }
+
+#[tokio::test]
+async fn origin_guard_refuses_other_hosts_and_cross_site_writes() {
+    const ORIGIN: &str = "http://127.0.0.1:4321";
+    let guarded = || router(AppState::new(db::open_demo(None).unwrap()).with_origin(ORIGIN));
+    let req = |method: &str, host: &str, origin: Option<&str>| {
+        let mut r = Request::builder().method(method).uri("/print").header(header::HOST, host);
+        if let Some(o) = origin {
+            r = r.header(header::ORIGIN, o);
+        }
+        r.body(Body::empty()).unwrap()
+    };
+
+    let (status, _, _) =
+        send(guarded(), Request::get("/").header(header::HOST, "127.0.0.1:4321").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::OK);
+    let (status, _, _) =
+        send(guarded(), Request::get("/").header(header::HOST, "evil.example:4321").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::MISDIRECTED_REQUEST, "DNS rebinding");
+    let (status, _, _) = send(guarded(), req("POST", "127.0.0.1:4321", Some("https://evil.example"))).await;
+    assert_eq!(status, StatusCode::FORBIDDEN, "cross-site POST");
+    let (status, _, _) = send(guarded(), req("POST", "127.0.0.1:4321", None)).await;
+    assert_eq!(status, StatusCode::FORBIDDEN, "POST without Origin");
+    let (status, _, _) = send(guarded(), req("POST", "127.0.0.1:4321", Some(ORIGIN))).await;
+    assert_eq!(status, StatusCode::NOT_IMPLEMENTED, "same-origin POST reaches the handler");
+}

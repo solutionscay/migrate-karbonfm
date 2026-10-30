@@ -23,11 +23,14 @@ pub type PrintHook = Arc<dyn Fn() -> Result<(), String> + Send + Sync>;
 pub struct AppState {
     db: Arc<Mutex<Connection>>,
     print: Option<PrintHook>,
+    /// The server's own origin, `http://127.0.0.1:<port>`. Requests must name it in Host (and in Origin for
+    /// writes), which blocks DNS rebinding and cross-site requests from other pages (AP-13, R-07).
+    origin: Option<String>,
 }
 
 impl AppState {
     pub fn new(db: Connection) -> Self {
-        Self { db: Arc::new(Mutex::new(db)), print: None }
+        Self { db: Arc::new(Mutex::new(db)), print: None, origin: None }
     }
 
     /// The desktop shell passes the window's print function. `window.print()` does nothing in WKWebView on macOS
@@ -36,10 +39,20 @@ impl AppState {
         self.print = Some(print);
         self
     }
+
+    /// Set by `serve` from the bound address; tests set it to check the guard.
+    pub fn with_origin(mut self, origin: impl Into<String>) -> Self {
+        self.origin = Some(origin.into());
+        self
+    }
 }
 
 pub fn router(state: AppState) -> Router {
-    routes::router().merge(assets::router()).with_state(state).layer(axum::middleware::from_fn(web::security_headers))
+    routes::router()
+        .merge(assets::router())
+        .layer(axum::middleware::from_fn_with_state(state.clone(), web::origin_guard))
+        .layer(axum::middleware::from_fn(web::security_headers))
+        .with_state(state)
 }
 
 /// Binds 127.0.0.1 on a free port. Loopback only (AP-10, AP-13).
@@ -50,5 +63,6 @@ pub async fn bind() -> std::io::Result<(TcpListener, SocketAddr)> {
 }
 
 pub async fn serve(listener: TcpListener, state: AppState) -> std::io::Result<()> {
-    axum::serve(listener, router(state)).await
+    let origin = format!("http://{}", listener.local_addr()?);
+    axum::serve(listener, router(state.with_origin(origin))).await
 }
