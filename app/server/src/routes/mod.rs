@@ -3,6 +3,7 @@
 mod customers;
 mod dashboard;
 mod invoices;
+mod sales;
 
 use crate::web::AppError;
 use crate::AppState;
@@ -17,6 +18,8 @@ pub fn router() -> Router<AppState> {
         .route("/customers", get(customers::list))
         .route("/customers/new", get(customers::new_dialog).post(customers::create))
         .route("/invoices/{doc_number}", get(invoices::page))
+        .route("/sales/{doc_number}", get(sales::page))
+        .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/print", post(print))
 }
 

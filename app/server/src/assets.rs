@@ -10,6 +10,7 @@ use axum::Router;
 /// (path under /assets/, content type, bytes). Vendored files carry their version in the name.
 const FILES: &[(&str, &str, &[u8])] = &[
     ("app.css", "text/css; charset=utf-8", include_bytes!("../assets/app.css")),
+    ("invoice.css", "text/css; charset=utf-8", include_bytes!("../assets/invoice.css")),
     ("app.js", "text/javascript; charset=utf-8", include_bytes!("../assets/app.js")),
     ("theme-init.js", "text/javascript; charset=utf-8", include_bytes!("../assets/theme-init.js")),
     (
