@@ -84,8 +84,8 @@ fn main() {
             });
 
             // One window on the server URL. The window has no capabilities, so the page cannot call Tauri IPC.
-            let base: tauri::Url = format!("http://{addr}/").parse()?;
-            app.manage(Home(base));
+            #[cfg(target_os = "macos")]
+            app.manage(history_menu::Home(format!("http://{addr}/").parse()?));
             let url = format!("http://{addr}{launch}").parse()?;
             WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
                 .title("KarbonFM")
@@ -120,9 +120,6 @@ fn pick_folder(handle: &AppHandle, what: karbon_server::FolderPick) -> Result<Op
     let picked = rx.recv().map_err(|e| e.to_string())?;
     Ok(picked.map(|f| f.path().to_path_buf()))
 }
-
-/// The app's start page on the local server (the History > Home menu item navigates back to it).
-struct Home(tauri::Url);
 
 /// The server's save hook: the native save dialog on the window (as tauri-plugin-dialog shows it, but without
 /// registering that plugin, whose page script reroutes alert() and confirm() through IPC the page does not have),
@@ -173,9 +170,11 @@ fn open_in_viewer(path: &std::path::Path) -> Result<(), String> {
 /// Windows and Linux keep no menu bar: WebView2 has Alt+Left built in, and WebKitGTK cannot show a PDF at all.
 #[cfg(target_os = "macos")]
 mod history_menu {
-    use super::Home;
     use tauri::menu::{Menu, MenuEvent, MenuItem, Submenu};
     use tauri::{AppHandle, Manager};
+
+    /// The app's start page on the local server (the History > Home menu item navigates back to it).
+    pub struct Home(pub tauri::Url);
 
     pub fn build(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         let menu = Menu::default(app)?;
