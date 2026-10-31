@@ -41,6 +41,18 @@ async fn customers_page_shows_the_seed_totals() {
 }
 
 #[tokio::test]
+async fn customers_page_has_one_new_customer_trigger() {
+    let (status, html) = get("/customers").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(html.matches(r#"hx-get="/customers/new""#).count(), 1, "only the top bar opens the dialog");
+    assert_eq!(html.matches(">New customer</button>").count(), 1);
+    let topbar = html.find(r#"<header class="topbar">"#).unwrap();
+    let topbar_end = topbar + html[topbar..].find("</header>").unwrap();
+    let trigger = html.find(r#"hx-get="/customers/new""#).unwrap();
+    assert!((topbar..topbar_end).contains(&trigger), "the trigger is in the top bar");
+}
+
+#[tokio::test]
 async fn htmx_paging_returns_a_fragment() {
     let (status, html) = htmx_get("/customers?page=2").await;
     assert_eq!(status, StatusCode::OK);
