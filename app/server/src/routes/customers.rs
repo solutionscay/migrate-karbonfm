@@ -82,6 +82,7 @@ pub struct Totals {
 #[template(path = "customers/list.html")]
 struct ListPage<'a> {
     nav: Nav,
+    demo: bool,
     totals: Totals,
     table: Table<'a>,
 }
@@ -213,7 +214,7 @@ pub async fn list(
         return render(&table);
     }
     let totals = load_totals(&conn)?;
-    render(&ListPage { nav: Nav::Customers, totals, table })
+    render(&ListPage { nav: Nav::Customers, demo: crate::db::has_demo_data(&conn)?, totals, table })
 }
 
 #[derive(Template)]

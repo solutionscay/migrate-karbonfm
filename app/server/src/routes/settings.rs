@@ -182,6 +182,7 @@ impl FormView {
 #[template(path = "settings/page.html")]
 struct SettingsPage {
     nav: Nav,
+    demo: bool,
     body: String,
     /// The Backup panel (OP-ADMIN-06, OP-ADMIN-07), outside the settings form.
     backup: String,
@@ -233,7 +234,7 @@ fn respond(
         Html(body)
     } else {
         let backup = super::backup::Panel::for_state(state, notice).render()?;
-        render(&SettingsPage { nav: Nav::Settings, body, backup })?
+        render(&SettingsPage { nav: Nav::Settings, demo: super::demo(state)?, body, backup })?
     };
     Ok((status, html).into_response())
 }

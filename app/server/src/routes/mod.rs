@@ -68,6 +68,12 @@ async fn print(State(state): State<AppState>) -> Result<StatusCode, AppError> {
     }
 }
 
+/// Whether the sidebar shows the DEMO badge: the database holds the demo data (see [`crate::db::has_demo_data`]).
+pub fn demo(state: &AppState) -> Result<bool, AppError> {
+    let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
+    Ok(crate::db::has_demo_data(&conn)?)
+}
+
 /// Which sidebar link is current; the layout marks it with aria-current.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Nav {

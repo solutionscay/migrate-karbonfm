@@ -12,6 +12,7 @@ use axum::response::Html;
 #[template(path = "dashboard.html")]
 struct Dashboard {
     nav: Nav,
+    demo: bool,
     owner_first_name: String,
     balance_due: String,
     open_invoices: i64,
@@ -61,6 +62,7 @@ pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppErro
 
     render(&Dashboard {
         nav: Nav::Dashboard,
+        demo: crate::db::has_demo_data(&conn)?,
         owner_first_name,
         balance_due: usd(balance),
         open_invoices,

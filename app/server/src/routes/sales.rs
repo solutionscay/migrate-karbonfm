@@ -15,6 +15,7 @@ use axum::response::{Html, IntoResponse, Response};
 #[template(path = "sales/invoice.html")]
 struct InvoicePage {
     nav: Nav,
+    demo: bool,
     inv: Invoice,
     initial: String,
     date_text: String,
@@ -39,6 +40,7 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
     };
     render(&InvoicePage {
         nav: Nav::Invoices,
+        demo: super::demo(&state)?,
         initial: inv.seller.name.chars().next().map(|c| c.to_uppercase().collect()).unwrap_or_default(),
         date_text: display_date(&inv.date),
         due_text: display_date(&inv.due_date),

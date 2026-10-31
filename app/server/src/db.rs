@@ -172,6 +172,11 @@ pub fn strip_transaction(sql: &str) -> String {
 /// The app_meta key the demo seed writes.
 pub const DEMO_KEY: &str = "demo_data";
 
+/// True when the database holds the demo data (its `app_meta.demo_data` row). The sidebar shows DEMO only then.
+pub fn has_demo_data(conn: &Connection) -> rusqlite::Result<bool> {
+    conn.query_row("SELECT EXISTS (SELECT 1 FROM app_meta WHERE key = ?1)", [DEMO_KEY], |r| r.get(0))
+}
+
 /// Loads the demo seed when the database has no party and was never demo-seeded. Returns whether it loaded.
 pub fn load_demo_seed(conn: &mut Connection) -> Result<bool, DbError> {
     let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
