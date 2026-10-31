@@ -56,6 +56,7 @@ pub fn router(state: AppState) -> Router {
     routes::router()
         .merge(assets::router())
         .layer(axum::middleware::from_fn_with_state(state.clone(), web::origin_guard))
+        .layer(axum::middleware::from_fn(web::log_errors))
         .layer(axum::middleware::from_fn(web::security_headers))
         .with_state(state)
 }
