@@ -28,6 +28,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/customers/new"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
+    ("POST", "/sales/{doc_number}/save-pdf"),
     ("POST", "/print"),
     ("GET", "/setup"),
     ("POST", "/setup"),
