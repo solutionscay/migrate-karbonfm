@@ -13,6 +13,7 @@ pub mod session;
 mod web;
 
 use axum::Router;
+pub use routes::ROUTES;
 use rusqlite::Connection;
 use session::Session;
 use std::net::{Ipv4Addr, SocketAddr};

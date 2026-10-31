@@ -67,10 +67,8 @@ impl Session {
 }
 
 /// The only route that works without the cookie (with the static files).
-pub const LAUNCH_ROUTE: &str = "/session/{token}";
-
 pub fn router() -> Router<AppState> {
-    Router::new().route(LAUNCH_ROUTE, get(launch))
+    Router::new().route("/session/{token}", get(launch))
 }
 
 /// Sets the session cookie and redirects to the dashboard. A spent or wrong token gets 403, unless the request already
