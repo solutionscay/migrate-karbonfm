@@ -34,6 +34,10 @@ use tokio::net::TcpListener;
 /// Opens the native print dialog of the window that shows the app (set by the desktop shell).
 pub type PrintHook = Arc<dyn Fn() -> Result<(), String> + Send + Sync>;
 
+/// Saves a file through the desktop shell: native save dialog with the suggested name, write, open in the system
+/// viewer. Returns the saved path, or `None` when the user cancels. It blocks until the dialog closes.
+pub type SaveHook = Arc<dyn Fn(String, Vec<u8>) -> Result<Option<PathBuf>, String> + Send + Sync>;
+
 /// Which folder the shell's native folder dialog asks for (its title and button say so).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FolderPick {
@@ -53,6 +57,7 @@ pub type FolderHook = Arc<dyn Fn(FolderPick) -> Result<Option<PathBuf>, String> 
 pub struct AppState {
     db: Arc<Mutex<Connection>>,
     print: Option<PrintHook>,
+    save: Option<SaveHook>,
     /// The server's own origin, `http://127.0.0.1:<port>`. Requests must name it in Host (and in Origin for
     /// writes), which blocks DNS rebinding and cross-site requests from other pages (AP-13, R-07).
     origin: Option<String>,
@@ -76,6 +81,7 @@ impl AppState {
         Self {
             db: Arc::new(Mutex::new(db)),
             print: None,
+            save: None,
             origin: None,
             session: None,
             secrets: Arc::new(MemoryStore::default()),
@@ -108,6 +114,13 @@ impl AppState {
     /// (S-01), so the page asks the server, and the server asks the window; the page itself has no IPC access.
     pub fn with_print(mut self, print: PrintHook) -> Self {
         self.print = Some(print);
+        self
+    }
+
+    /// The desktop shell passes its save function. The window never navigates to a file (it would replace the app
+    /// page and strand the window), and the page has no IPC, so the page asks the server and the server asks the shell.
+    pub fn with_save(mut self, save: SaveHook) -> Self {
+        self.save = Some(save);
         self
     }
 

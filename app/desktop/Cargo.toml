@@ -15,10 +15,12 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 karbon-server.workspace = true
-# The native folder dialog for backup and restore, called from Rust: the same dialog crate Tauri's dialog plugin
-# uses, without the plugin or its page script (as the save dialog on fix/pdf-view).
+# The native save dialog (invoice PDF) and folder dialog (backup, restore), called from Rust: the dialog crate Tauri's
+# dialog plugin uses, without the plugin or its page script, which reroutes alert() and confirm() through IPC.
 rfd = { version = "0.17", default-features = false, features = ["gtk3", "common-controls-v6"] }
 tauri = { version = "2", features = [] }
+# Only its open_path function; the plugin is not registered, so it adds nothing to the page.
+tauri-plugin-opener = "2"
 tokio.workspace = true
 
 [features]

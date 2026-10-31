@@ -8,7 +8,7 @@ use crate::web::{render, AppError};
 use crate::AppState;
 use askama::Template;
 use axum::extract::{Path, Query, State};
-use axum::http::header;
+use axum::http::{header, StatusCode};
 use axum::response::{Html, IntoResponse, Response};
 
 #[derive(Template)]
@@ -20,6 +20,8 @@ struct InvoicePage {
     date_text: String,
     due_text: String,
     status_class: &'static str,
+    /// The desktop shell can save files (native save dialog); in a browser the page links the PDF for download.
+    can_save: bool,
 }
 
 fn load(state: &AppState, doc_number: &str) -> Result<Invoice, AppError> {
@@ -41,6 +43,7 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
         date_text: display_date(&inv.date),
         due_text: display_date(&inv.due_date),
         status_class,
+        can_save: state.save.is_some(),
         inv,
     })
 }
@@ -63,7 +66,45 @@ pub async fn pdf(
         _ => Engine::Krilla,
     };
     let bytes = crate::pdf::invoice_pdf(&inv, engine);
-    let disposition = format!("inline; filename=\"{}.pdf\"", inv.doc_number.replace(['"', '\\'], ""));
-    Ok(([(header::CONTENT_TYPE, "application/pdf".to_string()), (header::CONTENT_DISPOSITION, disposition)], bytes)
+    let disposition = format!("inline; filename=\"{}\"", file_name(&inv));
+    Ok((
+        [
+            (header::CONTENT_TYPE, "application/pdf".to_string()),
+            (header::CONTENT_DISPOSITION, disposition),
+            // Pages of this server may frame the PDF (the preview dialog); other sites may not.
+            (header::CONTENT_SECURITY_POLICY, "frame-ancestors 'self'".to_string()),
+        ],
+        bytes,
+    )
         .into_response())
+}
+
+/// Saves the invoice PDF through the desktop shell: the native save dialog, then the system PDF viewer (S-02 plan for
+/// I5). The page posts here, so it needs no Tauri IPC (AP-01). The answer is 204 when the user cancels, or an empty
+/// body with a toast when the file is saved. Without a shell (the dev server in a browser) it answers 501; that page
+/// links the PDF with `download` instead.
+pub async fn save_pdf(State(state): State<AppState>, Path(doc_number): Path<String>) -> Result<Response, AppError> {
+    let Some(save) = state.save.clone() else {
+        return Ok(StatusCode::NOT_IMPLEMENTED.into_response());
+    };
+    let inv = load(&state, &doc_number)?;
+    let name = file_name(&inv);
+    let bytes = crate::pdf::invoice_pdf(&inv, Engine::Krilla);
+    // The dialog blocks until the user answers; keep it off the async workers.
+    let saved = tokio::task::spawn_blocking(move || save(name, bytes))
+        .await
+        .map_err(|e| AppError::Internal(format!("save dialog: {e}")))?
+        .map_err(AppError::Internal)?;
+    let Some(path) = saved else {
+        return Ok(StatusCode::NO_CONTENT.into_response());
+    };
+    let shown = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+    let trigger = serde_json::json!({ "karbon-toast": format!("Saved {shown}") });
+    Ok(([("HX-Trigger", trigger.to_string())], Html(String::new())).into_response())
+}
+
+/// The PDF's file name: the document number, without characters that would break a header or a path.
+fn file_name(inv: &Invoice) -> String {
+    let stem: String = inv.doc_number.chars().filter(|c| !matches!(c, '"' | '\\' | '/' | ':')).collect();
+    format!("{stem}.pdf")
 }
