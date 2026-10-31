@@ -1,6 +1,11 @@
 // KarbonFM page behaviour: theme, toasts, the shared <dialog>, the revenue chart, the command palette.
 // Plain JS plus Alpine components; no build step. Adapted from design/assets/app.js.
 
+// A form answered with 422 (field errors, 05/D-25) is swapped like a 200, so the errors show; other 4xx/5xx are not.
+if (window.htmx) {
+  htmx.config.responseHandling = [{ code: "422", swap: true }].concat(htmx.config.responseHandling);
+}
+
 (function () {
   // Links to screens that are not built yet show a toast instead of a 404.
   document.addEventListener("click", (e) => {

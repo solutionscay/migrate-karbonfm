@@ -3,6 +3,9 @@
 mod customers;
 mod dashboard;
 mod sales;
+mod setup;
+
+pub use setup::setup_gate;
 
 use crate::web::AppError;
 use crate::AppState;
@@ -23,6 +26,8 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/print"),
+    ("GET", "/setup"),
+    ("POST", "/setup"),
     // assets.rs: the embedded static files.
     ("GET", "/assets/{*path}"),
     // session.rs: the one-time launch URL of AP-13.
@@ -37,6 +42,7 @@ pub fn router() -> Router<AppState> {
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/print", post(print))
+        .route("/setup", get(setup::page).post(setup::submit))
 }
 
 /// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a

@@ -1,0 +1,70 @@
+{# One step of the setup wizard (UI-01). htmx swaps this whole block; the fields of the other steps ride along as
+   hidden inputs, so the last step posts everything and the server saves it in one transaction (BR-ADMIN-01). #}
+<form id="setup-step" class="panel" method="post" action="/setup" hx-post="/setup" hx-target="#setup-step" hx-swap="outerHTML" novalidate>
+  <ol class="flex gap-4 px-5 pt-4 text-[12px]" aria-label="Setup steps">
+    {% for (n, label, current, done) in steps() %}
+    <li class="flex items-center gap-1.5 {% if !current && !done %}muted{% endif %}" {% if current %}aria-current="step"{% endif %}>
+      <span class="chip">{% if done %}✓{% else %}{{ n }}{% endif %}</span>{{ label }}
+    </li>
+    {% endfor %}
+  </ol>
+  <input type="hidden" name="step" value="{{ step.key() }}">
+  {% for (name, value) in carried() %}
+  <input type="hidden" name="{{ name }}" value="{{ value }}">
+  {% endfor %}
+  <div class="p-5 space-y-3">
+    {% if let Some(failure) = failure %}
+    <div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ failure }}</div>
+    {% endif %}
+    {% match step %}
+    {% when Step::Organization %}
+    <h2 class="panel-title">Your business</h2>
+    <p class="muted text-[12.5px]">The organization that owns this install. Invoices show its name.</p>
+    {% let field = "organization_name" %}
+    <label class="block">
+      <span class="text-[12px] muted">Business name</span>
+      <input name="organization_name" value="{{ value(field) }}" class="input input-sm w-full mt-1" autofocus autocomplete="organization" {% if error(field).is_some() %}aria-invalid="true" aria-describedby="err-{{ field }}"{% endif %}>
+      {% if let Some(e) = error(field) %}<span id="err-{{ field }}" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+    </label>
+    {% when Step::Person %}
+    <h2 class="panel-title">You</h2>
+    <p class="muted text-[12.5px]">The person who uses this app: you become an employee of the business and its one user.</p>
+    <div class="grid grid-cols-2 gap-3">
+      {% for (field, label, auto) in [("first_name", "First name", "given-name"), ("last_name", "Last name", "family-name")] %}
+      <label class="block">
+        <span class="text-[12px] muted">{{ label }}</span>
+        <input name="{{ field }}" value="{{ value(field) }}" class="input input-sm w-full mt-1" autocomplete="{{ auto }}" {% if loop.first %}autofocus{% endif %} {% if error(field).is_some() %}aria-invalid="true" aria-describedby="err-{{ field }}"{% endif %}>
+        {% if let Some(e) = error(field) %}<span id="err-{{ field }}" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+    {% for (field, label, auto) in [("job_title", "Job title (optional)", "organization-title"), ("email", "Email (optional)", "email")] %}
+    <label class="block">
+      <span class="text-[12px] muted">{{ label }}</span>
+      <input name="{{ field }}" value="{{ value(field) }}" class="input input-sm w-full mt-1" autocomplete="{{ auto }}" {% if error(field).is_some() %}aria-invalid="true" aria-describedby="err-{{ field }}"{% endif %}>
+      {% if let Some(e) = error(field) %}<span id="err-{{ field }}" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+    </label>
+    {% endfor %}
+    {% when Step::Settings %}
+    <h2 class="panel-title">Settings</h2>
+    <p class="muted text-[12.5px]">You can change these later in Settings.</p>
+    {% for (field, label, hint) in [("tax_rate", "Sales tax rate (%)", "Applied to taxable lines, like 5.5"), ("country_code", "Country calling code", "1 for the US"), ("area_code", "Default area code (optional)", "3 digits, like 207")] %}
+    <label class="block">
+      <span class="text-[12px] muted">{{ label }}</span>
+      <input name="{{ field }}" value="{{ value(field) }}" class="input input-sm w-full mt-1" inputmode="decimal" placeholder="{{ hint }}" {% if loop.first %}autofocus{% endif %} {% if error(field).is_some() %}aria-invalid="true" aria-describedby="err-{{ field }}"{% endif %}>
+      {% if let Some(e) = error(field) %}<span id="err-{{ field }}" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+    </label>
+    {% endfor %}
+    <label class="flex items-center gap-2 text-[13px]">
+      <input type="checkbox" name="format_phone_numbers" value="on" class="checkbox checkbox-sm" {% if value("format_phone_numbers") == "on" %}checked{% endif %}>
+      Format US phone numbers as I type them
+    </label>
+    {% endmatch %}
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-between gap-2">
+    {% if step != Step::Organization %}
+    <button type="submit" name="go" value="back" class="btn btn-sm btn-quiet">Back</button>
+    {% else %}<span></span>{% endif %}
+    <button type="submit" class="btn btn-sm btn-primary">{% if step == Step::Settings %}Finish setup{% else %}Continue{% endif %}</button>
+  </div>
+</form>

@@ -15,7 +15,8 @@ async fn a_failing_route_writes_a_log_line_and_shows_a_generic_message() {
     let dir = tempfile::tempdir().unwrap();
     applog::init(dir.path()).unwrap();
 
-    let (conn, _) = db::open_in_memory(Seed::Reference).unwrap();
+    // A set-up database (the demo seed), so the setup gate lets the request through to the failing page.
+    let (conn, _) = db::open_in_memory(Seed::Demo).unwrap();
     conn.execute_batch("DROP VIEW sales_summary_by_month;").unwrap();
     let res = router(AppState::new(conn)).oneshot(Request::get("/").body(Body::empty()).unwrap()).await.unwrap();
     assert_eq!(res.status(), StatusCode::INTERNAL_SERVER_ERROR);

@@ -24,6 +24,7 @@ pub use routes::ROUTES;
 use rusqlite::Connection;
 use session::Session;
 use std::net::{Ipv4Addr, SocketAddr};
+use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
 
@@ -40,11 +41,19 @@ pub struct AppState {
     origin: Option<String>,
     /// The per-launch session cookie that only the app window gets (AP-13).
     session: Option<Arc<Session>>,
+    /// Set once setup is seen done (it is never undone), so the setup gate stops asking SQLite.
+    setup_done: Arc<AtomicBool>,
 }
 
 impl AppState {
     pub fn new(db: Connection) -> Self {
-        Self { db: Arc::new(Mutex::new(db)), print: None, origin: None, session: None }
+        Self {
+            db: Arc::new(Mutex::new(db)),
+            print: None,
+            origin: None,
+            session: None,
+            setup_done: Arc::new(AtomicBool::new(false)),
+        }
     }
 
     /// The desktop shell passes the window's print function. `window.print()` does nothing in WKWebView on macOS
@@ -71,6 +80,7 @@ pub fn router(state: AppState) -> Router {
     routes::router()
         .merge(assets::router())
         .merge(session::router())
+        .layer(axum::middleware::from_fn_with_state(state.clone(), routes::setup_gate))
         .layer(axum::middleware::from_fn_with_state(state.clone(), web::origin_guard))
         .layer(axum::middleware::from_fn(web::log_errors))
         .layer(axum::middleware::from_fn(web::security_headers))
