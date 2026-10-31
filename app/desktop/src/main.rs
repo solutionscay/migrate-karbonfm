@@ -8,7 +8,7 @@ use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 fn main() {
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
-    let builder = builder.menu(go_menu::build).on_menu_event(go_menu::handle);
+    let builder = builder.menu(history_menu::build).on_menu_event(history_menu::handle);
     builder
         .setup(|app| {
             // The database lives in the per-user app data folder (D-17).
@@ -47,7 +47,7 @@ fn main() {
         .expect("error while running KarbonFM");
 }
 
-/// The app's start page on the local server (the Go > Home menu item navigates back to it).
+/// The app's start page on the local server (the History > Home menu item navigates back to it).
 struct Home(tauri::Url);
 
 /// The server's save hook: the native save dialog on the window (as tauri-plugin-dialog shows it, but without
@@ -75,11 +75,11 @@ fn save_file(handle: &AppHandle, name: String, bytes: Vec<u8>) -> Result<Option<
     Ok(Some(path))
 }
 
-/// macOS menu bar: the standard menus plus Go > Back (Cmd+[) and Home (Shift+Cmd+H), so the window can always get
+/// macOS menu bar: the standard menus plus History > Back (Cmd+[) and Home (Shift+Cmd+H), so the window can always get
 /// back to the app, even from a page that is not the app's (a file shown full-window has no sidebar or back button).
 /// Windows and Linux keep no menu bar: WebView2 has Alt+Left built in, and WebKitGTK cannot show a PDF at all.
 #[cfg(target_os = "macos")]
-mod go_menu {
+mod history_menu {
     use super::Home;
     use tauri::menu::{Menu, MenuEvent, MenuItem, Submenu};
     use tauri::{AppHandle, Manager};
@@ -88,8 +88,8 @@ mod go_menu {
         let menu = Menu::default(app)?;
         let back = MenuItem::with_id(app, "go-back", "Back", true, Some("CmdOrCtrl+["))?;
         let home = MenuItem::with_id(app, "go-home", "Home", true, Some("CmdOrCtrl+Shift+H"))?;
-        // After View, where Safari puts History: App, File, Edit, View, Go, Window, Help.
-        menu.insert(&Submenu::with_items(app, "Go", true, &[&back, &home])?, 4)?;
+        // After View, as in Safari. Not "Go": macOS 26 left a top-level menu with that title out of the menu bar.
+        menu.insert(&Submenu::with_items(app, "History", true, &[&back, &home])?, 4)?;
         Ok(menu)
     }
 
