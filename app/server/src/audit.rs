@@ -73,16 +73,48 @@ enum Part {
 /// Sets the creation and modification stamps of the new row `id` of `table` (FileMaker sets both on create).
 /// Returns the number of stamp columns set (0 for a table without stamp columns).
 pub fn stamp_created(conn: &Connection, table: &str, id: &dyn ToSql, stamp: &Stamp) -> rusqlite::Result<usize> {
-    stamp_row(conn, table, id, stamp, &[Part::Creation, Part::Modification])
+    stamp_row(conn, table, "id", id, stamp, &[Part::Creation, Part::Modification])
+}
+
+/// [`stamp_created`] for a table whose key column is not `id` (`system_setting.singleton`).
+pub fn stamp_created_by(
+    conn: &Connection,
+    table: &str,
+    key_column: &str,
+    key: &dyn ToSql,
+    stamp: &Stamp,
+) -> rusqlite::Result<usize> {
+    stamp_row(conn, table, key_column, key, stamp, &[Part::Creation, Part::Modification])
 }
 
 /// Sets the modification stamps of row `id` of `table`; the creation stamps stay.
 pub fn stamp_modified(conn: &Connection, table: &str, id: &dyn ToSql, stamp: &Stamp) -> rusqlite::Result<usize> {
-    stamp_row(conn, table, id, stamp, &[Part::Modification])
+    stamp_row(conn, table, "id", id, stamp, &[Part::Modification])
 }
 
-fn stamp_row(conn: &Connection, table: &str, id: &dyn ToSql, stamp: &Stamp, parts: &[Part]) -> rusqlite::Result<usize> {
+/// [`stamp_modified`] for a table whose key column is not `id`.
+pub fn stamp_modified_by(
+    conn: &Connection,
+    table: &str,
+    key_column: &str,
+    key: &dyn ToSql,
+    stamp: &Stamp,
+) -> rusqlite::Result<usize> {
+    stamp_row(conn, table, key_column, key, stamp, &[Part::Modification])
+}
+
+fn stamp_row(
+    conn: &Connection,
+    table: &str,
+    key_column: &str,
+    id: &dyn ToSql,
+    stamp: &Stamp,
+    parts: &[Part],
+) -> rusqlite::Result<usize> {
     let columns = table_columns(conn, table)?;
+    if !columns.iter().any(|c| c == key_column) {
+        return Err(rusqlite::Error::InvalidColumnName(format!("{table}.{key_column}")));
+    }
     let mut sets: Vec<String> = Vec::new();
     let mut values: Vec<&dyn ToSql> = Vec::new();
     for part in parts {
@@ -104,8 +136,8 @@ fn stamp_row(conn: &Connection, table: &str, id: &dyn ToSql, stamp: &Stamp, part
         return Ok(0);
     }
     values.push(id);
-    // `table` is safe to splice: table_columns found it in sqlite_master.
-    let sql = format!("UPDATE \"{table}\" SET {} WHERE id = ?{}", sets.join(", "), values.len());
+    // `table` and `key_column` are safe to splice: both were found in the schema above.
+    let sql = format!("UPDATE \"{table}\" SET {} WHERE \"{key_column}\" = ?{}", sets.join(", "), values.len());
     let changed = conn.execute(&sql, values.as_slice())?;
     if changed != 1 {
         return Err(rusqlite::Error::QueryReturnedNoRows);
