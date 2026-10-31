@@ -9,12 +9,24 @@ use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
+            // KARBONFM_DATA_DIR (development and checks only) puts the database and the log in another folder, so
+            // a fresh run does not touch the user's karbonfm.db.
+            let override_dir = std::env::var_os("KARBONFM_DATA_DIR").map(std::path::PathBuf::from);
+
             // The log file in the per-user app log folder (D-30), before anything that can fail.
-            let log_dir = karbon_server::applog::init(app.path().app_log_dir()?)?;
+            let log_dir = match &override_dir {
+                Some(dir) => dir.join("logs"),
+                None => app.path().app_log_dir()?,
+            };
+            let log_dir = karbon_server::applog::init(log_dir)?;
 
             // One database in the per-user app data folder (D-17): migrated by refinery, reference-seeded, and in
             // the demo build demo-seeded while it has no party (03, "Demo seed data").
-            let db_path = karbon_server::db::database_path(&app.path().app_data_dir()?);
+            let data_dir = match &override_dir {
+                Some(dir) => dir.clone(),
+                None => app.path().app_data_dir()?,
+            };
+            let db_path = karbon_server::db::database_path(&data_dir);
             let seed = if cfg!(feature = "demo") { Seed::Demo } else { Seed::Reference };
             let (db, report) = karbon_server::db::open(&db_path, seed).inspect_err(|e| {
                 applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
@@ -41,7 +53,9 @@ fn main() {
             // client of the port gets 401.
             let session = Arc::new(karbon_server::session::Session::new(addr.port()));
             let launch = session.launch_path().ok_or("session already used")?;
-            let state = karbon_server::AppState::new(db).with_print(print).with_session(session);
+            // Secrets live in the OS keychain (AP-03); the settings page reads and writes them off the async workers.
+            let secrets = Arc::new(karbon_server::secrets::Keychain::new());
+            let state = karbon_server::AppState::new(db).with_print(print).with_session(session).with_secrets(secrets);
             tauri::async_runtime::spawn(async move {
                 if let Err(e) = karbon_server::serve(listener, state).await {
                     applog::log_write(&applog::Entry::error(
