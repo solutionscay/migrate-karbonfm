@@ -7,6 +7,7 @@ pub mod assets;
 pub mod db;
 pub mod invoice;
 pub mod money;
+pub mod net;
 pub mod pdf;
 mod routes;
 pub mod secrets;
