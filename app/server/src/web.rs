@@ -16,7 +16,8 @@ const CSP: &str = "default-src 'self'; script-src 'self' 'unsafe-eval'; style-sr
 pub async fn security_headers(req: Request, next: Next) -> Response {
     let mut res = next.run(req).await;
     let h = res.headers_mut();
-    h.insert(header::CONTENT_SECURITY_POLICY, HeaderValue::from_static(CSP));
+    // A route may set its own policy (the invoice PDF, which the invoice page frames in its preview).
+    h.entry(header::CONTENT_SECURITY_POLICY).or_insert(HeaderValue::from_static(CSP));
     h.insert(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
     h.insert(header::REFERRER_POLICY, HeaderValue::from_static("no-referrer"));
     res
