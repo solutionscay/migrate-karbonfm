@@ -9,6 +9,7 @@ pub mod invoice;
 pub mod money;
 pub mod pdf;
 mod routes;
+pub mod secrets;
 pub mod session;
 mod web;
 
