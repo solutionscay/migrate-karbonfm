@@ -5,7 +5,7 @@ Tailwind/DaisyUI, SQLite through rusqlite. See `migration/02_recommendations.md`
 
 ```bash
 cargo run -p karbon-desktop                          # the app (window)
-cargo run -p karbon-server --bin karbon-dev-server   # the same pages in a browser, http://127.0.0.1:3000/
+cargo run -p karbon-server --bin karbon-dev-server   # the same pages in a browser: open the one-time URL it prints
 ./tools/build-css.sh                                 # rebuild server/assets/app.css after changing templates or styles
 cargo test && cargo clippy --all-targets -- -D warnings
 cd desktop && cargo tauri build                      # bundles (needs: cargo install tauri-cli --version 2.12.4 --locked)
@@ -19,3 +19,9 @@ cd desktop && cargo tauri build                      # bundles (needs: cargo ins
 | `tools/build-css.sh` | Tailwind standalone CLI, pinned and checksummed; no Node |
 
 The demo database is created in the app data folder on first start (`karbonfm-demo.db`); delete it to reseed.
+
+The local server only answers the app window (AP-13): the window opens a one-time `/session/{token}` URL that sets a
+session cookie, and every other request without that cookie gets 401. The dev server prints its one-time URL
+(`http://127.0.0.1:3000/session/...`); open it once per run, then reload and browse as usual in that browser. Restart
+the dev server for a new URL. Tests: `server/tests/auth.rs` (T-08-01, 02, 03, 10, 14) and `desktop/tests/no_ipc.rs`;
+`cargo test -p karbon-server keychain_round_trip -- --ignored` writes and deletes one test entry in the OS keychain.
