@@ -22,15 +22,29 @@ pub async fn security_headers(req: Request, next: Next) -> Response {
     res
 }
 
-/// Host and Origin checks of AP-13 (the per-launch session cookie comes with I1). Every request must be addressed to
-/// this server by its 127.0.0.1 address (no DNS rebinding); a request that is not GET or HEAD must also come from a
-/// page of this server (no cross-site POST from a page in another browser).
+/// The local server guard of AP-13, in this order:
+/// 1. Host: every request must be addressed to this server by its 127.0.0.1 address (no DNS rebinding): 421.
+/// 2. Session: every route except the launch route and the static files needs the per-launch session cookie
+///    ([`crate::session`]), which only the app window has: 401.
+/// 3. Origin: a request that is not GET or HEAD must come from a page of this server (no cross-site POST from a page
+///    in another browser): 403.
+///
+/// Each check is on when its part of the state is set (`serve` sets both; route tests may leave them off).
 pub async fn origin_guard(State(state): State<AppState>, req: Request, next: Next) -> Response {
     if let Some(origin) = &state.origin {
         let host = req.headers().get(header::HOST).and_then(|h| h.to_str().ok());
         if host != origin.strip_prefix("http://") {
             return (StatusCode::MISDIRECTED_REQUEST, "Wrong host").into_response();
         }
+    }
+    if let Some(session) = &state.session {
+        let path = req.uri().path();
+        let open = path.starts_with("/session/") || path.starts_with("/assets/");
+        if !open && !session.is_valid(req.headers()) {
+            return (StatusCode::UNAUTHORIZED, "Open KarbonFM from the app.").into_response();
+        }
+    }
+    if let Some(origin) = &state.origin {
         let safe = req.method() == axum::http::Method::GET || req.method() == axum::http::Method::HEAD;
         let from = req.headers().get(header::ORIGIN).and_then(|h| h.to_str().ok());
         if !safe && from != Some(origin.as_str()) {

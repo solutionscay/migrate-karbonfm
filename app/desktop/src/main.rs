@@ -19,8 +19,12 @@ fn main() {
                 let window = handle.get_webview_window("main").ok_or("no main window")?;
                 window.print().map_err(|e| e.to_string())
             });
-            let state = karbon_server::AppState::new(db).with_print(print);
             let (listener, addr) = tauri::async_runtime::block_on(karbon_server::bind())?;
+            // AP-13: the window opens the one-time launch URL, which gives it the session cookie; any other
+            // client of the port gets 401.
+            let session = Arc::new(karbon_server::session::Session::new(addr.port()));
+            let launch = session.launch_path().ok_or("session already used")?;
+            let state = karbon_server::AppState::new(db).with_print(print).with_session(session);
             tauri::async_runtime::spawn(async move {
                 if let Err(e) = karbon_server::serve(listener, state).await {
                     eprintln!("local server stopped: {e}");
@@ -28,7 +32,7 @@ fn main() {
             });
 
             // One window on the server URL. The window has no capabilities, so the page cannot call Tauri IPC.
-            let url = format!("http://{addr}/").parse()?;
+            let url = format!("http://{addr}{launch}").parse()?;
             WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
                 .title("KarbonFM")
                 .inner_size(1440.0, 900.0)

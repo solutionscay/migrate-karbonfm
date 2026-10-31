@@ -9,10 +9,12 @@ pub mod invoice;
 pub mod money;
 pub mod pdf;
 mod routes;
+pub mod session;
 mod web;
 
 use axum::Router;
 use rusqlite::Connection;
+use session::Session;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
@@ -28,11 +30,13 @@ pub struct AppState {
     /// The server's own origin, `http://127.0.0.1:<port>`. Requests must name it in Host (and in Origin for
     /// writes), which blocks DNS rebinding and cross-site requests from other pages (AP-13, R-07).
     origin: Option<String>,
+    /// The per-launch session cookie that only the app window gets (AP-13).
+    session: Option<Arc<Session>>,
 }
 
 impl AppState {
     pub fn new(db: Connection) -> Self {
-        Self { db: Arc::new(Mutex::new(db)), print: None, origin: None }
+        Self { db: Arc::new(Mutex::new(db)), print: None, origin: None, session: None }
     }
 
     /// The desktop shell passes the window's print function. `window.print()` does nothing in WKWebView on macOS
@@ -47,11 +51,18 @@ impl AppState {
         self.origin = Some(origin.into());
         self
     }
+
+    /// The session the window opens with `Session::launch_path` (AP-13). `serve` refuses to start without one.
+    pub fn with_session(mut self, session: Arc<Session>) -> Self {
+        self.session = Some(session);
+        self
+    }
 }
 
 pub fn router(state: AppState) -> Router {
     routes::router()
         .merge(assets::router())
+        .merge(session::router())
         .layer(axum::middleware::from_fn_with_state(state.clone(), web::origin_guard))
         .layer(axum::middleware::from_fn(web::security_headers))
         .with_state(state)
@@ -64,7 +75,16 @@ pub async fn bind() -> std::io::Result<(TcpListener, SocketAddr)> {
     Ok((listener, addr))
 }
 
+/// Serves the router with the full guard on. Refuses a listener that is not on loopback (AP-10) and a state without
+/// a session (AP-13).
 pub async fn serve(listener: TcpListener, state: AppState) -> std::io::Result<()> {
-    let origin = format!("http://{}", listener.local_addr()?);
+    let addr = listener.local_addr()?;
+    if !addr.ip().is_loopback() {
+        return Err(std::io::Error::other(format!("refusing to serve on {addr}: loopback only")));
+    }
+    if state.session.is_none() {
+        return Err(std::io::Error::other("refusing to serve without a session (AP-13)"));
+    }
+    let origin = format!("http://{addr}");
     axum::serve(listener, router(state.with_origin(origin))).await
 }
