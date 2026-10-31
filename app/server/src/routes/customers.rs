@@ -183,8 +183,10 @@ fn load_totals(conn: &rusqlite::Connection) -> Result<Totals, AppError> {
         "{} ",
         CUSTOMERS_SQL.replacen(
             "SELECT * FROM c",
-            "SELECT COUNT(*), SUM(current), SUM(balance), SUM(balance <> 0), SUM(overdue), SUM(overdue > 0), \
-             MAX(overdue_days), SUM(retainer), SUM(retainer > 0) FROM c",
+            // COALESCE: no customers (a fresh install) gives 0, not NULL.
+            "SELECT COUNT(*), COALESCE(SUM(current), 0), COALESCE(SUM(balance), 0), COALESCE(SUM(balance <> 0), 0), \
+             COALESCE(SUM(overdue), 0), COALESCE(SUM(overdue > 0), 0), COALESCE(MAX(overdue_days), 0), \
+             COALESCE(SUM(retainer), 0), COALESCE(SUM(retainer > 0), 0) FROM c",
             1
         )
     );

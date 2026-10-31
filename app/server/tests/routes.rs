@@ -190,3 +190,31 @@ async fn origin_guard_refuses_other_hosts_and_cross_site_writes() {
     let (status, _, _) = send(guarded(), req("POST", "127.0.0.1:4321", Some(ORIGIN))).await;
     assert_eq!(status, StatusCode::NOT_IMPLEMENTED, "same-origin POST reaches the handler");
 }
+
+/// A fresh install after setup: the reference rows and the user's organization and person, no customers.
+fn fresh_app() -> axum::Router {
+    let (mut conn, _) = db::open_in_memory(db::Seed::Reference).unwrap();
+    let input = karbon_server::admin::SetupInput {
+        organization_name: "Harbor & Pine Design".into(),
+        first_name: "Rosa".into(),
+        last_name: "Lindqvist".into(),
+        tax_rate_bp: 550,
+        country_code: "1".into(),
+        account_name: "rosa".into(),
+        ..Default::default()
+    };
+    karbon_server::admin::setup_welcome(&mut conn, &input).unwrap();
+    router(AppState::new(conn))
+}
+
+#[tokio::test]
+async fn pages_of_an_empty_database_render_zero_totals() {
+    let (status, _, html) = send(fresh_app(), Request::get("/customers").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(html.contains("0 customers"));
+    assert!(html.contains("$0.00"));
+    let (status, _, html) = send(fresh_app(), Request::get("/").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    let (status, _, _) = send(fresh_app(), Request::get("/sales/INV-1048").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::NOT_FOUND, "no such invoice yet");
+}

@@ -46,8 +46,7 @@ async fn database_without_the_demo_seed_shows_no_badge() {
     };
     admin::setup_welcome(&mut conn, &input).unwrap();
     let state = AppState::new(conn);
-    // Not /customers: it answers 500 on a database without customers (SUM(current) is NULL), a separate bug.
-    for uri in ["/", "/settings"] {
+    for uri in ["/", "/customers", "/settings"] {
         let html = page(&state, uri).await;
         assert!(!html.contains(BADGE) && !html.contains(">DEMO<"), "{uri} shows no DEMO");
     }
