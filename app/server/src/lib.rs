@@ -67,7 +67,9 @@ pub struct AppState {
     origin: Option<String>,
     /// The per-launch session cookie that only the app window gets (AP-13).
     session: Option<Arc<Session>>,
-    /// Keychain secrets (AP-03): `Keychain` in the desktop app, `MemoryStore` (the default) in tests and the dev server.
+    /// The keychain side of the secrets (AP-03): `secrets::system_store()` in the desktop app (the keychain, or
+    /// `NoKeychain` when the computer has none), `MemoryStore` (the default) in tests and the dev server. Routes use
+    /// [`AppState::secret_store`], which adds the opt-in `secrets.toml` of the data folder (D-09).
     secrets: Arc<dyn SecretStore>,
     /// Set once setup is seen done (it is never undone), so the setup gate stops asking SQLite.
     setup_done: Arc<AtomicBool>,
@@ -108,10 +110,15 @@ impl AppState {
         self
     }
 
-    /// The secret store; the desktop shell passes `secrets::Keychain`.
+    /// The secret store; the desktop shell passes `secrets::system_store()`.
     pub fn with_secrets(mut self, secrets: Arc<dyn SecretStore>) -> Self {
         self.secrets = secrets;
         self
+    }
+
+    /// The secrets as the routes use them: `secrets.toml` in the data folder while it exists, else the keychain.
+    pub fn secret_store(&self) -> secrets::Secrets {
+        secrets::Secrets::new(self.secrets.clone(), self.data_dir.as_deref().map(secrets::secrets_path))
     }
 
     /// The desktop shell passes the window's print function. `window.print()` does nothing in WKWebView on macOS

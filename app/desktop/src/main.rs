@@ -58,7 +58,9 @@ fn main() {
             let session = Arc::new(karbon_server::session::Session::new(addr.port()));
             let launch = session.launch_path().ok_or("session already used")?;
             // Secrets live in the OS keychain (AP-03); the settings page reads and writes them off the async workers.
-            let secrets = Arc::new(karbon_server::secrets::Keychain::new());
+            // Without a keychain (Linux without a Secret Service) this logs why once, and Settings offers the opt-in
+            // secrets.toml (D-09, issue #7).
+            let secrets = karbon_server::secrets::system_store();
             // Backup and restore (OP-ADMIN-06, OP-ADMIN-07): the server asks for a folder, the shell shows the native
             // dialog. The page itself never gets a path or file-system access (AP-01).
             let handle = app.handle().clone();
