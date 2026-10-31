@@ -103,6 +103,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: behavior-ready
 - Use case and users: First-run wizard: organization, first person, user, settings; the single local user (ROLE-OWNER).
+- Built (I1, 2026-10-31, branch `i1/setup`): a standalone page without the sidebar, three steps (Your business: name; You: first and last name, job title, email; Settings: tax rate in percent, country calling code, area code, phone formatting) with Back and Continue / Finish setup. Nothing is saved before Finish. Every other page redirects here until setup is done; a demo database is set up already. The user's account name is the OS account name (FileMaker's Get(AccountName)); the organization's address, phone and email wait for the party screens (I2).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/133-Welcome_Wizard.txt`
 - Page: `GET /setup` (full page; the same route returns the fragment to htmx)
 - Fragments and actions: `GET /setup; POST /setup` (OP-ADMIN-01 `setup_welcome`), `internal: runs at first start, no route` (OP-ADMIN-02 `reference_seed`)
@@ -295,6 +296,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: inventory-only
 - Use case and users: System settings, user email settings, integrations, the sales tax rate; the single local user (ROLE-OWNER).
+- Built (I1, 2026-10-31, branch `i1/setup`): one page in four panels. Business and sales tax: owner organization (a select of the current organizations), tax rate in percent, default tax code. Country and phone numbers: calling code, area code, phone formatting. System email account: sender name, address, SMTP server, port, encryption (None, STARTTLS, SSL/TLS), authentication (None, Password), user name, password (write-only `SecretField`). Integrations: Google Places, SmartyStreets and FullContact keys (write-only), and the read-only line "Accounting: Not implemented" (OP-INTEG-04). The user's own SMTP settings (user.smtp_*) are not on the page yet; they come with email sending (I4). Linked from the sidebar.
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/70-Admin_Dashboard.txt`, `objects/karbon_kontacts.fmp12/layouts/71-Admin_User_List.txt`, `objects/karbon_kontacts.fmp12/layouts/128-Admin_Integrations.txt`, `objects/karbon_kontacts.fmp12/layouts/134-Admin_User_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/122-Card_-_Utility_User.txt`, `objects/karbon_log.fmp12/layouts/20-Settings.txt`
 - Page: `GET /settings` (full page; the same route returns the fragment to htmx)
 - Fragments and actions: `GET /settings; PUT /settings` (OP-ADMIN-03 `settings_get_update`), `internal: request extractor used by every handler, no route` (OP-ADMIN-04 `current_user`)
