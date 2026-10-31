@@ -1,5 +1,6 @@
 //! Route handlers (05). Each handler queries or calls a command, then renders a template.
 
+mod backup;
 pub mod current_user;
 mod customers;
 mod dashboard;
@@ -32,6 +33,9 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/setup"),
     ("GET", "/settings"),
     ("PUT", "/settings"),
+    ("POST", "/settings/backup"),
+    ("POST", "/settings/restore/check"),
+    ("POST", "/settings/restore"),
     // assets.rs: the embedded static files.
     ("GET", "/assets/{*path}"),
     // session.rs: the one-time launch URL of AP-13.
@@ -48,6 +52,9 @@ pub fn router() -> Router<AppState> {
         .route("/print", post(print))
         .route("/setup", get(setup::page).post(setup::submit))
         .route("/settings", get(settings::page).put(settings::update))
+        .route("/settings/backup", post(backup::create))
+        .route("/settings/restore/check", post(backup::check))
+        .route("/settings/restore", post(backup::restore))
 }
 
 /// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a

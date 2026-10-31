@@ -1,0 +1,24 @@
+{# UI-17 Backup panel (OP-ADMIN-06, OP-ADMIN-07). Outside the settings form: its buttons post on their own. The
+   folder dialogs are native, opened by the desktop shell; the page never sees or sends a path (AP-01). #}
+<section id="backup-panel" class="panel max-w-3xl mt-5" aria-labelledby="s-backup">
+  <div class="panel-head"><h2 id="s-backup" class="panel-title">Backup and restore</h2></div>
+  <div class="p-5 space-y-3">
+    {% if let Some(n) = notice %}
+    <div role="{% if n.ok %}status{% else %}alert{% endif %}" class="alert {% if n.ok %}alert-success{% else %}alert-error{% endif %} alert-soft text-[13px] py-2 block">
+      <div>{{ n.text }}</div>
+      {% if let Some(d) = n.detail %}<div class="muted text-[12px] mt-0.5 break-all">{{ d }}</div>{% endif %}
+    </div>
+    {% endif %}
+    <p class="text-[13px]">A backup is a folder with a copy of the database, the attached files and a list of what is in it. It is made while you work; nothing has to be closed.</p>
+    <p class="muted text-[12.5px]">Passwords and API keys are not in a backup: they stay in this computer's keychain. After restoring on another computer, type them again above.</p>
+    <p class="muted text-[12.5px]">Restoring replaces all the data in KarbonFM with the backup's. A copy of the current data is kept first, in the app's data folder.</p>
+    {% if available %}
+    <div class="flex gap-2 pt-1">
+      <button type="button" class="btn btn-sm btn-primary" hx-post="/settings/backup" hx-target="#backup-panel" hx-swap="outerHTML" hx-disabled-elt="this">Back up now…</button>
+      <button type="button" class="btn btn-sm btn-quiet" hx-post="/settings/restore/check" hx-target="#modal-body" hx-disabled-elt="this">Restore from a backup…</button>
+    </div>
+    {% else %}
+    <p class="text-[13px]"><span class="muted">Backup and restore:</span> available in the desktop app.</p>
+    {% endif %}
+  </div>
+</section>

@@ -10,7 +10,7 @@ use crate::secrets::{SecretField, SecretKey, SecretStore};
 use crate::web::{is_htmx, render, AppError};
 use crate::AppState;
 use askama::Template;
-use axum::extract::State;
+use axum::extract::{Query, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{Html, IntoResponse, Response};
 use axum::Form;
@@ -183,6 +183,8 @@ impl FormView {
 struct SettingsPage {
     nav: Nav,
     body: String,
+    /// The Backup panel (OP-ADMIN-06, OP-ADMIN-07), outside the settings form.
+    backup: String,
 }
 
 /// The `SecretField`s, read from the store off the async workers.
@@ -219,20 +221,36 @@ async fn view(
     })
 }
 
-fn respond(headers: &HeaderMap, view: FormView, status: StatusCode) -> Result<Response, AppError> {
+fn respond(
+    state: &AppState,
+    headers: &HeaderMap,
+    view: FormView,
+    status: StatusCode,
+    notice: Option<super::backup::Notice>,
+) -> Result<Response, AppError> {
     let body = view.render()?;
-    let html = if is_htmx(headers) { Html(body) } else { render(&SettingsPage { nav: Nav::Settings, body })? };
+    let html = if is_htmx(headers) {
+        Html(body)
+    } else {
+        let backup = super::backup::Panel::for_state(state, notice).render()?;
+        render(&SettingsPage { nav: Nav::Settings, body, backup })?
+    };
     Ok((status, html).into_response())
 }
 
 /// `GET /settings`.
-pub async fn page(State(state): State<AppState>, headers: HeaderMap, _user: CurrentUser) -> Result<Response, AppError> {
+pub async fn page(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    _user: CurrentUser,
+    Query(restored): Query<super::backup::RestoredQuery>,
+) -> Result<Response, AppError> {
     let settings = {
         let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
         admin::settings_get(&conn)?
     };
     let view = view(&state, SettingsForm::from_settings(&settings), Vec::new(), false).await?;
-    respond(&headers, view, StatusCode::OK)
+    respond(&state, &headers, view, StatusCode::OK, restored.notice())
 }
 
 /// `PUT /settings`: checks the form, writes the typed secrets to the keychain, then saves the settings row.
@@ -246,7 +264,7 @@ pub async fn update(
         Ok(s) => s,
         Err(errors) => {
             let view = view(&state, form, errors, false).await?;
-            return respond(&headers, view, StatusCode::UNPROCESSABLE_ENTITY);
+            return respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None);
         }
     };
     // Owner first: a bad owner must not leave a half-saved form (secrets saved, settings not).
@@ -258,7 +276,7 @@ pub async fn update(
         let errors =
             vec![FieldError { field: "owner_id", message: "Choose the organization that owns this install.".into() }];
         let view = view(&state, form, errors, false).await?;
-        return respond(&headers, view, StatusCode::UNPROCESSABLE_ENTITY);
+        return respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None);
     }
     let typed: Vec<(SecretKey, String)> = SECRETS.iter().map(|(k, _)| (*k, form.secret(*k).to_owned())).collect();
     let store = state.secrets.clone();
@@ -274,13 +292,13 @@ pub async fn update(
         Ok(()) => {
             let saved = SettingsForm::from_settings(&settings);
             let view = view(&state, saved, Vec::new(), true).await?;
-            let mut res = respond(&headers, view, StatusCode::OK)?;
+            let mut res = respond(&state, &headers, view, StatusCode::OK, None)?;
             res.headers_mut().insert("HX-Trigger", r#"{"karbon-toast":"Settings saved"}"#.parse().unwrap());
             Ok(res)
         }
         Err(CommandError::Validation(errors)) => {
             let view = view(&state, form, errors, false).await?;
-            respond(&headers, view, StatusCode::UNPROCESSABLE_ENTITY)
+            respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None)
         }
         Err(CommandError::AlreadySetUp) => Err(AppError::Internal("settings_update: unexpected AlreadySetUp".into())),
         Err(CommandError::Storage(e)) => Err(AppError::Internal(format!("settings_update: {e}"))),

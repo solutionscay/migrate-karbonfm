@@ -1,0 +1,28 @@
+{# Body of the shared <dialog id="modal">: confirm a restore (OP-ADMIN-07). The backup already passed the checks; the
+   form posts only the id of that check, never a path. #}
+<form hx-post="/settings/restore" hx-target="#modal-body" hx-disabled-elt="find button[type=submit]">
+  <input type="hidden" name="pending" value="{{ pending }}">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">Restore this backup?</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3 text-[13px]">
+    {% if let Some(e) = error %}
+    <div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>
+    {% endif %}
+    <dl class="grid grid-cols-2 gap-x-4 gap-y-1">
+      <dt class="muted">Made</dt><dd>{{ created_at }}</dd>
+      <dt class="muted">Folder</dt><dd class="break-all">{{ folder_name }}</dd>
+      <dt class="muted">Parties</dt><dd>{{ parties }}</dd>
+      <dt class="muted">Sales transactions</dt><dd>{{ transactions }}</dd>
+      <dt class="muted">Rows in all</dt><dd>{{ total_rows }}</dd>
+      <dt class="muted">Attached files</dt><dd>{{ files }}</dd>
+      <dt class="muted">KarbonFM version</dt><dd>{{ app_version }} (schema {{ schema_version }})</dd>
+    </dl>
+    <p>Everything in KarbonFM now is replaced by this backup. A copy of the current data is kept first.</p>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()" autofocus>Cancel</button>
+    <button type="submit" class="btn btn-sm btn-primary">Restore</button>
+  </div>
+</form>
