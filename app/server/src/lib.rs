@@ -7,6 +7,7 @@ pub mod admin;
 pub mod applog;
 pub mod assets;
 pub mod audit;
+pub mod backup;
 pub mod db;
 pub mod ids;
 pub mod invoice;
