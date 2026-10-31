@@ -122,7 +122,7 @@ Hide rules gate no sensitive data in the core layouts (the explorers found none 
 | AP-09 | File access is scoped | Stored files live only in the app data directory. file_add takes an uploaded multipart body, never a path. The import folder is chosen in a native dialog that the server opens in the desktop process; the route gets back a handle, not a path. No route takes a free path or URL from the page except the enrichment photo download (BR-FILE-01 limits apply). | OP-FILE-01, OP-IMPORT-01 | upload body or dialog handle only; canonicalize and check prefix | T-08-09 |
 | AP-10 | No remote command entry | The app registers no URL scheme handler and no IPC listener that runs commands (the fmp:// Commander script is not migrated). Its only listener is the axum server on 127.0.0.1 (AP-13); nothing listens on another interface. | none | no deep-link plugin; loopback bind address only | T-08-10 |
 | AP-11 | No app lock | No passcode and no database encryption (owner, 2026-10-28; OD-08-01): the OS account protects the data. No card data is stored; SMTP and optional API keys are in the system keychain (AP-03; D-09). | app start | none | T-08-11 |
-| AP-13 | Local server accepts only the app window | The server binds 127.0.0.1 on a random free port. At start the window opens `/session/{one-time token}`, which sets an HttpOnly, SameSite=Strict session cookie and redirects. Every route needs that cookie; the `Host` header must be `127.0.0.1:<port>` (DNS rebinding); a non-GET request needs a matching `Origin`. Another local process or a web page in a browser gets 401 or 403. | all routes | axum middleware; the token is random per launch and works once | T-08-14 |
+| AP-13 | Local server accepts only the app window | The server binds 127.0.0.1 on a random free port. At start the window opens `/session/{one-time token}`, which sets an HttpOnly, SameSite=Strict session cookie and redirects. Every route needs that cookie; the `Host` header must be `127.0.0.1:<port>` (DNS rebinding); a non-GET request needs a matching `Origin`. Another local process or a web page in a browser gets 401 (no or wrong cookie), 403 (spent token, foreign `Origin`) or 421 (foreign `Host`). | all routes | axum middleware; the token is random per launch and works once | T-08-14 |
 | AP-12 | Integrations off by default | Each optional integration is enabled by the user in settings, with its key stored by AP-03; a disabled integration makes no network call. | OP-INTEG-02, OP-INTEG-03 | settings flag checked in the command | T-08-12 |
 
 ## Negative authorization tests
@@ -141,7 +141,17 @@ Hide rules gate no sensitive data in the core layouts (the explorers found none 
 | T-08-11 | n/a | start the app | opens without a passcode; the database is plain SQLite in the app data folder | app start | AP-11 |
 | T-08-12 | ROLE-OWNER | address suggestion with the integration disabled | no network call | command | AP-12 |
 | T-08-13 | import | export containing SSN/card columns | columns absent after import | import | BR-IMPORT-02 |
-| T-08-14 | other local process / web page | request a route without the session cookie, with a foreign `Host`, or a POST with a foreign `Origin` | 401 / 403; nothing changes | HTTP middleware | AP-13 |
+| T-08-14 | other local process / web page | request a route without the session cookie, with a foreign `Host`, or a POST with a foreign `Origin` | 401 / 403 (421 for a foreign `Host`); nothing changes | HTTP middleware | AP-13 |
+
+Implemented in I1 (branch `i1/guard`, 2026-10-31), all passing on macOS:
+
+| Test id | Where | What it proves |
+|---|---|---|
+| T-08-01 | `app/server/tests/auth.rs` `t_08_01_only_registered_routes`; `app/desktop/tests/no_ipc.rs`; unit test `routes::tests::route_list_matches_the_router` | every `karbon_server::ROUTES` entry answers, anything else 404 (401 before routing without the cookie), a listed path with another method 405; the list equals the `.route(...)` calls; no capability, no `withGlobalTauri`, no invoke handler, no `tauri-plugin-*` crate |
+| T-08-02 | `auth.rs` `t_08_02_outbound_default_deny`; `app/server/src/net.rs` unit tests | `net::OutboundPolicy` is deny-all; only an enabled integration's host or the SMTP host passes, https only, exact host; the refusal is logged with the host only; no HTTP client crate outside the policy yet |
+| T-08-03 | `auth.rs` `t_08_03_secrets_never_reach_the_page`, `t_08_03_no_page_shows_a_secret`; `secrets.rs` unit tests | a saved secret is not in the `SecretField` HTML (write-only password input, has_secret flag), nor in `Debug` output, nor in any SQLite column; `Secret` has no `Display`/`Serialize`. The settings page itself comes with the setup slice and must render `SecretField` |
+| T-08-10 | `auth.rs` `t_08_10_loopback_only`, `serve_needs_a_session`; `no_ipc.rs` `t_08_10_no_url_scheme_and_loopback_only` | `bind()` is 127.0.0.1; the machine's LAN address refuses the port; `serve` refuses a non-loopback listener and a missing session; no deep link, URL scheme or URI-scheme protocol |
+| T-08-14 | `auth.rs` `t_08_14_only_the_app_window_gets_in`, `guard_over_a_real_socket` | no or wrong cookie 401, cookie of another port 401, foreign Host 421, foreign or missing Origin 403, made-up or spent token 403; refused requests never reach the handler; the same over a real socket. A WKWebView probe (same engine as the window) followed the launch redirect to the dashboard; `document.cookie` is empty (HttpOnly) |
 
 ## Open decisions and unavailable evidence
 

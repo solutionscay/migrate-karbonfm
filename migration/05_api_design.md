@@ -78,8 +78,8 @@ No generic per-table CRUD route exists. Full source-script list per command: `05
 - **Methods.** Reads are `GET`; creates `POST`; changes `PUT` or `PATCH`; deletes `DELETE` (htmx `hx-put`, `hx-patch`, `hx-delete`). A form without htmx falls back to `POST` with a `_method` field.
 - **Input.** Forms are parsed into a typed struct with axum `Form` (serde, `deny_unknown_fields`). Money fields arrive as dollar text and are parsed to i64 cents in the handler (OD-04-02); a bad value re-renders the form with the field error.
 - **Output.** Handlers return askama templates. Out-of-band swaps (`hx-swap-oob`) refresh dependent fragments, for example the invoice totals after a line change. `HX-Redirect` moves to a new page after a create or delete.
-- **Static assets.** `GET /static/*` serves the vendored htmx, Alpine.js and Chart.js files and the built Tailwind/DaisyUI CSS, embedded in the binary.
-- **Guards.** Every route except `GET /session/{token}` and the static files needs the session cookie, a matching `Host` header and, for non-GET methods, a matching `Origin` (AP-13).
+- **Static assets.** `GET /assets/*` (named `/static/*` before S-01) serves the vendored htmx, Alpine.js and Chart.js files and the built Tailwind/DaisyUI CSS, embedded in the binary.
+- **Guards.** Every route except `GET /session/{token}` and the static files needs the session cookie, a matching `Host` header and, for non-GET methods, a matching `Origin` (AP-13). Order and answers: foreign `Host` 421, no or wrong cookie 401, foreign or missing `Origin` on a write 403. `GET /session/{token}` sets the cookie (`karbon_session_<port>`, HttpOnly, SameSite=Strict, Path=/) and answers 303 to `/` once; a spent or wrong token is 403 unless the request already has the cookie (then 303). The dev server (`karbon-dev-server`) prints its one-time URL. `serve` refuses to start without a session or on a non-loopback address. Every registered route is listed in `karbon_server::ROUTES` (AP-01).
 
 ## Query/read contracts
 

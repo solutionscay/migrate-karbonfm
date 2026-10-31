@@ -82,7 +82,7 @@ Per-install import, not a cutover (D-34). Increments in 03 set build order; the 
 | axum, askama and rusqlite build on stable Rust and embed into a Tauri app | axum 0.8.9, askama 0.14.0, rusqlite 0.37.0 (bundled), Rust 1.90.0 | 2026-10-30 | fact on macOS (S-01) |
 | The Tailwind standalone CLI can build DaisyUI styles without Node | Tailwind CLI 4.1.11 + daisyui.mjs 5.0.43 | 2026-10-30 | fact on macOS (S-05); Windows and Linux wait for CI |
 | tauri-driver WebDriver testing works on Linux and Windows, not macOS | Tauri testing docs | same | inference until re-verified |
-| keyring supports macOS Keychain, Windows Credential Manager and Linux Secret Service | crates.io / docs.rs | same | inference until re-verified |
+| keyring supports macOS Keychain, Windows Credential Manager and Linux Secret Service | keyring 4.2.0 (default `v1` stores; Secret Service over zbus, no libdbus) | 2026-10-31 | fact on macOS 26 (I1 `i1/guard`: `secrets::tests::keychain_round_trip`, run by hand with `--ignored`); Windows and Linux build in CI, not run |
 
 Re-check these against the current releases before I1 starts (spikes S-01, S-05). S-01 and S-05 ran on macOS on 2026-10-30 (`spikes/S-01.md`, `spikes/S-05.md`); the Windows and Linux rows stay open until the CI workflow has run.
 
