@@ -145,8 +145,27 @@ fn save_file(handle: &AppHandle, name: String, bytes: Vec<u8>) -> Result<Option<
     let Some(file) = rx.recv().map_err(|e| e.to_string())? else { return Ok(None) };
     let path = file.path().to_path_buf();
     std::fs::write(&path, bytes).map_err(|e| format!("could not write {}: {e}", path.display()))?;
-    tauri_plugin_opener::open_path(&path, None::<&str>).map_err(|e| e.to_string())?;
+    open_in_viewer(&path)?;
     Ok(Some(path))
+}
+
+/// Opens a file the user just saved in the system's default app (Preview, the Windows default, xdg-open on Linux).
+/// A direct process call instead of tauri-plugin-opener, so the shell links no Tauri plugin at all (T-08-01). The path
+/// comes from the native save dialog, never from the page, and goes to the program as one argument (no shell).
+fn open_in_viewer(path: &std::path::Path) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    let program = "open";
+    #[cfg(target_os = "windows")]
+    let program = "explorer";
+    #[cfg(all(unix, not(target_os = "macos")))]
+    let program = "xdg-open";
+    let mut child = std::process::Command::new(program)
+        .arg(path)
+        .spawn()
+        .map_err(|e| format!("could not open {} with {program}: {e}", path.display()))?;
+    // Reap the helper when it exits (explorer.exe's exit code says nothing about success, so it is not checked).
+    std::thread::spawn(move || child.wait());
+    Ok(())
 }
 
 /// macOS menu bar: the standard menus plus History > Back (Cmd+[) and Home (Shift+Cmd+H), so the window can always get
