@@ -1,5 +1,6 @@
 {# UI-17 settings form (OP-ADMIN-03). htmx PUTs it and swaps it with the answer: the same form, with field errors
-   (422) or "Saved". Secrets are SecretFields: write-only, the page only knows whether one is saved (AP-03). #}
+   (422) or "Saved". Secrets are SecretFields: write-only, the page only knows whether one is saved (AP-03). `store` says where they
+   are kept when that is not the keychain (D-09). #}
 {% macro field(name, label, value, hint) %}
 <label class="block">
   <span class="text-[12px] muted">{{ label }}</span>
@@ -44,6 +45,8 @@
     </div>
   </section>
 
+  {{ store|safe }}
+
   <section class="panel" aria-labelledby="s-email">
     <div class="panel-head"><h2 id="s-email" class="panel-title">System email account</h2></div>
     <div class="p-5 grid grid-cols-2 gap-3">
@@ -73,7 +76,7 @@
   <section class="panel" aria-labelledby="s-integrations">
     <div class="panel-head"><h2 id="s-integrations" class="panel-title">Integrations</h2></div>
     <div class="p-5 space-y-3">
-      <p class="muted text-[12.5px]">Keys are kept in the system keychain. Address suggestions and enrichment stay off until they are built.</p>
+      <p class="muted text-[12.5px]">{{ keys_note }} Address suggestions and enrichment stay off until they are built.</p>
       <div class="grid grid-cols-2 gap-3">
         {% for key in api_keys %}<div>{{ key|safe }}</div>{% endfor %}
       </div>

@@ -2,11 +2,16 @@
 //! `PUT /settings` saves it and answers with the form again. The SMTP password and the integration API keys are
 //! write-only `SecretField`s: the page gets only a has_secret flag, and a value goes straight to the keychain.
 //! Keychain calls block (and may show an OS prompt), so they run on `spawn_blocking`, off the async workers.
+//!
+//! Without a keychain (D-09, issue #7) the page still opens: the secret fields are disabled, a notice offers the
+//! opt-in `secrets.toml` (`secrets_store.rs`), and a secret typed anyway is a field error (422), never a 500 and
+//! never "Settings saved".
 
 use super::current_user::CurrentUser;
+use super::secrets_store::StorePanel;
 use super::Nav;
 use crate::admin::{self, CommandError, FieldError, SystemSettings};
-use crate::secrets::{SecretField, SecretKey, SecretStore};
+use crate::secrets::{SecretError, SecretField, SecretKey, SecretStore, Secrets, StoreKind};
 use crate::web::{is_htmx, render, AppError};
 use crate::AppState;
 use askama::Template;
@@ -15,7 +20,6 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::{Html, IntoResponse, Response};
 use axum::Form;
 use serde::Deserialize;
-use std::sync::Arc;
 
 /// The secrets the page manages: the system email account password (BR-ADMIN-05) and the optional integration keys
 /// (EXT-02, EXT-03; integrations stay off until I6, AP-12).
@@ -170,6 +174,10 @@ pub struct FormView {
     pub errors: Vec<FieldError>,
     pub saved: bool,
     pub accounting: &'static str,
+    /// The rendered `StorePanel`: the no-keychain notice, or "Secrets: local file" (empty with the keychain).
+    pub store: String,
+    /// Where the integration keys are kept, for the Integrations panel.
+    pub keys_note: &'static str,
 }
 
 impl FormView {
@@ -188,14 +196,22 @@ struct SettingsPage {
     backup: String,
 }
 
-/// The `SecretField`s, read from the store off the async workers.
-async fn secret_fields(store: Arc<dyn SecretStore>) -> Result<Vec<SecretField>, AppError> {
+/// The `SecretField`s and the store notice, read off the async workers. A field error of `errors` goes on its field.
+async fn secret_fields(store: Secrets, errors: Vec<FieldError>) -> Result<(Vec<SecretField>, StorePanel), AppError> {
     tokio::task::spawn_blocking(move || {
-        SECRETS.iter().map(|(k, label)| store.field(*k, label)).collect::<Result<Vec<_>, _>>()
+        let fields = SECRETS
+            .iter()
+            .map(|(k, label)| {
+                let mut field = store.field(*k, label)?;
+                field.error = errors.iter().find(|e| e.field == field.name).map(|e| e.message.clone());
+                Ok(field)
+            })
+            .collect::<Result<Vec<_>, SecretError>>()?;
+        Ok((fields, StorePanel::for_store(&store, None)))
     })
     .await
     .map_err(|e| AppError::Internal(format!("keychain task: {e}")))?
-    .map_err(|e| AppError::Internal(e.to_string()))
+    .map_err(|e: SecretError| AppError::Internal(e.to_string()))
 }
 
 async fn view(
@@ -208,10 +224,19 @@ async fn view(
         let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
         admin::owner_choices(&conn)?
     };
-    let mut fields = secret_fields(state.secrets.clone()).await?.into_iter().map(|f| f.render());
+    let (fields, panel) = secret_fields(state.secret_store(), errors.clone()).await?;
+    let keys_note = match panel.kind {
+        StoreKind::Keychain => "Keys are kept in the system keychain.",
+        StoreKind::File => "Keys are kept in KarbonFM's secrets file on this computer.",
+        StoreKind::Unavailable => "Keys need a system keychain or the file option.",
+    };
+    let store = panel.render()?;
+    let mut fields = fields.into_iter().map(|f| f.render());
     let smtp_password = fields.next().transpose()?.unwrap_or_default();
     let api_keys = fields.collect::<Result<Vec<_>, _>>()?;
     Ok(FormView {
+        store,
+        keys_note,
         form: form.without_secrets(),
         owners,
         smtp_password,
@@ -280,11 +305,24 @@ pub async fn update(
         return respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None);
     }
     let typed: Vec<(SecretKey, String)> = SECRETS.iter().map(|(k, _)| (*k, form.secret(*k).to_owned())).collect();
-    let store = state.secrets.clone();
-    tokio::task::spawn_blocking(move || typed.iter().try_for_each(|(k, v)| store.update_from_form(*k, v)))
-        .await
-        .map_err(|e| AppError::Internal(format!("keychain task: {e}")))?
-        .map_err(|e| AppError::Internal(e.to_string()))?;
+    let store = state.secret_store();
+    let written = tokio::task::spawn_blocking(move || {
+        typed.iter().try_for_each(|(k, v)| store.update_from_form(*k, v).map_err(|e| (*k, e)))
+    })
+    .await
+    .map_err(|e| AppError::Internal(format!("keychain task: {e}")))?;
+    match written {
+        Ok(()) => {}
+        // No keychain and no file: the field says so and nothing is saved (D-09). Not a 500, not "saved".
+        Err((key, SecretError::Unavailable(_))) => {
+            let message =
+                "Not saved: this computer has no system keychain. Install one, or choose the file option above.";
+            let errors = vec![FieldError { field: key.account(), message: message.into() }];
+            let view = view(&state, form, errors, false).await?;
+            return respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None);
+        }
+        Err((_, e)) => return Err(AppError::Internal(e.to_string())),
+    }
     let result = {
         let mut conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
         admin::settings_update(&mut conn, &settings, &actor)

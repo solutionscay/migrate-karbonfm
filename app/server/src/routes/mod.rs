@@ -10,6 +10,7 @@ mod party_forms;
 mod relation_forms;
 mod sales;
 mod sales_lists;
+mod secrets_store;
 mod settings;
 mod setup;
 mod wizard;
@@ -70,6 +71,9 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/settings/backup"),
     ("POST", "/settings/restore/check"),
     ("POST", "/settings/restore"),
+    ("GET", "/settings/secrets/file"),
+    ("POST", "/settings/secrets/file"),
+    ("POST", "/settings/secrets/keychain"),
     // assets.rs: the embedded static files.
     ("GET", "/assets/{*path}"),
     // session.rs: the one-time launch URL of AP-13.
@@ -114,6 +118,8 @@ pub fn router() -> Router<AppState> {
         .route("/settings/backup", post(backup::create))
         .route("/settings/restore/check", post(backup::check))
         .route("/settings/restore", post(backup::restore))
+        .route("/settings/secrets/file", get(secrets_store::confirm).post(secrets_store::use_file))
+        .route("/settings/secrets/keychain", post(secrets_store::use_keychain))
 }
 
 /// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a
