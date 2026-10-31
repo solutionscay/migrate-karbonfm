@@ -369,3 +369,21 @@ fn a_backup_never_holds_the_secrets_file_and_a_restore_keeps_it() {
     #[cfg(unix)]
     assert_eq!(mode(&secrets_path(&data)), 0o600);
 }
+
+/// A failed request that htmx does not swap shows an error toast (the page has no JS test runner, so this checks
+/// that the handler, its style and its icon are served).
+#[tokio::test]
+async fn a_failed_request_shows_an_error_toast() {
+    let tmp = tempfile::tempdir().unwrap();
+    let app = start(tmp.path(), Arc::new(MemoryStore::default())).await;
+    let (status, _, js) = app.get("/assets/app.js").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(js.contains(r#"addEventListener("htmx:responseError""#), "the 4xx/5xx handler");
+    assert!(js.contains(r#"addEventListener("htmx:sendError""#), "the no-answer handler");
+    assert!(js.contains("k-toast-error") && js.contains("{ error: true }"));
+    assert!(js.contains(r#"[{ code: "422", swap: true }]"#), "422 is still swapped, not toasted");
+    let (_, _, css) = app.get("/assets/app.css").await;
+    assert!(css.contains(".k-toast-error"), "app.css was rebuilt with the error style");
+    let (_, _, html) = app.get("/settings").await;
+    assert!(html.contains(r#"<symbol id="i-alert""#));
+}

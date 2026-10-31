@@ -28,6 +28,22 @@ if (window.htmx) {
   document.addEventListener("karbon-close-dialog", () => document.getElementById("modal").close());
   document.addEventListener("karbon-toast", (e) => window.karbonToast(e.detail.value));
 
+  // A request that failed and was not swapped (any 4xx or 5xx except 422, see responseHandling above) says so.
+  // Before this, a failed save looked as if nothing had happened. It never says "saved".
+  document.addEventListener("htmx:responseError", (e) => {
+    const status = e.detail.xhr ? e.detail.xhr.status : 0;
+    window.karbonToast(
+      status >= 500
+        ? "Something went wrong, so this may not have been saved. The log has the details."
+        : `That did not work (error ${status}). Reload the page and try again.`,
+      { error: true },
+    );
+  });
+  // The local server did not answer at all (it stopped, or the request never reached it).
+  document.addEventListener("htmx:sendError", () =>
+    window.karbonToast("KarbonFM did not answer, so this was not saved. Restart KarbonFM and try again.", { error: true }),
+  );
+
   // Print buttons: the native print dialog (it also saves as PDF). In the desktop app the server opens it, because
   // window.print() does nothing in WKWebView on macOS; in a plain browser the server answers 501 and we print here.
   document.addEventListener("click", async (e) => {
@@ -67,14 +83,16 @@ window.karbonTheme = {
   toggle() { this.set(this.get() === "karbon-dark" ? "karbon-light" : "karbon-dark"); },
 };
 
-window.karbonToast = function (text) {
+// A short message at the bottom of the window. `{ error: true }`: the error style, announced as an alert, shown longer.
+window.karbonToast = function (text, options) {
+  const error = Boolean(options && options.error);
   const el = document.createElement("div");
-  el.className = "k-toast";
-  el.setAttribute("role", "status");
-  el.innerHTML = `<svg class="i i-sm"><use href="#i-check-circle"/></svg><span></span>`;
+  el.className = error ? "k-toast k-toast-error" : "k-toast";
+  el.setAttribute("role", error ? "alert" : "status");
+  el.innerHTML = `<svg class="i i-sm"><use href="#i-${error ? "alert" : "check-circle"}"/></svg><span></span>`;
   el.querySelector("span").textContent = text;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2400);
+  setTimeout(() => el.remove(), error ? 6000 : 2400);
 };
 
 // Read a theme colour (CSS custom property) as an rgba() string. The themes use oklch(), which Chart.js's colour
