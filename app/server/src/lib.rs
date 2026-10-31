@@ -3,12 +3,15 @@
 //! The page talks to this server only (no Tauri IPC). Each route renders an askama template: a full page for a
 //! normal request, a fragment for an htmx request (`HX-Request` header).
 
+pub mod applog;
 pub mod assets;
+pub mod audit;
 pub mod db;
 pub mod invoice;
 pub mod money;
 pub mod net;
 pub mod pdf;
+pub mod reference;
 mod routes;
 pub mod secrets;
 pub mod session;
@@ -67,6 +70,7 @@ pub fn router(state: AppState) -> Router {
         .merge(assets::router())
         .merge(session::router())
         .layer(axum::middleware::from_fn_with_state(state.clone(), web::origin_guard))
+        .layer(axum::middleware::from_fn(web::log_errors))
         .layer(axum::middleware::from_fn(web::security_headers))
         .with_state(state)
 }
