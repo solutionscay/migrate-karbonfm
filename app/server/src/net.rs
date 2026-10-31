@@ -2,9 +2,10 @@
 //!
 //! The app makes outbound calls only from Rust, and only to the SMTP host the user set and to the integration hosts
 //! the user enabled in settings. Every client (the SMTP sender, the HTTPS client of I6) asks [`OutboundPolicy`] first;
-//! a refused call is logged with its host and never sent. This is the stub the later integrations plug into: there
+//! a refused call is written to the app log (warn, host only) and never sent. This is the stub the later integrations plug into: there
 //! is no HTTP client yet.
 
+use crate::applog::{log_write, Entry, Level};
 use axum::http::Uri;
 use std::collections::BTreeSet;
 use std::fmt;
@@ -85,7 +86,7 @@ impl OutboundPolicy {
                 Err(Refused::HostNotEnabled(host))
             }
         })();
-        log_refusal(&result);
+        log_refusal("outbound https", &result);
         result
     }
 
@@ -94,15 +95,23 @@ impl OutboundPolicy {
         let host = host.trim().to_ascii_lowercase();
         let result =
             if self.smtp.as_deref() == Some(host.as_str()) { Ok(()) } else { Err(Refused::HostNotEnabled(host)) };
-        log_refusal(&result);
+        log_refusal("outbound smtp", &result);
         result
     }
 }
 
-/// To stderr until the log of BR-ADMIN-03 exists (the I1 database slice); the line has no URL path or query.
-fn log_refusal(result: &Result<(), Refused>) {
+/// Writes a refusal to the app log (OP-ADMIN-05, BR-ADMIN-03) at warn level with code Integration (05, D-25). The
+/// message names the host only, never the URL path or query, and `log_write` masks it again (AP-03).
+fn log_refusal(operation: &str, result: &Result<(), Refused>) {
     if let Err(e) = result {
-        eprintln!("{e}");
+        let message = e.to_string();
+        log_write(&Entry {
+            level: Level::Warn,
+            operation,
+            code: Some("Integration"),
+            message: &message,
+            payload: None,
+        });
     }
 }
 
