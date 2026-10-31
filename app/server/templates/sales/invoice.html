@@ -11,9 +11,29 @@
     <div class="ml-auto flex gap-2">
       {# S-02 compares the two PDF paths: the webview's print dialog and the PDF generated in Rust. #}
       <button class="btn btn-sm btn-quiet" data-print><svg class="i i-sm"><use href="#i-printer"/></svg>Print (webview)</button>
-      <a class="btn btn-sm btn-primary" href="/sales/{{ inv.doc_number }}/invoice.pdf"><svg class="i i-sm"><use href="#i-download"/></svg>PDF</a>
+      {# Not a link: a PDF that replaces the app page strands the desktop window (no sidebar, no back button). #}
+      <button class="btn btn-sm btn-primary" data-pdf-open="pdf-preview" aria-haspopup="dialog"><svg class="i i-sm"><use href="#i-download"/></svg>PDF</button>
     </div>
   </div>
+  {# PDF preview: the file in a frame inside the app. app.js opens it, or saves at once where the webview has no PDF
+     viewer (WebKitGTK). Save goes server -> desktop shell -> native save dialog; in a browser it is a download link. #}
+  <dialog id="pdf-preview" class="modal" aria-labelledby="pdf-preview-title" data-src="/sales/{{ inv.doc_number }}/invoice.pdf">
+    <div class="modal-box p-0 pdf-box">
+      <div class="px-5 pt-4 pb-3 border-b hairline flex items-center gap-2">
+        <h2 id="pdf-preview-title" class="font-semibold text-[15px] mono">{{ inv.doc_number }}.pdf</h2>
+        <div class="ml-auto flex items-center gap-2">
+          {% if can_save %}
+          <button class="btn btn-sm btn-primary" data-pdf-save hx-post="/sales/{{ inv.doc_number }}/save-pdf" hx-swap="none" hx-disabled-elt="this"><svg class="i i-sm"><use href="#i-download"/></svg>Save PDF…</button>
+          {% else %}
+          <a class="btn btn-sm btn-primary" data-pdf-save href="/sales/{{ inv.doc_number }}/invoice.pdf" download="{{ inv.doc_number }}.pdf"><svg class="i i-sm"><use href="#i-download"/></svg>Save PDF…</a>
+          {% endif %}
+          <button type="button" class="icon-btn" aria-label="Close" autofocus @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+        </div>
+      </div>
+      <iframe class="pdf-frame" title="{{ inv.doc_number }} PDF preview"></iframe>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
+  </dialog>
 </div>
 {% include "sales/document.html" %}
 {% endblock %}

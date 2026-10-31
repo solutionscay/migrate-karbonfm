@@ -33,6 +33,23 @@
     } catch (_) {}
     window.print();
   });
+
+  // Invoice PDF: shown in an in-app <dialog>, never as the page itself, so the window always keeps the app (S-02's
+  // stranded-window bug). Where the webview has no PDF viewer (WebKitGTK on Linux) the button saves the file instead.
+  document.addEventListener("click", (e) => {
+    const button = e.target.closest("[data-pdf-open]");
+    if (!button) return;
+    const dialog = document.getElementById(button.dataset.pdfOpen);
+    if (!navigator.pdfViewerEnabled) { dialog.querySelector("[data-pdf-save]").click(); return; }
+    const frame = dialog.querySelector("iframe");
+    // Esc closes the dialog even when the PDF has the focus (the frame is same-origin, so we can listen in it).
+    frame.onload = () => {
+      try { frame.contentDocument.addEventListener("keydown", (k) => { if (k.key === "Escape") dialog.close(); }); } catch (_) {}
+    };
+    frame.src = dialog.dataset.src;
+    dialog.addEventListener("close", () => { frame.src = "about:blank"; }, { once: true });
+    dialog.showModal();
+  });
 })();
 
 window.karbonTheme = {

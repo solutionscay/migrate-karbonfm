@@ -18,6 +18,7 @@ pub fn router() -> Router<AppState> {
         .route("/customers/new", get(customers::new_dialog).post(customers::create))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
+        .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))
         .route("/print", post(print))
 }
 
