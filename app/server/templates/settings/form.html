@@ -1,0 +1,87 @@
+{# UI-17 settings form (OP-ADMIN-03). htmx PUTs it and swaps it with the answer: the same form, with field errors
+   (422) or "Saved". Secrets are SecretFields: write-only, the page only knows whether one is saved (AP-03). #}
+{% macro field(name, label, value, hint) %}
+<label class="block">
+  <span class="text-[12px] muted">{{ label }}</span>
+  <input name="{{ name }}" value="{{ value }}" placeholder="{{ hint }}" class="input input-sm w-full mt-1" {% if error(name).is_some() %}aria-invalid="true" aria-describedby="err-{{ name }}"{% endif %}>
+  {% if let Some(e) = error(name) %}<span id="err-{{ name }}" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+</label>
+{% endmacro %}
+<form id="settings-form" class="space-y-5 max-w-3xl" hx-put="/settings" hx-target="#settings-form" hx-swap="outerHTML" novalidate>
+  {% if saved %}
+  <div role="status" class="alert alert-success alert-soft text-[13px] py-2">Settings saved.</div>
+  {% endif %}
+  {% if !errors.is_empty() %}
+  <div role="alert" class="alert alert-error alert-soft text-[13px] py-2">Check the fields marked below. Nothing was saved.</div>
+  {% endif %}
+
+  <section class="panel" aria-labelledby="s-business">
+    <div class="panel-head"><h2 id="s-business" class="panel-title">Business and sales tax</h2></div>
+    <div class="p-5 grid grid-cols-2 gap-3">
+      <label class="block col-span-2">
+        <span class="text-[12px] muted">Owner organization</span>
+        <select name="owner_id" class="select select-sm w-full mt-1" {% if error("owner_id").is_some() %}aria-invalid="true" aria-describedby="err-owner_id"{% endif %}>
+          {% for (id, name) in owners %}
+          <option value="{{ id }}" {% if *id == form.owner_id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+        {% if let Some(e) = error("owner_id") %}<span id="err-owner_id" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+      </label>
+      {% call field("tax_rate", "Sales tax rate (%)", form.tax_rate, "5.5") %}
+      {% call field("default_tax_code", "Default tax code", form.default_tax_code, "TAX") %}
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="s-phone">
+    <div class="panel-head"><h2 id="s-phone" class="panel-title">Country and phone numbers</h2></div>
+    <div class="p-5 grid grid-cols-2 gap-3">
+      {% call field("country_code", "Country calling code", form.country_code, "1") %}
+      {% call field("area_code", "Default area code", form.area_code, "207") %}
+      <label class="flex items-center gap-2 text-[13px] col-span-2">
+        <input type="checkbox" name="format_phone_numbers" value="on" class="checkbox checkbox-sm" {% if form.format_phone_numbers == "on" %}checked{% endif %}>
+        Format US phone numbers as they are typed
+      </label>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="s-email">
+    <div class="panel-head"><h2 id="s-email" class="panel-title">System email account</h2></div>
+    <div class="p-5 grid grid-cols-2 gap-3">
+      {% call field("email_full_name", "Sender name", form.email_full_name, "Ellison Studio") %}
+      {% call field("email_address", "Email address", form.email_address, "billing@example.com") %}
+      {% call field("smtp_server", "SMTP server", form.smtp_server, "smtp.example.com") %}
+      {% call field("smtp_port", "Port", form.smtp_port, "587") %}
+      <label class="block">
+        <span class="text-[12px] muted">Encryption</span>
+        <select name="smtp_encryption" class="select select-sm w-full mt-1">
+          {% for o in ENCRYPTION %}<option {% if *o == form.smtp_encryption %}selected{% endif %}>{{ o }}</option>{% endfor %}
+        </select>
+        {% if let Some(e) = error("smtp_encryption") %}<span class="text-error text-[12px]">{{ e }}</span>{% endif %}
+      </label>
+      <label class="block">
+        <span class="text-[12px] muted">Authentication</span>
+        <select name="smtp_authentication" class="select select-sm w-full mt-1">
+          {% for o in AUTHENTICATION %}<option {% if *o == form.smtp_authentication %}selected{% endif %}>{{ o }}</option>{% endfor %}
+        </select>
+        {% if let Some(e) = error("smtp_authentication") %}<span class="text-error text-[12px]">{{ e }}</span>{% endif %}
+      </label>
+      {% call field("email_user_name", "SMTP user name", form.email_user_name, "billing@example.com") %}
+      <div>{{ smtp_password|safe }}</div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="s-integrations">
+    <div class="panel-head"><h2 id="s-integrations" class="panel-title">Integrations</h2></div>
+    <div class="p-5 space-y-3">
+      <p class="muted text-[12.5px]">Keys are kept in the system keychain. Address suggestions and enrichment stay off until they are built.</p>
+      <div class="grid grid-cols-2 gap-3">
+        {% for key in api_keys %}<div>{{ key|safe }}</div>{% endfor %}
+      </div>
+      <p class="text-[13px] pt-1"><span class="muted">Accounting:</span> {{ accounting }}</p>
+    </div>
+  </section>
+
+  <div class="flex justify-end">
+    <button class="btn btn-sm btn-primary">Save settings</button>
+  </div>
+</form>

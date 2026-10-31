@@ -22,6 +22,7 @@ mod web;
 use axum::Router;
 pub use routes::ROUTES;
 use rusqlite::Connection;
+use secrets::{MemoryStore, SecretStore};
 use session::Session;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::sync::atomic::AtomicBool;
@@ -41,6 +42,8 @@ pub struct AppState {
     origin: Option<String>,
     /// The per-launch session cookie that only the app window gets (AP-13).
     session: Option<Arc<Session>>,
+    /// Keychain secrets (AP-03): `Keychain` in the desktop app, `MemoryStore` (the default) in tests and the dev server.
+    secrets: Arc<dyn SecretStore>,
     /// Set once setup is seen done (it is never undone), so the setup gate stops asking SQLite.
     setup_done: Arc<AtomicBool>,
 }
@@ -52,8 +55,15 @@ impl AppState {
             print: None,
             origin: None,
             session: None,
+            secrets: Arc::new(MemoryStore::default()),
             setup_done: Arc::new(AtomicBool::new(false)),
         }
+    }
+
+    /// The secret store; the desktop shell passes `secrets::Keychain`.
+    pub fn with_secrets(mut self, secrets: Arc<dyn SecretStore>) -> Self {
+        self.secrets = secrets;
+        self
     }
 
     /// The desktop shell passes the window's print function. `window.print()` does nothing in WKWebView on macOS

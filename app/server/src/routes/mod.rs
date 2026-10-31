@@ -1,8 +1,10 @@
 //! Route handlers (05). Each handler queries or calls a command, then renders a template.
 
+pub mod current_user;
 mod customers;
 mod dashboard;
 mod sales;
+mod settings;
 mod setup;
 
 pub use setup::setup_gate;
@@ -28,6 +30,8 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/print"),
     ("GET", "/setup"),
     ("POST", "/setup"),
+    ("GET", "/settings"),
+    ("PUT", "/settings"),
     // assets.rs: the embedded static files.
     ("GET", "/assets/{*path}"),
     // session.rs: the one-time launch URL of AP-13.
@@ -43,6 +47,7 @@ pub fn router() -> Router<AppState> {
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/print", post(print))
         .route("/setup", get(setup::page).post(setup::submit))
+        .route("/settings", get(settings::page).put(settings::update))
 }
 
 /// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a
@@ -60,6 +65,7 @@ pub enum Nav {
     Dashboard,
     Customers,
     Invoices,
+    Settings,
 }
 
 /// Two-letter initials for an avatar: "Halden & Pryce Architects" -> "HP".
