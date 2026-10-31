@@ -1,16 +1,33 @@
 // No console window on Windows in release builds.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use karbon_server::applog;
+use karbon_server::db::Seed;
 use std::sync::Arc;
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
-            // The database lives in the per-user app data folder (D-17).
-            let data_dir = app.path().app_data_dir()?;
-            std::fs::create_dir_all(&data_dir)?;
-            let db = karbon_server::db::open_demo(Some(&data_dir.join("karbonfm-demo.db")))?;
+            // The log file in the per-user app log folder (D-30), before anything that can fail.
+            let log_dir = karbon_server::applog::init(app.path().app_log_dir()?)?;
+
+            // One database in the per-user app data folder (D-17): migrated by refinery, reference-seeded, and in
+            // the demo build demo-seeded while it has no party (03, "Demo seed data").
+            let db_path = karbon_server::db::database_path(&app.path().app_data_dir()?);
+            let seed = if cfg!(feature = "demo") { Seed::Demo } else { Seed::Reference };
+            let (db, report) = karbon_server::db::open(&db_path, seed).inspect_err(|e| {
+                applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
+            })?;
+            let started = format!(
+                "database {} (migrations applied: {:?}; reference rows: {}; demo seed loaded: {}); log {}",
+                db_path.display(),
+                report.migrations_applied,
+                report.reference_rows_inserted,
+                report.demo_seed_loaded,
+                log_dir.display()
+            );
+            applog::log_write(&applog::Entry::info("start", &started));
 
             // The local server: 127.0.0.1 on a free port, inside this process. Its print route opens the
             // window's native print dialog (window.print() does nothing in WKWebView on macOS).
@@ -23,7 +40,11 @@ fn main() {
             let (listener, addr) = tauri::async_runtime::block_on(karbon_server::bind())?;
             tauri::async_runtime::spawn(async move {
                 if let Err(e) = karbon_server::serve(listener, state).await {
-                    eprintln!("local server stopped: {e}");
+                    applog::log_write(&applog::Entry::error(
+                        "serve",
+                        "Internal",
+                        &format!("local server stopped: {e}"),
+                    ));
                 }
             });
 
