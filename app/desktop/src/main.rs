@@ -6,7 +6,10 @@ use std::sync::{mpsc, Arc};
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 fn main() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    #[cfg(target_os = "macos")]
+    let builder = builder.menu(go_menu::build).on_menu_event(go_menu::handle);
+    builder
         .setup(|app| {
             // The database lives in the per-user app data folder (D-17).
             let data_dir = app.path().app_data_dir()?;
@@ -31,7 +34,8 @@ fn main() {
             });
 
             // One window on the server URL. The window has no capabilities, so the page cannot call Tauri IPC.
-            let url = format!("http://{addr}/").parse()?;
+            let url: tauri::Url = format!("http://{addr}/").parse()?;
+            app.manage(Home(url.clone()));
             WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
                 .title("KarbonFM")
                 .inner_size(1440.0, 900.0)
@@ -42,6 +46,9 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running KarbonFM");
 }
+
+/// The app's start page on the local server (the Go > Home menu item navigates back to it).
+struct Home(tauri::Url);
 
 /// The server's save hook: the native save dialog on the window (as tauri-plugin-dialog shows it, but without
 /// registering that plugin, whose page script reroutes alert() and confirm() through IPC the page does not have),
@@ -66,4 +73,35 @@ fn save_file(handle: &AppHandle, name: String, bytes: Vec<u8>) -> Result<Option<
     std::fs::write(&path, bytes).map_err(|e| format!("could not write {}: {e}", path.display()))?;
     tauri_plugin_opener::open_path(&path, None::<&str>).map_err(|e| e.to_string())?;
     Ok(Some(path))
+}
+
+/// macOS menu bar: the standard menus plus Go > Back (Cmd+[) and Home (Shift+Cmd+H), so the window can always get
+/// back to the app, even from a page that is not the app's (a file shown full-window has no sidebar or back button).
+/// Windows and Linux keep no menu bar: WebView2 has Alt+Left built in, and WebKitGTK cannot show a PDF at all.
+#[cfg(target_os = "macos")]
+mod go_menu {
+    use super::Home;
+    use tauri::menu::{Menu, MenuEvent, MenuItem, Submenu};
+    use tauri::{AppHandle, Manager};
+
+    pub fn build(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
+        let menu = Menu::default(app)?;
+        let back = MenuItem::with_id(app, "go-back", "Back", true, Some("CmdOrCtrl+["))?;
+        let home = MenuItem::with_id(app, "go-home", "Home", true, Some("CmdOrCtrl+Shift+H"))?;
+        // After View, where Safari puts History: App, File, Edit, View, Go, Window, Help.
+        menu.insert(&Submenu::with_items(app, "Go", true, &[&back, &home])?, 4)?;
+        Ok(menu)
+    }
+
+    pub fn handle(app: &AppHandle, event: MenuEvent) {
+        let Some(window) = app.get_webview_window("main") else { return };
+        let result = match event.id().as_ref() {
+            "go-back" => window.eval("history.back()"),
+            "go-home" => window.navigate(app.state::<Home>().0.clone()),
+            _ => return,
+        };
+        if let Err(e) = result {
+            eprintln!("menu {}: {e}", event.id().as_ref());
+        }
+    }
 }
