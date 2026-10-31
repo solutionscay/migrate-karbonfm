@@ -6,6 +6,8 @@ Tailwind/DaisyUI, SQLite through rusqlite. See `migration/02_recommendations.md`
 ```bash
 cargo run -p karbon-desktop                          # the app (window)
 cargo run -p karbon-server --bin karbon-dev-server   # the same pages in a browser: open the one-time URL it prints
+cargo run -p karbon-server --bin karbon-dev-server -- 3000 --fresh   # a new install (no demo seed): starts on /setup
+KARBONFM_DATA_DIR=/tmp/kfm cargo run -p karbon-desktop --no-default-features   # fresh non-demo app, data in /tmp/kfm
 ./tools/build-css.sh                                 # rebuild server/assets/app.css after changing templates or styles
 cargo test && cargo clippy --all-targets -- -D warnings
 cd desktop && cargo tauri build                      # bundles (needs: cargo install tauri-cli --version 2.12.4 --locked)
