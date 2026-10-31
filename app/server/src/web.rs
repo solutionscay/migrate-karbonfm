@@ -40,6 +40,24 @@ pub async fn origin_guard(State(state): State<AppState>, req: Request, next: Nex
     next.run(req).await
 }
 
+/// The error behind a 5xx response, for [`log_errors`]. The page only gets a generic message (D-25).
+#[derive(Clone, Debug)]
+pub struct ErrorDetail {
+    pub code: &'static str,
+    pub message: String,
+}
+
+/// Writes a log line (OP-ADMIN-05) for every response that carries an [`ErrorDetail`], with the route as the
+/// operation. The message is masked by the log (AP-03, D-30).
+pub async fn log_errors(req: Request, next: Next) -> Response {
+    let operation = format!("{} {}", req.method(), req.uri().path());
+    let res = next.run(req).await;
+    if let Some(e) = res.extensions().get::<ErrorDetail>() {
+        crate::applog::log_write(&crate::applog::Entry::error(&operation, e.code, &e.message));
+    }
+    res
+}
+
 /// True for a request made by htmx, which wants a fragment instead of a full page.
 pub fn is_htmx(headers: &HeaderMap) -> bool {
     headers.get("hx-request").is_some_and(|v| v == "true")
@@ -61,8 +79,9 @@ impl IntoResponse for AppError {
         match self {
             AppError::NotFound => (StatusCode::NOT_FOUND, "Not found").into_response(),
             AppError::Internal(msg) => {
-                eprintln!("internal error: {msg}");
-                (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong").into_response()
+                let mut res = (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong").into_response();
+                res.extensions_mut().insert(ErrorDetail { code: "Internal", message: msg });
+                res
             }
         }
     }
