@@ -3,8 +3,9 @@
 
 use karbon_server::applog;
 use karbon_server::db::Seed;
-use std::sync::Arc;
-use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
+use std::path::PathBuf;
+use std::sync::{mpsc, Arc};
+use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 fn main() {
     tauri::Builder::default()
@@ -55,7 +56,16 @@ fn main() {
             let launch = session.launch_path().ok_or("session already used")?;
             // Secrets live in the OS keychain (AP-03); the settings page reads and writes them off the async workers.
             let secrets = Arc::new(karbon_server::secrets::Keychain::new());
-            let state = karbon_server::AppState::new(db).with_print(print).with_session(session).with_secrets(secrets);
+            // Backup and restore (OP-ADMIN-06, OP-ADMIN-07): the server asks for a folder, the shell shows the native
+            // dialog. The page itself never gets a path or file-system access (AP-01).
+            let handle = app.handle().clone();
+            let folder: karbon_server::FolderHook = Arc::new(move |what| pick_folder(&handle, what));
+            let state = karbon_server::AppState::new(db)
+                .with_print(print)
+                .with_session(session)
+                .with_secrets(secrets)
+                .with_folder_picker(folder)
+                .with_data_dir(&data_dir);
             tauri::async_runtime::spawn(async move {
                 if let Err(e) = karbon_server::serve(listener, state).await {
                     applog::log_write(&applog::Entry::error(
@@ -77,4 +87,27 @@ fn main() {
         })
         .run(tauri::generate_context!())
         .expect("error while running KarbonFM");
+}
+
+/// The server's folder hook: the native folder dialog on the window, shown on the main thread (rfd needs it there);
+/// the server's blocking task waits for the answer. `None` when the user cancels.
+fn pick_folder(handle: &AppHandle, what: karbon_server::FolderPick) -> Result<Option<PathBuf>, String> {
+    let window = handle.get_webview_window("main").ok_or("no main window")?;
+    let title = match what {
+        karbon_server::FolderPick::BackupDestination => "Choose where to save the backup",
+        karbon_server::FolderPick::RestoreSource => "Choose the backup folder to restore",
+    };
+    let (tx, rx) = mpsc::channel();
+    handle
+        .run_on_main_thread(move || {
+            let dialog = rfd::AsyncFileDialog::new()
+                .set_title(title)
+                .set_can_create_directories(true)
+                .set_parent(&window)
+                .pick_folder();
+            std::thread::spawn(move || tx.send(tauri::async_runtime::block_on(dialog)));
+        })
+        .map_err(|e| e.to_string())?;
+    let picked = rx.recv().map_err(|e| e.to_string())?;
+    Ok(picked.map(|f| f.path().to_path_buf()))
 }
