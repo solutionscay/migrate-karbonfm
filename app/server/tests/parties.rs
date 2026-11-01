@@ -665,3 +665,21 @@ async fn the_party_header_keeps_contact_methods_whole() {
     assert!(actions.contains(">Add</summary>") && actions.contains(r#"aria-label="More actions""#));
     assert!(actions.contains("Add contact method") && actions.contains("Add role") && actions.contains("Archive…"));
 }
+
+/// Item 4 of the Ep03 check: one word for one state. A role with current_ind = 0 reads "Inactive customer" on the
+/// party page, as the /customers chip, KPI and filter (design/customers.html:175, 192, 333); it said "Former".
+#[tokio::test]
+async fn an_inactive_role_reads_inactive_on_the_page_and_in_the_list() {
+    let app = demo();
+    // Marigold Events Co.: customer role with current_ind 0 (04_demo_seed.sql:263).
+    let (_, html) = get(&app, "/parties/p-me").await;
+    let header = &html[html.find(r#"id="party-header""#).unwrap()..];
+    let header = &header[..header.find("</section>").unwrap()];
+    assert!(header.contains(r#"<span class="chip">Inactive customer</span>"#), "{header}");
+    assert!(!html.contains("Former"));
+    let (_, html) = htmx_get(&app, "/customers?status=inactive").await;
+    assert!(html.contains("Marigold Events Co.") && html.contains("Inactive</span>"));
+    // A current role keeps its chip.
+    let (_, html) = get(&app, "/parties/p-hp").await;
+    assert!(html.contains("Current customer") && !html.contains("Inactive customer"));
+}
