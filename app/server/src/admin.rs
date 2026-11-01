@@ -47,10 +47,10 @@ impl From<rusqlite::Error> for CommandError {
 
 /// The single local user as the actor of every command (BR-ADMIN-04). `None` before setup.
 pub fn current_user(conn: &Connection) -> rusqlite::Result<Option<Actor>> {
-    conn.query_row("SELECT id, COALESCE(account_name, '') FROM user ORDER BY creation_timestamp, id LIMIT 1", [], |r| {
-        Ok(Actor::user(r.get::<_, String>(0)?, r.get::<_, String>(1)?))
-    })
-    .optional()
+    // The user an import mapped as "me" (app_meta.local_user, UI-18 step 2), else the first user.
+    let sql = "SELECT id, COALESCE(account_name, '') FROM user \
+               ORDER BY id IS NOT (SELECT value FROM app_meta WHERE key = 'local_user'), creation_timestamp, id LIMIT 1";
+    conn.query_row(sql, [], |r| Ok(Actor::user(r.get::<_, String>(0)?, r.get::<_, String>(1)?))).optional()
 }
 
 /// True once setup has run (system_setting.initial_setup_done_ind = 1). The demo seed sets it, so a demo database

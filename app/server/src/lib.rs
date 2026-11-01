@@ -10,6 +10,7 @@ pub mod audit;
 pub mod backup;
 pub mod db;
 pub mod ids;
+pub mod import;
 pub mod invoice;
 pub mod money;
 pub mod net;
