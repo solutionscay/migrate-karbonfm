@@ -205,11 +205,19 @@ fn secrets_and_pii_of_d09_are_not_imported() {
         r.report.rejected.iter().map(|x| (x.source_table.as_str(), x.reason.as_str())).collect();
     assert_eq!(rejected, [("System", "more than one System row"), ("Employee", "duplicate key r-mara-emp")]);
     for x in &r.report.rejected {
-        assert!(x.raw_json.contains(karbon_server::import::REDACTED), "{}", x.raw_json);
+        assert!(x.raw_json.starts_with('{') && x.raw_json.len() > 2, "{}", x.raw_json);
+        for dropped in ["SocialSecurityNumber", "SystemEmailAccountPassword", "TwilioAuthToken", "qbo_"] {
+            assert!(!x.raw_json.contains(dropped), "{dropped} in {}", x.raw_json);
+        }
     }
     let bytes = std::fs::read(db::database_path(&r.data)).unwrap();
     let text = String::from_utf8_lossy(&bytes);
-    for secret in ["synthetic-secret-not-imported", "synthetic-token-not-imported", "900-00-0001"] {
+    for secret in [
+        "synthetic-secret-not-imported",
+        "synthetic-token-not-imported",
+        "synthetic-twilio-not-imported",
+        "900-00-0001",
+    ] {
         assert!(!text.contains(secret), "{secret} is in the database");
     }
     for field in ["SystemEmailAccountPassword", "SmartyStreetsAuthToken"] {

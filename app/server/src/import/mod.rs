@@ -566,26 +566,20 @@ fn target_tables(conn: &Connection) -> Result<HashMap<String, TargetTable>, Impo
     Ok(out)
 }
 
-/// A rejected row's fields as JSON (header -> value), for import_rejected_row.raw_json. The secret and PII fields of
-/// D-09 are redacted and fields the DDR does not have are left out, so a rejected row never stores what an imported
-/// row may not (BR-IMPORT-02).
+/// A rejected row's fields as JSON (header -> value), for import_rejected_row.raw_json. Only the fields the import
+/// stores are kept: every field the register drops (the D-09 secrets, Twilio tokens, QBO keys, ...) and every field
+/// the DDR does not have is left out, so a rejected row never stores what an imported row may not (BR-IMPORT-02).
 fn raw_json(reg: &Register, table: &str, header: &[String], row: &[String]) -> String {
     let fields = reg.fields.get(table);
     let map: serde_json::Map<String, serde_json::Value> = header
         .iter()
         .zip(row.iter().chain(std::iter::repeat(&String::new())))
         .filter(|(_, v)| !v.is_empty())
-        .filter_map(|(h, v)| {
-            let f = fields.and_then(|m| m.get(h.as_str()))?;
-            let v = if f.decision.contains("D-09") { REDACTED.to_string() } else { v.clone() };
-            Some((h.clone(), serde_json::Value::String(v)))
-        })
+        .filter(|(h, _)| fields.and_then(|m| m.get(h.as_str())).is_some_and(|f| f.target.is_some()))
+        .map(|(h, v)| (h.clone(), serde_json::Value::String(v.clone())))
         .collect();
     serde_json::Value::Object(map).to_string()
 }
-
-/// What a rejected row's raw_json holds in place of a D-09 secret or PII value.
-pub const REDACTED: &str = "[not imported: D-09]";
 
 impl Loader<'_> {
     fn reject(&mut self, s: &mut Source, row: &[String], key: Option<&str>, reason: String) {

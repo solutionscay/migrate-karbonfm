@@ -678,6 +678,7 @@ impl G<'_> {
             ("SystemEmailUserName", "billing@ellisonstudio.example".into()),
             ("SystemEmailAccountPassword", "synthetic-secret-not-imported".into()), // D-09
             ("SmartyStreetsAuthToken", "synthetic-token-not-imported".into()),      // D-09
+            ("TwilioAuthToken", "synthetic-twilio-not-imported".into()),            // OD-05-02
             ("SystemEmailSmtpServer", "smtp.ellisonstudio.example".into()),
             ("SystemEmailSmtpServerPort", "587".into()),
             ("SystemEmailSmtpServerEncryptionType", "None".into()),
