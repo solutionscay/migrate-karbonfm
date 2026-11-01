@@ -582,3 +582,52 @@ async fn pickers_and_find_by_contact() {
     let (_, html) = htmx_get(&app, "/parties/by-contact?email=nobody%40x.example").await;
     assert!(html.contains("Nobody has that email or phone."));
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// S6: UI-13 sales and payments lists (read only)
+// ---------------------------------------------------------------------------------------------------------------
+
+#[tokio::test]
+async fn sales_list_shows_every_document_with_its_status() {
+    let app = demo();
+    let (status, html) = get(&app, "/sales").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Invoices &amp; receipts</h1>"));
+    assert!(html.contains(r#"href="/sales" aria-current="page""#), "the sidebar links the list now");
+    assert!(
+        html.contains("1–16 of 16") && html.contains("$29,619.05 due"),
+        "the posted open balance, as on /customers"
+    );
+    assert!(html.contains(r#"href="/sales/INV-1048""#) && html.contains(r#"href="/parties/p-hp""#));
+    let (_, html) = htmx_get(&app, "/sales?status=paid").await;
+    assert!(!html.contains("<html") && html.contains("INV-1027") && !html.contains("INV-1051"));
+    let (_, html) = htmx_get(&app, "/sales?kind=receipt").await;
+    assert!(html.contains("1–5 of 5"));
+    let (_, html) = htmx_get(&app, "/sales?q=bluefin").await;
+    assert!(html.contains("INV-1051") && html.contains("1–1 of 1"));
+    let (_, html) = htmx_get(&app, "/sales?q=%3Cb%3E").await;
+    assert!(html.contains("No sales transactions match.") && !html.contains("<b>"));
+}
+
+#[tokio::test]
+async fn payments_list_shows_what_each_payment_pays() {
+    let app = demo();
+    let (status, html) = get(&app, "/payments").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Payments</h1>") && html.contains(r#"href="/payments" aria-current="page""#));
+    assert!(html.contains("1–4 of 4"));
+    assert!(html.contains(r#"href="/sales/INV-10"#), "each payment links the documents it pays");
+    let (_, html) = htmx_get(&app, "/payments?q=nobody").await;
+    assert!(html.contains("No payments match."));
+}
+
+#[tokio::test]
+async fn sales_lists_of_a_fresh_install_are_empty() {
+    let app = fresh();
+    let (status, html) = get(&app, "/sales").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("0 sales transactions"));
+    let (status, html) = get(&app, "/payments").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("0 payments"));
+}

@@ -98,7 +98,7 @@ async fn invoice_lives_at_sales() {
     assert_eq!(status, StatusCode::NOT_FOUND);
     let (status, html) = get("/").await;
     assert_eq!(status, StatusCode::OK);
-    assert!(html.contains(r#"href="/sales/INV-1048""#), "the nav links to the invoice");
+    assert!(html.contains(r#"href="/sales""#), "the nav links to the sales list (UI-13)");
     assert!(!html.contains("/invoices/"));
 }
 

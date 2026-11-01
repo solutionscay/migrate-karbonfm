@@ -171,6 +171,8 @@ pub struct SalesView {
     pub total: String,
     pub balance: String,
     pub has_balance: bool,
+    pub customer: String,
+    pub customer_href: String,
 }
 
 impl From<SalesRow> for SalesView {
@@ -185,6 +187,8 @@ impl From<SalesRow> for SalesView {
             total: usd(r.total),
             balance: usd(r.balance),
             has_balance: r.balance != 0,
+            customer_href: if r.party_id.is_empty() { String::new() } else { party_href(&r.party_id) },
+            customer: r.customer,
             doc_number: r.doc_number,
         }
     }

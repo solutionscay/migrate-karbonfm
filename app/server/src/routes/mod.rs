@@ -9,6 +9,7 @@ mod parties;
 mod party_forms;
 mod relation_forms;
 mod sales;
+mod sales_lists;
 mod settings;
 mod setup;
 mod wizard;
@@ -56,6 +57,8 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/relations/{id}/edit"),
     ("PATCH", "/relations/{id}"),
     ("DELETE", "/relations/{id}"),
+    ("GET", "/sales"),
+    ("GET", "/payments"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/sales/{doc_number}/save-pdf"),
@@ -100,6 +103,8 @@ pub fn router() -> Router<AppState> {
         .route("/parties/{id}/relations", post(relation_forms::create))
         .route("/relations/{id}/edit", get(relation_forms::edit_dialog))
         .route("/relations/{id}", patch(relation_forms::update).delete(relation_forms::delete))
+        .route("/sales", get(sales_lists::sales))
+        .route("/payments", get(sales_lists::payments))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))
@@ -138,6 +143,7 @@ pub enum Nav {
     Customers,
     Parties,
     Invoices,
+    Payments,
     Settings,
 }
 
