@@ -25,13 +25,22 @@ fn main() {
             let log_dir = karbon_server::applog::init(log_dir)?;
 
             // One database in the per-user app data folder (D-17): migrated by refinery, reference-seeded, and in
-            // the demo build demo-seeded while it has no party (03, "Demo seed data").
+            // the demo builds filled with demo data when it is new (03, "Demo seed data").
             let data_dir = match &override_dir {
                 Some(dir) => dir.clone(),
                 None => app.path().app_data_dir()?,
             };
             let db_path = karbon_server::db::database_path(&data_dir);
-            let seed = if cfg!(feature = "demo") { Seed::Demo } else { Seed::Reference };
+            // The shipped build: a folder with no database gets the big demo (under a second in a release build,
+            // before the window opens). An existing database is left as it is.
+            #[cfg(feature = "big-demo")]
+            {
+                let outcome = karbon_server::big_demo::create(&data_dir).inspect_err(|e| {
+                    applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
+                })?;
+                applog::log_write(&applog::Entry::info("start", &format!("big demo: {outcome:?}")));
+            }
+            let seed = if cfg!(feature = "demo") && !cfg!(feature = "big-demo") { Seed::Demo } else { Seed::Reference };
             let (db, report) = karbon_server::db::open(&db_path, seed).inspect_err(|e| {
                 applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
             })?;

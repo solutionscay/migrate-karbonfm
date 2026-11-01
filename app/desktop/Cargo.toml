@@ -22,8 +22,12 @@ tauri = { version = "2", features = [] }
 tokio.workspace = true
 
 [features]
-# The demo build loads 04_demo_seed.sql into a database that has no party yet (03, "Demo seed data").
-default = ["demo"]
+# The app ships on the big demo (owner decision 2026-11-01, 03 "Demo seed data"): when the data folder has no
+# database, the first run generates the karbon-synth export and imports it (about 470 parties, 3,700 sales documents).
+# An existing database is never replaced. `--no-default-features --features demo` gives the small 04_demo_seed.sql
+# instead; `--no-default-features` gives an empty database that opens on setup.
+default = ["big-demo"]
+big-demo = ["karbon-server/big-demo"]
 demo = []
 # Set by the Tauri CLI for release builds (serves frontendDist from the binary).
 custom-protocol = ["tauri/custom-protocol"]
