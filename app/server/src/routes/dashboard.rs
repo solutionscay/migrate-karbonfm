@@ -27,8 +27,8 @@ pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppErro
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
     let owner_first_name: String = conn
         .query_row(
-            "SELECT pe.first_name FROM user u JOIN person pe ON pe.id = u.party_id ORDER BY u.id LIMIT 1",
-            [],
+            "SELECT pe.first_name FROM user u JOIN person pe ON pe.id = u.party_id WHERE u.id = ?1",
+            [crate::admin::current_user(&conn)?.and_then(|a| a.user_id)],
             |r| r.get(0),
         )
         .unwrap_or_else(|_| "there".into());
