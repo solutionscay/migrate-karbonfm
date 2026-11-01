@@ -301,7 +301,6 @@ pub async fn update(
             let view = view(&state, form, errors, false).await?;
             respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None)
         }
-        Err(CommandError::AlreadySetUp) => Err(AppError::Internal("settings_update: unexpected AlreadySetUp".into())),
-        Err(CommandError::Storage(e)) => Err(AppError::Internal(format!("settings_update: {e}"))),
+        Err(other) => Err(AppError::Internal(format!("settings_update: {other}"))),
     }
 }

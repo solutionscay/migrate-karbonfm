@@ -78,6 +78,16 @@ pub fn is_htmx(headers: &HeaderMap) -> bool {
     headers.get("hx-request").is_some_and(|v| v == "true")
 }
 
+/// Percent-encodes a query-string value.
+pub fn urlencode(s: &str) -> String {
+    s.bytes()
+        .map(|b| match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => (b as char).to_string(),
+            _ => format!("%{b:02X}"),
+        })
+        .collect()
+}
+
 pub fn render(t: &impl Template) -> Result<Html<String>, AppError> {
     Ok(Html(t.render()?))
 }

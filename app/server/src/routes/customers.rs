@@ -2,7 +2,7 @@
 
 use super::{initials, Nav};
 use crate::money::usd;
-use crate::web::{is_htmx, render, AppError};
+use crate::web::{is_htmx, render, urlencode, AppError};
 use crate::AppState;
 use askama::Template;
 use axum::extract::{Query, State};
@@ -39,15 +39,6 @@ impl ListQuery {
     pub fn href(&self, page: i64, status: &str) -> String {
         format!("/customers?q={}&status={status}&sort={}&page={page}", urlencode(&self.q), self.sort())
     }
-}
-
-fn urlencode(s: &str) -> String {
-    s.bytes()
-        .map(|b| match b {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => (b as char).to_string(),
-            _ => format!("%{b:02X}"),
-        })
-        .collect()
 }
 
 pub struct Row {

@@ -321,5 +321,6 @@ pub async fn submit(
             res.extensions_mut().insert(ErrorDetail { code: "Storage", message: format!("setup_welcome: {e}") });
             Ok(res)
         }
+        Err(other) => Err(AppError::Internal(format!("setup_welcome: {other}"))),
     }
 }

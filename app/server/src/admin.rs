@@ -20,6 +20,14 @@ pub enum CommandError {
     Validation(Vec<FieldError>),
     /// Setup ran already (or the database has a user): setup never runs twice.
     AlreadySetUp,
+    /// The record the command names does not exist (05: 404 for a record, an empty list for a search).
+    NotFound,
+    /// A create named an id that exists already (BR-PARTY-10: "use Edit Party instead"); carries that id.
+    AlreadyExists(String),
+    /// A destructive command ran without `confirm` (AP-07); carries the summary for the confirmation dialog.
+    ConfirmationRequired(String),
+    /// The command is refused by a rule (409), like a duplicate relation pair (BR-PARTY-03); carries the message.
+    Refused(String),
     Storage(rusqlite::Error),
 }
 
@@ -28,6 +36,10 @@ impl fmt::Display for CommandError {
         match self {
             CommandError::Validation(errors) => write!(f, "validation: {} field errors", errors.len()),
             CommandError::AlreadySetUp => f.write_str("setup is already done"),
+            CommandError::NotFound => f.write_str("not found"),
+            CommandError::AlreadyExists(id) => write!(f, "{id} exists already"),
+            CommandError::ConfirmationRequired(summary) => write!(f, "confirmation required: {summary}"),
+            CommandError::Refused(message) => f.write_str(message),
             CommandError::Storage(e) => write!(f, "database: {e}"),
         }
     }
