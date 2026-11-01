@@ -976,6 +976,16 @@ fn pair_of(conn: &Connection, id: &str) -> Result<(String, String, String, Strin
     Ok((id.to_owned(), back, from, to))
 }
 
+/// The relations of an archived party stay as they are (BR-PARTY-01), as its contact methods do.
+fn refuse_archived(conn: &Connection, a: &str, b: &str) -> Result<(), CommandError> {
+    for id in [a, b] {
+        if party_state(conn, id)?.1 {
+            return Err(CommandError::Refused("The relations of an archived party cannot be changed.".into()));
+        }
+    }
+    Ok(())
+}
+
 /// OP-PARTY-07 `party_relation_create` (BR-PARTY-03): both rows, current from today. A pair that exists already
 /// (either way) is refused, as is a relation of a party to itself or with an archived party. Returns the id of the
 /// other -> party row (the one the party's Contacts tab shows).
@@ -997,11 +1007,7 @@ pub fn party_relation_create(
         }]));
     }
     let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
-    for id in [&input.party_id, &input.other_id] {
-        if party_state(&tx, id)?.1 {
-            return Err(CommandError::Refused("An archived party cannot get a new relation.".into()));
-        }
-    }
+    refuse_archived(&tx, &input.party_id, &input.other_id)?;
     let exists: bool = tx.query_row(
         "SELECT EXISTS (SELECT 1 FROM party_relation WHERE (party_id_from = ?1 AND party_id_to = ?2)
                                                        OR (party_id_from = ?2 AND party_id_to = ?1))",
@@ -1052,7 +1058,8 @@ pub fn party_relation_update(
     actor: &Actor,
 ) -> Result<(), CommandError> {
     let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
-    let (row, back, _, _) = pair_of(&tx, id)?;
+    let (row, back, from, to) = pair_of(&tx, id)?;
+    refuse_archived(&tx, &from, &to)?;
     let stamp = Stamp::now(actor);
     match change {
         RelationChange::Edit { relationship, reciprocal, billing, shipping } => {
@@ -1093,6 +1100,7 @@ pub fn party_relation_delete(
 ) -> Result<(), CommandError> {
     let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let (row, back, from, to) = pair_of(&tx, id)?;
+    refuse_archived(&tx, &from, &to)?;
     if !confirm {
         let name = |pid: &str| -> rusqlite::Result<String> {
             tx.query_row("SELECT COALESCE(name_cached, '') FROM party WHERE id = ?1", [pid], |r| r.get(0))
@@ -1452,6 +1460,17 @@ mod tests {
         party_relation_delete(&mut conn, &id, true, &actor).unwrap();
         assert!(pair_rows(&conn, "p-tf", "p-bm").is_empty());
         assert!(relations_without_reciprocal(&conn).unwrap().is_empty());
+    }
+
+    #[test]
+    fn relations_of_an_archived_party_are_read_only() {
+        let (mut conn, actor) = demo_user();
+        conn.execute("UPDATE party SET deleted_ind = 1 WHERE id = 'p-ellison'", []).unwrap();
+        let refused = |r: Result<(), CommandError>| matches!(r, Err(CommandError::Refused(_)));
+        assert!(refused(party_relation_update(&mut conn, "rel-mara", &RelationChange::End, &actor)));
+        assert!(refused(party_relation_delete(&mut conn, "rel-mara", true, &actor)));
+        assert!(refused(party_relation_create(&mut conn, &relation("p-ellison", "p-tf", "x"), &actor).map(|_| ())));
+        assert_eq!(pair_rows(&conn, "p-mara", "p-ellison").len(), 2, "nothing changed");
     }
 
     #[test]
