@@ -1,0 +1,68 @@
+{# Create or edit a person or an organization (OP-PARTY-01/02/03), the body of the shared <dialog>. Field errors come
+   back with 422 and this body again; a create sends the page to the new party, an edit closes the dialog. #}
+{% macro field(name, label, value, kind) %}
+<label class="block">
+  <span class="text-[12px] muted">{{ label }}</span>
+  <input name="{{ name }}" value="{{ value }}" type="{{ kind }}" class="input input-sm w-full mt-1 {% if self.error(name).is_some() %}input-error{% endif %}" autocomplete="off"
+         {% if let Some(e) = self.error(name) %}aria-invalid="true" aria-describedby="err-{{ name }}"{% endif %}>
+  {% if let Some(e) = self.error(name) %}<span class="text-[12px] text-error" id="err-{{ name }}">{{ e }}</span>{% endif %}
+</label>
+{% endmacro %}
+<form {% if edit.is_some() %}hx-patch{% else %}hx-post{% endif %}="{{ self.action() }}" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">{{ self.title() }}</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3 max-h-[70vh] overflow-y-auto">
+    {% if let Some(message) = failure %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ message }}</div>{% endif %}
+    {% if let Some(e) = self.error("id") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    {% if !errors.is_empty() %}<div role="alert" class="sr-only">Check the highlighted fields.</div>{% endif %}
+    {% if edit.is_none() %}
+    <input type="hidden" name="id" value="{{ self.id() }}">
+    <input type="hidden" name="role" value="{{ self.role() }}">
+    {% endif %}
+    {% if organization %}
+      {% call field("organization_name", "Name", org.organization_name, "text") %}
+      <div class="grid grid-cols-2 gap-3">
+        {% call field("company_type", "Type of business (optional)", org.company_type, "text") %}
+        {% call field("federal_tax_id_number", "Tax ID (optional)", org.federal_tax_id_number, "text") %}
+      </div>
+    {% else %}
+      <div class="grid grid-cols-2 gap-3">
+        {% call field("first_name", "First name", person.first_name, "text") %}
+        {% call field("last_name", "Last name", person.last_name, "text") %}
+      </div>
+      {% if edit.is_some() %}
+      <div class="grid grid-cols-3 gap-3">
+        {% call field("prefix", "Prefix", person.prefix, "text") %}
+        {% call field("middle_name", "Middle name", person.middle_name, "text") %}
+        {% call field("suffix", "Suffix", person.suffix, "text") %}
+      </div>
+      {% call field("nickname", "Nickname", person.nickname, "text") %}
+      {% endif %}
+      <div class="grid grid-cols-2 gap-3">
+        {% call field("job_title", "Job title (optional)", person.job_title, "text") %}
+        {% call field("department", "Department (optional)", person.department, "text") %}
+      </div>
+    {% endif %}
+    {% if edit.is_none() %}
+    <div class="grid grid-cols-2 gap-3">
+      {% if organization %}
+        {% call field("email", "Email (optional)", org.email, "email") %}
+        {% call field("phone", "Phone (optional)", org.phone, "tel") %}
+      {% else %}
+        {% call field("email", "Email (optional)", person.email, "email") %}
+        {% call field("phone", "Phone (optional)", person.phone, "tel") %}
+      {% endif %}
+    </div>
+    {% endif %}
+    <label class="block">
+      <span class="text-[12px] muted">Comments (optional)</span>
+      <textarea name="comments" rows="3" class="textarea textarea-sm w-full mt-1">{% if organization %}{{ org.comments }}{% else %}{{ person.comments }}{% endif %}</textarea>
+    </label>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">{% if edit.is_some() %}Save{% else %}Create{% endif %}</button>
+  </div>
+</form>

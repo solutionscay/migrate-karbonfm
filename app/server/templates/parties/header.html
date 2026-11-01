@@ -1,5 +1,5 @@
 {# UI-04 header: name, kind, roles, contact methods, customer figures. The edit form (OP-PARTY-03) swaps #party-header. #}
-<section class="panel p-5 mb-5" id="party-header" aria-labelledby="party-name">
+<section class="panel p-5 mb-5" id="party-header" aria-labelledby="party-name"{% if oob %} hx-swap-oob="true"{% endif %}>
   <div class="flex flex-wrap items-start gap-5">
     <span class="av {% if d.organization %}org{% endif %} c{{ color }} av-lg" aria-hidden="true">{{ initials }}</span>
     <div class="flex-1 min-w-[280px]">
@@ -30,6 +30,22 @@
       </dl>
       {% endif %}
     </div>
+    {% if !d.archived %}
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Actions">
+      <button class="btn btn-sm btn-quiet" hx-get="{{ href }}/edit" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button>
+      {% if !self.missing_roles().is_empty() %}
+      <details class="dropdown dropdown-end">
+        <summary class="btn btn-sm btn-quiet"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add role</summary>
+        <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-44 p-1 shadow border hairline">
+          {% for role in self.missing_roles() %}
+          <li><button hx-post="{{ href }}/roles" hx-vals='{"role": "{{ role.key() }}"}' hx-target="#party-header" hx-swap="outerHTML">{{ role.label() }}</button></li>
+          {% endfor %}
+        </ul>
+      </details>
+      {% endif %}
+      <button class="btn btn-sm btn-quiet" hx-get="{{ href }}/archive" hx-target="#modal-body">Archive</button>
+    </div>
+    {% endif %}
   </div>
   {% if let Some(c) = d.customer %}
   <div class="grid grid-cols-2 md:grid-cols-4 gap-px mt-5 rounded-box overflow-hidden border hairline" style="background:var(--k-line)">

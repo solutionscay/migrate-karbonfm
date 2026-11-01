@@ -222,6 +222,10 @@ pub fn month_year(iso: &str) -> String {
 #[template(path = "parties/header.html")]
 pub struct Header<'a> {
     pub d: &'a PartyDetail,
+    /// Sent as an out-of-band swap (after the edit dialog saves).
+    pub oob: bool,
+    /// `/parties/{id}`.
+    pub href: String,
     pub initials: String,
     pub color: usize,
     pub subtitle: String,
@@ -246,7 +250,14 @@ impl<'a> Header<'a> {
                 parts.push(format!("Customer since {since}"));
             }
         }
-        Header { d, initials: initials(&d.name), color: color(&d.id), subtitle: parts.join(" · ") }
+        Header {
+            d,
+            oob: false,
+            href: party_href(&d.id),
+            initials: initials(&d.name),
+            color: color(&d.id),
+            subtitle: parts.join(" · "),
+        }
     }
     pub fn icon(&self, m: &Method) -> &'static str {
         match m.kind {
@@ -255,6 +266,11 @@ impl<'a> Header<'a> {
             MethodKind::Web => "globe",
             MethodKind::Address => "pin",
         }
+    }
+    /// The roles the party does not hold now, for the Add role menu.
+    pub fn missing_roles(&self) -> Vec<parties::RoleKind> {
+        use parties::RoleKind::*;
+        [Customer, Lead, Employee, Vendor].into_iter().filter(|k| !self.d.has_role(*k)).collect()
     }
     pub fn balance(&self) -> String {
         self.d.customer.as_ref().map(|c| usd(c.balance)).unwrap_or_default()

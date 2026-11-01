@@ -7,8 +7,7 @@ use crate::AppState;
 use askama::Template;
 use axum::extract::{Query, State};
 use axum::http::HeaderMap;
-use axum::response::{Html, IntoResponse, Response};
-use axum::Form;
+use axum::response::Html;
 use serde::Deserialize;
 
 pub const PAGE_SIZE: i64 = 8;
@@ -212,42 +211,4 @@ pub async fn list(
     }
     let totals = load_totals(&conn)?;
     render(&ListPage { nav: Nav::Customers, demo: crate::db::has_demo_data(&conn)?, totals, table })
-}
-
-#[derive(Template)]
-#[template(path = "customers/new_dialog.html")]
-struct NewDialog {
-    name: String,
-    email: String,
-    error: Option<&'static str>,
-}
-
-/// The "New customer" dialog body, loaded by htmx into the page's <dialog>.
-pub async fn new_dialog() -> Result<Html<String>, AppError> {
-    render(&NewDialog { name: String::new(), email: String::new(), error: None })
-}
-
-#[derive(Deserialize)]
-pub struct NewCustomer {
-    name: String,
-    email: String,
-}
-
-/// Validates the form on the server and answers with the dialog again (with the error) or a toast.
-/// Creating the party is I2 (OP-PARTY-01); the spike only shows the form round trip.
-pub async fn create(Form(form): Form<NewCustomer>) -> Result<Response, AppError> {
-    let name = form.name.trim().to_string();
-    let email = form.email.trim().to_string();
-    let error = if name.is_empty() {
-        Some("Enter a name.")
-    } else if !email.is_empty() && !email.contains('@') {
-        Some("Enter a valid email address, or leave it empty.")
-    } else {
-        None
-    };
-    if error.is_some() {
-        return Ok(render(&NewDialog { name, email, error })?.into_response());
-    }
-    let trigger = serde_json::json!({ "karbon-close-dialog": null, "karbon-toast": format!("{name}: saving customers comes in I2") });
-    Ok(([("HX-Trigger", trigger.to_string())], Html(String::new())).into_response())
 }

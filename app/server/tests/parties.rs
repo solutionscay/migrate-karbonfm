@@ -29,7 +29,6 @@ async fn htmx_get(app: &axum::Router, uri: &str) -> (StatusCode, String) {
     (s, b)
 }
 
-#[allow(dead_code)]
 fn form(method: &str, uri: &str, body: &str) -> Request<Body> {
     Request::builder()
         .method(method)
@@ -163,4 +162,163 @@ async fn archived_party_opens_by_id_marked_archived() {
     assert!(html.contains("INV-1046"), "its sales stay");
     let (_, html) = htmx_get(&app, "/parties?q=harbor").await;
     assert!(!html.contains("Harbor Lane Coffee"), "hidden from the list");
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// S3: create, edit, archive, roles (OP-PARTY-01..04, 10; T-08-07)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// The hidden id of a create dialog.
+fn form_id(html: &str) -> String {
+    let at = html.find(r#"name="id" value=""#).expect("the dialog has an id") + r#"name="id" value=""#.len();
+    html[at..at + 36].to_owned()
+}
+
+#[tokio::test]
+async fn create_a_person_from_the_dialog() {
+    let app = demo();
+    let (status, html) = htmx_get(&app, "/parties/people/new").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("New person") && html.contains(r#"hx-post="/parties/people""#));
+    assert!(html.contains("<span class=\"text-[12px] muted\">First name</span>"), "labelled fields");
+    let id = form_id(&html);
+    // A field error re-renders the dialog with 422 and the message next to the field.
+    let (status, _, html) =
+        send(&app, form("POST", "/parties/people", &format!("id={id}&role=&first_name=&last_name=&email=nope"))).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Enter a first or last name.") && html.contains(r#"aria-invalid="true""#));
+    assert!(html.contains("Enter an email address like name@example.com"));
+    // The save sends the page to the new party.
+    let body = format!("id={id}&role=lead&first_name=Ada&last_name=Quinn&email=ada%40example.com&phone=207+555+0199");
+    let (status, headers, _) = send(&app, form("POST", "/parties/people", &body)).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(headers.get("hx-redirect").unwrap(), &format!("/parties/{id}"));
+    let (_, html) = get(&app, &format!("/parties/{id}")).await;
+    assert!(html.contains("Ada Quinn") && html.contains("Current lead") && html.contains("ada@example.com"));
+    // The same form again (a double submit) opens the same party and creates nothing (BR-PARTY-10).
+    let (_, headers, _) = send(&app, form("POST", "/parties/people", &body)).await;
+    assert_eq!(headers.get("hx-redirect").unwrap(), &format!("/parties/{id}"));
+    let (_, html) = htmx_get(&app, "/parties?q=ada+quinn").await;
+    assert!(html.contains("1–1 of 1"));
+    // An unknown field is refused (deny_unknown_fields).
+    let (status, _, _) = send(&app, form("POST", "/parties/people", &format!("{body}&organization_name=x"))).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+#[tokio::test]
+async fn new_customer_from_the_top_bar_creates_an_organization_customer() {
+    let app = demo();
+    let (_, html) = htmx_get(&app, "/parties/organizations/new?role=customer").await;
+    assert!(html.contains("New customer") && html.contains(r#"name="role" value="customer""#));
+    let id = form_id(&html);
+    let (status, headers, _) = send(
+        &app,
+        form("POST", "/parties/organizations", &format!("id={id}&role=customer&organization_name=Pier+Nine+Ropes")),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(headers.get("hx-redirect").is_some());
+    let (_, html) = get(&app, "/customers?q=pier").await;
+    assert!(html.contains("Pier Nine Ropes"), "it is on the customer list");
+    // A plain form post (no htmx) gets a 303.
+    let req = Request::post("/parties/organizations")
+        .header(header::CONTENT_TYPE, "application/x-www-form-urlencoded")
+        .body(Body::from(format!("id={}&organization_name=Plain", karbon_server::ids::new_id())))
+        .unwrap();
+    let (status, headers, _) = send(&app, req).await;
+    assert_eq!(status, StatusCode::SEE_OTHER);
+    assert!(headers.get(header::LOCATION).unwrap().to_str().unwrap().starts_with("/parties/"));
+}
+
+#[tokio::test]
+async fn edit_swaps_the_header_and_closes_the_dialog() {
+    let app = demo();
+    let (status, html) = htmx_get(&app, "/parties/p-hp/edit").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"hx-patch="/parties/p-hp""#) && html.contains(r#"value="Halden &#38; Pryce Architects""#));
+    let (status, _, html) =
+        send(&app, form("PATCH", "/parties/p-hp", "organization_name=&company_type=&federal_tax_id_number=&comments="))
+            .await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(
+        html.contains("Enter the organization&#39;s name.") || html.contains("Enter the organization&#x27;s name."),
+        "{html}"
+    );
+    let (status, headers, html) = send(
+        &app,
+        form(
+            "PATCH",
+            "/parties/p-hp",
+            "organization_name=Halden+%26+Pryce&company_type=Architects&federal_tax_id_number=&comments=+hi+",
+        ),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"id="party-header""#) && html.contains(r#"hx-swap-oob="true""#));
+    assert!(html.contains("Halden &#38; Pryce</h1>"));
+    let trigger = headers.get("hx-trigger").unwrap().to_str().unwrap();
+    assert!(trigger.contains("karbon-close-dialog") && trigger.contains("Saved"));
+    let (_, html) = get(&app, "/parties/p-hp").await;
+    assert!(html.contains("Architects") && html.contains(">hi</dd>"));
+}
+
+#[tokio::test]
+async fn archive_goes_back_to_the_list_without_the_party() {
+    let app = demo();
+    let (status, html) = htmx_get(&app, "/parties/p-hl/archive").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Archive Harbor Lane Coffee?") && html.contains("1 sales transaction"));
+    let (status, headers, _) = send(&app, form("POST", "/parties/p-hl/archive", "reason=Closed")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(headers.get("hx-redirect").unwrap(), "/parties");
+    let (_, html) = htmx_get(&app, "/parties?q=harbor").await;
+    assert!(!html.contains("Harbor Lane Coffee"));
+    let (_, html) = get(&app, "/parties/p-hl").await;
+    assert!(html.contains("Archived on") && !html.contains(r#"hx-get="/parties/p-hl/edit""#), "no edit actions");
+    let (status, _) = htmx_get(&app, "/parties/p-hl/edit").await;
+    assert_eq!(status, StatusCode::CONFLICT);
+}
+
+/// T-08-07: a party cannot be deleted for good: there is no such route, and nothing changes.
+#[tokio::test]
+async fn t_08_07_no_hard_delete_of_a_party() {
+    let app = demo();
+    for (method, uri) in
+        [("DELETE", "/parties/p-hp"), ("POST", "/parties/p-hp/delete"), ("DELETE", "/parties/p-hp/archive")]
+    {
+        let (status, _, _) = send(&app, form(method, uri, "confirm=true")).await;
+        assert!(matches!(status, StatusCode::NOT_FOUND | StatusCode::METHOD_NOT_ALLOWED), "{method} {uri}: {status}");
+    }
+    let (status, _, _) = send(&app, form("DELETE", "/parties/p-hp", "confirm=true")).await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+    let (status, html) = get(&app, "/parties/p-hp").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(!html.contains("Archived"));
+}
+
+#[tokio::test]
+async fn add_role_answers_with_the_header() {
+    let app = demo();
+    let (_, html) = get(&app, "/parties/p-tf").await;
+    assert!(html.contains("Add role") && html.contains(r#"{"role": "lead"}"#));
+    assert!(!html.contains(r#"{"role": "customer"}"#), "the customer role is held already");
+    let (status, headers, html) = send(&app, form("POST", "/parties/p-tf/roles", "role=lead")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Current lead") && html.contains(r#"id="party-header""#));
+    let trigger = headers.get("hx-trigger").unwrap().to_str().expect("an ASCII header");
+    assert!(trigger.contains(r"Tom\u00e1s Ferreira is now a lead"), "{trigger}");
+    let (status, _, _) = send(&app, form("POST", "/parties/p-tf/roles", "role=owner")).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    let (status, _, _) = send(&app, form("POST", "/parties/nobody/roles", "role=lead")).await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+}
+
+/// Before setup there is no user, so a write is sent to setup (the setup gate and the CurrentUser extractor).
+#[tokio::test]
+async fn writes_need_setup() {
+    let (conn, _) = db::open_in_memory(db::Seed::Reference).unwrap();
+    let app = router(AppState::new(conn));
+    let (status, headers, _) = send(&app, form("POST", "/parties/people", "id=x&first_name=A")).await;
+    assert!(status == StatusCode::OK || status.is_redirection(), "{status}");
+    assert_eq!(headers.get("hx-redirect").map(|v| v.to_str().unwrap()), Some("/setup"));
 }

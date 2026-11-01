@@ -5,6 +5,7 @@ pub mod current_user;
 mod customers;
 mod dashboard;
 mod parties;
+mod party_forms;
 mod sales;
 mod settings;
 mod setup;
@@ -25,10 +26,17 @@ use axum::Router;
 pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/"),
     ("GET", "/customers"),
-    ("GET", "/customers/new"),
     ("GET", "/parties"),
+    ("GET", "/parties/people/new"),
+    ("POST", "/parties/people"),
+    ("GET", "/parties/organizations/new"),
+    ("POST", "/parties/organizations"),
     ("GET", "/parties/{id}"),
-    ("POST", "/customers/new"),
+    ("PATCH", "/parties/{id}"),
+    ("GET", "/parties/{id}/edit"),
+    ("GET", "/parties/{id}/archive"),
+    ("POST", "/parties/{id}/archive"),
+    ("POST", "/parties/{id}/roles"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/sales/{doc_number}/save-pdf"),
@@ -50,9 +58,15 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(dashboard::page))
         .route("/customers", get(customers::list))
-        .route("/customers/new", get(customers::new_dialog).post(customers::create))
         .route("/parties", get(parties::list))
-        .route("/parties/{id}", get(parties::detail))
+        .route("/parties/people/new", get(party_forms::new_person))
+        .route("/parties/people", post(party_forms::create_person))
+        .route("/parties/organizations/new", get(party_forms::new_organization))
+        .route("/parties/organizations", post(party_forms::create_organization))
+        .route("/parties/{id}", get(parties::detail).patch(party_forms::update).fallback(not_found))
+        .route("/parties/{id}/edit", get(party_forms::edit))
+        .route("/parties/{id}/archive", get(party_forms::archive_dialog).post(party_forms::archive))
+        .route("/parties/{id}/roles", post(party_forms::add_role))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))
@@ -71,6 +85,11 @@ async fn print(State(state): State<AppState>) -> Result<StatusCode, AppError> {
         Some(print) => print().map(|()| StatusCode::NO_CONTENT).map_err(AppError::Internal),
         None => Ok(StatusCode::NOT_IMPLEMENTED),
     }
+}
+
+/// A 404 for the other methods of a path (T-08-07: a party has no delete route, it is only archived).
+async fn not_found() -> StatusCode {
+    StatusCode::NOT_FOUND
 }
 
 /// Whether the sidebar shows the DEMO badge: the database holds the demo data (see [`crate::db::has_demo_data`]).

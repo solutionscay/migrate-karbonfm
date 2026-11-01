@@ -2,9 +2,10 @@
 //! create-party wizard. Plain SQL; each write command is one `BEGIN IMMEDIATE` transaction and stamps every row it
 //! writes (BR-PARTY-07). Routes parse forms and render; they never run SQL (AP-01).
 
-use crate::admin::CommandError;
-use crate::contacts::{self, Method};
-use rusqlite::{params_from_iter, Connection, OptionalExtension};
+use crate::admin::{CommandError, FieldError};
+use crate::audit::{self, Actor, Stamp};
+use crate::contacts::{self, Method, MethodInput};
+use rusqlite::{params, params_from_iter, Connection, OptionalExtension, TransactionBehavior};
 
 // ---------------------------------------------------------------------------------------------------------------
 // OP-PARTY-05 party_search
@@ -307,6 +308,32 @@ impl RoleKind {
             RoleKind::Vendor => "Vendor",
         }
     }
+    fn column(self) -> &'static str {
+        match self {
+            RoleKind::Customer => "customer_ind",
+            RoleKind::Lead => "lead_ind",
+            RoleKind::Employee => "employee_ind",
+            RoleKind::Vendor => "vendor_ind",
+        }
+    }
+    /// The subtype table of the role (D-15).
+    fn table(self) -> &'static str {
+        match self {
+            RoleKind::Customer => "customer",
+            RoleKind::Lead => "lead",
+            RoleKind::Employee => "employee",
+            RoleKind::Vendor => "vendor",
+        }
+    }
+    /// party_role_type_id: 2 customer and 4 lead are the ids the source hard-codes (BR-PARTY-05); employee and
+    /// vendor have none in the source, so they stay empty with only their flag set (CHECK-03 default).
+    fn type_id(self) -> Option<i64> {
+        match self {
+            RoleKind::Customer => Some(crate::reference::PartyRoleType::Customer.id()),
+            RoleKind::Lead => Some(crate::reference::PartyRoleType::Lead.id()),
+            RoleKind::Employee | RoleKind::Vendor => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -557,6 +584,349 @@ pub fn relations_of(conn: &Connection, party_id: &str) -> rusqlite::Result<Vec<R
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// BR-PARTY-06 party caches
+// ---------------------------------------------------------------------------------------------------------------
+
+/// The party display caches, as (column, SQL expression over the party row aliased `t`). The commands that change
+/// names or contact methods refresh them with [`refresh_caches`]; the import recomputes them for every party with
+/// the same expressions (import::recompute::party_caches), so both write the same formats.
+///
+/// name_cached is the organization name or "First Last"; the phone, email and address caches point at the primary
+/// of their kind, or the first one added when none is primary.
+pub fn cache_columns() -> Vec<(&'static str, String)> {
+    let name = "COALESCE(CASE WHEN COALESCE(t.organization_ind, 0) = 1 \
+                THEN (SELECT NULLIF(trim(o.organization_name), '') FROM organization o WHERE o.id = t.id) \
+                ELSE (SELECT NULLIF(trim(COALESCE(pe.first_name, '') || ' ' || COALESCE(pe.last_name, '')), '') \
+                      FROM person pe WHERE pe.id = t.id) END, t.name_cached)"
+        .to_owned();
+    let first = |join: &str, filter: &str, col: &str| {
+        format!(
+            "(SELECT {col} FROM contact_method cm JOIN {join} WHERE cm.party_id = t.id {filter} \
+             ORDER BY COALESCE(s.primary_ind, 0) DESC, cm.creation_timestamp, cm.id LIMIT 1)"
+        )
+    };
+    let phone = |col: &str| first("phone s ON s.id = cm.id", "", col);
+    let email = |col: &str| first("network_address s ON s.id = cm.id", "AND COALESCE(s.email_address_ind, 0) = 1", col);
+    let address = |col: &str| first("address a ON a.id = cm.id JOIN address s ON s.id = a.id", "", col);
+    vec![
+        ("name_cached", name),
+        ("phone_id_cached", phone("cm.id")),
+        ("phone_number_cached", phone("s.number")),
+        ("phone_label_cached", phone("cm.label")),
+        ("email_address_id_cached", email("cm.id")),
+        ("email_address_cached", email("s.address")),
+        ("email_address_label_cached", email("cm.label")),
+        ("address_id_cached", address("cm.id")),
+        ("address_display_cached", address(contacts::address_display_sql())),
+        ("address_label_cached", address("cm.label")),
+    ]
+}
+
+/// BR-PARTY-06: recomputes the display caches of one party (BR-CONTACT-05: a deleted method's caches clear).
+pub fn refresh_caches(conn: &Connection, party_id: &str) -> rusqlite::Result<()> {
+    let sets: Vec<String> = cache_columns().into_iter().map(|(col, expr)| format!("{col} = ({expr})")).collect();
+    conn.execute(&format!("UPDATE party AS t SET {} WHERE t.id = ?1", sets.join(", ")), [party_id])?;
+    Ok(())
+}
+
+/// BR-PARTY-08 CleanText: leading and trailing white space and control characters removed (line breaks and tabs
+/// inside the text stay; Windows line ends become `\n`).
+pub fn clean_text(text: &str) -> String {
+    text.replace("\r\n", "\n")
+        .replace('\r', "\n")
+        .chars()
+        .filter(|c| !c.is_control() || *c == '\n' || *c == '\t')
+        .collect::<String>()
+        .trim()
+        .to_owned()
+}
+
+fn opt(s: &str) -> Option<String> {
+    let t = clean_text(s);
+    (!t.is_empty()).then_some(t)
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// OP-PARTY-01 party_create_person, OP-PARTY-02 party_create_organization, OP-PARTY-03 party_update
+// ---------------------------------------------------------------------------------------------------------------
+
+/// What a create or edit form gives for the person or organization row, plus the party comments.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PartyFields {
+    Person(PersonFields),
+    Organization(OrganizationFields),
+}
+
+impl PartyFields {
+    fn check(&self) -> Vec<FieldError> {
+        let mut errors = Vec::new();
+        match self {
+            PartyFields::Person(p) if p.first_name.trim().is_empty() && p.last_name.trim().is_empty() => {
+                errors.push(FieldError { field: "first_name", message: "Enter a first or last name.".into() })
+            }
+            PartyFields::Organization(o) if o.organization_name.trim().is_empty() => {
+                errors.push(FieldError { field: "organization_name", message: "Enter the organization's name.".into() })
+            }
+            _ => {}
+        }
+        errors
+    }
+    fn organization(&self) -> bool {
+        matches!(self, PartyFields::Organization(_))
+    }
+}
+
+/// A create (OP-PARTY-01/02): the server-issued id of the form (BR-PARTY-10), the fields, an optional first email
+/// and phone (saved through the contact-method rules, BR-CONTACT-03/04) and an optional first role.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NewParty {
+    pub id: String,
+    pub fields: PartyFields,
+    pub comments: String,
+    pub email: String,
+    pub phone: String,
+    pub role: Option<RoleKind>,
+}
+
+/// A form id: what `ids::new_id` gives (36 characters of hex digits and dashes). The import keeps other ids.
+fn valid_form_id(id: &str) -> bool {
+    id.len() == 36 && id.chars().all(|c| c.is_ascii_hexdigit() || c == '-')
+}
+
+/// OP-PARTY-01 / OP-PARTY-02 (BR-PARTY-10): creates the party and its person or organization row with one id, the
+/// optional first email and phone and the optional role, in one transaction. An id that exists already is refused
+/// with AlreadyExists (a resubmitted form; the route sends the page to that party).
+pub fn party_create(conn: &mut Connection, new: &NewParty, actor: &Actor) -> Result<String, CommandError> {
+    let mut errors = new.fields.check();
+    if !valid_form_id(&new.id) {
+        errors.push(FieldError { field: "id", message: "The form is out of date. Close it and try again.".into() });
+    }
+    let email = (!new.email.trim().is_empty()).then(|| MethodInput::email(&new.email));
+    let phone = (!new.phone.trim().is_empty()).then(|| MethodInput::phone(&new.phone));
+    if let Some(m) = &email {
+        errors.extend(m.check("email_"));
+    }
+    if let Some(m) = &phone {
+        errors.extend(m.check("phone_"));
+    }
+    if !errors.is_empty() {
+        return Err(CommandError::Validation(errors));
+    }
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let exists: bool = tx.query_row("SELECT EXISTS (SELECT 1 FROM party WHERE id = ?1)", [&new.id], |r| r.get(0))?;
+    if exists {
+        return Err(CommandError::AlreadyExists(new.id.clone()));
+    }
+    let stamp = Stamp::now(actor);
+    let org = new.fields.organization();
+    tx.execute(
+        "INSERT INTO party (id, organization_ind, person_ind, deleted_ind, merge_ind, comments) VALUES (?1, ?2, ?3, 0, 0, ?4)",
+        params![new.id, i64::from(org), i64::from(!org), opt(&new.comments)],
+    )?;
+    audit::stamp_created(&tx, "party", &new.id, &stamp)?;
+    match &new.fields {
+        PartyFields::Person(_) => tx.execute("INSERT INTO person (id) VALUES (?1)", [&new.id])?,
+        PartyFields::Organization(_) => tx.execute("INSERT INTO organization (id) VALUES (?1)", [&new.id])?,
+    };
+    write_fields(&tx, &new.id, &new.fields)?;
+    audit::stamp_created(&tx, if org { "organization" } else { "person" }, &new.id, &stamp)?;
+    for m in email.iter().chain(phone.iter()) {
+        contacts::insert_method(&tx, &new.id, m, &stamp)?;
+    }
+    refresh_caches(&tx, &new.id)?;
+    if let Some(role) = new.role {
+        add_role(&tx, &new.id, role, &stamp)?;
+    }
+    tx.commit()?;
+    Ok(new.id.clone())
+}
+
+fn write_fields(conn: &Connection, id: &str, fields: &PartyFields) -> rusqlite::Result<()> {
+    match fields {
+        PartyFields::Person(p) => conn.execute(
+            "UPDATE person SET prefix = ?2, first_name = ?3, middle_name = ?4, last_name = ?5, suffix = ?6,
+                               nickname = ?7, job_title = ?8, department = ?9, employer_name = ?10 WHERE id = ?1",
+            params![
+                id,
+                opt(&p.prefix),
+                opt(&p.first_name),
+                opt(&p.middle_name),
+                opt(&p.last_name),
+                opt(&p.suffix),
+                opt(&p.nickname),
+                opt(&p.job_title),
+                opt(&p.department),
+                opt(&p.employer_name),
+            ],
+        )?,
+        PartyFields::Organization(o) => conn.execute(
+            "UPDATE organization SET organization_name = ?2, company_type = ?3, federal_tax_id_number = ?4 WHERE id = ?1",
+            params![id, opt(&o.organization_name), opt(&o.company_type), opt(&o.federal_tax_id_number)],
+        )?,
+    };
+    Ok(())
+}
+
+/// OP-PARTY-03 `party_update` (BR-PARTY-06, BR-PARTY-08): the person or organization fields and the comments
+/// (cleaned), then the name cache. The fields must be of the party's kind. An archived party is not edited.
+pub fn party_update(
+    conn: &mut Connection,
+    id: &str,
+    fields: &PartyFields,
+    comments: &str,
+    actor: &Actor,
+) -> Result<(), CommandError> {
+    let errors = fields.check();
+    if !errors.is_empty() {
+        return Err(CommandError::Validation(errors));
+    }
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let (org, archived) = party_state(&tx, id)?;
+    if archived {
+        return Err(CommandError::Refused("An archived party cannot be edited.".into()));
+    }
+    if org != fields.organization() {
+        return Err(CommandError::Validation(vec![FieldError {
+            field: "kind",
+            message: "These fields are for the other kind of party.".into(),
+        }]));
+    }
+    // A party imported without its person or organization row gets one now.
+    let table = if org { "organization" } else { "person" };
+    let missing = tx.execute(&format!("INSERT OR IGNORE INTO {table} (id) VALUES (?1)"), [id])?;
+    write_fields(&tx, id, fields)?;
+    tx.execute("UPDATE party SET comments = ?2 WHERE id = ?1", params![id, opt(comments)])?;
+    let stamp = Stamp::now(actor);
+    if missing == 1 {
+        audit::stamp_created(&tx, table, &id, &stamp)?;
+    } else {
+        audit::stamp_modified(&tx, table, &id, &stamp)?;
+    }
+    refresh_caches(&tx, id)?;
+    audit::stamp_modified(&tx, "party", &id, &stamp)?;
+    tx.commit()?;
+    Ok(())
+}
+
+/// (organization, archived) of a party, or NotFound.
+fn party_state(conn: &Connection, id: &str) -> Result<(bool, bool), CommandError> {
+    conn.query_row(
+        "SELECT COALESCE(organization_ind, 0) = 1, COALESCE(deleted_ind, 0) = 1 FROM party WHERE id = ?1",
+        [id],
+        |r| Ok((r.get(0)?, r.get(1)?)),
+    )
+    .optional()?
+    .ok_or(CommandError::NotFound)
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// OP-PARTY-04 party_archive
+// ---------------------------------------------------------------------------------------------------------------
+
+/// OP-PARTY-04 `party_archive` (BR-PARTY-01): no hard delete. Sets deleted_ind, the reason (cleaned), the time and
+/// the account name; nothing else changes, so the party's sales, activities and contact methods stay. Archiving an
+/// archived party changes nothing.
+pub fn party_archive(conn: &mut Connection, id: &str, reason: &str, actor: &Actor) -> Result<(), CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let (_, archived) = party_state(&tx, id)?;
+    if archived {
+        return Ok(());
+    }
+    let stamp = Stamp::now(actor);
+    tx.execute(
+        "UPDATE party SET deleted_ind = 1, deleted_reason = ?2, deleted_timestamp = ?3, deleted_account_name = ?4
+         WHERE id = ?1",
+        params![id, opt(reason), stamp.at, actor.account_name],
+    )?;
+    audit::stamp_modified(&tx, "party", &id, &stamp)?;
+    tx.commit()?;
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// OP-PARTY-10 party_role_add
+// ---------------------------------------------------------------------------------------------------------------
+
+/// OP-PARTY-10 `party_role_add` (BR-PARTY-05): idempotent. When the party holds the role already, its id is
+/// returned (a former role is made current again). A new role is current from today, with type 2 for a customer
+/// and 4 for a lead, and its subtype row (customer, lead, employee, vendor). The party must exist and not be
+/// archived.
+pub fn party_role_add(
+    conn: &mut Connection,
+    party_id: &str,
+    role: RoleKind,
+    actor: &Actor,
+) -> Result<String, CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let (_, archived) = party_state(&tx, party_id)?;
+    if archived {
+        return Err(CommandError::Refused("An archived party cannot get a new role.".into()));
+    }
+    let id = add_role(&tx, party_id, role, &Stamp::now(actor))?;
+    tx.commit()?;
+    Ok(id)
+}
+
+/// [`party_role_add`] inside the caller's transaction.
+pub(crate) fn add_role(
+    conn: &Connection,
+    party_id: &str,
+    role: RoleKind,
+    stamp: &Stamp,
+) -> Result<String, CommandError> {
+    let col = role.column();
+    let existing: Option<(String, bool)> = conn
+        .query_row(
+            &format!(
+                "SELECT id, COALESCE(current_ind, 0) = 1 FROM party_role WHERE party_id = ?1 AND COALESCE({col}, 0) = 1
+                 ORDER BY COALESCE(current_ind, 0) DESC, from_date DESC, id LIMIT 1"
+            ),
+            [party_id],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )
+        .optional()?;
+    let today = &stamp.at[..10];
+    let name: String =
+        conn.query_row("SELECT COALESCE(name_cached, '') FROM party WHERE id = ?1", [party_id], |r| r.get(0))?;
+    let id = match existing {
+        Some((id, true)) => id,
+        Some((id, false)) => {
+            conn.execute("UPDATE party_role SET current_ind = 1, thru_date = NULL WHERE id = ?1", [&id])?;
+            audit::stamp_modified(conn, "party_role", &id, stamp)?;
+            id
+        }
+        None => {
+            let id = crate::ids::new_id();
+            conn.execute(
+                "INSERT INTO party_role (id, party_id, party_role_type_id, customer_ind, lead_ind, employee_ind,
+                                         vendor_ind, current_ind, from_date)
+                 VALUES (?1, ?2, ?3, 0, 0, 0, 0, 1, ?4)",
+                params![id, party_id, role.type_id(), today],
+            )?;
+            conn.execute(&format!("UPDATE party_role SET {col} = 1 WHERE id = ?1"), [&id])?;
+            audit::stamp_created(conn, "party_role", &id, stamp)?;
+            id
+        }
+    };
+    // The subtype row (D-15); sales transactions point at the customer row (BR-PARTY-05 check).
+    let table = role.table();
+    let inserted = match role {
+        RoleKind::Customer => conn.execute(
+            "INSERT OR IGNORE INTO customer (id, display_name, balance, retainer_balance_cached, retainer_adjustment, taxable)
+             VALUES (?1, ?2, 0, 0, 0, 0)",
+            params![id, name],
+        )?,
+        RoleKind::Lead | RoleKind::Employee | RoleKind::Vendor => {
+            conn.execute(&format!("INSERT OR IGNORE INTO {table} (id, name_cached) VALUES (?1, ?2)"), params![id, name])?
+        }
+    };
+    if inserted == 1 {
+        audit::stamp_created(conn, table, &id, stamp)?;
+    }
+    Ok(id)
+}
+
+// ---------------------------------------------------------------------------------------------------------------
 // Data checks (BR-PARTY-03, BR-PARTY-05)
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -597,6 +967,209 @@ mod tests {
 
     fn q(query: &str) -> Search {
         Search { query: query.into(), ..Default::default() }
+    }
+
+    /// The demo database with its user as the actor.
+    fn demo_user() -> (Connection, Actor) {
+        let conn = demo();
+        let actor = crate::admin::current_user(&conn).unwrap().unwrap();
+        (conn, actor)
+    }
+
+    fn person(first: &str, last: &str) -> PartyFields {
+        PartyFields::Person(PersonFields { first_name: first.into(), last_name: last.into(), ..Default::default() })
+    }
+
+    fn new_party(fields: PartyFields) -> NewParty {
+        NewParty {
+            id: crate::ids::new_id(),
+            fields,
+            comments: String::new(),
+            email: String::new(),
+            phone: String::new(),
+            role: None,
+        }
+    }
+
+    fn one(conn: &Connection, sql: &str, id: &str) -> String {
+        conn.query_row(sql, [id], |r| r.get::<_, Option<String>>(0)).unwrap().unwrap_or_default()
+    }
+
+    #[test]
+    fn create_a_person_with_email_and_phone() {
+        let (mut conn, actor) = demo_user();
+        conn.execute("UPDATE system_setting SET automatically_format_phone_numbers_ind = 1, country_code = '1'", [])
+            .unwrap();
+        let new = NewParty {
+            email: " ada@example.com ".into(),
+            phone: "207.555.0199".into(),
+            comments: "  met at\r\nthe fair\u{7}  ".into(),
+            ..new_party(person("Ada", "Quinn"))
+        };
+        let id = party_create(&mut conn, &new, &actor).unwrap();
+        assert_eq!(id, new.id);
+        let d = party_get(&conn, &id).unwrap();
+        assert_eq!(d.name, "Ada Quinn");
+        assert!(!d.organization && d.person.is_some());
+        assert_eq!(d.comments, "met at\nthe fair", "CleanText (BR-PARTY-08)");
+        assert_eq!(one(&conn, "SELECT phone_number_cached FROM party WHERE id = ?1", &id), "(207) 555-0199");
+        assert_eq!(one(&conn, "SELECT email_address_cached FROM party WHERE id = ?1", &id), "ada@example.com");
+        assert!(d.methods.iter().all(|m| m.primary), "the first of each kind is primary");
+        // The party, person and contact rows share the stamps of one instant by the user (BR-PARTY-07).
+        let stamps: Vec<(String, String)> = conn
+            .prepare(
+                "SELECT creation_user_id, creation_timestamp FROM party WHERE id = ?1
+                 UNION ALL SELECT creation_user_id, creation_timestamp FROM person WHERE id = ?1
+                 UNION ALL SELECT creation_user_id, creation_timestamp FROM contact_method WHERE party_id = ?1",
+            )
+            .unwrap()
+            .query_map([&id], |r| Ok((r.get(0)?, r.get(1)?)))
+            .unwrap()
+            .collect::<Result<_, _>>()
+            .unwrap();
+        assert_eq!(stamps.len(), 4);
+        assert!(stamps.iter().all(|s| s == &stamps[0] && Some(&s.0) == actor.user_id.as_ref()));
+    }
+
+    #[test]
+    fn create_an_organization_customer_and_refuse_its_id_twice() {
+        let (mut conn, actor) = demo_user();
+        let new = NewParty {
+            role: Some(RoleKind::Customer),
+            ..new_party(PartyFields::Organization(OrganizationFields {
+                organization_name: "Pier Nine Ropes".into(),
+                ..Default::default()
+            }))
+        };
+        let id = party_create(&mut conn, &new, &actor).unwrap();
+        let d = party_get(&conn, &id).unwrap();
+        assert!(d.organization && d.has_role(RoleKind::Customer));
+        assert_eq!(d.customer.as_ref().unwrap().balance, 0);
+        let role = &d.roles[0];
+        assert_eq!(one(&conn, "SELECT CAST(party_role_type_id AS TEXT) FROM party_role WHERE id = ?1", &role.id), "2");
+        assert!(
+            matches!(party_create(&mut conn, &new, &actor), Err(CommandError::AlreadyExists(x)) if x == id),
+            "BR-PARTY-10"
+        );
+        assert!(customer_roles_without_customer_row(&conn).unwrap().is_empty());
+    }
+
+    #[test]
+    fn create_refuses_bad_input_and_leaves_nothing() {
+        let (mut conn, actor) = demo_user();
+        let before: i64 = conn.query_row("SELECT COUNT(*) FROM party", [], |r| r.get(0)).unwrap();
+        let bad = NewParty { email: "not-an-email".into(), phone: "call me".into(), ..new_party(person(" ", "")) };
+        let Err(CommandError::Validation(errors)) = party_create(&mut conn, &bad, &actor) else { panic!() };
+        let fields: Vec<_> = errors.iter().map(|e| e.field).collect();
+        assert_eq!(fields, ["first_name", "email", "phone"]);
+        let bad = NewParty { id: "x'; DROP TABLE party; --".into(), ..new_party(person("A", "B")) };
+        assert!(matches!(party_create(&mut conn, &bad, &actor), Err(CommandError::Validation(_))));
+        // A failing write after the first insert rolls the whole create back (one transaction).
+        conn.execute_batch("CREATE TRIGGER fail_person AFTER INSERT ON person BEGIN SELECT RAISE(ABORT, 'boom'); END;")
+            .unwrap();
+        let err = party_create(&mut conn, &new_party(person("Roll", "Back")), &actor).unwrap_err();
+        assert!(matches!(err, CommandError::Storage(_)), "{err}");
+        let after: i64 = conn.query_row("SELECT COUNT(*) FROM party", [], |r| r.get(0)).unwrap();
+        assert_eq!(before, after);
+    }
+
+    #[test]
+    fn update_changes_the_fields_the_name_cache_and_the_stamps() {
+        let (mut conn, actor) = demo_user();
+        let fields = PartyFields::Person(PersonFields {
+            first_name: "Mara".into(),
+            last_name: "Ellison-Hart".into(),
+            job_title: "Principal".into(),
+            ..Default::default()
+        });
+        party_update(&mut conn, "p-mara", &fields, "\tLikes early calls. ", &actor).unwrap();
+        let d = party_get(&conn, "p-mara").unwrap();
+        assert_eq!(d.name, "Mara Ellison-Hart");
+        assert_eq!(d.person.as_ref().unwrap().job_title, "Principal");
+        assert_eq!(d.comments, "Likes early calls.");
+        assert_eq!(
+            one(&conn, "SELECT modification_user_id FROM party WHERE id = ?1", "p-mara"),
+            actor.user_id.clone().unwrap()
+        );
+        let org = PartyFields::Organization(OrganizationFields { organization_name: "X".into(), ..Default::default() });
+        assert!(matches!(party_update(&mut conn, "p-mara", &org, "", &actor), Err(CommandError::Validation(_))));
+        assert!(matches!(party_update(&mut conn, "nobody", &fields, "", &actor), Err(CommandError::NotFound)));
+    }
+
+    #[test]
+    fn archive_hides_the_party_and_keeps_its_records() {
+        let (mut conn, actor) = demo_user();
+        let sales = |c: &Connection| -> i64 {
+            c.query_row("SELECT COUNT(*) FROM sales_transaction WHERE id_customer = 'r-hl'", [], |r| r.get(0)).unwrap()
+        };
+        let before = sales(&conn);
+        party_archive(&mut conn, "p-hl", "  Closed the shop ", &actor).unwrap();
+        let d = party_get(&conn, "p-hl").unwrap();
+        assert!(d.archived);
+        assert_eq!(d.deleted_reason, "Closed the shop");
+        assert_eq!(one(&conn, "SELECT deleted_account_name FROM party WHERE id = ?1", "p-hl"), actor.account_name);
+        assert!(crate::audit::is_timestamp(&d.deleted_timestamp));
+        assert_eq!(sales(&conn), before, "no cascade: the sales stay");
+        assert!(!d.methods.is_empty(), "contact methods stay");
+        assert!(party_search(&conn, &q("harbor lane")).unwrap().rows.is_empty());
+        party_archive(&mut conn, "p-hl", "again", &actor).unwrap();
+        assert_eq!(
+            party_get(&conn, "p-hl").unwrap().deleted_reason,
+            "Closed the shop",
+            "archiving twice changes nothing"
+        );
+        assert!(matches!(
+            party_update(&mut conn, "p-hl", &person("a", "b"), "", &actor),
+            Err(CommandError::Refused(_))
+        ));
+        assert!(matches!(party_archive(&mut conn, "nobody", "", &actor), Err(CommandError::NotFound)));
+    }
+
+    #[test]
+    fn role_add_is_idempotent() {
+        let (mut conn, actor) = demo_user();
+        let first = party_role_add(&mut conn, "p-tf", RoleKind::Lead, &actor).unwrap();
+        let again = party_role_add(&mut conn, "p-tf", RoleKind::Lead, &actor).unwrap();
+        assert_eq!(first, again);
+        assert_eq!(one(&conn, "SELECT CAST(party_role_type_id AS TEXT) FROM party_role WHERE id = ?1", &first), "4");
+        assert_eq!(one(&conn, "SELECT name_cached FROM lead WHERE id = ?1", &first), "Tomás Ferreira");
+        // The existing customer role of Halden & Pryce is returned, not a second one.
+        assert_eq!(party_role_add(&mut conn, "p-hp", RoleKind::Customer, &actor).unwrap(), "r-hp");
+        // Marigold's former customer role is made current again.
+        assert_eq!(party_role_add(&mut conn, "p-me", RoleKind::Customer, &actor).unwrap(), "r-me");
+        assert!(party_get(&conn, "p-me").unwrap().has_role(RoleKind::Customer));
+        // Employee and vendor roles have no type in the source (CHECK-03): only the flag.
+        let v = party_role_add(&mut conn, "p-bm", RoleKind::Vendor, &actor).unwrap();
+        assert_eq!(one(&conn, "SELECT CAST(party_role_type_id AS TEXT) FROM party_role WHERE id = ?1", &v), "");
+        assert_eq!(one(&conn, "SELECT CAST(vendor_ind AS TEXT) FROM party_role WHERE id = ?1", &v), "1");
+        assert!(matches!(party_role_add(&mut conn, "nobody", RoleKind::Lead, &actor), Err(CommandError::NotFound)));
+    }
+
+    #[test]
+    fn cache_columns_give_the_primary_or_the_first_method() {
+        let (conn, _) = demo_user();
+        // The demo seed's caches already hold what the expressions derive.
+        for id in ["p-hp", "p-ellison", "p-mara", "p-bm"] {
+            let before = party_get(&conn, id).unwrap();
+            let cached = |c: &Connection| -> (String, String) {
+                c.query_row(
+                    "SELECT COALESCE(phone_number_cached, ''), COALESCE(email_address_cached, '') FROM party WHERE id = ?1",
+                    [id],
+                    |r| Ok((r.get(0)?, r.get(1)?)),
+                )
+                .unwrap()
+            };
+            let seeded = cached(&conn);
+            refresh_caches(&conn, id).unwrap();
+            assert_eq!(cached(&conn), seeded, "{id}");
+            assert_eq!(party_get(&conn, id).unwrap().name, before.name);
+        }
+    }
+
+    #[test]
+    fn clean_text_rule() {
+        assert_eq!(clean_text("  a\u{0}b\r\nc\t \u{1b}"), "ab\nc");
+        assert_eq!(clean_text("\n\n"), "");
     }
 
     #[test]

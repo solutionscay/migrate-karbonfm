@@ -200,6 +200,8 @@ async fn t_08_01_only_registered_routes() {
         "/api/query?sql=SELECT+1",
         "/tables/party",
         "/customers/1/delete",
+        "/customers/new",
+        "/parties/p-hp/delete",
         "/ipc",
         "/plugin%3Asql%7Cexecute",
         "/__tauri__/ipc",

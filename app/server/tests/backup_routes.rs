@@ -128,8 +128,9 @@ async fn backup_then_restore_through_the_panel() {
     assert_eq!(app.post("/settings/restore/check", "").await.0, StatusCode::NO_CONTENT);
 
     // Change the data, through the app.
-    let (status, _, _) = app.post("/customers/new", "name=Acme&email=").await;
-    assert_eq!(status, StatusCode::OK);
+    let body = format!("id={}&organization_name=Acme", karbon_server::ids::new_id());
+    let (status, _, _) = app.post("/parties/organizations", &body).await;
+    assert!(status == StatusCode::OK || status == StatusCode::SEE_OTHER, "{status}");
     {
         let conn = rusqlite::Connection::open(db::database_path(&app.data)).unwrap();
         conn.execute_batch("PRAGMA foreign_keys = OFF; DELETE FROM sales_line;").unwrap();

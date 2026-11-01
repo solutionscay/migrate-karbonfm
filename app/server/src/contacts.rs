@@ -2,8 +2,11 @@
 //! and postal addresses. A contact method is a `contact_method` row plus one subtype row with the same id (D-15);
 //! purposes (billing, shipping, mailing) are `contact_method_purpose` rows with a cached flag on the contact method.
 
+use crate::admin::{CommandError, FieldError};
+use crate::audit::{self, Stamp};
+use crate::ids::new_id;
 use crate::reference::ContactMethodPurposeType;
-use rusqlite::{Connection, OptionalExtension};
+use rusqlite::{params, Connection, OptionalExtension};
 
 /// Which subtype a contact method is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -213,10 +216,369 @@ pub fn method(conn: &Connection, id: &str) -> rusqlite::Result<Option<Method>> {
     conn.query_row(&format!("{METHOD_SQL} WHERE cm.id = ?1"), [id], method_row).optional()
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// BR-CONTACT-04 phone numbers
+// ---------------------------------------------------------------------------------------------------------------
+
+/// The digits of a phone number (phone.number_digits_only, a stored calculation kept by the commands).
+pub fn digits_only(number: &str) -> String {
+    number.chars().filter(char::is_ascii_digit).collect()
+}
+
+/// BR-CONTACT-04: with automatic formatting on, a US number (country code 1, 10 digits, or 11 digits starting with
+/// the country code 1) is stored as `(207) 555-0142`; every other number is kept as typed (trimmed).
+pub fn format_phone(number: &str, country_code: Option<i64>, format_on: bool) -> String {
+    let typed = number.trim();
+    if !format_on || country_code != Some(1) {
+        return typed.to_owned();
+    }
+    let digits = digits_only(typed);
+    let ten = match digits.len() {
+        10 => digits.as_str(),
+        11 if digits.starts_with('1') => &digits[1..],
+        _ => return typed.to_owned(),
+    };
+    // A typed letter (a vanity number or a note) is not a plain number: keep it as typed.
+    if typed.chars().any(char::is_alphabetic) {
+        return typed.to_owned();
+    }
+    format!("({}) {}-{}", &ten[..3], &ten[3..6], &ten[6..])
+}
+
+/// The phone settings of the install: the default country code and automatic formatting (system_setting).
+pub fn phone_settings(conn: &Connection) -> rusqlite::Result<(Option<i64>, bool)> {
+    conn.query_row(
+        "SELECT CAST(NULLIF(trim(country_code), '') AS INTEGER), COALESCE(automatically_format_phone_numbers_ind, 0) = 1
+         FROM system_setting WHERE singleton = 1",
+        [],
+        |r| Ok((r.get(0)?, r.get(1)?)),
+    )
+    .optional()
+    .map(|o| o.unwrap_or((Some(1), false)))
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// OP-CONTACT-01 contact_method_save (the insert; S4 adds the update)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// What a contact-method form gives. Only the fields of `kind` are used.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct MethodInput {
+    pub kind: Option<MethodKind>,
+    pub label: String,
+    pub comment: String,
+    /// Make it the party's primary of its kind (BR-CONTACT-01). The first of a kind is primary anyway.
+    pub primary: bool,
+    /// Replaces the purposes (BR-CONTACT-03).
+    pub purposes: Vec<ContactMethodPurposeType>,
+    pub number: String,
+    pub extension: String,
+    /// Empty uses the install's country code.
+    pub country_code: Option<i64>,
+    pub fax: bool,
+    pub sms: bool,
+    pub address: String,
+    pub line1: String,
+    pub line2: String,
+    pub line3: String,
+    pub city: String,
+    pub state: String,
+    pub postal_code: String,
+    pub country: String,
+}
+
+impl MethodInput {
+    pub fn email(address: &str) -> Self {
+        Self { kind: Some(MethodKind::Email), address: address.into(), ..Default::default() }
+    }
+    pub fn phone(number: &str) -> Self {
+        Self { kind: Some(MethodKind::Phone), number: number.into(), ..Default::default() }
+    }
+
+    /// Field errors of the form; `prefix` names the fields (`""`, or `"email_"` on the create dialog).
+    pub fn check(&self, prefix: &str) -> Vec<FieldError> {
+        let field = |name: &'static str| -> &'static str {
+            match (prefix, name) {
+                ("", n) => n,
+                ("email_", "address") => "email",
+                ("phone_", "number") => "phone",
+                (_, n) => n,
+            }
+        };
+        let mut errors = Vec::new();
+        let mut err =
+            |name: &'static str, message: &str| errors.push(FieldError { field: field(name), message: message.into() });
+        match self.kind {
+            None => err("kind", "Choose phone, email, website or address."),
+            Some(MethodKind::Phone) => {
+                if digits_only(&self.number).is_empty() {
+                    err("number", "Enter a phone number.");
+                }
+            }
+            Some(MethodKind::Email) => {
+                if let Err(e) = crate::admin::parse_email(&self.address)
+                    .and_then(|o| o.ok_or_else(|| "Enter an email address like name@example.com.".to_owned()))
+                {
+                    err("address", &e);
+                }
+            }
+            Some(MethodKind::Web) => {
+                let a = self.address.trim();
+                if a.is_empty() || a.contains(char::is_whitespace) {
+                    err("address", "Enter a web address like example.com.");
+                }
+            }
+            Some(MethodKind::Address) => {
+                if [&self.line1, &self.city, &self.postal_code].iter().all(|s| s.trim().is_empty()) {
+                    err("line1", "Enter a street, a city or a postal code.");
+                }
+            }
+        }
+        errors
+    }
+}
+
+fn opt(s: &str) -> Option<&str> {
+    let t = s.trim();
+    (!t.is_empty()).then_some(t)
+}
+
+/// Inserts a contact method of `party_id` with its subtype row and purposes, inside the caller's transaction, then
+/// keeps one primary per kind (BR-CONTACT-01: the new one is primary when asked or when it is the first of its
+/// kind). The caller refreshes the party caches. Returns the new id.
+pub fn insert_method(
+    conn: &Connection,
+    party_id: &str,
+    input: &MethodInput,
+    stamp: &Stamp,
+) -> Result<String, CommandError> {
+    let errors = input.check("");
+    if !errors.is_empty() {
+        return Err(CommandError::Validation(errors));
+    }
+    let kind = input.kind.expect("checked");
+    let id = new_id();
+    conn.execute(
+        "INSERT INTO contact_method (id, party_id, phone_ind, address_ind, network_address_ind, label, comment,
+                                     billing_ind_cached, shipping_ind_cached, mailing_ind_cached)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 0, 0, 0)",
+        params![
+            id,
+            party_id,
+            i64::from(kind == MethodKind::Phone),
+            i64::from(kind == MethodKind::Address),
+            i64::from(matches!(kind, MethodKind::Email | MethodKind::Web)),
+            opt(&input.label),
+            opt(&input.comment),
+        ],
+    )?;
+    audit::stamp_created(conn, "contact_method", &id, stamp)?;
+    write_subtype(conn, &id, kind, input, true)?;
+    audit::stamp_created(conn, kind.table(), &id, stamp)?;
+    set_purposes(conn, &id, &input.purposes, stamp)?;
+    let has_primary: bool = conn.query_row(
+        &format!(
+            "SELECT EXISTS (SELECT 1 FROM contact_method cm JOIN {t} s ON s.id = cm.id
+             WHERE cm.party_id = ?1 AND cm.id <> ?2 AND COALESCE(s.primary_ind, 0) = 1 {email})",
+            t = kind.table(),
+            email = email_filter(kind, "s"),
+        ),
+        params![party_id, id],
+        |r| r.get(0),
+    )?;
+    if input.primary || !has_primary {
+        make_primary(conn, party_id, &id, kind, stamp)?;
+    }
+    Ok(id)
+}
+
+/// Email and web addresses share network_address but each kind has its own primary (the party caches the primary
+/// email; a website is never the primary email). Returns the extra filter for `alias`.
+fn email_filter(kind: MethodKind, alias: &str) -> String {
+    match kind {
+        MethodKind::Email => format!("AND COALESCE({alias}.email_address_ind, 0) = 1"),
+        MethodKind::Web => format!("AND COALESCE({alias}.email_address_ind, 0) = 0"),
+        _ => String::new(),
+    }
+}
+
+/// Writes the subtype row of `kind` (insert, or update of an existing row).
+fn write_subtype(
+    conn: &Connection,
+    id: &str,
+    kind: MethodKind,
+    input: &MethodInput,
+    insert: bool,
+) -> Result<(), CommandError> {
+    match kind {
+        MethodKind::Phone => {
+            let (default_cc, format_on) = phone_settings(conn)?;
+            let cc = input.country_code.or(default_cc);
+            let number = format_phone(&input.number, cc, format_on);
+            let digits = digits_only(&number);
+            if insert {
+                conn.execute(
+                    "INSERT INTO phone (id, number, extension, country_code, primary_ind, fax_ind, sms_ind, voice_ind,
+                                        number_digits_only)
+                     VALUES (?1, ?2, ?3, ?4, 0, ?5, ?6, ?7, ?8)",
+                    params![
+                        id,
+                        number,
+                        opt(&input.extension),
+                        cc,
+                        i64::from(input.fax),
+                        i64::from(input.sms),
+                        i64::from(!input.fax),
+                        digits
+                    ],
+                )?;
+            } else {
+                conn.execute(
+                    "UPDATE phone SET number = ?2, extension = ?3, country_code = ?4, fax_ind = ?5, sms_ind = ?6,
+                                      voice_ind = ?7, number_digits_only = ?8 WHERE id = ?1",
+                    params![
+                        id,
+                        number,
+                        opt(&input.extension),
+                        cc,
+                        i64::from(input.fax),
+                        i64::from(input.sms),
+                        i64::from(!input.fax),
+                        digits
+                    ],
+                )?;
+            }
+        }
+        MethodKind::Email | MethodKind::Web => {
+            let email = kind == MethodKind::Email;
+            if insert {
+                conn.execute(
+                    "INSERT INTO network_address (id, address, primary_ind, email_address_ind, web_address_ind)
+                     VALUES (?1, ?2, 0, ?3, ?4)",
+                    params![id, input.address.trim(), i64::from(email), i64::from(!email)],
+                )?;
+            } else {
+                conn.execute(
+                    "UPDATE network_address SET address = ?2, email_address_ind = ?3, web_address_ind = ?4 WHERE id = ?1",
+                    params![id, input.address.trim(), i64::from(email), i64::from(!email)],
+                )?;
+            }
+        }
+        MethodKind::Address => {
+            let values = params![
+                id,
+                opt(&input.line1),
+                opt(&input.line2),
+                opt(&input.line3),
+                opt(&input.city),
+                opt(&input.state),
+                opt(&input.postal_code),
+                opt(&input.country),
+            ];
+            if insert {
+                conn.execute(
+                    "INSERT INTO address (id, address_line_1, address_line_2, address_line_3, city, state_province,
+                                          postal_code, country, primary_ind)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, 0)",
+                    values,
+                )?;
+            } else {
+                conn.execute(
+                    "UPDATE address SET address_line_1 = ?2, address_line_2 = ?3, address_line_3 = ?4, city = ?5,
+                                        state_province = ?6, postal_code = ?7, country = ?8 WHERE id = ?1",
+                    values,
+                )?;
+            }
+        }
+    }
+    Ok(())
+}
+
+/// BR-CONTACT-03: replaces the purposes of a contact method with `purposes` and sets the cached flags.
+pub fn set_purposes(
+    conn: &Connection,
+    id: &str,
+    purposes: &[ContactMethodPurposeType],
+    stamp: &Stamp,
+) -> Result<(), CommandError> {
+    conn.execute("DELETE FROM contact_method_purpose WHERE contact_method_id = ?1", [id])?;
+    let mut seen = Vec::new();
+    for p in purposes {
+        if seen.contains(p) {
+            continue;
+        }
+        seen.push(*p);
+        let row = new_id();
+        conn.execute(
+            "INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpose_type_id) VALUES (?1, ?2, ?3)",
+            params![row, id, p.id()],
+        )?;
+        audit::stamp_created(conn, "contact_method_purpose", &row, stamp)?;
+    }
+    sync_purpose_flags(conn, id)
+}
+
+/// Sets billing/shipping/mailing_ind_cached from the purpose rows (ids 1, 2, 3; BR-CONTACT-02).
+fn sync_purpose_flags(conn: &Connection, id: &str) -> Result<(), CommandError> {
+    let has = |t: ContactMethodPurposeType| {
+        format!(
+            "EXISTS (SELECT 1 FROM contact_method_purpose x WHERE x.contact_method_id = ?1 \
+             AND x.contact_method_purpose_type_id = {})",
+            t.id()
+        )
+    };
+    conn.execute(
+        &format!(
+            "UPDATE contact_method SET billing_ind_cached = {}, shipping_ind_cached = {}, mailing_ind_cached = {}
+             WHERE id = ?1",
+            has(ContactMethodPurposeType::Billing),
+            has(ContactMethodPurposeType::Shipping),
+            has(ContactMethodPurposeType::Mailing)
+        ),
+        [id],
+    )?;
+    Ok(())
+}
+
+/// BR-CONTACT-01: makes `id` the primary of its kind and clears primary_ind on the party's others of that kind.
+fn make_primary(
+    conn: &Connection,
+    party_id: &str,
+    id: &str,
+    kind: MethodKind,
+    stamp: &Stamp,
+) -> Result<(), CommandError> {
+    let t = kind.table();
+    let mut stmt = conn.prepare(&format!(
+        "SELECT s.id FROM contact_method cm JOIN {t} s ON s.id = cm.id
+         WHERE cm.party_id = ?1 AND s.id <> ?2 AND COALESCE(s.primary_ind, 0) = 1 {}",
+        email_filter(kind, "s")
+    ))?;
+    let others: Vec<String> = stmt.query_map(params![party_id, id], |r| r.get(0))?.collect::<Result<_, _>>()?;
+    for other in others {
+        conn.execute(&format!("UPDATE {t} SET primary_ind = 0 WHERE id = ?1"), [&other])?;
+        audit::stamp_modified(conn, t, &other, stamp)?;
+    }
+    conn.execute(&format!("UPDATE {t} SET primary_ind = 1 WHERE id = ?1"), [id])?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::db::{open_in_memory, Seed};
+
+    #[test]
+    fn us_numbers_are_formatted_when_the_setting_is_on() {
+        assert_eq!(format_phone("2075550142", Some(1), true), "(207) 555-0142");
+        assert_eq!(format_phone(" 207.555.0142 ", Some(1), true), "(207) 555-0142");
+        assert_eq!(format_phone("+1 207 555 0142", Some(1), true), "(207) 555-0142");
+        assert_eq!(format_phone("2075550142", Some(1), false), "2075550142", "setting off: as typed");
+        assert_eq!(format_phone("+44 20 7946 0958", Some(44), true), "+44 20 7946 0958", "not US: as typed");
+        assert_eq!(format_phone("555-0142", Some(1), true), "555-0142", "7 digits: as typed");
+        assert_eq!(format_phone("1-800-FLOWERS", Some(1), true), "1-800-FLOWERS");
+        assert_eq!(digits_only("(207) 555-0142"), "2075550142");
+    }
 
     #[test]
     fn address_display_skips_empty_parts() {

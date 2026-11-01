@@ -44,12 +44,13 @@ async fn customers_page_shows_the_seed_totals() {
 async fn customers_page_has_one_new_customer_trigger() {
     let (status, html) = get("/customers").await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(html.matches(r#"hx-get="/customers/new""#).count(), 1, "only the top bar opens the dialog");
+    let trigger = r#"hx-get="/parties/organizations/new?role=customer""#;
+    assert_eq!(html.matches(trigger).count(), 1, "only the top bar opens the dialog");
     assert_eq!(html.matches(">New customer</button>").count(), 1);
     let topbar = html.find(r#"<header class="topbar">"#).unwrap();
     let topbar_end = topbar + html[topbar..].find("</header>").unwrap();
-    let trigger = html.find(r#"hx-get="/customers/new""#).unwrap();
-    assert!((topbar..topbar_end).contains(&trigger), "the trigger is in the top bar");
+    let at = html.find(trigger).unwrap();
+    assert!((topbar..topbar_end).contains(&at), "the trigger is in the top bar");
 }
 
 #[tokio::test]
@@ -79,27 +80,6 @@ async fn filters_search_and_sort() {
     let (status, html) = htmx_get("/customers?page=99").await;
     assert_eq!(status, StatusCode::OK);
     assert!(html.contains("Page 2 of 2"), "an out-of-range page is clamped");
-}
-
-#[tokio::test]
-async fn new_customer_dialog_validates_on_the_server() {
-    let (status, html) = get("/customers/new").await;
-    assert_eq!(status, StatusCode::OK);
-    assert!(html.contains("New customer") && html.contains(r#"hx-post="/customers/new""#));
-
-    let post = |body: &'static str| {
-        Request::post("/customers/new")
-            .header(header::CONTENT_TYPE, "application/x-www-form-urlencoded")
-            .body(Body::from(body))
-            .unwrap()
-    };
-    let (status, _, html) = send(app(), post("name=++&email=")).await;
-    assert_eq!(status, StatusCode::OK);
-    assert!(html.contains("Enter a name."));
-    let (_, headers, html) = send(app(), post("name=Acme&email=acme%40example.com")).await;
-    assert!(html.is_empty());
-    let trigger = headers.get("hx-trigger").unwrap().to_str().unwrap();
-    assert!(trigger.contains("karbon-close-dialog") && trigger.contains("karbon-toast"));
 }
 
 #[tokio::test]
