@@ -1,0 +1,66 @@
+{# The swappable part of the party list (UI-03): toolbar state, rows and pager. htmx replaces #party-table with it. #}
+<form class="flex flex-wrap items-center gap-2 px-4 py-3 border-b hairline" role="search"
+      hx-get="/parties" hx-target="#party-table" hx-push-url="true"
+      hx-trigger="input changed delay:250ms from:input[name=q], change from:select, change from:input[type=checkbox]">
+  <label class="flex items-center gap-2 h-8 px-2.5 w-72 rounded-field border hairline bg-base-200/50 focus-within:border-primary">
+    <svg class="i muted"><use href="#i-search"/></svg>
+    <input name="q" value="{{ query.q }}" class="bg-transparent outline-none w-full text-[13px]" placeholder="Search by name" aria-label="Search people and organizations" autocomplete="off">
+  </label>
+  <input type="hidden" name="kind" value="{{ query.kind() }}">
+  {% for (key, label) in [("all", "All"), ("person", "People"), ("org", "Organizations")] %}
+  <a class="filter-chip {% if query.kind() == *key %}on{% endif %}" href="{{ query.href(1, key, query.role()) }}"
+     hx-get="{{ query.href(1, key, query.role()) }}" hx-target="#party-table" hx-push-url="true"
+     {% if query.kind() == *key %}aria-current="true"{% endif %}>{{ label }}</a>
+  {% endfor %}
+  <div class="ml-auto flex flex-wrap items-center gap-3 text-[12px] muted">
+    <label class="flex items-center gap-1.5"><input type="checkbox" name="full" value="1" class="checkbox checkbox-xs" {% if query.full() %}checked{% endif %}>Whole words</label>
+    <label class="flex items-center gap-1.5"><input type="checkbox" name="archived" value="1" class="checkbox checkbox-xs" {% if query.archived() %}checked{% endif %}>Show archived</label>
+    <select name="role" class="select select-sm w-40 text-[12.5px]" aria-label="Role">
+      {% for (key, label) in [("any", "Any role"), ("customer", "Customers"), ("lead", "Leads"), ("employee", "Employees"), ("vendor", "Vendors")] %}
+      <option value="{{ key }}" {% if query.role() == *key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</form>
+<div class="overflow-x-auto">
+  <table class="tbl">
+    <thead>
+      <tr><th>Name</th><th>Email / phone</th><th>Address</th><th>Roles</th></tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><div class="flex items-center gap-3"><span class="av {% if row.party.organization %}org{% endif %} c{{ row.color }}" aria-hidden="true">{{ row.initials }}</span><div class="min-w-0"><a class="font-medium truncate link link-hover block" href="{{ row.href }}">{{ row.party.name }}</a><div class="text-[12px] muted truncate">{% if row.party.organization %}Organization{% else %}Person{% endif %}</div></div></div></td>
+        <td><div class="truncate max-w-[240px]">{{ row.party.email }}</div><div class="text-[12px] muted num">{{ row.party.phone }}</div></td>
+        <td><div class="truncate max-w-[260px] text-[12.5px]">{{ row.party.address }}</div></td>
+        <td><div class="flex flex-wrap gap-1.5">
+          {% if row.party.archived %}<span class="chip bad"><span class="dot"></span>Archived</span>{% endif %}
+          {% if row.party.customer %}<span class="chip ok">Customer</span>{% endif %}
+          {% if row.party.lead %}<span class="chip info">Lead</span>{% endif %}
+          {% if row.party.employee %}<span class="chip">Employee</span>{% endif %}
+          {% if row.party.vendor %}<span class="chip">Vendor</span>{% endif %}
+        </div></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center muted py-10">No people or organizations match.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<nav class="flex items-center gap-3 px-4 py-2.5 border-t hairline text-[12px] muted" aria-label="Pages">
+  <span class="num">{% if matched > 0 %}{{ first }}–{{ last }} of {{ matched }}{% else %}0 people or organizations{% endif %}</span>
+  {% if capped %}<span role="note">Only the first 500 can be paged. Refine the search to see the rest.</span>{% endif %}
+  <div class="ml-auto join">
+    {% if page > 1 %}
+    <a class="join-item btn btn-sm btn-quiet" href="{{ query.href(page - 1, query.kind(), query.role()) }}" hx-get="{{ query.href(page - 1, query.kind(), query.role()) }}" hx-target="#party-table" hx-push-url="true" aria-label="Previous page"><svg class="i i-sm"><use href="#i-chevron-left"/></svg></a>
+    {% else %}
+    <button class="join-item btn btn-sm btn-quiet" disabled aria-label="Previous page"><svg class="i i-sm"><use href="#i-chevron-left"/></svg></button>
+    {% endif %}
+    <span class="join-item btn btn-sm btn-quiet pointer-events-none num">Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}
+    <a class="join-item btn btn-sm btn-quiet" href="{{ query.href(page + 1, query.kind(), query.role()) }}" hx-get="{{ query.href(page + 1, query.kind(), query.role()) }}" hx-target="#party-table" hx-push-url="true" aria-label="Next page"><svg class="i i-sm"><use href="#i-chevron-right"/></svg></a>
+    {% else %}
+    <button class="join-item btn btn-sm btn-quiet" disabled aria-label="Next page"><svg class="i i-sm"><use href="#i-chevron-right"/></svg></button>
+    {% endif %}
+  </div>
+</nav>

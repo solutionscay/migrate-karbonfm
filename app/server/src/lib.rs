@@ -14,6 +14,7 @@ pub mod import;
 pub mod invoice;
 pub mod money;
 pub mod net;
+pub mod parties;
 pub mod pdf;
 pub mod reference;
 mod routes;

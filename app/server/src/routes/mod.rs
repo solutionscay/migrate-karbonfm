@@ -4,6 +4,7 @@ mod backup;
 pub mod current_user;
 mod customers;
 mod dashboard;
+mod parties;
 mod sales;
 mod settings;
 mod setup;
@@ -25,6 +26,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/"),
     ("GET", "/customers"),
     ("GET", "/customers/new"),
+    ("GET", "/parties"),
     ("POST", "/customers/new"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
@@ -48,6 +50,7 @@ pub fn router() -> Router<AppState> {
         .route("/", get(dashboard::page))
         .route("/customers", get(customers::list))
         .route("/customers/new", get(customers::new_dialog).post(customers::create))
+        .route("/parties", get(parties::list))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))
@@ -79,6 +82,7 @@ pub fn demo(state: &AppState) -> Result<bool, AppError> {
 pub enum Nav {
     Dashboard,
     Customers,
+    Parties,
     Invoices,
     Settings,
 }
