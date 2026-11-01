@@ -3,7 +3,8 @@
 //! writes (BR-PARTY-07). Routes parse forms and render; they never run SQL (AP-01).
 
 use crate::admin::CommandError;
-use rusqlite::{params_from_iter, Connection};
+use crate::contacts::{self, Method};
+use rusqlite::{params_from_iter, Connection, OptionalExtension};
 
 // ---------------------------------------------------------------------------------------------------------------
 // OP-PARTY-05 party_search
@@ -246,6 +247,316 @@ pub fn party_search(conn: &Connection, s: &Search) -> Result<SearchPage, Command
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// party_get (05 "entity get commands"): the party and the children UI-04 shows
+// ---------------------------------------------------------------------------------------------------------------
+
+/// The person fields of a party (person row, same id as the party; D-15).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct PersonFields {
+    pub prefix: String,
+    pub first_name: String,
+    pub middle_name: String,
+    pub last_name: String,
+    pub suffix: String,
+    pub nickname: String,
+    pub job_title: String,
+    pub department: String,
+    pub employer_name: String,
+}
+
+/// The organization fields of a party.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct OrganizationFields {
+    pub organization_name: String,
+    pub company_type: String,
+    pub federal_tax_id_number: String,
+}
+
+/// The four role kinds of party_role (one flag each).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RoleKind {
+    Customer,
+    Lead,
+    Employee,
+    Vendor,
+}
+
+impl RoleKind {
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "customer" => Some(RoleKind::Customer),
+            "lead" => Some(RoleKind::Lead),
+            "employee" => Some(RoleKind::Employee),
+            "vendor" => Some(RoleKind::Vendor),
+            _ => None,
+        }
+    }
+    pub fn key(self) -> &'static str {
+        match self {
+            RoleKind::Customer => "customer",
+            RoleKind::Lead => "lead",
+            RoleKind::Employee => "employee",
+            RoleKind::Vendor => "vendor",
+        }
+    }
+    pub fn label(self) -> &'static str {
+        match self {
+            RoleKind::Customer => "Customer",
+            RoleKind::Lead => "Lead",
+            RoleKind::Employee => "Employee",
+            RoleKind::Vendor => "Vendor",
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Role {
+    pub id: String,
+    pub kind: RoleKind,
+    pub current: bool,
+    pub from_date: String,
+    pub thru_date: String,
+}
+
+/// One relation as the party sees it: the other party and what the other party is to this one (the row from the
+/// other party to this one, BR-PARTY-03), with that row's billing and shipping flags.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Relation {
+    /// The row other -> this party.
+    pub id: String,
+    pub other_id: String,
+    pub other_name: String,
+    pub other_organization: bool,
+    pub other_archived: bool,
+    /// What the other party is to this one ("Office manager"), from the other -> this row.
+    pub relationship: String,
+    /// What this party is to the other one ("Employer"), from the reciprocal row; empty when it is missing.
+    pub reciprocal: String,
+    pub current: bool,
+    pub from_date: String,
+    pub thru_date: String,
+    pub billing: bool,
+    pub shipping: bool,
+    /// The other party's primary email and phone (party caches), for the Contacts tab.
+    pub email: String,
+    pub phone: String,
+}
+
+/// The customer figures of the header tiles (UI-04): posted balance and retainer balance, in cents.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CustomerFigures {
+    pub role_id: String,
+    pub balance: i64,
+    pub retainer: i64,
+    pub taxable: bool,
+    pub terms: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PartyDetail {
+    pub id: String,
+    pub name: String,
+    pub organization: bool,
+    pub person: Option<PersonFields>,
+    pub org: Option<OrganizationFields>,
+    pub comments: String,
+    pub archived: bool,
+    pub deleted_reason: String,
+    pub deleted_timestamp: String,
+    /// creation_timestamp, `YYYY-MM-DD HH:MM:SS` (D-05), or empty.
+    pub created: String,
+    pub methods: Vec<Method>,
+    pub roles: Vec<Role>,
+    pub relations: Vec<Relation>,
+    pub customer: Option<CustomerFigures>,
+}
+
+impl PartyDetail {
+    pub fn has_role(&self, kind: RoleKind) -> bool {
+        self.roles.iter().any(|r| r.kind == kind && r.current)
+    }
+}
+
+/// The party `id` with its person or organization row, contact methods, roles, relations and customer figures.
+/// An archived party is returned too (BR-PARTY-01: its records stay); the page shows it as archived.
+pub fn party_get(conn: &Connection, id: &str) -> Result<PartyDetail, CommandError> {
+    let head = conn
+        .query_row(
+            "SELECT p.id, COALESCE(p.name_cached, ''), COALESCE(p.organization_ind, 0) = 1, COALESCE(p.comments, ''),
+                    COALESCE(p.deleted_ind, 0) = 1, COALESCE(p.deleted_reason, ''),
+                    COALESCE(p.deleted_timestamp, ''), COALESCE(p.creation_timestamp, '')
+             FROM party p WHERE p.id = ?1",
+            [id],
+            |r| {
+                Ok((
+                    r.get::<_, String>(0)?,
+                    r.get::<_, String>(1)?,
+                    r.get::<_, bool>(2)?,
+                    r.get::<_, String>(3)?,
+                    r.get::<_, bool>(4)?,
+                    r.get::<_, String>(5)?,
+                    r.get::<_, String>(6)?,
+                    r.get::<_, String>(7)?,
+                ))
+            },
+        )
+        .optional()?
+        .ok_or(CommandError::NotFound)?;
+    let (id, name, organization, comments, archived, deleted_reason, deleted_timestamp, created) = head;
+    let person = conn
+        .query_row(
+            "SELECT COALESCE(prefix, ''), COALESCE(first_name, ''), COALESCE(middle_name, ''), COALESCE(last_name, ''),
+                    COALESCE(suffix, ''), COALESCE(nickname, ''), COALESCE(job_title, ''), COALESCE(department, ''),
+                    COALESCE(employer_name, '')
+             FROM person WHERE id = ?1",
+            [&id],
+            |r| {
+                Ok(PersonFields {
+                    prefix: r.get(0)?,
+                    first_name: r.get(1)?,
+                    middle_name: r.get(2)?,
+                    last_name: r.get(3)?,
+                    suffix: r.get(4)?,
+                    nickname: r.get(5)?,
+                    job_title: r.get(6)?,
+                    department: r.get(7)?,
+                    employer_name: r.get(8)?,
+                })
+            },
+        )
+        .optional()?;
+    let org = conn
+        .query_row(
+            "SELECT COALESCE(organization_name, ''), COALESCE(company_type, ''), COALESCE(federal_tax_id_number, '')
+             FROM organization WHERE id = ?1",
+            [&id],
+            |r| {
+                Ok(OrganizationFields {
+                    organization_name: r.get(0)?,
+                    company_type: r.get(1)?,
+                    federal_tax_id_number: r.get(2)?,
+                })
+            },
+        )
+        .optional()?;
+    let methods = contacts::methods_of(conn, &id)?;
+    let roles = roles_of(conn, &id)?;
+    let relations = relations_of(conn, &id)?;
+    let customer = conn
+        .query_row(
+            "SELECT r.id,
+                    COALESCE((SELECT SUM(st.balance) FROM sales_transaction st WHERE st.id_customer = r.id
+                              AND COALESCE(st.locked_ind, 0) = 1 AND COALESCE(st.deleted, 0) = 0
+                              AND COALESCE(st.invoice_ind, 0) = 1), 0),
+                    COALESCE(c.retainer_balance_cached, 0), COALESCE(c.taxable, 0) = 1, COALESCE(c.sales_term_ref, '')
+             FROM party_role r JOIN customer c ON c.id = r.id
+             WHERE r.party_id = ?1 AND COALESCE(r.customer_ind, 0) = 1
+             ORDER BY COALESCE(r.current_ind, 0) DESC, r.from_date DESC, r.id LIMIT 1",
+            [&id],
+            |r| {
+                Ok(CustomerFigures {
+                    role_id: r.get(0)?,
+                    balance: r.get(1)?,
+                    retainer: r.get(2)?,
+                    taxable: r.get(3)?,
+                    terms: r.get(4)?,
+                })
+            },
+        )
+        .optional()?;
+    Ok(PartyDetail {
+        id,
+        name,
+        organization,
+        person,
+        org,
+        comments,
+        archived,
+        deleted_reason,
+        deleted_timestamp,
+        created,
+        methods,
+        roles,
+        relations,
+        customer,
+    })
+}
+
+/// The roles of a party, current first. A role row with several flags set gives one entry per flag.
+pub fn roles_of(conn: &Connection, party_id: &str) -> rusqlite::Result<Vec<Role>> {
+    let mut stmt = conn.prepare(
+        "SELECT id, COALESCE(customer_ind, 0) = 1, COALESCE(lead_ind, 0) = 1, COALESCE(employee_ind, 0) = 1,
+                COALESCE(vendor_ind, 0) = 1, COALESCE(current_ind, 0) = 1, COALESCE(from_date, ''),
+                COALESCE(thru_date, '')
+         FROM party_role WHERE party_id = ?1 ORDER BY COALESCE(current_ind, 0) DESC, from_date, id",
+    )?;
+    let mut roles = Vec::new();
+    let rows = stmt.query_map([party_id], |r| {
+        Ok((
+            r.get::<_, String>(0)?,
+            [r.get::<_, bool>(1)?, r.get::<_, bool>(2)?, r.get::<_, bool>(3)?, r.get::<_, bool>(4)?],
+            r.get::<_, bool>(5)?,
+            r.get::<_, String>(6)?,
+            r.get::<_, String>(7)?,
+        ))
+    })?;
+    for row in rows {
+        let (id, flags, current, from_date, thru_date) = row?;
+        let kinds = [RoleKind::Customer, RoleKind::Lead, RoleKind::Employee, RoleKind::Vendor];
+        for (kind, on) in kinds.into_iter().zip(flags) {
+            if on {
+                roles.push(Role {
+                    id: id.clone(),
+                    kind,
+                    current,
+                    from_date: from_date.clone(),
+                    thru_date: thru_date.clone(),
+                });
+            }
+        }
+    }
+    Ok(roles)
+}
+
+/// The relations of a party (the rows other -> this party), current first, then by the other party's name.
+pub fn relations_of(conn: &Connection, party_id: &str) -> rusqlite::Result<Vec<Relation>> {
+    let mut stmt = conn.prepare(
+        "SELECT r.id, o.id, COALESCE(o.name_cached, ''), COALESCE(o.organization_ind, 0) = 1,
+                COALESCE(o.deleted_ind, 0) = 1, COALESCE(r.relationship, ''),
+                COALESCE((SELECT b.relationship FROM party_relation b
+                          WHERE b.party_id_from = r.party_id_to AND b.party_id_to = r.party_id_from
+                          ORDER BY b.id LIMIT 1), ''),
+                COALESCE(r.current_ind, 0) = 1, COALESCE(r.from_date, ''), COALESCE(r.thru_date, ''),
+                COALESCE(r.billing_ind, 0) = 1, COALESCE(r.shipping_ind, 0) = 1,
+                COALESCE(o.email_address_cached, ''), COALESCE(o.phone_number_cached, '')
+         FROM party_relation r JOIN party o ON o.id = r.party_id_from
+         WHERE r.party_id_to = ?1
+         ORDER BY COALESCE(r.current_ind, 0) DESC, o.name_cached COLLATE NOCASE, r.id",
+    )?;
+    let rows = stmt
+        .query_map([party_id], |r| {
+            Ok(Relation {
+                id: r.get(0)?,
+                other_id: r.get(1)?,
+                other_name: r.get(2)?,
+                other_organization: r.get(3)?,
+                other_archived: r.get(4)?,
+                relationship: r.get(5)?,
+                reciprocal: r.get(6)?,
+                current: r.get(7)?,
+                from_date: r.get(8)?,
+                thru_date: r.get(9)?,
+                billing: r.get(10)?,
+                shipping: r.get(11)?,
+                email: r.get(12)?,
+                phone: r.get(13)?,
+            })
+        })?
+        .collect();
+    rows
+}
+
+// ---------------------------------------------------------------------------------------------------------------
 // Data checks (BR-PARTY-03, BR-PARTY-05)
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -286,6 +597,40 @@ mod tests {
 
     fn q(query: &str) -> Search {
         Search { query: query.into(), ..Default::default() }
+    }
+
+    #[test]
+    fn party_get_of_an_organization_with_contacts_and_a_customer_role() {
+        let conn = demo();
+        let hp = party_get(&conn, "p-hp").unwrap();
+        assert_eq!(hp.name, "Halden & Pryce Architects");
+        assert!(hp.organization && hp.person.is_none());
+        assert_eq!(hp.org.as_ref().unwrap().company_type, "Architecture & interiors");
+        assert!(hp.has_role(RoleKind::Customer) && !hp.has_role(RoleKind::Lead));
+        let c = hp.customer.as_ref().unwrap();
+        assert_eq!((c.role_id.as_str(), c.balance, c.retainer), ("r-hp", 305_715, 150_000), "the design's tiles");
+        let names: Vec<_> = hp.relations.iter().map(|r| (r.other_name.as_str(), r.relationship.as_str())).collect();
+        assert_eq!(
+            names,
+            [("Elena Halden", "Principal"), ("Joanna Whitfield", "Office manager"), ("Marcus Pryce", "Partner")]
+        );
+        assert!(hp.relations.iter().all(|r| r.reciprocal == "Employer"));
+        assert!(hp.relations.iter().find(|r| r.other_name == "Joanna Whitfield").unwrap().billing);
+        assert!(!hp.methods.is_empty());
+    }
+
+    #[test]
+    fn party_get_of_a_person_and_of_nobody() {
+        let conn = demo();
+        let mara = party_get(&conn, "p-mara").unwrap();
+        assert_eq!(mara.person.as_ref().unwrap().first_name, "Mara");
+        assert!(mara.has_role(RoleKind::Employee) && mara.customer.is_none());
+        assert_eq!(mara.relations.len(), 1);
+        assert_eq!(
+            (mara.relations[0].other_name.as_str(), mara.relations[0].relationship.as_str()),
+            ("Ellison Studio", "Employer")
+        );
+        assert!(matches!(party_get(&conn, "nobody"), Err(CommandError::NotFound)));
     }
 
     #[test]

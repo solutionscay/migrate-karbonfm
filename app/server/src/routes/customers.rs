@@ -42,6 +42,7 @@ impl ListQuery {
 }
 
 pub struct Row {
+    pub href: String,
     pub name: String,
     pub initials: String,
     pub org: bool,
@@ -90,13 +91,15 @@ pub struct Table<'a> {
     last: i64,
 }
 
-/// One row per customer role with its open balance, overdue amount and retainer balance (posted transactions only,
+/// One row per customer role, with its first current contact person (relation pairs, BR-PARTY-03, also hold the
+/// employer rows, which are not contacts), its open balance, overdue amount and retainer balance (posted transactions only,
 /// BR-SALES-06). Overdue is an open invoice past its due date, by the local date.
 const CUSTOMERS_SQL: &str = "
 WITH c AS (
   SELECT p.id AS party_id, p.name_cached AS name, p.organization_ind AS org,
     COALESCE((SELECT k.name_cached FROM party_relation r JOIN party k ON k.id = r.party_id_from
-              WHERE r.party_id_to = p.id AND r.current_ind = 1 ORDER BY r.id LIMIT 1), '') AS contact,
+              WHERE r.party_id_to = p.id AND r.current_ind = 1 AND COALESCE(k.person_ind, 0) = 1
+              ORDER BY r.id LIMIT 1), '') AS contact,
     COALESCE(p.email_address_cached, '') AS email, COALESCE(p.phone_number_cached, '') AS phone,
     pr.current_ind AS current,
     COALESCE((SELECT SUM(st.balance) FROM sales_transaction st WHERE st.id_customer = pr.id AND st.locked_ind = 1
@@ -149,6 +152,7 @@ pub fn load_table<'a>(conn: &rusqlite::Connection, query: &'a ListQuery) -> Resu
             let retainer: i64 = r.get("retainer")?;
             let party_id: String = r.get("party_id")?;
             Ok(Row {
+                href: super::parties::party_href(&party_id),
                 initials: initials(&name),
                 color: party_id.bytes().map(usize::from).sum::<usize>() % 7 + 1,
                 name,

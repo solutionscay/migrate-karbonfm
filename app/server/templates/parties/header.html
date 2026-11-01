@@ -1,0 +1,42 @@
+{# UI-04 header: name, kind, roles, contact methods, customer figures. The edit form (OP-PARTY-03) swaps #party-header. #}
+<section class="panel p-5 mb-5" id="party-header" aria-labelledby="party-name">
+  <div class="flex flex-wrap items-start gap-5">
+    <span class="av {% if d.organization %}org{% endif %} c{{ color }} av-lg" aria-hidden="true">{{ initials }}</span>
+    <div class="flex-1 min-w-[280px]">
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <h1 class="page-title" id="party-name">{{ d.name }}</h1>
+        {% if d.archived %}<span class="chip bad"><span class="dot"></span>Archived</span>{% endif %}
+        {% for role in d.roles %}
+          {% if role.current %}<span class="chip {% if role.kind == crate::parties::RoleKind::Customer %}ok{% elif role.kind == crate::parties::RoleKind::Lead %}info{% endif %}"><span class="dot"></span>Current {{ role.kind.label()|lower }}</span>
+          {% else %}<span class="chip">Former {{ role.kind.label()|lower }}</span>{% endif %}
+        {% endfor %}
+        {% if let Some(c) = d.customer %}{% if c.taxable %}<span class="chip">Taxable</span>{% endif %}{% if c.retainer != 0 %}<span class="chip info">Retainer</span>{% endif %}{% endif %}
+      </div>
+      <div class="muted mt-1">{{ subtitle }}</div>
+      {% if d.methods.is_empty() %}
+      <p class="muted text-[12.5px] mt-4">No phone, email or address yet.</p>
+      {% else %}
+      <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5 mt-4">
+        {% for m in d.methods %}
+        <div class="flex items-center gap-2.5 min-w-0">
+          <dt class="sr-only">{{ m.kind.label() }}</dt>
+          <svg class="i muted" aria-hidden="true"><use href="#i-{{ self.icon(m) }}"/></svg>
+          <dd class="truncate {% if m.kind == crate::contacts::MethodKind::Phone %}num{% endif %}">{% if m.kind == crate::contacts::MethodKind::Email %}<a class="link link-hover" href="mailto:{{ m.address }}">{{ m.display() }}</a>{% else %}{{ m.display() }}{% endif %}</dd>
+          {% if !m.label.is_empty() %}<span class="chip">{{ m.label }}</span>{% endif %}
+          {% for p in m.purposes() %}<span class="chip">{{ p }}</span>{% endfor %}
+          {% if m.primary %}<span class="text-[11px] text-primary font-medium">Primary</span>{% endif %}
+        </div>
+        {% endfor %}
+      </dl>
+      {% endif %}
+    </div>
+  </div>
+  {% if let Some(c) = d.customer %}
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-px mt-5 rounded-box overflow-hidden border hairline" style="background:var(--k-line)">
+    <div class="bg-base-100 px-4 py-3"><div class="text-[12px] muted">Balance due</div><div class="text-[18px] font-semibold num mt-0.5">{{ self.balance() }}</div></div>
+    <div class="bg-base-100 px-4 py-3"><div class="text-[12px] muted">Retainer balance</div><div class="text-[18px] font-semibold num mt-0.5">{{ self.retainer() }}</div></div>
+    <div class="bg-base-100 px-4 py-3"><div class="text-[12px] muted">Payment terms</div><div class="text-[18px] font-semibold mt-0.5">{% if c.terms.is_empty() %}—{% else %}{{ c.terms }}{% endif %}</div></div>
+    <div class="bg-base-100 px-4 py-3"><div class="text-[12px] muted">Tax</div><div class="text-[18px] font-semibold mt-0.5">{% if c.taxable %}Taxable{% else %}Not taxable{% endif %}</div></div>
+  </div>
+  {% endif %}
+</section>

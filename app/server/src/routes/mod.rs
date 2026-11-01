@@ -27,6 +27,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/customers"),
     ("GET", "/customers/new"),
     ("GET", "/parties"),
+    ("GET", "/parties/{id}"),
     ("POST", "/customers/new"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
@@ -51,6 +52,7 @@ pub fn router() -> Router<AppState> {
         .route("/customers", get(customers::list))
         .route("/customers/new", get(customers::new_dialog).post(customers::create))
         .route("/parties", get(parties::list))
+        .route("/parties/{id}", get(parties::detail))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ d.name }} · KarbonFM{% endblock %}
+{% block content %}
+<div class="flex items-center gap-2 mb-3 text-[12.5px]">
+  <a class="link link-hover muted" href="/parties">People &amp; organizations</a>
+  <svg class="i i-sm muted" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+  <span>{{ d.name }}</span>
+</div>
+{% if d.archived %}
+<div role="status" class="alert alert-warning alert-soft text-[13px] py-2 mb-4">
+  Archived{% if !archived_on.is_empty() %} on {{ archived_on }}{% endif %}{% if !d.deleted_reason.is_empty() %}: {{ d.deleted_reason }}{% endif %}. It is hidden from lists and searches; its sales and activities stay.
+</div>
+{% endif %}
+{{ header|safe }}
+
+<div class="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-5" x-data="{ tab: 'contacts' }">
+  <div class="min-w-0">
+    <nav class="ktabs mb-4" role="tablist" aria-label="Party records">
+      <button type="button" class="ktab" :class="tab === 'contacts' && 'on'" @click="tab = 'contacts'" role="tab" id="tab-contacts" aria-controls="panel-contacts" :aria-selected="tab === 'contacts'">Contacts <span class="n">{{ d.relations.len() }}</span></button>
+      <button type="button" class="ktab" :class="tab === 'sales' && 'on'" @click="tab = 'sales'" role="tab" id="tab-sales" aria-controls="panel-sales" :aria-selected="tab === 'sales'">Sales transactions <span class="n">{{ sales_matched }}</span></button>
+      <button type="button" class="ktab" :class="tab === 'activity' && 'on'" @click="tab = 'activity'" role="tab" id="tab-activity" aria-controls="panel-activity" :aria-selected="tab === 'activity'">Activity</button>
+      <button type="button" class="ktab" :class="tab === 'opps' && 'on'" @click="tab = 'opps'" role="tab" id="tab-opps" aria-controls="panel-opps" :aria-selected="tab === 'opps'">Opportunities</button>
+    </nav>
+
+    <section x-show="tab === 'contacts'" role="tabpanel" id="panel-contacts" aria-labelledby="tab-contacts">
+      {{ relations|safe }}
+    </section>
+
+    <section x-show="tab === 'sales'" x-cloak role="tabpanel" id="panel-sales" aria-labelledby="tab-sales" class="panel overflow-hidden">
+      {% if sales.is_empty() %}
+      <div class="p-8 text-center muted">{% if d.customer.is_some() %}No sales transactions yet.{% else %}Not a customer: no sales transactions.{% endif %}</div>
+      {% else %}
+      <table class="tbl">
+        <thead><tr><th>Date</th><th>Doc number</th><th>Type</th><th>Due</th><th>Status</th><th class="r">Amount</th><th class="r">Balance due</th></tr></thead>
+        <tbody>
+          {% for s in sales %}
+          <tr><td class="num">{{ s.date }}</td><td class="mono font-medium"><a class="link link-hover" href="{{ s.href }}">{{ s.doc_number }}</a></td><td>{{ s.kind }}</td><td class="num">{{ s.due }}</td>
+            <td><span class="chip {{ s.chip }}"><span class="dot"></span>{{ s.status }}</span></td>
+            <td class="r num">{{ s.total }}</td><td class="r num">{% if s.has_balance %}{{ s.balance }}{% else %}<span class="muted">—</span>{% endif %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+
+    <section x-show="tab === 'activity'" x-cloak role="tabpanel" id="panel-activity" aria-labelledby="tab-activity" class="panel p-8 text-center muted">Activities come in a later release.</section>
+    <section x-show="tab === 'opps'" x-cloak role="tabpanel" id="panel-opps" aria-labelledby="tab-opps" class="panel p-8 text-center muted">Opportunities come in a later release.</section>
+  </div>
+
+  <aside class="space-y-4" aria-label="Details">
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">Details</h2></div>
+      <dl class="p-4 grid grid-cols-[110px_1fr] gap-y-2 text-[12.5px]">
+        {% if let Some(p) = d.person %}
+          {% if !p.job_title.is_empty() %}<dt class="muted">Job title</dt><dd>{{ p.job_title }}</dd>{% endif %}
+          {% if !p.department.is_empty() %}<dt class="muted">Department</dt><dd>{{ p.department }}</dd>{% endif %}
+          {% if !p.nickname.is_empty() %}<dt class="muted">Nickname</dt><dd>{{ p.nickname }}</dd>{% endif %}
+        {% endif %}
+        {% if let Some(o) = d.org %}
+          {% if !o.company_type.is_empty() %}<dt class="muted">Type</dt><dd>{{ o.company_type }}</dd>{% endif %}
+          {% if !o.federal_tax_id_number.is_empty() %}<dt class="muted">Tax ID</dt><dd class="mono">{{ o.federal_tax_id_number }}</dd>{% endif %}
+        {% endif %}
+        <dt class="muted">Comments</dt><dd class="whitespace-pre-line">{% if d.comments.is_empty() %}<span class="muted">—</span>{% else %}{{ d.comments }}{% endif %}</dd>
+      </dl>
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -70,7 +70,10 @@ async fn launch(app: &axum::Router, path: &str) -> String {
 
 /// A concrete URI for a route of the list.
 fn sample(path: &str) -> String {
-    path.replace("{doc_number}", "INV-1048").replace("{*path}", "app.css").replace("{token}", "spent")
+    path.replace("{doc_number}", "INV-1048")
+        .replace("{id}", "p-hp")
+        .replace("{*path}", "app.css")
+        .replace("{token}", "spent")
 }
 
 /// T-08-14: without the session cookie, with a foreign Host, or a POST with a foreign Origin: refused, nothing changes.
