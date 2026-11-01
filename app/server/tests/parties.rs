@@ -439,3 +439,146 @@ async fn contact_methods_of_an_archived_party_are_read_only() {
     assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
     assert!(html.contains("archived party"));
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// S5: relations (OP-PARTY-07..09), wizard (OP-PARTY-11, UI-05), pickers (UI-06, OP-PARTY-06)
+// ---------------------------------------------------------------------------------------------------------------
+
+#[tokio::test]
+async fn relate_two_parties_from_the_contacts_tab() {
+    let app = demo();
+    let (status, html) = htmx_get(&app, "/parties/p-bm/relations/new").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Relate to Bluefin Marine Supply") && html.contains(r#"role="radiogroup""#));
+    assert!(!html.contains(r#"name="other_id" value="p-bm""#), "the party itself is not offered");
+    assert!(html.contains(r#"hx-get="/pickers/contact?exclude=p-bm""#), "and not while searching");
+    // The picker narrows as the user types.
+    let (_, html) = htmx_get(&app, "/pickers/contact?q=ferr&exclude=p-bm").await;
+    assert!(html.contains("Tomás Ferreira") && html.contains(r#"name="other_id" value="p-tf""#));
+    let (status, _, html) = send(&app, form("POST", "/parties/p-bm/relations", "q=&relationship=Consultant")).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Choose the related person or organization."));
+    let body = "q=ferr&other_id=p-tf&relationship=Consultant&reciprocal=Client&billing=on";
+    let (status, headers, html) = send(&app, form("POST", "/parties/p-bm/relations", body)).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(
+        html.contains(r#"id="party-relations" hx-swap-oob="true""#) && html.contains("Consultant · Billing contact")
+    );
+    assert!(headers.get("hx-trigger").unwrap().to_str().unwrap().contains("karbon-close-dialog"));
+    let (_, html) = get(&app, "/parties/p-tf").await;
+    assert!(
+        html.contains("Bluefin Marine Supply") && html.contains("Client"),
+        "the reciprocal row, seen from the person"
+    );
+    // The same pair again is refused, with the reason in the dialog.
+    let (status, _, html) = send(&app, form("POST", "/parties/p-bm/relations", body)).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("related already"));
+}
+
+#[tokio::test]
+async fn edit_end_restore_and_delete_a_relation() {
+    let app = demo();
+    // rel-p-hp-jw is Joanna Whitfield -> Halden & Pryce (the row the organization's Contacts tab shows).
+    let (status, html) = htmx_get(&app, "/relations/rel-p-hp-jw/edit").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Relation with Joanna Whitfield") && html.contains(r#"value="Office manager""#));
+    let (status, _, html) = send(
+        &app,
+        form("PATCH", "/relations/rel-p-hp-jw", "relationship=Studio+manager&reciprocal=Employer&billing=on"),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Studio manager · Billing contact"));
+    let (_, _, html) = send(&app, form("PATCH", "/relations/rel-p-hp-jw", "change=end")).await;
+    assert!(html.contains("· Ended") && html.contains(r#"{"change": "restore"}"#));
+    let (_, _, html) = send(&app, form("PATCH", "/relations/rel-p-hp-jw", "change=restore")).await;
+    assert!(!html.contains("· Ended"));
+    let req = Request::delete("/relations/rel-p-hp-jw").header("HX-Request", "true").body(Body::empty()).unwrap();
+    let (status, _, html) = send(&app, req).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        html.contains(r#"role="alertdialog""#) && html.contains("Joanna Whitfield and Halden &#38; Pryce Architects")
+    );
+    let req = Request::delete("/relations/rel-p-hp-jw?confirm=true")
+        .header("HX-Request", "true")
+        .body(Body::empty())
+        .unwrap();
+    let (status, _, html) = send(&app, req).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(!html.contains("Joanna Whitfield"), "both rows are gone from the organization's tab");
+    let (_, html) = get(&app, "/parties/p-hp-jw").await;
+    assert!(html.contains("No related people or organizations yet."), "and from the person's");
+}
+
+#[tokio::test]
+async fn wizard_creates_an_organization_customer_and_its_contact() {
+    let app = demo();
+    let (status, html) = get(&app, "/parties/new").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("New contact") && html.contains(r#"aria-current="step""#));
+    let org_id = {
+        let at = html.find(r#"name="org_id" value=""#).unwrap() + r#"name="org_id" value=""#.len();
+        html[at..at + 36].to_owned()
+    };
+    let (status, _, html) = send(&app, form("POST", "/parties/wizard", &format!("step=names&org_id={org_id}"))).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Enter an organization, a person, or both."));
+    // Names that look like existing parties show them first (the duplicate check of BR-PARTY-02).
+    let names =
+        format!("step=names&org_id={org_id}&person_id=&org_name=Halden&person_first_name=Elena&person_last_name=Hal");
+    let (status, _, html) = send(&app, form("POST", "/parties/wizard", &names)).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(
+        html.contains("These may be the same")
+            && html.contains(r#"href="/parties/p-hp""#)
+            && html.contains(r#"href="/parties/p-hp-eh""#)
+    );
+    assert!(html.contains(r#"value="employee" class="radio radio-xs" checked"#));
+    // Back keeps the values.
+    let (_, _, html) = send(
+        &app,
+        form("POST", "/parties/wizard", &format!("{}&go=back", names.replace("step=names", "step=details"))),
+    )
+    .await;
+    assert!(html.contains(r#"value="Halden""#) && html.contains("1. Names"));
+    // Save: one transaction for the organization, the person, their roles and the pair.
+    let save = format!(
+        "step=details&org_id={org_id}&person_id={}&org_name=Tidewater+Kayak&person_first_name=Nell&person_last_name=Barrow\
+         &org_email=hello%40tidewater.example&org_phone=&org_role=customer&person_email=&person_phone=&person_job_title=Owner\
+         &person_role=employee&relationship=Owner&billing_contact=on",
+        karbon_server::ids::new_id()
+    );
+    let (status, headers, html) = send(&app, form("POST", "/parties/wizard", &save)).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert_eq!(headers.get("hx-redirect").unwrap(), &format!("/parties/{org_id}"));
+    let (_, html) = get(&app, &format!("/parties/{org_id}")).await;
+    assert!(html.contains("Tidewater Kayak") && html.contains("Current customer") && html.contains("Nell Barrow"));
+    assert!(html.contains("Owner · Billing contact"));
+    // A resubmitted save opens the same party and creates nothing.
+    let (_, headers, _) = send(&app, form("POST", "/parties/wizard", &save)).await;
+    assert_eq!(headers.get("hx-redirect").unwrap(), &format!("/parties/{org_id}"));
+    let (_, html) = htmx_get(&app, "/parties?q=tidewater").await;
+    assert!(html.contains("1–1 of 1"));
+}
+
+#[tokio::test]
+async fn pickers_and_find_by_contact() {
+    let app = demo();
+    let (status, html) = htmx_get(&app, "/pickers/email?party_id=p-hp-eh").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("elena@haldenpryce.example") && html.contains(r#"name="email_id""#));
+    let (_, html) = htmx_get(&app, "/pickers/phone?party_id=p-hp-mp").await;
+    assert!(html.contains("(207) 555-0163"));
+    let (_, html) = htmx_get(&app, "/pickers/phone?party_id=p-bm-c").await;
+    assert!(html.contains("Owen Castellano has no phone number."));
+    let (status, _) = htmx_get(&app, "/pickers/fax?party_id=p-hp").await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+    let (status, html) = htmx_get(&app, "/parties/by-contact?email=elena%40haldenpryce.example").await;
+    assert_eq!(status, StatusCode::OK);
+    let org = html.find("Halden &#38; Pryce Architects").expect("the employer");
+    let person = html.find("Elena Halden").expect("the owner");
+    assert!(org < person, "the organization first (BR-PARTY-11)");
+    let (_, html) = htmx_get(&app, "/parties/by-contact?email=nobody%40x.example").await;
+    assert!(html.contains("Nobody has that email or phone."));
+}

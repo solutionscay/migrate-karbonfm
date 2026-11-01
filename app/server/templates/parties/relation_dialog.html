@@ -1,0 +1,36 @@
+{# Relate two parties (OP-PARTY-07) or edit a relation (OP-PARTY-08). Both rows of the pair are written: what the
+   other party is to this one, and what this one is to the other (BR-PARTY-03). #}
+<form {% if edit %}hx-patch{% else %}hx-post{% endif %}="{{ action }}" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">{% if edit %}Relation with {{ other_name }}{% else %}Relate to {{ party_name }}{% endif %}</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3">
+    {% if let Some(message) = failure %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ message }}</div>{% endif %}
+    {% if !edit %}
+    <fieldset>
+      <legend class="text-[12px] muted mb-1">Person or organization</legend>
+      {{ picker|safe }}
+      {% if let Some(e) = self.error("other_id") %}<span class="text-[12px] text-error" role="alert">{{ e }}</span>{% endif %}
+    </fieldset>
+    {% endif %}
+    <div class="grid grid-cols-2 gap-3">
+      <label class="block">
+        <span class="text-[12px] muted">{% if edit %}{{ other_name }}{% else %}They{% endif %} is {{ party_name }}'s…</span>
+        <input name="relationship" value="{{ form.relationship }}" class="input input-sm w-full mt-1" placeholder="Office manager" autocomplete="off">
+      </label>
+      <label class="block">
+        <span class="text-[12px] muted">{{ party_name }} is {% if edit %}{{ other_name }}{% else %}their{% endif %}'s…</span>
+        <input name="reciprocal" value="{{ form.reciprocal }}" class="input input-sm w-full mt-1" placeholder="Employer" autocomplete="off">
+      </label>
+    </div>
+    <div class="flex gap-4 text-[12.5px]">
+      <label class="flex items-center gap-1.5"><input type="checkbox" name="billing" class="checkbox checkbox-xs" {% if !form.billing.is_empty() %}checked{% endif %}>Billing contact</label>
+      <label class="flex items-center gap-1.5"><input type="checkbox" name="shipping" class="checkbox checkbox-xs" {% if !form.shipping.is_empty() %}checked{% endif %}>Shipping contact</label>
+    </div>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">{% if edit %}Save{% else %}Relate{% endif %}</button>
+  </div>
+</form>

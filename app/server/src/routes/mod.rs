@@ -7,9 +7,11 @@ mod customers;
 mod dashboard;
 mod parties;
 mod party_forms;
+mod relation_forms;
 mod sales;
 mod settings;
 mod setup;
+mod wizard;
 
 pub use setup::setup_gate;
 
@@ -17,7 +19,7 @@ use crate::web::AppError;
 use crate::AppState;
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::routing::{get, post, put};
+use axum::routing::{get, patch, post, put};
 use axum::Router;
 
 /// Every route the server registers, as (method, path) (AP-01). The page has no other way to reach SQLite: no generic
@@ -28,6 +30,10 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/"),
     ("GET", "/customers"),
     ("GET", "/parties"),
+    ("GET", "/parties/new"),
+    ("POST", "/parties/wizard"),
+    ("GET", "/parties/by-contact"),
+    ("GET", "/pickers/{kind}"),
     ("GET", "/parties/people/new"),
     ("POST", "/parties/people"),
     ("GET", "/parties/organizations/new"),
@@ -45,6 +51,11 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("DELETE", "/contact-methods/{id}"),
     ("POST", "/contact-methods/{id}/primary"),
     ("POST", "/contact-methods/{id}/purposes/{type_id}"),
+    ("GET", "/parties/{id}/relations/new"),
+    ("POST", "/parties/{id}/relations"),
+    ("GET", "/relations/{id}/edit"),
+    ("PATCH", "/relations/{id}"),
+    ("DELETE", "/relations/{id}"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/sales/{doc_number}/save-pdf"),
@@ -67,6 +78,10 @@ pub fn router() -> Router<AppState> {
         .route("/", get(dashboard::page))
         .route("/customers", get(customers::list))
         .route("/parties", get(parties::list))
+        .route("/parties/new", get(wizard::page))
+        .route("/parties/wizard", post(wizard::submit))
+        .route("/parties/by-contact", get(relation_forms::by_contact))
+        .route("/pickers/{kind}", get(relation_forms::picker))
         .route("/parties/people/new", get(party_forms::new_person))
         .route("/parties/people", post(party_forms::create_person))
         .route("/parties/organizations/new", get(party_forms::new_organization))
@@ -81,6 +96,10 @@ pub fn router() -> Router<AppState> {
         .route("/contact-methods/{id}", put(contact_forms::update).delete(contact_forms::delete))
         .route("/contact-methods/{id}/primary", post(contact_forms::set_primary))
         .route("/contact-methods/{id}/purposes/{type_id}", post(contact_forms::toggle_purpose))
+        .route("/parties/{id}/relations/new", get(relation_forms::new_dialog))
+        .route("/parties/{id}/relations", post(relation_forms::create))
+        .route("/relations/{id}/edit", get(relation_forms::edit_dialog))
+        .route("/relations/{id}", patch(relation_forms::update).delete(relation_forms::delete))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))

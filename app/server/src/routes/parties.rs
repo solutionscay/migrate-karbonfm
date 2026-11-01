@@ -296,9 +296,17 @@ impl<'a> Header<'a> {
 #[template(path = "parties/relations.html")]
 pub struct Relations<'a> {
     pub d: &'a PartyDetail,
+    /// Sent as an out-of-band swap (after a dialog).
+    pub oob: bool,
 }
 
 impl Relations<'_> {
+    pub fn party(&self) -> String {
+        party_href(&self.d.id)
+    }
+    pub fn relation_href(&self, id: &str) -> String {
+        format!("/relations/{}", urlencode(id))
+    }
     pub fn href(&self, id: &str) -> String {
         party_href(id)
     }
@@ -336,7 +344,7 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
         None => (Vec::new(), 0),
     };
     let header = Header::new(&d).render()?;
-    let relations = Relations { d: &d }.render()?;
+    let relations = Relations { d: &d, oob: false }.render()?;
     render(&DetailPage {
         nav: Nav::Parties,
         demo: crate::db::has_demo_data(&conn)?,

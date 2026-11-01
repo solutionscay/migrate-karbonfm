@@ -1,0 +1,80 @@
+{# One step of the create-party wizard (UI-05, BR-PARTY-09). The form posts every field; the other step's values
+   ride along hidden. htmx swaps #wizard with the next step, or with this one and its errors (422). #}
+{% macro field(name, label, value, kind) %}
+<label class="block">
+  <span class="text-[12px] muted">{{ label }}</span>
+  <input name="{{ name }}" value="{{ value }}" type="{{ kind }}" class="input input-sm w-full mt-1 {% if self.error(name).is_some() %}input-error{% endif %}" autocomplete="off"
+         {% if let Some(e) = self.error(name) %}aria-invalid="true" aria-describedby="err-{{ name }}"{% endif %}>
+  {% if let Some(e) = self.error(name) %}<span class="text-[12px] text-error" id="err-{{ name }}">{{ e }}</span>{% endif %}
+</label>
+{% endmacro %}
+{% macro role(name, value, current, label) %}
+<label class="flex items-center gap-1.5 text-[12.5px]"><input type="radio" name="{{ name }}" value="{{ value }}" class="radio radio-xs" {% if current == value %}checked{% endif %}>{{ label }}</label>
+{% endmacro %}
+<form hx-post="/parties/wizard" hx-target="#wizard" method="post" action="/parties/wizard">
+  <input type="hidden" name="step" value="{{ step }}">
+  {% for (name, value) in form.carried(step) %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
+  <ol class="flex gap-4 px-5 pt-4 text-[12px] muted" aria-label="Steps">
+    <li {% if step == "names" %}aria-current="step" class="font-medium text-primary"{% endif %}>1. Names</li>
+    <li {% if step == "details" %}aria-current="step" class="font-medium text-primary"{% endif %}>2. Details and roles</li>
+  </ol>
+  <div class="p-5 space-y-4">
+    {% if step == "names" %}
+      <p class="text-[13px] muted">An organization, a person, or both: the person is then related to the organization.</p>
+      {% call field("org_name", "Organization (optional)", form.org_name, "text") %}
+      <div class="grid grid-cols-2 gap-3">
+        {% call field("person_first_name", "Person: first name (optional)", form.person_first_name, "text") %}
+        {% call field("person_last_name", "Last name", form.person_last_name, "text") %}
+      </div>
+    {% else %}
+      {% if !org_matches.is_empty() || !person_matches.is_empty() %}
+      <div role="note" class="alert alert-warning alert-soft text-[13px] py-2 block">
+        <div class="font-medium mb-1">These may be the same. Open one instead of creating it again:</div>
+        <ul class="list-disc ml-5">
+          {% for (row, href) in org_matches %}<li><a class="link" href="{{ href }}">{{ row.name }}</a> <span class="muted">organization</span></li>{% endfor %}
+          {% for (row, href) in person_matches %}<li><a class="link" href="{{ href }}">{{ row.name }}</a> <span class="muted">person</span></li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if self.has_org() %}
+      <fieldset class="space-y-2">
+        <legend class="font-medium text-[13px] mb-1">{{ form.org_name }}</legend>
+        <div class="grid grid-cols-2 gap-3">
+          {% call field("org_email", "Email (optional)", form.org_email, "email") %}
+          {% call field("org_phone", "Phone (optional)", form.org_phone, "tel") %}
+        </div>
+        <div class="flex gap-4" role="radiogroup" aria-label="Organization role">
+          {% call role("org_role", "customer", form.org_role, "Customer") %}{% call role("org_role", "lead", form.org_role, "Lead") %}{% call role("org_role", "", form.org_role, "Neither") %}
+        </div>
+        {% if let Some(e) = self.error("org_role") %}<span class="text-[12px] text-error">{{ e }}</span>{% endif %}
+      </fieldset>
+      {% endif %}
+      {% if self.has_person() %}
+      <fieldset class="space-y-2">
+        <legend class="font-medium text-[13px] mb-1">{{ form.person_first_name }} {{ form.person_last_name }}</legend>
+        <div class="grid grid-cols-2 gap-3">
+          {% call field("person_email", "Email (optional)", form.person_email, "email") %}
+          {% call field("person_phone", "Phone (optional)", form.person_phone, "tel") %}
+        </div>
+        {% call field("person_job_title", "Job title (optional)", form.person_job_title, "text") %}
+        <div class="flex gap-4" role="radiogroup" aria-label="Person role">
+          {% call role("person_role", "employee", form.person_role, "Employee") %}
+          {% if !self.has_org() %}{% call role("person_role", "lead", form.person_role, "Lead") %}{% endif %}
+          {% call role("person_role", "", form.person_role, "Neither") %}
+        </div>
+        {% if let Some(e) = self.error("person_role") %}<span class="text-[12px] text-error">{{ e }}</span>{% endif %}
+        {% if self.has_org() %}
+        <div class="grid grid-cols-2 gap-3 items-end">
+          {% call field("relationship", "Their role at the organization", form.relationship, "text") %}
+          <label class="flex items-center gap-1.5 text-[12.5px] pb-2"><input type="checkbox" name="billing_contact" value="on" class="checkbox checkbox-xs" {% if !form.billing_contact.is_empty() %}checked{% endif %}>Billing contact</label>
+        </div>
+        {% endif %}
+      </fieldset>
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    {% if step == "details" %}<button class="btn btn-sm btn-quiet" name="go" value="back">Back</button>{% endif %}
+    <button class="btn btn-sm btn-primary">{% if step == "names" %}Next{% else %}Create{% endif %}</button>
+  </div>
+</form>

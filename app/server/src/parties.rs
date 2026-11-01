@@ -697,48 +697,60 @@ fn valid_form_id(id: &str) -> bool {
 /// optional first email and phone and the optional role, in one transaction. An id that exists already is refused
 /// with AlreadyExists (a resubmitted form; the route sends the page to that party).
 pub fn party_create(conn: &mut Connection, new: &NewParty, actor: &Actor) -> Result<String, CommandError> {
-    let mut errors = new.fields.check();
-    if !valid_form_id(&new.id) {
-        errors.push(FieldError { field: "id", message: "The form is out of date. Close it and try again.".into() });
-    }
-    let email = (!new.email.trim().is_empty()).then(|| MethodInput::email(&new.email));
-    let phone = (!new.phone.trim().is_empty()).then(|| MethodInput::phone(&new.phone));
-    if let Some(m) = &email {
-        errors.extend(m.check("email_"));
-    }
-    if let Some(m) = &phone {
-        errors.extend(m.check("phone_"));
-    }
+    let errors = check_new(new);
     if !errors.is_empty() {
         return Err(CommandError::Validation(errors));
     }
     let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    create_in(&tx, new, &Stamp::now(actor))?;
+    tx.commit()?;
+    Ok(new.id.clone())
+}
+
+/// The field errors of a create, before any write.
+fn check_new(new: &NewParty) -> Vec<FieldError> {
+    let mut errors = new.fields.check();
+    if !valid_form_id(&new.id) {
+        errors.push(FieldError { field: "id", message: "The form is out of date. Close it and try again.".into() });
+    }
+    if !new.email.trim().is_empty() {
+        errors.extend(MethodInput::email(&new.email).check("email_"));
+    }
+    if !new.phone.trim().is_empty() {
+        errors.extend(MethodInput::phone(&new.phone).check("phone_"));
+    }
+    errors
+}
+
+/// [`party_create`] inside the caller's transaction (also the wizard's).
+fn create_in(tx: &Connection, new: &NewParty, stamp: &Stamp) -> Result<(), CommandError> {
     let exists: bool = tx.query_row("SELECT EXISTS (SELECT 1 FROM party WHERE id = ?1)", [&new.id], |r| r.get(0))?;
     if exists {
         return Err(CommandError::AlreadyExists(new.id.clone()));
     }
-    let stamp = Stamp::now(actor);
     let org = new.fields.organization();
     tx.execute(
         "INSERT INTO party (id, organization_ind, person_ind, deleted_ind, merge_ind, comments) VALUES (?1, ?2, ?3, 0, 0, ?4)",
         params![new.id, i64::from(org), i64::from(!org), opt(&new.comments)],
     )?;
-    audit::stamp_created(&tx, "party", &new.id, &stamp)?;
+    audit::stamp_created(tx, "party", &new.id, stamp)?;
     match &new.fields {
         PartyFields::Person(_) => tx.execute("INSERT INTO person (id) VALUES (?1)", [&new.id])?,
         PartyFields::Organization(_) => tx.execute("INSERT INTO organization (id) VALUES (?1)", [&new.id])?,
     };
-    write_fields(&tx, &new.id, &new.fields)?;
-    audit::stamp_created(&tx, if org { "organization" } else { "person" }, &new.id, &stamp)?;
-    for m in email.iter().chain(phone.iter()) {
-        contacts::insert_method(&tx, &new.id, m, &stamp)?;
+    write_fields(tx, &new.id, &new.fields)?;
+    audit::stamp_created(tx, if org { "organization" } else { "person" }, &new.id, stamp)?;
+    if !new.email.trim().is_empty() {
+        contacts::insert_method(tx, &new.id, &MethodInput::email(&new.email), stamp)?;
     }
-    refresh_caches(&tx, &new.id)?;
+    if !new.phone.trim().is_empty() {
+        contacts::insert_method(tx, &new.id, &MethodInput::phone(&new.phone), stamp)?;
+    }
+    refresh_caches(tx, &new.id)?;
     if let Some(role) = new.role {
-        add_role(&tx, &new.id, role, &stamp)?;
+        add_role(tx, &new.id, role, stamp)?;
     }
-    tx.commit()?;
-    Ok(new.id.clone())
+    Ok(())
 }
 
 fn write_fields(conn: &Connection, id: &str, fields: &PartyFields) -> rusqlite::Result<()> {
@@ -927,6 +939,378 @@ pub(crate) fn add_role(
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// OP-PARTY-07..09 relations (BR-PARTY-03, BR-PARTY-04)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// A new relation, seen from `party_id` (the page it is added on): `other_id` is `relationship` of the party ("Office
+/// manager"), and the party is `reciprocal` of the other one ("Employer"). Billing and shipping say the other party
+/// is the party's billing or shipping contact; they are on the other -> party row.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct RelationInput {
+    pub party_id: String,
+    pub other_id: String,
+    pub relationship: String,
+    pub reciprocal: String,
+    pub billing: bool,
+    pub shipping: bool,
+}
+
+/// The two rows of a relation pair: (other -> party, party -> other) as ids.
+fn pair_of(conn: &Connection, id: &str) -> Result<(String, String, String, String), CommandError> {
+    let (from, to): (String, String) = conn
+        .query_row("SELECT party_id_from, party_id_to FROM party_relation WHERE id = ?1", [id], |r| {
+            Ok((r.get(0)?, r.get(1)?))
+        })
+        .optional()?
+        .ok_or(CommandError::NotFound)?;
+    let back: Option<String> = conn
+        .query_row(
+            "SELECT id FROM party_relation WHERE party_id_from = ?1 AND party_id_to = ?2 AND id <> ?3 ORDER BY id LIMIT 1",
+            params![to, from, id],
+            |r| r.get(0),
+        )
+        .optional()?;
+    let back = back.ok_or_else(|| {
+        CommandError::Refused("This relation has no reciprocal row, so it cannot be changed here (BR-PARTY-03).".into())
+    })?;
+    Ok((id.to_owned(), back, from, to))
+}
+
+/// OP-PARTY-07 `party_relation_create` (BR-PARTY-03): both rows, current from today. A pair that exists already
+/// (either way) is refused, as is a relation of a party to itself or with an archived party. Returns the id of the
+/// other -> party row (the one the party's Contacts tab shows).
+pub fn party_relation_create(
+    conn: &mut Connection,
+    input: &RelationInput,
+    actor: &Actor,
+) -> Result<String, CommandError> {
+    if input.other_id.trim().is_empty() {
+        return Err(CommandError::Validation(vec![FieldError {
+            field: "other_id",
+            message: "Choose the related person or organization.".into(),
+        }]));
+    }
+    if input.other_id == input.party_id {
+        return Err(CommandError::Validation(vec![FieldError {
+            field: "other_id",
+            message: "A party cannot be related to itself.".into(),
+        }]));
+    }
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    for id in [&input.party_id, &input.other_id] {
+        if party_state(&tx, id)?.1 {
+            return Err(CommandError::Refused("An archived party cannot get a new relation.".into()));
+        }
+    }
+    let exists: bool = tx.query_row(
+        "SELECT EXISTS (SELECT 1 FROM party_relation WHERE (party_id_from = ?1 AND party_id_to = ?2)
+                                                       OR (party_id_from = ?2 AND party_id_to = ?1))",
+        params![input.other_id, input.party_id],
+        |r| r.get(0),
+    )?;
+    if exists {
+        return Err(CommandError::Refused("These two are related already. Edit that relation instead.".into()));
+    }
+    let stamp = Stamp::now(actor);
+    let today = &stamp.at[..10];
+    let forward = crate::ids::new_id();
+    let back = crate::ids::new_id();
+    for (id, from, to, what, billing, shipping) in [
+        (&forward, &input.other_id, &input.party_id, &input.relationship, input.billing, input.shipping),
+        (&back, &input.party_id, &input.other_id, &input.reciprocal, false, false),
+    ] {
+        tx.execute(
+            "INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind,
+                                         billing_ind, shipping_ind)
+             VALUES (?1, ?2, ?3, ?4, ?5, 1, ?6, ?7)",
+            params![id, from, to, opt(what), today, i64::from(billing), i64::from(shipping)],
+        )?;
+        audit::stamp_created(&tx, "party_relation", id, &stamp)?;
+    }
+    tx.commit()?;
+    Ok(forward)
+}
+
+/// What OP-PARTY-08 does to a pair.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RelationChange {
+    /// New texts and flags, each written to the row it belongs to (the source wrote unset variables; D-07).
+    Edit { relationship: String, reciprocal: String, billing: bool, shipping: bool },
+    /// BR-PARTY-04: current_ind = 0 and thru_date = today on both rows.
+    End,
+    /// BR-PARTY-04: current_ind = 1 and no thru_date on both rows.
+    Restore,
+}
+
+/// OP-PARTY-08 `party_relation_update` on the pair of row `id` (either row of it). Edit takes `id` as the
+/// other -> party row (the one the Contacts tab shows): `relationship`, billing and shipping go to it, `reciprocal` to
+/// the row back. A pair without its reciprocal row is refused.
+pub fn party_relation_update(
+    conn: &mut Connection,
+    id: &str,
+    change: &RelationChange,
+    actor: &Actor,
+) -> Result<(), CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let (row, back, _, _) = pair_of(&tx, id)?;
+    let stamp = Stamp::now(actor);
+    match change {
+        RelationChange::Edit { relationship, reciprocal, billing, shipping } => {
+            tx.execute(
+                "UPDATE party_relation SET relationship = ?2, billing_ind = ?3, shipping_ind = ?4 WHERE id = ?1",
+                params![row, opt(relationship), i64::from(*billing), i64::from(*shipping)],
+            )?;
+            tx.execute("UPDATE party_relation SET relationship = ?2 WHERE id = ?1", params![back, opt(reciprocal)])?;
+        }
+        RelationChange::End => {
+            for r in [&row, &back] {
+                tx.execute(
+                    "UPDATE party_relation SET current_ind = 0, thru_date = ?2 WHERE id = ?1",
+                    params![r, &stamp.at[..10]],
+                )?;
+            }
+        }
+        RelationChange::Restore => {
+            for r in [&row, &back] {
+                tx.execute("UPDATE party_relation SET current_ind = 1, thru_date = NULL WHERE id = ?1", [r])?;
+            }
+        }
+    }
+    for r in [&row, &back] {
+        audit::stamp_modified(&tx, "party_relation", r, &stamp)?;
+    }
+    tx.commit()?;
+    Ok(())
+}
+
+/// OP-PARTY-09 `party_relation_delete` (BR-PARTY-03, AP-07): without `confirm`, ConfirmationRequired with a summary;
+/// with it, both rows go. A missing reciprocal row is an error.
+pub fn party_relation_delete(
+    conn: &mut Connection,
+    id: &str,
+    confirm: bool,
+    _actor: &Actor,
+) -> Result<(), CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let (row, back, from, to) = pair_of(&tx, id)?;
+    if !confirm {
+        let name = |pid: &str| -> rusqlite::Result<String> {
+            tx.query_row("SELECT COALESCE(name_cached, '') FROM party WHERE id = ?1", [pid], |r| r.get(0))
+        };
+        return Err(CommandError::ConfirmationRequired(format!(
+            "Deletes the relation between {} and {} (both of its rows). Ending it instead keeps its history.",
+            name(&from)?,
+            name(&to)?
+        )));
+    }
+    tx.execute("DELETE FROM party_relation WHERE id IN (?1, ?2)", params![row, back])?;
+    tx.commit()?;
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// OP-PARTY-11 party_create_wizard (BR-PARTY-09)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// What the create-party wizard (UI-05) gives: an organization and/or a person, each with its role, and the
+/// person's relationship to the organization when both are new.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WizardInput {
+    pub organization: Option<NewParty>,
+    pub person: Option<NewParty>,
+    /// What the person is of the organization ("Office manager"); empty means "Employee".
+    pub relationship: String,
+    pub billing_contact: bool,
+}
+
+/// Field names of the wizard: the organization's fields start with org_, the person's with person_.
+fn wizard_field(prefix: &str, field: &'static str) -> &'static str {
+    match (prefix, field) {
+        ("org_", "organization_name") => "org_name",
+        ("org_", "email") => "org_email",
+        ("org_", "phone") => "org_phone",
+        ("org_", "id") | ("person_", "id") => "id",
+        ("person_", "first_name") => "person_first_name",
+        ("person_", "email") => "person_email",
+        ("person_", "phone") => "person_phone",
+        (_, f) => f,
+    }
+}
+
+/// OP-PARTY-11 `party_create_wizard` (BR-PARTY-09), one transaction (D-08: a failure leaves nothing behind):
+/// the organization with a customer or lead role or none; the person with an employee role, a lead role (only when
+/// no organization is created) or none; then the relation pair between them (person -> organization is the
+/// relationship, organization -> person is "Employer"). Returns (organization id, person id).
+pub fn party_create_wizard(
+    conn: &mut Connection,
+    input: &WizardInput,
+    actor: &Actor,
+) -> Result<(Option<String>, Option<String>), CommandError> {
+    let mut errors = Vec::new();
+    if input.organization.is_none() && input.person.is_none() {
+        errors.push(FieldError { field: "org_name", message: "Enter an organization, a person, or both.".into() });
+    }
+    if let Some(o) = &input.organization {
+        errors.extend(check_new(o).into_iter().map(|e| FieldError { field: wizard_field("org_", e.field), ..e }));
+        if !matches!(o.role, None | Some(RoleKind::Customer) | Some(RoleKind::Lead)) {
+            errors.push(FieldError {
+                field: "org_role",
+                message: "An organization is a customer, a lead or neither.".into(),
+            });
+        }
+    }
+    if let Some(p) = &input.person {
+        errors.extend(check_new(p).into_iter().map(|e| FieldError { field: wizard_field("person_", e.field), ..e }));
+        match p.role {
+            None | Some(RoleKind::Employee) => {}
+            Some(RoleKind::Lead) if input.organization.is_none() => {}
+            Some(RoleKind::Lead) => errors.push(FieldError {
+                field: "person_role",
+                message: "With a new organization, the lead is the organization.".into(),
+            }),
+            Some(_) => errors.push(FieldError {
+                field: "person_role",
+                message: "A person here is an employee, a lead or neither.".into(),
+            }),
+        }
+    }
+    if !errors.is_empty() {
+        return Err(CommandError::Validation(errors));
+    }
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let stamp = Stamp::now(actor);
+    if let Some(o) = &input.organization {
+        create_in(&tx, o, &stamp)?;
+    }
+    if let Some(p) = &input.person {
+        create_in(&tx, p, &stamp)?;
+    }
+    if let (Some(o), Some(p)) = (&input.organization, &input.person) {
+        let today = &stamp.at[..10];
+        let what =
+            if input.relationship.trim().is_empty() { "Employee".to_owned() } else { clean_text(&input.relationship) };
+        for (from, to, what, billing) in
+            [(&p.id, &o.id, what.as_str(), input.billing_contact), (&o.id, &p.id, "Employer", false)]
+        {
+            let id = crate::ids::new_id();
+            tx.execute(
+                "INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind,
+                                             billing_ind, shipping_ind)
+                 VALUES (?1, ?2, ?3, ?4, ?5, 1, ?6, 0)",
+                params![id, from, to, what, today, i64::from(billing)],
+            )?;
+            audit::stamp_created(&tx, "party_relation", &id, &stamp)?;
+        }
+    }
+    tx.commit()?;
+    Ok((input.organization.as_ref().map(|o| o.id.clone()), input.person.as_ref().map(|p| p.id.clone())))
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// OP-PARTY-06 party_find_by_contact (BR-PARTY-11)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// A party found by its email or phone, for the pickers.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Found {
+    pub id: String,
+    pub name: String,
+    pub organization: bool,
+    /// The email or phone that matched (the owner's), or the person's when this is the employer.
+    pub matched: String,
+    /// True when the party is here as the employer of the owner (BR-PARTY-11).
+    pub via_relation: bool,
+}
+
+/// OP-PARTY-06 `party_find_by_contact` (BR-PARTY-11): the parties that own one of `emails` (case-insensitive) or
+/// `phones` (same digits, the last 10 when longer), archived ones left out. With `prefer_org`, the organization of a
+/// current relation of a matching person comes first (the parent party), then the owners.
+pub fn party_find_by_contact(
+    conn: &Connection,
+    emails: &[String],
+    phones: &[String],
+    prefer_org: bool,
+) -> Result<Vec<Found>, CommandError> {
+    let mut owners: Vec<Found> = Vec::new();
+    let push = |f: Found, list: &mut Vec<Found>| {
+        if !list.iter().any(|x| x.id == f.id) {
+            list.push(f);
+        }
+    };
+    let mut stmt = conn.prepare(
+        "SELECT p.id, COALESCE(p.name_cached, ''), COALESCE(p.organization_ind, 0) = 1, n.address
+         FROM network_address n JOIN contact_method cm ON cm.id = n.id JOIN party p ON p.id = cm.party_id
+         WHERE COALESCE(n.email_address_ind, 0) = 1 AND lower(trim(n.address)) = lower(trim(?1))
+           AND COALESCE(p.deleted_ind, 0) = 0
+         ORDER BY p.name_cached COLLATE NOCASE, p.id",
+    )?;
+    for e in emails.iter().filter(|e| !e.trim().is_empty()) {
+        for row in stmt.query_map([e], |r| {
+            Ok(Found {
+                id: r.get(0)?,
+                name: r.get(1)?,
+                organization: r.get(2)?,
+                matched: r.get(3)?,
+                via_relation: false,
+            })
+        })? {
+            push(row?, &mut owners);
+        }
+    }
+    let mut stmt = conn.prepare(
+        "SELECT p.id, COALESCE(p.name_cached, ''), COALESCE(p.organization_ind, 0) = 1, ph.number
+         FROM phone ph JOIN contact_method cm ON cm.id = ph.id JOIN party p ON p.id = cm.party_id
+         WHERE ph.number_digits_only <> '' AND substr(ph.number_digits_only, -10) = ?1 AND COALESCE(p.deleted_ind, 0) = 0
+         ORDER BY p.name_cached COLLATE NOCASE, p.id",
+    )?;
+    for phone in phones {
+        let digits = contacts::digits_only(phone);
+        if digits.len() < 7 {
+            continue;
+        }
+        let key = if digits.len() > 10 { digits[digits.len() - 10..].to_owned() } else { digits };
+        for row in stmt.query_map([key], |r| {
+            Ok(Found {
+                id: r.get(0)?,
+                name: r.get(1)?,
+                organization: r.get(2)?,
+                matched: r.get(3)?,
+                via_relation: false,
+            })
+        })? {
+            push(row?, &mut owners);
+        }
+    }
+    if !prefer_org {
+        return Ok(owners);
+    }
+    let mut found = Vec::new();
+    let mut stmt = conn.prepare(
+        "SELECT o.id, COALESCE(o.name_cached, '') FROM party_relation r JOIN party o ON o.id = r.party_id_to
+         WHERE r.party_id_from = ?1 AND COALESCE(r.current_ind, 0) = 1 AND COALESCE(o.organization_ind, 0) = 1
+           AND COALESCE(o.deleted_ind, 0) = 0
+         ORDER BY o.name_cached COLLATE NOCASE, o.id",
+    )?;
+    for owner in owners.iter().filter(|o| !o.organization) {
+        for row in stmt.query_map([&owner.id], |r| {
+            Ok(Found {
+                id: r.get(0)?,
+                name: r.get(1)?,
+                organization: true,
+                matched: owner.matched.clone(),
+                via_relation: true,
+            })
+        })? {
+            push(row?, &mut found);
+        }
+    }
+    for owner in owners {
+        push(owner, &mut found);
+    }
+    Ok(found)
+}
+
+// ---------------------------------------------------------------------------------------------------------------
 // Data checks (BR-PARTY-03, BR-PARTY-05)
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -993,6 +1377,182 @@ mod tests {
 
     fn one(conn: &Connection, sql: &str, id: &str) -> String {
         conn.query_row(sql, [id], |r| r.get::<_, Option<String>>(0)).unwrap().unwrap_or_default()
+    }
+
+    fn relation(party: &str, other: &str, what: &str) -> RelationInput {
+        RelationInput {
+            party_id: party.into(),
+            other_id: other.into(),
+            relationship: what.into(),
+            reciprocal: "Client".into(),
+            billing: true,
+            shipping: false,
+        }
+    }
+
+    fn pair_rows(conn: &Connection, a: &str, b: &str) -> Vec<(String, String, String, i64, i64, String)> {
+        conn.prepare(
+            "SELECT party_id_from, party_id_to, COALESCE(relationship, ''), COALESCE(billing_ind, 0),
+                    COALESCE(current_ind, 0), COALESCE(thru_date, '')
+             FROM party_relation WHERE (party_id_from = ?1 AND party_id_to = ?2) OR (party_id_from = ?2 AND party_id_to = ?1)
+             ORDER BY party_id_from = ?1 DESC",
+        )
+        .unwrap()
+        .query_map([a, b], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)))
+        .unwrap()
+        .collect::<Result<_, _>>()
+        .unwrap()
+    }
+
+    #[test]
+    fn a_relation_is_created_edited_and_deleted_as_a_pair() {
+        let (mut conn, actor) = demo_user();
+        let id = party_relation_create(&mut conn, &relation("p-bm", "p-tf", "Consultant"), &actor).unwrap();
+        let rows = pair_rows(&conn, "p-tf", "p-bm");
+        assert_eq!(rows.len(), 2);
+        assert_eq!((rows[0].2.as_str(), rows[0].3), ("Consultant", 1), "other -> party: relationship and billing");
+        assert_eq!((rows[1].2.as_str(), rows[1].3), ("Client", 0), "party -> other: the reciprocal, no billing");
+        // A duplicate pair, either way round, is refused.
+        assert!(matches!(
+            party_relation_create(&mut conn, &relation("p-bm", "p-tf", "Again"), &actor),
+            Err(CommandError::Refused(_))
+        ));
+        assert!(matches!(
+            party_relation_create(&mut conn, &relation("p-tf", "p-bm", "Again"), &actor),
+            Err(CommandError::Refused(_))
+        ));
+        assert!(matches!(
+            party_relation_create(&mut conn, &relation("p-tf", "p-tf", "Me"), &actor),
+            Err(CommandError::Validation(_))
+        ));
+        // Edit writes each value to its own row.
+        let edit = RelationChange::Edit {
+            relationship: "Advisor".into(),
+            reciprocal: "Advisee".into(),
+            billing: false,
+            shipping: true,
+        };
+        party_relation_update(&mut conn, &id, &edit, &actor).unwrap();
+        let rows = pair_rows(&conn, "p-tf", "p-bm");
+        assert_eq!((rows[0].2.as_str(), rows[0].3), ("Advisor", 0));
+        assert_eq!(rows[1].2, "Advisee");
+        // End, then restore, on both rows (BR-PARTY-04).
+        party_relation_update(&mut conn, &id, &RelationChange::End, &actor).unwrap();
+        let rows = pair_rows(&conn, "p-tf", "p-bm");
+        assert!(rows.iter().all(|r| r.4 == 0 && r.5.len() == 10), "{rows:?}");
+        party_relation_update(&mut conn, &id, &RelationChange::Restore, &actor).unwrap();
+        assert!(pair_rows(&conn, "p-tf", "p-bm").iter().all(|r| r.4 == 1 && r.5.is_empty()));
+        // Delete asks first (AP-07), then removes both rows.
+        let Err(CommandError::ConfirmationRequired(summary)) = party_relation_delete(&mut conn, &id, false, &actor)
+        else {
+            panic!()
+        };
+        assert!(summary.contains("Tomás Ferreira") && summary.contains("Bluefin Marine Supply"), "{summary}");
+        assert_eq!(pair_rows(&conn, "p-tf", "p-bm").len(), 2);
+        party_relation_delete(&mut conn, &id, true, &actor).unwrap();
+        assert!(pair_rows(&conn, "p-tf", "p-bm").is_empty());
+        assert!(relations_without_reciprocal(&conn).unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_missing_reciprocal_row_is_an_error() {
+        let (mut conn, actor) = demo_user();
+        conn.execute("DELETE FROM party_relation WHERE id = 'rel-mara-r'", []).unwrap();
+        assert!(matches!(party_relation_delete(&mut conn, "rel-mara", true, &actor), Err(CommandError::Refused(_))));
+        assert!(matches!(
+            party_relation_update(&mut conn, "rel-mara", &RelationChange::End, &actor),
+            Err(CommandError::Refused(_))
+        ));
+        assert!(matches!(party_relation_delete(&mut conn, "nope", true, &actor), Err(CommandError::NotFound)));
+    }
+
+    fn org(name: &str, role: Option<RoleKind>) -> NewParty {
+        NewParty {
+            role,
+            ..new_party(PartyFields::Organization(OrganizationFields {
+                organization_name: name.into(),
+                ..Default::default()
+            }))
+        }
+    }
+
+    #[test]
+    fn wizard_creates_the_organization_the_person_their_roles_and_the_pair() {
+        let (mut conn, actor) = demo_user();
+        let input = WizardInput {
+            organization: Some(NewParty {
+                email: "hello@tidewater.example".into(),
+                ..org("Tidewater Kayak", Some(RoleKind::Customer))
+            }),
+            person: Some(NewParty { role: Some(RoleKind::Employee), ..new_party(person("Nell", "Barrow")) }),
+            relationship: "Owner".into(),
+            billing_contact: true,
+        };
+        let (o, p) = party_create_wizard(&mut conn, &input, &actor).unwrap();
+        let (o, p) = (o.unwrap(), p.unwrap());
+        let org = party_get(&conn, &o).unwrap();
+        assert!(org.has_role(RoleKind::Customer));
+        assert_eq!(org.relations.len(), 1);
+        assert_eq!(
+            (org.relations[0].other_name.as_str(), org.relations[0].relationship.as_str()),
+            ("Nell Barrow", "Owner")
+        );
+        assert!(org.relations[0].billing);
+        let person = party_get(&conn, &p).unwrap();
+        assert!(person.has_role(RoleKind::Employee));
+        assert_eq!(person.relations[0].relationship, "Employer");
+        assert!(relations_without_reciprocal(&conn).unwrap().is_empty());
+        assert!(customer_roles_without_customer_row(&conn).unwrap().is_empty());
+    }
+
+    #[test]
+    fn wizard_rules_and_rollback() {
+        let (mut conn, actor) = demo_user();
+        // A lead person only when no organization is created; an organization is never an employee.
+        let both_leads = WizardInput {
+            organization: Some(org("Lead Co", Some(RoleKind::Lead))),
+            person: Some(NewParty { role: Some(RoleKind::Lead), ..new_party(person("Lee", "Dee")) }),
+            relationship: String::new(),
+            billing_contact: false,
+        };
+        let Err(CommandError::Validation(errors)) = party_create_wizard(&mut conn, &both_leads, &actor) else {
+            panic!()
+        };
+        assert_eq!(errors.iter().map(|e| e.field).collect::<Vec<_>>(), ["person_role"]);
+        let lone_lead = WizardInput { organization: None, ..both_leads.clone() };
+        let (o, p) = party_create_wizard(&mut conn, &lone_lead, &actor).unwrap();
+        assert!(o.is_none() && party_get(&conn, &p.unwrap()).unwrap().has_role(RoleKind::Lead));
+        let empty =
+            WizardInput { organization: None, person: None, relationship: String::new(), billing_contact: false };
+        assert!(matches!(party_create_wizard(&mut conn, &empty, &actor), Err(CommandError::Validation(_))));
+        // A failure in the second insert leaves nothing behind (one transaction, D-08).
+        let before: i64 = conn.query_row("SELECT COUNT(*) FROM party", [], |r| r.get(0)).unwrap();
+        conn.execute_batch("CREATE TRIGGER fail_person AFTER INSERT ON person BEGIN SELECT RAISE(ABORT, 'boom'); END;")
+            .unwrap();
+        let input = WizardInput {
+            organization: Some(org("Rollback Ltd", Some(RoleKind::Customer))),
+            person: Some(new_party(person("Roll", "Back"))),
+            relationship: String::new(),
+            billing_contact: false,
+        };
+        assert!(matches!(party_create_wizard(&mut conn, &input, &actor), Err(CommandError::Storage(_))));
+        let after: i64 = conn.query_row("SELECT COUNT(*) FROM party", [], |r| r.get(0)).unwrap();
+        assert_eq!(before, after);
+        assert!(names(&conn, &q("rollback")).is_empty());
+    }
+
+    #[test]
+    fn find_by_email_prefers_the_organization() {
+        let (conn, _) = demo_user();
+        let joanna = vec!["ELENA@haldenpryce.example".to_owned()];
+        let found = party_find_by_contact(&conn, &joanna, &[], true).unwrap();
+        let names: Vec<_> = found.iter().map(|f| (f.name.as_str(), f.via_relation)).collect();
+        assert_eq!(names, [("Halden & Pryce Architects", true), ("Elena Halden", false)], "BR-PARTY-11");
+        let found = party_find_by_contact(&conn, &joanna, &[], false).unwrap();
+        assert_eq!(found.iter().map(|f| f.name.as_str()).collect::<Vec<_>>(), ["Elena Halden"]);
+        let by_phone = party_find_by_contact(&conn, &[], &["+1 (207) 555-0148".into()], false).unwrap();
+        assert!(by_phone.iter().any(|f| f.name == "Elena Halden"), "{by_phone:?}");
+        assert!(party_find_by_contact(&conn, &["nobody@x.example".into()], &["12".into()], true).unwrap().is_empty());
     }
 
     #[test]

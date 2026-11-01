@@ -81,6 +81,7 @@ fn sample(path: &str) -> String {
     path.replace("{doc_number}", "INV-1048")
         .replace("{id}", id)
         .replace("{type_id}", "1")
+        .replace("{kind}", "contact")
         .replace("{*path}", "app.css")
         .replace("{token}", "spent")
 }

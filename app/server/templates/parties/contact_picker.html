@@ -1,0 +1,21 @@
+{# UI-06 contact picker: search (OP-PARTY-05) and choose one party. The rows are radio buttons named other_id; typing
+   swaps this picker. #}
+<div id="contact-picker">
+  <label class="flex items-center gap-2 h-8 px-2.5 rounded-field border hairline bg-base-200/50 focus-within:border-primary">
+    <svg class="i muted" aria-hidden="true"><use href="#i-search"/></svg>
+    <input name="q" value="{{ q }}" class="bg-transparent outline-none w-full text-[13px]" placeholder="Search by name" aria-label="Search people and organizations" autocomplete="off"
+           hx-get="{{ self.search_url() }}" hx-target="#contact-picker" hx-swap="outerHTML" hx-trigger="input changed delay:250ms">
+  </label>
+  <ul class="mt-2 max-h-56 overflow-y-auto" role="radiogroup" aria-label="Results">
+    {% for (row, initials, color) in rows %}
+    <li><label class="flex items-center gap-2.5 px-2 py-1.5 rounded-field hover:bg-base-200 cursor-pointer">
+      <input type="radio" name="other_id" value="{{ row.id }}" class="radio radio-xs" {% if *selected == row.id %}checked{% endif %}>
+      <span class="av av-xs {% if row.organization %}org{% endif %} c{{ color }}" aria-hidden="true">{{ initials }}</span>
+      <span class="min-w-0"><span class="block truncate text-[13px]">{{ row.name }}</span><span class="block text-[11.5px] muted truncate">{% if row.organization %}Organization{% else %}Person{% endif %}{% if !row.email.is_empty() %} · {{ row.email }}{% endif %}</span></span>
+    </label></li>
+    {% else %}
+    <li class="text-[12.5px] muted px-2 py-3">{% if q.is_empty() %}No people or organizations yet.{% else %}Nobody matches “{{ q }}”.{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% if matched > rows.len() as i64 + 1 %}<p class="text-[11.5px] muted px-2">Showing the first {{ rows.len() }} of {{ matched }}. Type more to narrow it.</p>{% endif %}
+</div>

@@ -1,0 +1,15 @@
+{# UI-06 email or phone picker: the party's emails or phones, primary first, as radio rows named {{ kind }}_id. #}
+<div id="{{ kind }}-picker">
+  <ul role="radiogroup" aria-label="{% if kind == "email" %}Email addresses{% else %}Phone numbers{% endif %} of {{ name }}">
+    {% for (id, display, label, primary) in rows %}
+    <li><label class="flex items-center gap-2.5 px-2 py-1.5 rounded-field hover:bg-base-200 cursor-pointer text-[13px]">
+      <input type="radio" name="{{ kind }}_id" value="{{ id }}" class="radio radio-xs" {% if *primary %}checked{% endif %}>
+      <span class="truncate {% if kind == "phone" %}num{% endif %}">{{ display }}</span>
+      {% if !label.is_empty() %}<span class="chip">{{ label }}</span>{% endif %}
+      {% if *primary %}<span class="text-[11px] text-primary font-medium">Primary</span>{% endif %}
+    </label></li>
+    {% else %}
+    <li class="text-[12.5px] muted px-2 py-3">{{ name }} has no {% if kind == "email" %}email address{% else %}phone number{% endif %}.</li>
+    {% endfor %}
+  </ul>
+</div>

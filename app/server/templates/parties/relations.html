@@ -1,5 +1,11 @@
-{# The Contacts tab of UI-04: the related parties, as each one is to this party (BR-PARTY-03). #}
-<div id="party-relations">
+{# The Contacts tab of UI-04: the related parties, as each one is to this party (BR-PARTY-03). Relation changes
+   (OP-PARTY-07..09) answer with this fragment, in place or out of band after a dialog. #}
+<div id="party-relations"{% if oob %} hx-swap-oob="true"{% endif %}>
+  {% if !d.archived %}
+  <div class="flex justify-end mb-3">
+    <button class="btn btn-sm btn-quiet" hx-get="{{ self.party() }}/relations/new" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add related person or organization</button>
+  </div>
+  {% endif %}
   {% if d.relations.is_empty() %}
   <div class="panel p-8 text-center muted">No related people or organizations yet.</div>
   {% else %}
@@ -8,10 +14,24 @@
     <li class="panel p-4 {% if !r.current %}opacity-70{% endif %}">
       <div class="flex items-center gap-3">
         <span class="av {% if r.other_organization %}org{% endif %} c{{ self.color(r.other_id) }}" aria-hidden="true">{{ self.initials(r.other_name) }}</span>
-        <div class="min-w-0">
+        <div class="min-w-0 flex-1">
           <a class="font-medium link link-hover truncate block" href="{{ self.href(r.other_id) }}">{{ r.other_name }}</a>
           <div class="text-[12px] muted">{% if r.relationship.is_empty() %}Related{% else %}{{ r.relationship }}{% endif %}{% if r.billing %} · Billing contact{% endif %}{% if r.shipping %} · Shipping contact{% endif %}{% if !r.current %} · Ended{% if !r.thru_date.is_empty() %} {{ r.thru_date }}{% endif %}{% endif %}{% if r.other_archived %} · Archived{% endif %}</div>
         </div>
+        {% if !d.archived %}
+        <details class="dropdown dropdown-end">
+          <summary class="icon-btn" aria-label="Actions for the relation with {{ r.other_name }}"><svg class="i i-sm" aria-hidden="true"><use href="#i-more"/></svg></summary>
+          <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-40 p-1 shadow border hairline text-[12.5px]">
+            <li><button hx-get="{{ self.relation_href(r.id) }}/edit" hx-target="#modal-body">Edit</button></li>
+            {% if r.current %}
+            <li><button hx-patch="{{ self.relation_href(r.id) }}" hx-vals='{"change": "end"}' hx-target="#party-relations" hx-swap="outerHTML">End</button></li>
+            {% else %}
+            <li><button hx-patch="{{ self.relation_href(r.id) }}" hx-vals='{"change": "restore"}' hx-target="#party-relations" hx-swap="outerHTML">Restore</button></li>
+            {% endif %}
+            <li><button class="text-error" hx-delete="{{ self.relation_href(r.id) }}" hx-target="#modal-body">Delete</button></li>
+          </ul>
+        </details>
+        {% endif %}
       </div>
       {% if !r.phone.is_empty() || !r.email.is_empty() %}
       <div class="mt-3 space-y-1.5 text-[12.5px]">
