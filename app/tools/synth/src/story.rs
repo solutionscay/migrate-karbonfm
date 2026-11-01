@@ -585,18 +585,34 @@ impl G<'_> {
         self.push("PartyRole", r, at);
     }
 
+    /// A relation pair (BR-PARTY-03): `from` is `what` of `to` (the person is the employee, owner, ...), and the
+    /// reciprocal row says `to` is the employer of `from`. The reciprocal row takes nothing from the random stream, so
+    /// the rest of the export stays the same: its id is the forward id with the UUID version digit 5 instead of 4 (it
+    /// cannot collide with a generated v4 id), and it carries the forward row's stamps.
     fn relation(&mut self, from: &str, to: &str, what: &str, billing: bool, at: NaiveDateTime) {
         let id = self.r.uuid();
-        let r = row(&[
-            ("Id", id),
-            ("PartyIdFrom", from.into()),
-            ("PartyIdTo", to.into()),
-            ("Relationship", what.into()),
-            ("FromDate", fm_date(at.date())),
-            ("CurrentInd", "1".into()),
-            ("BillingInd", fm_bool(billing)),
-        ]);
-        self.push("PartyRelation", r, at);
+        let back = format!("{}5{}", &id[..14], &id[15..]);
+        let pair = |id: String, from: &str, to: &str, what: &str, billing: bool| {
+            row(&[
+                ("Id", id),
+                ("PartyIdFrom", from.into()),
+                ("PartyIdTo", to.into()),
+                ("Relationship", what.into()),
+                ("FromDate", fm_date(at.date())),
+                ("CurrentInd", "1".into()),
+                ("BillingInd", fm_bool(billing)),
+            ])
+        };
+        let mut forward = pair(id, from, to, what, billing);
+        let mut reciprocal = pair(back, to, from, "Employer", false);
+        self.stamp("PartyRelation", &mut forward, at);
+        for (k, v) in forward.iter() {
+            if k.starts_with("Creation") || k.starts_with("Modification") || matches!(*k, "CreatedBy" | "ModifiedBy") {
+                reciprocal.insert(k, v.clone());
+            }
+        }
+        self.x.push("PartyRelation", forward);
+        self.x.push("PartyRelation", reciprocal);
     }
 
     fn street(&mut self) -> [String; 4] {

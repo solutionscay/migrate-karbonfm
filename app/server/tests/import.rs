@@ -86,6 +86,14 @@ fn golden_counts_of_the_full_export_and_the_import_time() {
     let actual: Vec<(&str, i64)> =
         golden.iter().map(|(t, _)| (*t, count(&conn, &format!("SELECT COUNT(*) FROM \"{t}\"")))).collect();
     assert_eq!(actual, golden, "golden counts");
+    // BR-PARTY-03: the generator writes every relation as a pair; BR-PARTY-05: every customer role has its row.
+    assert_eq!(count(&conn, "SELECT COUNT(*) FROM party_relation"), 2 * 230);
+    assert_eq!(
+        count(&conn, "SELECT COUNT(*) FROM party_relation WHERE relationship = 'Employer' AND billing_ind = 1"),
+        0
+    );
+    assert_eq!(karbon_server::parties::relations_without_reciprocal(&conn).unwrap(), Vec::<String>::new());
+    assert_eq!(karbon_server::parties::customer_roles_without_customer_row(&conn).unwrap(), Vec::<String>::new());
     // The export is the size the brief asks for: 300-500 parties, 3,000-5,000 sales transactions, 3-4 years.
     let parties = count(&conn, "SELECT COUNT(*) FROM party");
     assert!((300..=500).contains(&parties));

@@ -245,6 +245,32 @@ pub fn party_search(conn: &Connection, s: &Search) -> Result<SearchPage, Command
     Ok(SearchPage { rows, matched, capped: matched > MAX_ROWS, page, pages, page_size })
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// Data checks (BR-PARTY-03, BR-PARTY-05)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// The relation rows that have no reciprocal row (BR-PARTY-03: every relation is a From->To and To->From pair).
+pub fn relations_without_reciprocal(conn: &Connection) -> rusqlite::Result<Vec<String>> {
+    let mut stmt = conn.prepare(
+        "SELECT a.id FROM party_relation a
+         WHERE NOT EXISTS (SELECT 1 FROM party_relation b WHERE b.id <> a.id
+                           AND b.party_id_from = a.party_id_to AND b.party_id_to = a.party_id_from)
+         ORDER BY a.id",
+    )?;
+    let ids = stmt.query_map([], |r| r.get(0))?.collect();
+    ids
+}
+
+/// The customer roles (customer_ind = 1) that have no `customer` subtype row; sales transactions point at that row.
+pub fn customer_roles_without_customer_row(conn: &Connection) -> rusqlite::Result<Vec<String>> {
+    let mut stmt = conn.prepare(
+        "SELECT r.id FROM party_role r WHERE COALESCE(r.customer_ind, 0) = 1
+         AND NOT EXISTS (SELECT 1 FROM customer c WHERE c.id = r.id) ORDER BY r.id",
+    )?;
+    let ids = stmt.query_map([], |r| r.get(0))?.collect();
+    ids
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

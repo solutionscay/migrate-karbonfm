@@ -92,6 +92,7 @@ INSERT INTO phone (id, number, number_digits_only, country_code, primary_ind, vo
 INSERT INTO contact_method (id, party_id, label, phone_ind, address_ind, network_address_ind, billing_ind_cached) VALUES ('cm-005', 'p-mara', 'Mobile', 0, 0, 1, 0);
 INSERT INTO network_address (id, address, primary_ind, email_address_ind, web_address_ind) VALUES ('cm-005', 'mara@ellisonstudio.example', 1, 1, 0);
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind) VALUES ('rel-mara', 'p-mara', 'p-ellison', 'Owner', '2019-04-01', 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-mara-r', 'p-ellison', 'p-mara', 'Employer', '2019-04-01', 1, 0);
 INSERT INTO party_role (id, party_id, employee_ind, customer_ind, current_ind, from_date) VALUES ('r-mara-emp', 'p-mara', 1, 0, 1, '2019-04-01');
 INSERT INTO employee (id, name_cached, initials, type) VALUES ('r-mara-emp', 'Mara Ellison', 'ME', 'Owner');
 INSERT INTO user (id, account_name, party_id, email_address) VALUES ('u-mara', 'mara', 'p-mara', 'mara@ellisonstudio.example');
@@ -122,6 +123,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-bm-c', 'Owen Castellano', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-bm-c', 'Owen', 'Castellano', 'Accounts payable');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-bm-c', 'p-bm-c', 'p-bm', 'Accounts payable', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-bm-c-r', 'p-bm', 'p-bm-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-bm', 'p-bm', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-wt', 'Westbrook Community Theatre', 1, 0, 0, '(603) 555-0119', 'office@westbrooktheatre.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO organization (id, organization_name, federal_tax_id_number, company_type) VALUES ('p-wt', 'Westbrook Community Theatre', NULL, NULL);
@@ -133,6 +135,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-wt-c', 'Dana Whitlock', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-wt-c', 'Dana', 'Whitlock', 'Office manager');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-wt-c', 'p-wt-c', 'p-wt', 'Office manager', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-wt-c-r', 'p-wt', 'p-wt-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-wt', 'p-wt', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-af', 'Atlas Freight Partners', 1, 0, 0, '(617) 555-0166', 'billing@atlasfreight.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO organization (id, organization_name, federal_tax_id_number, company_type) VALUES ('p-af', 'Atlas Freight Partners', NULL, NULL);
@@ -144,6 +147,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-af-c', 'Raj Menon', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-af-c', 'Raj', 'Menon', 'Finance lead');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-af-c', 'p-af-c', 'p-af', 'Finance lead', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-af-c-r', 'p-af', 'p-af-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-af', 'p-af', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-od', 'Okafor Family Dental', 1, 0, 0, '(207) 555-0175', 'frontdesk@okafordental.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO organization (id, organization_name, federal_tax_id_number, company_type) VALUES ('p-od', 'Okafor Family Dental', NULL, NULL);
@@ -155,6 +159,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-od-c', 'Ngozi Okafor', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-od-c', 'Ngozi', 'Okafor', 'Dentist');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-od-c', 'p-od-c', 'p-od', 'Dentist', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-od-c-r', 'p-od', 'p-od-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-od', 'p-od', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-jr', 'Juniper Row Bakery', 1, 0, 0, '(207) 555-0103', 'hello@juniperrow.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO organization (id, organization_name, federal_tax_id_number, company_type) VALUES ('p-jr', 'Juniper Row Bakery', NULL, NULL);
@@ -166,6 +171,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-jr-c', 'Lena Moreau', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-jr-c', 'Lena', 'Moreau', 'Owner');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-jr-c', 'p-jr-c', 'p-jr', 'Owner', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-jr-c-r', 'p-jr', 'p-jr-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-jr', 'p-jr', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-cs', 'Cedar & Slate Realty', 1, 0, 0, '(603) 555-0131', 'grant@cedarslate.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO organization (id, organization_name, federal_tax_id_number, company_type) VALUES ('p-cs', 'Cedar & Slate Realty', NULL, NULL);
@@ -177,6 +183,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-cs-c', 'Grant Albee', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-cs-c', 'Grant', 'Albee', 'Broker');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-cs-c', 'p-cs-c', 'p-cs', 'Broker', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-cs-c-r', 'p-cs', 'p-cs-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-cs', 'p-cs', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-tf', 'Tomás Ferreira', 0, 1, 0, '(207) 555-0158', 'tomas.ferreira@mail.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-tf', 'Tomás', 'Ferreira', NULL);
@@ -196,6 +203,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-hl-c', 'Ivy Tran', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-hl-c', 'Ivy', 'Tran', 'Owner');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-hl-c', 'p-hl-c', 'p-hl', 'Owner', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-hl-c-r', 'p-hl', 'p-hl-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-hl', 'p-hl', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-ly', 'Lumen Yoga Collective', 1, 0, 0, '(207) 555-0192', 'studio@lumenyoga.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO organization (id, organization_name, federal_tax_id_number, company_type) VALUES ('p-ly', 'Lumen Yoga Collective', NULL, NULL);
@@ -207,6 +215,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-ly-c', 'Sasha Lindqvist', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-ly-c', 'Sasha', 'Lindqvist', 'Studio lead');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-ly-c', 'p-ly-c', 'p-ly', 'Studio lead', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-ly-c-r', 'p-ly', 'p-ly-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-ly', 'p-ly', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-sp', 'Sundial Physio', 1, 0, 0, '(603) 555-0148', 'ben@sundialphysio.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO organization (id, organization_name, federal_tax_id_number, company_type) VALUES ('p-sp', 'Sundial Physio', NULL, NULL);
@@ -218,6 +227,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-sp-c', 'Ben Achebe', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-sp-c', 'Ben', 'Achebe', 'Practice manager');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-sp-c', 'p-sp-c', 'p-sp', 'Practice manager', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-sp-c-r', 'p-sp', 'p-sp-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-sp', 'p-sp', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-pr', 'Priya Raman', 0, 1, 0, '(617) 555-0110', 'priya.raman@mail.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-pr', 'Priya', 'Raman', NULL);
@@ -237,6 +247,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-nv-c', 'Hollis Grant', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-nv-c', 'Hollis', 'Grant', 'Administrator');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-nv-c', 'p-nv-c', 'p-nv', 'Administrator', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-nv-c-r', 'p-nv', 'p-nv-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-nv', 'p-nv', 1, 1, 2, '2024-01-15', NULL);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-me', 'Marigold Events Co.', 1, 0, 0, '(603) 555-0171', 'june@marigoldevents.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO organization (id, organization_name, federal_tax_id_number, company_type) VALUES ('p-me', 'Marigold Events Co.', NULL, NULL);
@@ -248,6 +259,7 @@ INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpos
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-me-c', 'June Okoro', 0, 1, 0, NULL, NULL, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-me-c', 'June', 'Okoro', 'Owner');
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-me-c', 'p-me-c', 'p-me', 'Owner', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-me-c-r', 'p-me', 'p-me-c', 'Employer', NULL, 1, 0);
 INSERT INTO party_role (id, party_id, customer_ind, current_ind, party_role_type_id, from_date, thru_date) VALUES ('r-me', 'p-me', 1, 0, 2, '2024-01-15', '2026-07-02');
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-hp-eh', 'Elena Halden', 0, 1, 0, '(207) 555-0148', 'elena@haldenpryce.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-hp-eh', 'Elena', 'Halden', 'Principal');
@@ -256,6 +268,7 @@ INSERT INTO phone (id, number, number_digits_only, country_code, primary_ind, vo
 INSERT INTO contact_method (id, party_id, label, phone_ind, address_ind, network_address_ind, billing_ind_cached) VALUES ('cm-037', 'p-hp-eh', 'Mobile', 0, 0, 1, 0);
 INSERT INTO network_address (id, address, primary_ind, email_address_ind, web_address_ind) VALUES ('cm-037', 'elena@haldenpryce.example', 1, 1, 0);
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-p-hp-eh', 'p-hp-eh', 'p-hp', 'Principal', 1, 0);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-p-hp-eh-r', 'p-hp', 'p-hp-eh', 'Employer', NULL, 1, 0);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-hp-mp', 'Marcus Pryce', 0, 1, 0, '(207) 555-0163', 'marcus@haldenpryce.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-hp-mp', 'Marcus', 'Pryce', 'Partner');
 INSERT INTO contact_method (id, party_id, label, phone_ind, address_ind, network_address_ind, billing_ind_cached) VALUES ('cm-038', 'p-hp-mp', 'Mobile', 1, 0, 0, 0);
@@ -263,6 +276,7 @@ INSERT INTO phone (id, number, number_digits_only, country_code, primary_ind, vo
 INSERT INTO contact_method (id, party_id, label, phone_ind, address_ind, network_address_ind, billing_ind_cached) VALUES ('cm-039', 'p-hp-mp', 'Mobile', 0, 0, 1, 0);
 INSERT INTO network_address (id, address, primary_ind, email_address_ind, web_address_ind) VALUES ('cm-039', 'marcus@haldenpryce.example', 1, 1, 0);
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-p-hp-mp', 'p-hp-mp', 'p-hp', 'Partner', 1, 0);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-p-hp-mp-r', 'p-hp', 'p-hp-mp', 'Employer', NULL, 1, 0);
 INSERT INTO party (id, name_cached, organization_ind, person_ind, deleted_ind, phone_number_cached, email_address_cached, creation_timestamp, creation_user_id) VALUES ('p-hp-jw', 'Joanna Whitfield', 0, 1, 0, '(207) 555-0142', 'studio@haldenpryce.example', '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO person (id, first_name, last_name, job_title) VALUES ('p-hp-jw', 'Joanna', 'Whitfield', 'Office manager');
 INSERT INTO contact_method (id, party_id, label, phone_ind, address_ind, network_address_ind, billing_ind_cached) VALUES ('cm-040', 'p-hp-jw', 'Office', 1, 0, 0, 0);
@@ -270,6 +284,7 @@ INSERT INTO phone (id, number, number_digits_only, country_code, primary_ind, vo
 INSERT INTO contact_method (id, party_id, label, phone_ind, address_ind, network_address_ind, billing_ind_cached) VALUES ('cm-041', 'p-hp-jw', 'Office', 0, 0, 1, 0);
 INSERT INTO network_address (id, address, primary_ind, email_address_ind, web_address_ind) VALUES ('cm-041', 'studio@haldenpryce.example', 1, 1, 0);
 INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, current_ind, billing_ind) VALUES ('rel-p-hp-jw', 'p-hp-jw', 'p-hp', 'Office manager', 1, 1);
+INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind, billing_ind) VALUES ('rel-p-hp-jw-r', 'p-hp', 'p-hp-jw', 'Employer', NULL, 1, 0);
 
 -- Items. "Retainer" is the item BR-SALES-07 counts; Apply Retainer adds a negative line of it (BR-SALES-18).
 INSERT INTO item (id, sku, name, description, unit_price, taxable, active, item_type) VALUES ('i-svc-workshop', 'SVC-WORKSHOP', 'Discovery workshop', 'Discovery workshop', 120000, 0, 1, 'Service');

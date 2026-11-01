@@ -321,3 +321,33 @@ fn stamps_roll_back_with_the_command() {
     }
     assert_eq!(count(&conn, "SELECT COUNT(*) FROM party"), 0);
 }
+
+/// BR-PARTY-03 and BR-PARTY-05 on the data the app starts with: every relation of the demo seed and of first-run
+/// setup is a pair of rows, and every customer role of the demo seed has its customer row.
+#[test]
+fn demo_seed_and_setup_write_relation_pairs_and_customer_rows() {
+    let (conn, _) = db::open_in_memory(Seed::Demo).unwrap();
+    assert_eq!(karbon_server::parties::relations_without_reciprocal(&conn).unwrap(), Vec::<String>::new());
+    assert_eq!(count(&conn, "SELECT COUNT(*) FROM party_relation"), 30);
+    assert_eq!(karbon_server::parties::customer_roles_without_customer_row(&conn).unwrap(), Vec::<String>::new());
+
+    let (mut conn, _) = db::open_in_memory(Seed::Reference).unwrap();
+    let input = karbon_server::admin::SetupInput {
+        organization_name: "Harbor & Pine Design".into(),
+        first_name: "Rosa".into(),
+        last_name: "Lindqvist".into(),
+        country_code: "1".into(),
+        account_name: "rosa".into(),
+        ..Default::default()
+    };
+    karbon_server::admin::setup_welcome(&mut conn, &input).unwrap();
+    assert_eq!(count(&conn, "SELECT COUNT(*) FROM party_relation"), 2);
+    assert_eq!(karbon_server::parties::relations_without_reciprocal(&conn).unwrap(), Vec::<String>::new());
+    assert_eq!(
+        count(
+            &conn,
+            "SELECT COUNT(*) FROM party_relation WHERE relationship = 'Employer' AND creation_user_id IS NOT NULL"
+        ),
+        1
+    );
+}

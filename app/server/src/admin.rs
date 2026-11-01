@@ -117,6 +117,7 @@ pub fn setup_welcome(conn: &mut Connection, input: &SetupInput) -> Result<SetupD
     let person = new_id();
     let role = new_id();
     let relation = new_id();
+    let relation_back = new_id();
     let user_id = new_id();
     let actor = Actor::user(&user_id, &input.account_name);
     let stamp = Stamp::now(&actor);
@@ -140,11 +141,16 @@ pub fn setup_welcome(conn: &mut Connection, input: &SetupInput) -> Result<SetupD
         params![person, input.first_name, input.last_name, input.job_title],
     )?;
     // The person works for the organization (kontroller "_wip_Create Employee": an employee role and a relation).
-    tx.execute(
-        "INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind)
-         VALUES (?1, ?2, ?3, 'Employee', ?4, 1)",
-        params![relation, person, org, today],
-    )?;
+    // A relation is a pair of rows, one each way (BR-PARTY-03): the person is the employee of the organization, and
+    // the organization is the employer of the person.
+    for (id, from, to, what) in [(&relation, &person, &org, "Employee"), (&relation_back, &org, &person, "Employer")] {
+        tx.execute(
+            "INSERT INTO party_relation (id, party_id_from, party_id_to, relationship, from_date, current_ind,
+                                         billing_ind, shipping_ind)
+             VALUES (?1, ?2, ?3, ?4, ?5, 1, 0, 0)",
+            params![id, from, to, what, today],
+        )?;
+    }
     tx.execute(
         "INSERT INTO party_role (id, party_id, employee_ind, customer_ind, vendor_ind, lead_ind, current_ind, from_date)
          VALUES (?1, ?2, 1, 0, 0, 0, 1, ?3)",
@@ -172,6 +178,7 @@ pub fn setup_welcome(conn: &mut Connection, input: &SetupInput) -> Result<SetupD
         ("party", &person),
         ("person", &person),
         ("party_relation", &relation),
+        ("party_relation", &relation_back),
         ("party_role", &role),
         ("employee", &role),
         ("user", &user_id),
