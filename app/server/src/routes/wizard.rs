@@ -15,7 +15,7 @@ use crate::parties::{
 use crate::web::{is_htmx, render, AppError};
 use crate::AppState;
 use askama::Template;
-use axum::extract::State;
+use axum::extract::{Query, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{Html, IntoResponse, Response};
 use axum::Form;
@@ -137,15 +137,26 @@ impl StepView {
 struct WizardPage {
     nav: Nav,
     demo: bool,
+    title: &'static str,
     body: String,
 }
 
 fn respond(state: &AppState, headers: &HeaderMap, view: StepView, status: StatusCode) -> Result<Response, AppError> {
+    respond_titled(state, headers, view, status, "New contact")
+}
+
+fn respond_titled(
+    state: &AppState,
+    headers: &HeaderMap,
+    view: StepView,
+    status: StatusCode,
+    title: &'static str,
+) -> Result<Response, AppError> {
     let body = view.render()?;
     let html = if is_htmx(headers) {
         Html(body)
     } else {
-        render(&WizardPage { nav: Nav::Parties, demo: demo(state)?, body })?
+        render(&WizardPage { nav: Nav::Parties, demo: demo(state)?, title, body })?
     };
     Ok((status, html).into_response())
 }
@@ -159,16 +170,32 @@ fn fresh() -> WizardForm {
     }
 }
 
-/// `GET /parties/new` (UI-05): the names step.
-pub async fn page(State(state): State<AppState>, headers: HeaderMap) -> Result<Response, AppError> {
-    let view = StepView {
-        step: "names",
-        form: fresh(),
-        errors: Vec::new(),
-        org_matches: Vec::new(),
-        person_matches: Vec::new(),
-    };
-    respond(&state, &headers, view, StatusCode::OK)
+/// `?role=` of `GET /parties/new`: the organization's role to preselect (`customer`, `lead` or `none`).
+#[derive(Deserialize, Default)]
+#[serde(default)]
+pub struct NewQuery {
+    pub role: String,
+}
+
+/// `GET /parties/new?role=` (UI-05): the names step. Every create entry point opens it (the top bar's New ▾ Customer
+/// and /customers' New customer with `role=customer`, /parties' New contact), so every create has the duplicate check
+/// of BR-PARTY-02. An unknown role keeps the default (customer).
+pub async fn page(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Query(q): Query<NewQuery>,
+) -> Result<Response, AppError> {
+    let mut form = fresh();
+    match q.role.as_str() {
+        "customer" | "lead" => form.org_role = q.role.clone(),
+        "none" => form.org_role = String::new(),
+        _ => {}
+    }
+    // Opened for a customer (the top bar, /customers): the page says so.
+    let title = if q.role == "customer" { "New customer" } else { "New contact" };
+    let view =
+        StepView { step: "names", form, errors: Vec::new(), org_matches: Vec::new(), person_matches: Vec::new() };
+    respond_titled(&state, &headers, view, StatusCode::OK, title)
 }
 
 /// The duplicate check of BR-PARTY-02: the parties of that kind whose names start with the typed words.

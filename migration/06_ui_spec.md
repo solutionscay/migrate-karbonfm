@@ -128,6 +128,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: implementation-ready (design/customers.html)
 - Use case and users: Party and customer lists with quick find and advanced find; the single local user (ROLE-OWNER).
+- Built (I2, 2026-11-01): /parties (New contact) and /customers (New customer), both opening UI-05.
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/47-Parties.txt`, `objects/karbon_kontacts.fmp12/layouts/40-Customers.txt`, `objects/karbon_kontacts.fmp12/layouts/177-Party_Find.txt`, `objects/karbon_kontacts.fmp12/layouts/178-Customer_Find.txt`; target design: `design/customers.html`
 - Page: `GET /parties` (full page; the same route returns the fragment to htmx)
 - Fragments and actions: `GET /parties?q=&kind=&page=` (OP-PARTY-05 `party_search`)
@@ -152,6 +153,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: behavior-ready
 - Use case and users: Create-party wizard with duplicate check; the single local user (ROLE-OWNER).
+- Built (I2 and the Ep03 follow-up, 2026-11-01): the one create flow. Every create entry point opens it, so every create has the duplicate check (BR-PARTY-02): the top bar's **New ▾** menu (design/partials/topbar.html) item Customer and the /customers **New customer** button open `/parties/new?role=customer` (titled "New customer", Customer preselected for the organization); /parties **New contact** opens `/parties/new`. `?role=` takes `customer`, `lead` or `none`; anything else keeps the default (customer). The menu's Invoice, Sales receipt, Task and Note belong to later releases and show the "not part of the demo yet" toast; they are not links. The New person and New organization dialogs (OP-PARTY-01/02, `GET /parties/people/new`, `GET /parties/organizations/new?role=`) stay as routes with no top-level button.
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/124-Card_-_UtilityParty.txt`
 - Page: `GET /parties/new` (full page; the same route returns the fragment to htmx)
 - Fragments and actions: `POST /parties/wizard` (OP-PARTY-11 `party_create_wizard`), `GET /parties?q=&kind=&page=` (OP-PARTY-05 `party_search`)

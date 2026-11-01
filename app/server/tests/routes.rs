@@ -41,16 +41,13 @@ async fn customers_page_shows_the_seed_totals() {
 }
 
 #[tokio::test]
-async fn customers_page_has_one_new_customer_trigger() {
+async fn customers_page_new_customer_opens_the_wizard() {
     let (status, html) = get("/customers").await;
     assert_eq!(status, StatusCode::OK);
-    let trigger = r#"hx-get="/parties/organizations/new?role=customer""#;
-    assert_eq!(html.matches(trigger).count(), 1, "only the top bar opens the dialog");
-    assert_eq!(html.matches(">New customer</button>").count(), 1);
-    let topbar = html.find(r#"<header class="topbar">"#).unwrap();
-    let topbar_end = topbar + html[topbar..].find("</header>").unwrap();
-    let at = html.find(trigger).unwrap();
-    assert!((topbar..topbar_end).contains(&at), "the trigger is in the top bar");
+    // The page's New customer and the top bar's New ▾ Customer: both the wizard, never the dialog.
+    assert_eq!(html.matches(r#"href="/parties/new?role=customer""#).count(), 2);
+    assert!(html.contains(r##"href="/parties/new?role=customer"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>New customer</a>"##));
+    assert!(!html.contains("/parties/organizations/new"), "no top-level button opens the dialog");
 }
 
 #[tokio::test]

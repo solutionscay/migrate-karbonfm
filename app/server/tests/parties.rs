@@ -683,3 +683,84 @@ async fn an_inactive_role_reads_inactive_on_the_page_and_in_the_list() {
     let (_, html) = get(&app, "/parties/p-hp").await;
     assert!(html.contains("Current customer") && !html.contains("Inactive customer"));
 }
+
+/// Item 5 of the Ep03 check: the top bar is the design's New ▾ menu (design/partials/topbar.html:13-19). Customer
+/// opens the wizard with Customer preselected; the items of later releases are buttons with the "not part of the demo
+/// yet" toast, not links.
+#[tokio::test]
+async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
+    let app = demo();
+    let (_, html) = get(&app, "/parties/p-hp").await;
+    let topbar = &html[html.find(r#"<header class="topbar">"#).unwrap()..];
+    let topbar = &topbar[..topbar.find("</header>").unwrap()];
+    assert!(topbar.contains(r#"<details class="dropdown dropdown-end">"#) && topbar.contains("</svg>New<svg"));
+    let menu = &topbar[topbar.find(r#"aria-label="New""#).unwrap()..topbar.find("</ul>").unwrap()];
+    assert_eq!(menu.matches("<li>").count(), 5, "Invoice, Sales receipt, Customer, Task, Note");
+    assert_eq!(menu.matches("<a ").count(), 1, "one real link, no fake ones");
+    assert!(menu.contains(r#"<a href="/parties/new?role=customer">"#));
+    for soon in ["New invoice", "New sales receipt", "New task", "New note"] {
+        assert!(menu.contains(&format!(r#"<button type="button" class="muted" data-soon="{soon}">"#)), "{soon}");
+    }
+    assert!(!topbar.contains("hx-get"), "the top bar opens no dialog");
+}
+
+#[tokio::test]
+async fn the_wizard_role_preset() {
+    let app = demo();
+    let org_role = |html: &str| {
+        let at = html.find(r#"name="org_role" value=""#).unwrap() + r#"name="org_role" value=""#.len();
+        html[at..at + html[at..].find('"').unwrap()].to_owned()
+    };
+    let (status, html) = get(&app, "/parties/new?role=customer").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        html.contains("<title>New customer · KarbonFM</title>")
+            && html.contains(r#"<h1 class="page-title mb-5">New customer</h1>"#)
+    );
+    assert_eq!(org_role(&html), "customer");
+    for (role, want, title) in
+        [("lead", "lead", "New contact"), ("none", "", "New contact"), ("bogus", "customer", "New contact")]
+    {
+        let (status, html) = get(&app, &format!("/parties/new?role={role}")).await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(org_role(&html), want, "{role}");
+        assert!(html.contains(&format!("<h1 class=\"page-title mb-5\">{title}</h1>")), "{role}");
+    }
+    // The preset rides along to the details step, where Customer is checked.
+    let (_, html) = get(&app, "/parties/new?role=customer").await;
+    let id = |name: &str| {
+        let key = format!(r#"name="{name}" value=""#);
+        let at = html.find(&key).unwrap() + key.len();
+        html[at..at + 36].to_owned()
+    };
+    let names = format!(
+        "step=names&org_id={}&person_id={}&org_role=customer&org_name=Gull+Rock+Ferry",
+        id("org_id"),
+        id("person_id")
+    );
+    let (status, _, step) = send(&app, form("POST", "/parties/wizard", &names)).await;
+    assert_eq!(status, StatusCode::OK, "{step}");
+    assert!(step.contains(r#"name="org_role" value="customer" class="radio radio-xs" checked"#));
+}
+
+/// Every create entry point is the wizard (BR-PARTY-02's duplicate check); the New person and New organization
+/// dialogs (05 OP-PARTY-01/02) stay as routes, with no top-level button.
+#[tokio::test]
+async fn every_create_entry_point_lands_on_the_wizard() {
+    let app = demo();
+    for page in ["/", "/customers", "/parties", "/parties/p-hp", "/sales", "/payments", "/settings"] {
+        let (status, html) = get(&app, page).await;
+        assert_eq!(status, StatusCode::OK, "{page}");
+        assert!(!html.contains("/parties/people/new") && !html.contains("/parties/organizations/new"), "{page}");
+        assert!(html.contains(r#"href="/parties/new?role=customer""#), "{page}: the top bar's Customer");
+    }
+    let (_, html) = get(&app, "/parties").await;
+    assert!(html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new">"#), "New contact");
+    let (_, html) = get(&app, "/customers").await;
+    assert!(html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new?role=customer">"#), "New customer");
+    for dialog in ["/parties/people/new", "/parties/organizations/new?role=customer"] {
+        let (status, html) = htmx_get(&app, dialog).await;
+        assert_eq!(status, StatusCode::OK, "{dialog} is kept");
+        assert!(html.contains("<form"));
+    }
+}
