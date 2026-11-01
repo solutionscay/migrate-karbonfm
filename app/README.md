@@ -10,6 +10,10 @@ cargo run -p karbon-server --bin karbon-dev-server -- 3000 --fresh   # a new ins
 KARBONFM_DATA_DIR=/tmp/kfm cargo run -p karbon-desktop --no-default-features   # fresh non-demo app, data in /tmp/kfm
 KARBONFM_DATA_DIR=/tmp/kfm-demo cargo run -p karbon-desktop   # demo app with its data in /tmp/kfm-demo (try backup/restore)
 cargo run -p karbon-server --bin karbon-dev-server -- 3000 --data-dir /tmp/kfm-dev --backup-folder /tmp/kfm-backups   # backup/restore in a browser
+cargo run --release -p karbon-server --features big-demo --bin karbon-dev-server -- 3917 --big-demo   # ~470 parties, ~3,700 invoices (I3)
+cargo run --release -p karbon-synth -- /tmp/kfm-export                                  # the synthetic FileMaker export (never commit it)
+cargo run --release -p karbon-server --bin karbon-import -- /tmp/kfm-export --data-dir /tmp/kfm-big   # import it into a new database
+cargo run -p karbon-server --bin karbon-dev-server -- 3917 --data-dir /tmp/kfm-big                    # serve that database
 ./tools/build-css.sh                                 # rebuild server/assets/app.css after changing templates or styles
 cargo test && cargo clippy --all-targets -- -D warnings
 cd desktop && cargo tauri build                      # bundles (needs: cargo install tauri-cli --version 2.12.4 --locked)
