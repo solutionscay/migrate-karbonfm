@@ -198,6 +198,9 @@ fn backup_is_consistent_while_another_connection_writes() {
     let path = db::database_path(&i.data);
     let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
     let flag = stop.clone();
+    // The backups start once the table and a first pair are committed, not after a sleep: on a slow runner
+    // (Windows CI) the writer had not created `pairs` 50 ms in, and a backup without the table proves nothing.
+    let (started, first_pair) = std::sync::mpsc::channel();
     // A second writer (WAL) inserting pairs of rows in one transaction each: a torn copy would hold half a pair.
     let writer = std::thread::spawn(move || {
         let conn = Connection::open(path).unwrap();
@@ -209,11 +212,14 @@ fn backup_is_consistent_while_another_connection_writes() {
                 "BEGIN IMMEDIATE; INSERT INTO pairs VALUES ({n}, 'a'); INSERT INTO pairs VALUES ({n}, 'b'); COMMIT;"
             ))
             .unwrap();
+            if n == 0 {
+                started.send(()).unwrap();
+            }
             n += 1;
         }
         n
     });
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    first_pair.recv().expect("the writer committed a first pair");
     let mut backups = Vec::new();
     for _ in 0..5 {
         backups.push(backup::create(&i.conn, &backup::files_dir(&i.data), &backups_folder(&i)).unwrap());
@@ -223,7 +229,8 @@ fn backup_is_consistent_while_another_connection_writes() {
     for b in backups {
         backup::validate(&b.dir).unwrap();
         let copy = Connection::open(db::database_path(&b.dir)).unwrap();
-        let odd: i64 = copy.query_row("SELECT COUNT(*) % 2 FROM pairs", [], |r| r.get(0)).unwrap();
-        assert_eq!(odd, 0, "a transaction was split by the copy");
+        let rows: i64 = copy.query_row("SELECT COUNT(*) FROM pairs", [], |r| r.get(0)).unwrap();
+        assert!(rows >= 2, "the copy misses the pair committed before it: {rows} rows");
+        assert_eq!(rows % 2, 0, "a transaction was split by the copy");
     }
 }
