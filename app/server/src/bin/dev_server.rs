@@ -11,8 +11,9 @@
 //! A big database (I3), to look at the app with a few thousand invoices:
 //! - `--import EXPORT_DIR --data-dir DIR` loads a FileMaker export (one CSV per table) into DIR when DIR has no
 //!   database yet (OP-IMPORT-01), then serves it; later runs reuse it;
-//! - `--big-demo` (build with `--features big-demo`) generates the synthetic export of karbon-synth into
-//!   `<data dir>/../export` and imports it the same way. Without `--data-dir` it uses `<temp>/karbonfm-big-demo`.
+//! - `--big-demo` (build with `--features big-demo`) creates the big demo database in the data folder when it has
+//!   none (`karbon_server::big_demo`, the same data the desktop app opens on), then serves it. Without `--data-dir` it
+//!   uses `<temp>/karbonfm-big-demo/data`.
 //!
 //! The server has the same guard as the app (AP-13): open the one-time URL it prints once per run. The browser then
 //! keeps the session cookie until the server stops; reloads and other tabs of the same browser work.
@@ -41,11 +42,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     if big_demo {
         let dir = data_dir.get_or_insert_with(|| std::env::temp_dir().join("karbonfm-big-demo").join("data")).clone();
-        let export = dir.parent().unwrap_or(&dir).join("export");
-        if !db::database_path(&dir).exists() {
-            generate_big_demo(&export)?;
-        }
-        import = Some(export);
+        create_big_demo(&dir)?;
+        fresh = true; // the big demo is demo data already; never add the small seed
     }
     if let Some(export) = &import {
         let dir = data_dir.as_ref().ok_or("--import needs --data-dir (the folder of the new database)")?;
@@ -88,14 +86,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[cfg(feature = "big-demo")]
-fn generate_big_demo(export: &std::path::Path) -> Result<(), Box<dyn std::error::Error>> {
-    let s = karbon_synth::generate(karbon_synth::Config::default(), export)?;
-    eprintln!("generated the synthetic export: {} rows in {}", s.total_rows(), export.display());
+fn create_big_demo(dir: &std::path::Path) -> Result<(), Box<dyn std::error::Error>> {
+    match karbon_server::big_demo::create(dir)? {
+        karbon_server::big_demo::Outcome::Created { rows, total_ms, .. } => {
+            eprintln!("created the big demo database: {rows} rows in {total_ms} ms in {}", dir.display())
+        }
+        other => eprintln!("{}: {other:?}, serving it as it is", dir.display()),
+    }
     Ok(())
 }
 
 #[cfg(not(feature = "big-demo"))]
-fn generate_big_demo(_: &std::path::Path) -> Result<(), Box<dyn std::error::Error>> {
+fn create_big_demo(_: &std::path::Path) -> Result<(), Box<dyn std::error::Error>> {
     Err("--big-demo needs a build with --features big-demo".into())
 }
 

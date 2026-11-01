@@ -8,6 +8,8 @@ pub mod applog;
 pub mod assets;
 pub mod audit;
 pub mod backup;
+#[cfg(feature = "big-demo")]
+pub mod big_demo;
 pub mod contacts;
 pub mod db;
 pub mod ids;
