@@ -4,8 +4,10 @@
 //! Open order, every start:
 //! 1. Open the file and set the pragmas: `foreign_keys = ON` (OD-04-01), `journal_mode = WAL`,
 //!    `synchronous = NORMAL`, `busy_timeout = 5000`.
-//! 2. Run the refinery migrations that are not applied yet (history in `refinery_schema_history`). V1 is
-//!    `migration/04_database_schema.sql` as written; later changes are new migrations, never edits of an applied one.
+//! 2. Run the refinery migrations that are not applied yet (history in `refinery_schema_history`), from
+//!    `app/server/migrations/`. V1 is schema 04 as first written; later changes are new migrations, never edits of an
+//!    applied one. `migration/04_database_schema.sql` shows the schema after the last migration (test
+//!    `schema_04_equals_the_migrations`).
 //! 3. Reference seed (OP-ADMIN-02) once per database, marked by `app_meta.reference_seed`.
 //! 4. Demo build only: the demo seed (`migration/04_demo_seed.sql`) once, when the database has no party and no
 //!    `app_meta.demo_data` row, in one transaction that ends with an empty `PRAGMA foreign_key_check` (03, "Demo seed
@@ -26,7 +28,10 @@ pub fn database_path(data_dir: &Path) -> PathBuf {
     data_dir.join(FILE_NAME)
 }
 
-const SCHEMA_04: &str = include_str!("../../../migration/04_database_schema.sql");
+/// V1: schema 04 as it was when I1 shipped. Frozen: refinery refuses a database whose applied V1 differs.
+const SCHEMA_04: &str = include_str!("../migrations/V1__schema_04.sql");
+/// V2: the fixes of the DDR schema audit (migration/10_ddr_schema_audit.md).
+const V2_DDR_AUDIT: &str = include_str!("../migrations/V2__ddr_audit.sql");
 const DEMO_SEED: &str = include_str!("../../../migration/04_demo_seed.sql");
 
 /// What to seed into a database that has none yet.
@@ -133,9 +138,12 @@ fn set_pragmas(conn: &Connection, file: bool) -> Result<(), DbError> {
 }
 
 /// The migrations, in order. V1 is schema 04 without its own `PRAGMA`/`BEGIN`/`COMMIT` lines: refinery runs each
-/// migration in its own transaction, and the connection already has foreign keys on.
+/// migration in its own transaction, and the connection already has foreign keys on. Later files have no such lines.
 pub fn migrations() -> Vec<Migration> {
-    vec![Migration::unapplied("V1__schema_04", &strip_transaction(SCHEMA_04)).expect("V1 migration name")]
+    vec![
+        Migration::unapplied("V1__schema_04", &strip_transaction(SCHEMA_04)).expect("V1 migration name"),
+        Migration::unapplied("V2__ddr_audit", V2_DDR_AUDIT).expect("V2 migration name"),
+    ]
 }
 
 /// Applies the pending migrations and returns their names.
