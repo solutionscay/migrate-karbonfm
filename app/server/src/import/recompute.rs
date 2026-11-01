@@ -348,43 +348,13 @@ fn customers(tx: &Transaction, report: &mut Report, name_of: &NameOf) -> rusqlit
 
 /// BR-PARTY-06: name, primary phone, email and address of every party, with their labels and ids.
 pub fn party_caches(tx: &Transaction, report: &mut Report, name_of: &NameOf) -> rusqlite::Result<()> {
+    // The same expressions as the I2 commands (parties::refresh_caches), so imported and edited parties show the
+    // same formats (BR-PARTY-06).
     let why = "party cache recomputed (BR-PARTY-06)";
-    let name = "COALESCE(CASE WHEN COALESCE(t.organization_ind, 0) = 1 \
-                THEN (SELECT o.organization_name FROM organization o WHERE o.id = t.id) \
-                ELSE (SELECT NULLIF(trim(COALESCE(pe.first_name, '') || ' ' || COALESCE(pe.last_name, '')), '') \
-                      FROM person pe WHERE pe.id = t.id) END, t.name_cached)";
-    cache(tx, report, name_of, "party", "id", "name_cached", name, why)?;
-    let phone = |col: &str| {
-        format!(
-            "(SELECT {col} FROM contact_method cm JOIN phone p ON p.id = cm.id WHERE cm.party_id = t.id \
-             ORDER BY COALESCE(p.primary_ind, 0) DESC, cm.creation_timestamp, cm.id LIMIT 1)"
-        )
-    };
-    cache(tx, report, name_of, "party", "id", "phone_id_cached", &phone("cm.id"), why)?;
-    cache(tx, report, name_of, "party", "id", "phone_number_cached", &phone("p.number"), why)?;
-    cache(tx, report, name_of, "party", "id", "phone_label_cached", &phone("cm.label"), why)?;
-    let email = |col: &str| {
-        format!(
-            "(SELECT {col} FROM contact_method cm JOIN network_address n ON n.id = cm.id WHERE cm.party_id = t.id \
-             AND COALESCE(n.email_address_ind, 0) = 1 \
-             ORDER BY COALESCE(n.primary_ind, 0) DESC, cm.creation_timestamp, cm.id LIMIT 1)"
-        )
-    };
-    cache(tx, report, name_of, "party", "id", "email_address_id_cached", &email("cm.id"), why)?;
-    cache(tx, report, name_of, "party", "id", "email_address_cached", &email("n.address"), why)?;
-    cache(tx, report, name_of, "party", "id", "email_address_label_cached", &email("cm.label"), why)?;
-    let address = |col: &str| {
-        format!(
-            "(SELECT {col} FROM contact_method cm JOIN address a ON a.id = cm.id WHERE cm.party_id = t.id \
-             ORDER BY COALESCE(a.primary_ind, 0) DESC, cm.creation_timestamp, cm.id LIMIT 1)"
-        )
-    };
-    let display =
-        "COALESCE(a.address_line_1, '') || COALESCE(', ' || a.city, '') || COALESCE(', ' || a.state_province, '') \
-                   || COALESCE(' ' || a.postal_code, '')";
-    cache(tx, report, name_of, "party", "id", "address_id_cached", &address("cm.id"), why)?;
-    cache(tx, report, name_of, "party", "id", "address_display_cached", &address(display), why)?;
-    cache(tx, report, name_of, "party", "id", "address_label_cached", &address("cm.label"), why)
+    for (column, expr) in crate::parties::cache_columns() {
+        cache(tx, report, name_of, "party", "id", column, &expr, why)?;
+    }
+    Ok(())
 }
 
 fn other_caches(tx: &Transaction, report: &mut Report, name_of: &NameOf) -> rusqlite::Result<()> {
