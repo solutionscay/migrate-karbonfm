@@ -10,11 +10,13 @@
 //! * the sales rules in [`sales`] round half away from zero, as FileMaker Round()
 //!   does (BR-SALES-01, BR-SALES-02).
 //!
-//! The import edge (a FileMaker decimal, such as a 7-decimal unit price, rounded
-//! to cents; BR-IMPORT-01) is deferred with I3 and not built here.
+//! * the import edge reads a FileMaker decimal (a 7-decimal unit price, a quantity
+//!   with more than 4 places) with [`filemaker::cents`] and [`filemaker::qty`],
+//!   rounded half away from zero, and says whether the value changed (BR-IMPORT-01).
 
 mod cents;
 mod decimal;
+pub mod filemaker;
 mod qty;
 pub mod round;
 pub mod sales;

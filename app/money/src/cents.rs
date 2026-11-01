@@ -172,7 +172,7 @@ mod tests {
         assert_eq!(p("0.005"), Err(ParseError::TooManyDecimals { max: 2 }));
         // Trailing zeros too: "1.500" may be a European 1500.
         assert_eq!(p("1.500"), Err(ParseError::TooManyDecimals { max: 2 }));
-        // The 7-decimal source unit price is an import concern (deferred with I3).
+        // The 7-decimal source unit price is read by the import edge, filemaker::cents.
         assert_eq!(p("33.3333333"), Err(ParseError::TooManyDecimals { max: 2 }));
     }
 
