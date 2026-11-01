@@ -25,6 +25,20 @@
           {% if !m.label.is_empty() %}<span class="chip">{{ m.label }}</span>{% endif %}
           {% for p in m.purposes() %}<span class="chip">{{ p }}</span>{% endfor %}
           {% if m.primary %}<span class="text-[11px] text-primary font-medium">Primary</span>{% endif %}
+          {% if !d.archived %}
+          <details class="dropdown ml-auto">
+            <summary class="icon-btn" aria-label="Actions for {{ m.display() }}"><svg class="i i-sm" aria-hidden="true"><use href="#i-more"/></svg></summary>
+            <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-48 p-1 shadow border hairline text-[12.5px]">
+              <li><button hx-get="{{ self.method_href(m) }}/edit" hx-target="#modal-body">Edit</button></li>
+              {% if !m.primary %}<li><button hx-post="{{ self.method_href(m) }}/primary" hx-target="#party-header" hx-swap="outerHTML">Make primary</button></li>{% endif %}
+              {% let toggles = self.purpose_toggles(m) %}
+              {% for (type_id, label, on) in toggles %}
+              <li><button hx-post="{{ self.method_href(m) }}/purposes/{{ type_id }}" hx-target="#party-header" hx-swap="outerHTML" aria-pressed="{{ on }}">{% if on %}<svg class="i i-sm" aria-hidden="true"><use href="#i-check"/></svg>{% endif %}{{ label }}</button></li>
+              {% endfor %}
+              <li><button class="text-error" hx-delete="{{ self.method_href(m) }}" hx-target="#modal-body">Delete</button></li>
+            </ul>
+          </details>
+          {% endif %}
         </div>
         {% endfor %}
       </dl>
@@ -43,6 +57,14 @@
         </ul>
       </details>
       {% endif %}
+      <details class="dropdown dropdown-end">
+        <summary class="btn btn-sm btn-quiet"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add contact method</summary>
+        <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-44 p-1 shadow border hairline">
+          {% for (kind, label) in [("phone", "Phone"), ("email", "Email"), ("web", "Website"), ("address", "Address")] %}
+          <li><button hx-get="{{ href }}/contact-methods/new?kind={{ kind }}" hx-target="#modal-body">{{ label }}</button></li>
+          {% endfor %}
+        </ul>
+      </details>
       <button class="btn btn-sm btn-quiet" hx-get="{{ href }}/archive" hx-target="#modal-body">Archive</button>
     </div>
     {% endif %}

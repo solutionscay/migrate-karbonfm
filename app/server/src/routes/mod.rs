@@ -1,6 +1,7 @@
 //! Route handlers (05). Each handler queries or calls a command, then renders a template.
 
 mod backup;
+mod contact_forms;
 pub mod current_user;
 mod customers;
 mod dashboard;
@@ -16,7 +17,7 @@ use crate::web::AppError;
 use crate::AppState;
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::routing::{get, post};
+use axum::routing::{get, post, put};
 use axum::Router;
 
 /// Every route the server registers, as (method, path) (AP-01). The page has no other way to reach SQLite: no generic
@@ -37,6 +38,13 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/parties/{id}/archive"),
     ("POST", "/parties/{id}/archive"),
     ("POST", "/parties/{id}/roles"),
+    ("GET", "/parties/{id}/contact-methods/new"),
+    ("POST", "/parties/{id}/contact-methods"),
+    ("GET", "/contact-methods/{id}/edit"),
+    ("PUT", "/contact-methods/{id}"),
+    ("DELETE", "/contact-methods/{id}"),
+    ("POST", "/contact-methods/{id}/primary"),
+    ("POST", "/contact-methods/{id}/purposes/{type_id}"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/sales/{doc_number}/save-pdf"),
@@ -67,6 +75,12 @@ pub fn router() -> Router<AppState> {
         .route("/parties/{id}/edit", get(party_forms::edit))
         .route("/parties/{id}/archive", get(party_forms::archive_dialog).post(party_forms::archive))
         .route("/parties/{id}/roles", post(party_forms::add_role))
+        .route("/parties/{id}/contact-methods/new", get(contact_forms::new_dialog))
+        .route("/parties/{id}/contact-methods", post(contact_forms::create))
+        .route("/contact-methods/{id}/edit", get(contact_forms::edit_dialog))
+        .route("/contact-methods/{id}", put(contact_forms::update).delete(contact_forms::delete))
+        .route("/contact-methods/{id}/primary", post(contact_forms::set_primary))
+        .route("/contact-methods/{id}/purposes/{type_id}", post(contact_forms::toggle_purpose))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))

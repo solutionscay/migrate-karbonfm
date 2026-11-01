@@ -267,6 +267,17 @@ impl<'a> Header<'a> {
             MethodKind::Address => "pin",
         }
     }
+    /// (purpose type id, label, set) for the purpose toggles of a method (BR-CONTACT-02 ids).
+    pub fn purpose_toggles(&self, m: &Method) -> Vec<(i64, &'static str, bool)> {
+        use crate::reference::ContactMethodPurposeType::*;
+        [(Billing, m.billing), (Shipping, m.shipping), (Mailing, m.mailing)]
+            .into_iter()
+            .map(|(p, on)| (p.id(), p.name(), on))
+            .collect()
+    }
+    pub fn method_href(&self, m: &Method) -> String {
+        super::contact_forms::method_href(&m.id)
+    }
     /// The roles the party does not hold now, for the Add role menu.
     pub fn missing_roles(&self) -> Vec<parties::RoleKind> {
         use parties::RoleKind::*;

@@ -70,8 +70,17 @@ async fn launch(app: &axum::Router, path: &str) -> String {
 
 /// A concrete URI for a route of the list.
 fn sample(path: &str) -> String {
+    // A real id of the demo seed for each kind of record, so a listed route answers instead of 404.
+    let id = if path.starts_with("/contact-methods/") {
+        "cm-001"
+    } else if path.starts_with("/relations/") {
+        "rel-mara"
+    } else {
+        "p-hp"
+    };
     path.replace("{doc_number}", "INV-1048")
-        .replace("{id}", "p-hp")
+        .replace("{id}", id)
+        .replace("{type_id}", "1")
         .replace("{*path}", "app.css")
         .replace("{token}", "spent")
 }

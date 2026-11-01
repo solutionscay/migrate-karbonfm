@@ -322,3 +322,120 @@ async fn writes_need_setup() {
     assert!(status == StatusCode::OK || status.is_redirection(), "{status}");
     assert_eq!(headers.get("hx-redirect").map(|v| v.to_str().unwrap()), Some("/setup"));
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// S4: contact methods (OP-CONTACT-01..04, AP-07)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// The demo database with automatic US phone formatting on (BR-CONTACT-04).
+fn demo_formatting() -> axum::Router {
+    let (conn, _) = db::open_in_memory(db::Seed::Demo).unwrap();
+    conn.execute("UPDATE system_setting SET automatically_format_phone_numbers_ind = 1, country_code = '1'", [])
+        .unwrap();
+    router(AppState::new(conn))
+}
+
+#[tokio::test]
+async fn add_a_phone_from_the_dialog() {
+    let app = demo_formatting();
+    let (status, html) = htmx_get(&app, "/parties/p-tf/contact-methods/new?kind=phone").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Add phone") && html.contains(r#"hx-post="/parties/p-tf/contact-methods""#));
+    let (status, _, html) = send(&app, form("POST", "/parties/p-tf/contact-methods", "kind=phone&number=")).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Enter a phone number."));
+    let (status, _, html) =
+        send(&app, form("POST", "/parties/p-tf/contact-methods", "kind=phone&number=1&country_code=abc")).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Enter a country code like 1 or 44."));
+    let (status, headers, html) = send(
+        &app,
+        form(
+            "POST",
+            "/parties/p-tf/contact-methods",
+            "kind=phone&number=207.555.0177&label=Mobile&billing=on&primary=on",
+        ),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(html.contains(r#"hx-swap-oob="true""#) && html.contains("(207) 555-0177"));
+    assert!(headers.get("hx-trigger").unwrap().to_str().unwrap().contains("karbon-close-dialog"));
+    let (_, html) = htmx_get(&app, "/parties?q=ferreira").await;
+    assert!(html.contains("(207) 555-0177"), "the list shows the new primary phone (BR-PARTY-06)");
+}
+
+#[tokio::test]
+async fn edit_make_primary_and_toggle_from_the_header() {
+    let app = demo_formatting();
+    let (status, html) = htmx_get(&app, "/contact-methods/cm-001/edit").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"hx-put="/contact-methods/cm-001""#) && html.contains("(207) 555-0100"));
+    let (status, _, html) =
+        send(&app, form("PUT", "/contact-methods/cm-001", "kind=phone&number=2075550109&label=Main")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("(207) 555-0109") && html.contains(">Main</span>"));
+    // Toggling a purpose answers with the header; twice returns to the start (BR-CONTACT-02).
+    let (status, headers, html) = send(&app, form("POST", "/contact-methods/cm-001/purposes/2", "")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(">Shipping</span>"));
+    assert!(headers.get("hx-trigger").unwrap().to_str().unwrap().contains("Shipping set"));
+    let (_, _, html) = send(&app, form("POST", "/contact-methods/cm-001/purposes/2", "")).await;
+    assert!(!html.contains(">Shipping</span>"));
+    let (status, _, _) = send(&app, form("POST", "/contact-methods/cm-001/purposes/9", "")).await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+    // A second phone made primary takes the Primary mark and the cache.
+    send(&app, form("POST", "/parties/p-ellison/contact-methods", "kind=phone&number=2075550188")).await;
+    let (_, html) = get(&app, "/parties/p-ellison").await;
+    // The new phone is the only method with a generated (36-character) id and a Make primary button.
+    let second = html
+        .split(r#"hx-post="/contact-methods/"#)
+        .skip(1)
+        .find(|s| s.len() > 44 && &s[36..44] == "/primary")
+        .map(|s| s[..36].to_owned())
+        .expect("the new phone has a Make primary button");
+    let (status, _, html) = send(&app, form("POST", &format!("/contact-methods/{second}/primary"), "")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(html.matches(">Primary</span>").count(), 3, "one primary phone, one email, one address");
+    let (_, html) = htmx_get(&app, "/parties?q=ellison+studio").await;
+    assert!(html.contains("(207) 555-0188"));
+}
+
+#[tokio::test]
+async fn delete_a_contact_method_asks_first() {
+    let app = demo();
+    let (status, _, html) = send(
+        &app,
+        Request::delete("/contact-methods/cm-001").header("HX-Request", "true").body(Body::empty()).unwrap(),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"role="alertdialog""#), "AP-07: a confirmation dialog");
+    assert!(html.contains("Deletes the phone (207) 555-0100 of Ellison Studio."));
+    assert!(html.contains(r#"hx-delete="/contact-methods/cm-001?confirm=true""#));
+    let (_, html) = get(&app, "/parties/p-ellison").await;
+    assert!(html.contains("(207) 555-0100"), "nothing deleted yet");
+    let req = Request::delete("/contact-methods/cm-001?confirm=true")
+        .header("HX-Request", "true")
+        .body(Body::empty())
+        .unwrap();
+    let (status, headers, html) = send(&app, req).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"hx-swap-oob="true""#) && !html.contains("(207) 555-0100"));
+    assert!(headers.get("hx-trigger").unwrap().to_str().unwrap().contains("Deleted"));
+    let req = Request::delete("/contact-methods/cm-001?confirm=true").body(Body::empty()).unwrap();
+    assert_eq!(send(&app, req).await.0, StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn contact_methods_of_an_archived_party_are_read_only() {
+    let (conn, _) = db::open_in_memory(db::Seed::Demo).unwrap();
+    conn.execute("UPDATE party SET deleted_ind = 1 WHERE id = 'p-ellison'", []).unwrap();
+    let app = router(AppState::new(conn));
+    let (_, html) = get(&app, "/parties/p-ellison").await;
+    assert!(!html.contains("Actions for") && !html.contains("Add contact method"));
+    let (status, _, _) = send(&app, form("POST", "/contact-methods/cm-001/primary", "")).await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    let (status, _, html) = send(&app, form("POST", "/parties/p-ellison/contact-methods", "kind=phone&number=1")).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("archived party"));
+}

@@ -3,10 +3,10 @@
 //! purposes (billing, shipping, mailing) are `contact_method_purpose` rows with a cached flag on the contact method.
 
 use crate::admin::{CommandError, FieldError};
-use crate::audit::{self, Stamp};
+use crate::audit::{self, Actor, Stamp};
 use crate::ids::new_id;
 use crate::reference::ContactMethodPurposeType;
-use rusqlite::{params, Connection, OptionalExtension};
+use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 
 /// Which subtype a contact method is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -563,10 +563,361 @@ fn make_primary(
     Ok(())
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// The commands (OP-CONTACT-01..04): one BEGIN IMMEDIATE transaction each, stamped (BR-PARTY-07), and each ends by
+// refreshing the party caches (BR-PARTY-06)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// The party must exist and not be archived (an archived party's records stay as they are, BR-PARTY-01).
+fn writable_party(conn: &Connection, party_id: &str) -> Result<(), CommandError> {
+    let archived: Option<bool> = conn
+        .query_row("SELECT COALESCE(deleted_ind, 0) = 1 FROM party WHERE id = ?1", [party_id], |r| r.get(0))
+        .optional()?;
+    match archived {
+        None => Err(CommandError::NotFound),
+        Some(true) => Err(CommandError::Refused("The contact methods of an archived party cannot be changed.".into())),
+        Some(false) => Ok(()),
+    }
+}
+
+fn existing(conn: &Connection, id: &str) -> Result<Method, CommandError> {
+    let m = method(conn, id)?.ok_or(CommandError::NotFound)?;
+    writable_party(conn, &m.party_id)?;
+    Ok(m)
+}
+
+fn finish(conn: &Connection, party_id: &str, stamp: &Stamp) -> Result<(), CommandError> {
+    crate::parties::refresh_caches(conn, party_id)?;
+    audit::stamp_modified(conn, "party", &party_id, stamp)?;
+    Ok(())
+}
+
+/// OP-CONTACT-01 `contact_method_save`, new (`POST /parties/{id}/contact-methods`; BR-CONTACT-03, BR-CONTACT-04).
+pub fn contact_method_create(
+    conn: &mut Connection,
+    party_id: &str,
+    input: &MethodInput,
+    actor: &Actor,
+) -> Result<String, CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    writable_party(&tx, party_id)?;
+    let stamp = Stamp::now(actor);
+    let id = insert_method(&tx, party_id, input, &stamp)?;
+    finish(&tx, party_id, &stamp)?;
+    tx.commit()?;
+    Ok(id)
+}
+
+/// OP-CONTACT-01 `contact_method_save`, edit (`PUT /contact-methods/{id}`): label, comment and the subtype fields;
+/// the purposes are replaced, not merged (BR-CONTACT-03). A phone stays a phone and an address an address; an email
+/// may become a website and back. `primary` makes it the primary (it never clears a primary: choose another one).
+pub fn contact_method_update(
+    conn: &mut Connection,
+    id: &str,
+    input: &MethodInput,
+    actor: &Actor,
+) -> Result<(), CommandError> {
+    let errors = input.check("");
+    if !errors.is_empty() {
+        return Err(CommandError::Validation(errors));
+    }
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let m = existing(&tx, id)?;
+    let kind = input.kind.expect("checked");
+    if kind.table() != m.kind.table() {
+        return Err(CommandError::Validation(vec![FieldError {
+            field: "kind",
+            message: format!("A {} cannot become a {}.", m.kind.label().to_lowercase(), kind.label().to_lowercase()),
+        }]));
+    }
+    let stamp = Stamp::now(actor);
+    tx.execute(
+        "UPDATE contact_method SET label = ?2, comment = ?3 WHERE id = ?1",
+        params![id, opt(&input.label), opt(&input.comment)],
+    )?;
+    audit::stamp_modified(&tx, "contact_method", &id, &stamp)?;
+    write_subtype(&tx, id, kind, input, false)?;
+    if kind != m.kind && m.primary {
+        // An email that becomes a website (or back) leaves the primary of its old kind.
+        tx.execute(&format!("UPDATE {} SET primary_ind = 0 WHERE id = ?1", kind.table()), [id])?;
+    }
+    audit::stamp_modified(&tx, kind.table(), &id, &stamp)?;
+    set_purposes(&tx, id, &input.purposes, &stamp)?;
+    if input.primary {
+        make_primary(&tx, &m.party_id, id, kind, &stamp)?;
+    }
+    finish(&tx, &m.party_id, &stamp)?;
+    tx.commit()?;
+    Ok(())
+}
+
+/// OP-CONTACT-02 `contact_method_set_primary` (BR-CONTACT-01, BR-PARTY-06): this one becomes the primary of its
+/// kind, the party's others of that kind are cleared, and the party caches follow.
+pub fn contact_method_set_primary(conn: &mut Connection, id: &str, actor: &Actor) -> Result<(), CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let m = existing(&tx, id)?;
+    let stamp = Stamp::now(actor);
+    make_primary(&tx, &m.party_id, id, m.kind, &stamp)?;
+    audit::stamp_modified(&tx, m.kind.table(), &id, &stamp)?;
+    finish(&tx, &m.party_id, &stamp)?;
+    tx.commit()?;
+    Ok(())
+}
+
+/// OP-CONTACT-03 `contact_method_toggle_purpose` (BR-CONTACT-02): creates or deletes the purpose row and sets or
+/// clears the cached flag; toggling twice returns to the start. Returns whether the purpose is now set.
+pub fn contact_method_toggle_purpose(
+    conn: &mut Connection,
+    id: &str,
+    purpose: ContactMethodPurposeType,
+    actor: &Actor,
+) -> Result<bool, CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let m = existing(&tx, id)?;
+    let stamp = Stamp::now(actor);
+    // Every row of this purpose goes (an import may have left two); otherwise one is added.
+    let removed = tx.execute(
+        "DELETE FROM contact_method_purpose WHERE contact_method_id = ?1 AND contact_method_purpose_type_id = ?2",
+        params![id, purpose.id()],
+    )?;
+    if removed == 0 {
+        let row = new_id();
+        tx.execute(
+            "INSERT INTO contact_method_purpose (id, contact_method_id, contact_method_purpose_type_id) VALUES (?1, ?2, ?3)",
+            params![row, id, purpose.id()],
+        )?;
+        audit::stamp_created(&tx, "contact_method_purpose", &row, &stamp)?;
+    }
+    sync_purpose_flags(&tx, id)?;
+    audit::stamp_modified(&tx, "contact_method", &id, &stamp)?;
+    finish(&tx, &m.party_id, &stamp)?;
+    tx.commit()?;
+    Ok(removed == 0)
+}
+
+/// What a delete removes, for the confirmation dialog (AP-07).
+pub fn delete_summary(m: &Method, party_name: &str) -> String {
+    format!("Deletes the {} {} of {party_name}.", m.kind.label().to_lowercase(), m.display())
+}
+
+/// OP-CONTACT-04 `contact_method_delete` (BR-CONTACT-05, AP-07): without `confirm` nothing changes and the answer is
+/// ConfirmationRequired with a summary. With it, the purposes, the subtype row and the contact method go, and every
+/// party cache that pointed at it is recomputed (the source left email_address_id_cached behind; D-07).
+pub fn contact_method_delete(
+    conn: &mut Connection,
+    id: &str,
+    confirm: bool,
+    actor: &Actor,
+) -> Result<(), CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let m = existing(&tx, id)?;
+    if !confirm {
+        let name: String =
+            tx.query_row("SELECT COALESCE(name_cached, '') FROM party WHERE id = ?1", [&m.party_id], |r| r.get(0))?;
+        return Err(CommandError::ConfirmationRequired(delete_summary(&m, &name)));
+    }
+    tx.execute("DELETE FROM contact_method_purpose WHERE contact_method_id = ?1", [id])?;
+    tx.execute(&format!("DELETE FROM {} WHERE id = ?1", m.kind.table()), [id])?;
+    tx.execute("DELETE FROM contact_method WHERE id = ?1", [id])?;
+    finish(&tx, &m.party_id, &Stamp::now(actor))?;
+    tx.commit()?;
+    Ok(())
+}
+
+/// The number of primaries per kind of a party (BR-CONTACT-01 says at most one each); for the tests and checks.
+pub fn primaries(conn: &Connection, party_id: &str) -> rusqlite::Result<Vec<(MethodKind, usize)>> {
+    let methods = methods_of(conn, party_id)?;
+    Ok([MethodKind::Phone, MethodKind::Email, MethodKind::Web, MethodKind::Address]
+        .into_iter()
+        .map(|k| (k, methods.iter().filter(|m| m.kind == k && m.primary).count()))
+        .collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::db::{open_in_memory, Seed};
+
+    fn setup() -> (Connection, Actor) {
+        let (conn, _) = open_in_memory(Seed::Demo).unwrap();
+        conn.execute("UPDATE system_setting SET automatically_format_phone_numbers_ind = 1, country_code = '1'", [])
+            .unwrap();
+        let actor = crate::admin::current_user(&conn).unwrap().unwrap();
+        (conn, actor)
+    }
+
+    fn cached(conn: &Connection, party: &str) -> (String, String, String, String) {
+        conn.query_row(
+            "SELECT COALESCE(phone_number_cached, ''), COALESCE(email_address_cached, ''),
+                    COALESCE(email_address_id_cached, ''), COALESCE(address_display_cached, '')
+             FROM party WHERE id = ?1",
+            [party],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+        )
+        .unwrap()
+    }
+
+    fn phone(number: &str, primary: bool) -> MethodInput {
+        MethodInput { primary, label: "Mobile".into(), ..MethodInput::phone(number) }
+    }
+
+    #[test]
+    fn create_formats_us_phones_and_keeps_others_as_typed() {
+        let (mut conn, actor) = setup();
+        let id = contact_method_create(&mut conn, "p-tf", &phone("207 555 0177", false), &actor).unwrap();
+        let m = method(&conn, &id).unwrap().unwrap();
+        assert_eq!((m.number.as_str(), m.country_code), ("(207) 555-0177", Some(1)));
+        let digits: String =
+            conn.query_row("SELECT number_digits_only FROM phone WHERE id = ?1", [&id], |r| r.get(0)).unwrap();
+        assert_eq!(digits, "2075550177");
+        let uk = MethodInput { country_code: Some(44), ..phone("020 7946 0958", false) };
+        let id = contact_method_create(&mut conn, "p-tf", &uk, &actor).unwrap();
+        assert_eq!(method(&conn, &id).unwrap().unwrap().number, "020 7946 0958");
+        conn.execute("UPDATE system_setting SET automatically_format_phone_numbers_ind = 0", []).unwrap();
+        let id = contact_method_create(&mut conn, "p-tf", &phone("2075550178", false), &actor).unwrap();
+        assert_eq!(method(&conn, &id).unwrap().unwrap().number, "2075550178", "setting off");
+    }
+
+    #[test]
+    fn only_one_primary_per_kind_after_any_sequence() {
+        let (mut conn, actor) = setup();
+        let party = "p-pr";
+        let mut ids = Vec::new();
+        for (i, n) in ["6175550001", "6175550002", "6175550003"].iter().enumerate() {
+            ids.push(contact_method_create(&mut conn, party, &phone(n, i == 1), &actor).unwrap());
+        }
+        let emails: Vec<String> = ["a@x.example", "b@x.example"]
+            .iter()
+            .map(|e| contact_method_create(&mut conn, party, &MethodInput::email(e), &actor).unwrap())
+            .collect();
+        let web = MethodInput { kind: Some(MethodKind::Web), address: "priya.example".into(), ..Default::default() };
+        let web = contact_method_create(&mut conn, party, &web, &actor).unwrap();
+        // A fixed pseudo-random sequence of primary changes, deletes and adds.
+        let mut seed = 7u64;
+        for step in 0..40 {
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            let all: Vec<String> = ids.iter().chain(emails.iter()).chain([&web]).cloned().collect();
+            let pick = &all[(seed >> 33) as usize % all.len()];
+            if method(&conn, pick).unwrap().is_some() {
+                if step % 9 == 8 {
+                    contact_method_delete(&mut conn, pick, true, &actor).unwrap();
+                } else {
+                    contact_method_set_primary(&mut conn, pick, &actor).unwrap();
+                }
+            } else {
+                ids.push(contact_method_create(&mut conn, party, &phone("6175550999", step % 2 == 0), &actor).unwrap());
+            }
+            for (kind, n) in primaries(&conn, party).unwrap() {
+                assert!(n <= 1, "step {step}: {n} primaries of {kind:?}");
+            }
+            // The cache always shows the primary phone and email when there is one.
+            let methods = methods_of(&conn, party).unwrap();
+            let (cached_phone, cached_email, cached_email_id, _) = cached(&conn, party);
+            if let Some(p) = methods.iter().find(|m| m.kind == MethodKind::Phone && m.primary) {
+                assert_eq!(cached_phone, p.number, "step {step}");
+            }
+            if let Some(e) = methods.iter().find(|m| m.kind == MethodKind::Email && m.primary) {
+                assert_eq!((cached_email, cached_email_id), (e.address.clone(), e.id.clone()), "step {step}");
+            }
+        }
+        // The website is never the cached email.
+        let (_, email, _, _) = cached(&conn, party);
+        assert_ne!(email, "priya.example");
+    }
+
+    #[test]
+    fn set_primary_moves_the_cache() {
+        let (mut conn, actor) = setup();
+        let second = contact_method_create(&mut conn, "p-hp", &phone("2075550111", false), &actor).unwrap();
+        assert_eq!(cached(&conn, "p-hp").0, "(207) 555-0142");
+        contact_method_set_primary(&mut conn, &second, &actor).unwrap();
+        assert_eq!(cached(&conn, "p-hp").0, "(207) 555-0111");
+        let label: String =
+            conn.query_row("SELECT phone_label_cached FROM party WHERE id = 'p-hp'", [], |r| r.get(0)).unwrap();
+        assert_eq!(label, "Mobile");
+        assert!(matches!(contact_method_set_primary(&mut conn, "nope", &actor), Err(CommandError::NotFound)));
+    }
+
+    #[test]
+    fn toggle_purpose_twice_returns_to_the_start() {
+        let (mut conn, actor) = setup();
+        let id = contact_method_create(&mut conn, "p-tf", &phone("2075550123", false), &actor).unwrap();
+        let start = method(&conn, &id).unwrap().unwrap();
+        assert!(contact_method_toggle_purpose(&mut conn, &id, ContactMethodPurposeType::Shipping, &actor).unwrap());
+        let on = method(&conn, &id).unwrap().unwrap();
+        assert!(on.shipping && !on.billing && !on.mailing);
+        let rows: i64 = conn
+            .query_row("SELECT COUNT(*) FROM contact_method_purpose WHERE contact_method_id = ?1 AND contact_method_purpose_type_id = 2", [&id], |r| r.get(0))
+            .unwrap();
+        assert_eq!(rows, 1);
+        assert!(!contact_method_toggle_purpose(&mut conn, &id, ContactMethodPurposeType::Shipping, &actor).unwrap());
+        let back = method(&conn, &id).unwrap().unwrap();
+        assert_eq!((back.billing, back.shipping, back.mailing), (start.billing, start.shipping, start.mailing));
+        let rows: i64 = conn
+            .query_row("SELECT COUNT(*) FROM contact_method_purpose WHERE contact_method_id = ?1", [&id], |r| r.get(0))
+            .unwrap();
+        assert_eq!(rows, 0, "toggling is idempotent in the rows too");
+    }
+
+    #[test]
+    fn save_replaces_the_purposes() {
+        let (mut conn, actor) = setup();
+        use ContactMethodPurposeType::*;
+        let input = MethodInput { purposes: vec![Billing, Mailing], ..MethodInput::email("ap@x.example") };
+        let id = contact_method_create(&mut conn, "p-tf", &input, &actor).unwrap();
+        let m = method(&conn, &id).unwrap().unwrap();
+        assert!(m.billing && m.mailing && !m.shipping);
+        let edit =
+            MethodInput { purposes: vec![Shipping], label: "Work".into(), ..MethodInput::email("ap2@x.example") };
+        contact_method_update(&mut conn, &id, &edit, &actor).unwrap();
+        let m = method(&conn, &id).unwrap().unwrap();
+        assert_eq!((m.billing, m.shipping, m.mailing), (false, true, false), "replaced, not merged");
+        assert_eq!((m.address.as_str(), m.label.as_str()), ("ap2@x.example", "Work"));
+        let wrong = MethodInput { kind: Some(MethodKind::Address), line1: "1 Main".into(), ..Default::default() };
+        assert!(matches!(contact_method_update(&mut conn, &id, &wrong, &actor), Err(CommandError::Validation(_))));
+        let bad = MethodInput::email("nope");
+        assert!(matches!(contact_method_update(&mut conn, &id, &bad, &actor), Err(CommandError::Validation(_))));
+    }
+
+    #[test]
+    fn delete_needs_confirmation_and_clears_the_caches() {
+        let (mut conn, actor) = setup();
+        crate::parties::refresh_caches(&conn, "p-hp").unwrap();
+        let email_id = cached(&conn, "p-hp").2;
+        assert!(!email_id.is_empty());
+        let Err(CommandError::ConfirmationRequired(summary)) =
+            contact_method_delete(&mut conn, &email_id, false, &actor)
+        else {
+            panic!("AP-07")
+        };
+        assert_eq!(summary, "Deletes the email studio@haldenpryce.example of Halden & Pryce Architects.");
+        assert!(method(&conn, &email_id).unwrap().is_some(), "nothing changed");
+        contact_method_delete(&mut conn, &email_id, true, &actor).unwrap();
+        assert!(method(&conn, &email_id).unwrap().is_none());
+        let left: i64 =
+            conn.query_row("SELECT COUNT(*) FROM network_address WHERE id = ?1", [&email_id], |r| r.get(0)).unwrap();
+        assert_eq!(left, 0, "the subtype row goes too");
+        let (_, email, id, _) = cached(&conn, "p-hp");
+        assert_ne!(id, email_id, "BR-CONTACT-05: email_address_id_cached no longer points at it");
+        assert_ne!(email, "studio@haldenpryce.example");
+        assert!(crate::db::foreign_key_check(&conn).unwrap().is_empty());
+    }
+
+    #[test]
+    fn archived_parties_are_read_only() {
+        let (mut conn, actor) = setup();
+        let m = methods_of(&conn, "p-hl").unwrap().remove(0);
+        conn.execute("UPDATE party SET deleted_ind = 1 WHERE id = 'p-hl'", []).unwrap();
+        assert!(matches!(contact_method_set_primary(&mut conn, &m.id, &actor), Err(CommandError::Refused(_))));
+        assert!(matches!(
+            contact_method_create(&mut conn, "p-hl", &phone("1", false), &actor),
+            Err(CommandError::Refused(_))
+        ));
+        assert!(matches!(
+            contact_method_create(&mut conn, "nobody", &phone("1", false), &actor),
+            Err(CommandError::NotFound)
+        ));
+    }
 
     #[test]
     fn us_numbers_are_formatted_when_the_setting_is_on() {

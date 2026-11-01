@@ -1,0 +1,62 @@
+{# Add or edit a contact method (OP-CONTACT-01). The fields are those of its kind; purposes are replaced on save
+   (BR-CONTACT-03). Field errors come back with 422 and this body again. #}
+{% macro field(name, label, value, kind) %}
+<label class="block">
+  <span class="text-[12px] muted">{{ label }}</span>
+  <input name="{{ name }}" value="{{ value }}" type="{{ kind }}" class="input input-sm w-full mt-1 {% if self.error(name).is_some() %}input-error{% endif %}" autocomplete="off"
+         {% if let Some(e) = self.error(name) %}aria-invalid="true" aria-describedby="err-{{ name }}"{% endif %}>
+  {% if let Some(e) = self.error(name) %}<span class="text-[12px] text-error" id="err-{{ name }}">{{ e }}</span>{% endif %}
+</label>
+{% endmacro %}
+{% macro check(name, label) %}
+<label class="flex items-center gap-1.5 text-[12.5px]"><input type="checkbox" name="{{ name }}" class="checkbox checkbox-xs" {% if form.on(name) %}checked{% endif %}>{{ label }}</label>
+{% endmacro %}
+<form {% if edit %}hx-put{% else %}hx-post{% endif %}="{{ action }}" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">{{ self.title() }}</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3">
+    {% if let Some(message) = failure %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ message }}</div>{% endif %}
+    {% if let Some(e) = self.error("kind") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    {% if form.is("email") || form.is("web") %}
+    <fieldset class="flex gap-4 text-[12.5px]"><legend class="sr-only">Kind</legend>
+      <label class="flex items-center gap-1.5"><input type="radio" name="kind" value="email" class="radio radio-xs" {% if form.is("email") %}checked{% endif %}>Email</label>
+      <label class="flex items-center gap-1.5"><input type="radio" name="kind" value="web" class="radio radio-xs" {% if form.is("web") %}checked{% endif %}>Website</label>
+    </fieldset>
+    {% call field("address", "Address", form.address, "text") %}
+    {% else %}
+    <input type="hidden" name="kind" value="{{ form.kind }}">
+    {% endif %}
+    {% if form.is("phone") %}
+    <div class="grid grid-cols-[1fr_90px_70px] gap-3">
+      {% call field("number", "Number", form.number, "tel") %}
+      {% call field("extension", "Ext.", form.extension, "text") %}
+      {% call field("country_code", "Country", form.country_code, "text") %}
+    </div>
+    <div class="flex gap-4">{% call check("sms", "Takes texts") %}{% call check("fax", "Fax") %}</div>
+    {% endif %}
+    {% if form.is("address") %}
+    {% call field("line1", "Street", form.line1, "text") %}
+    {% call field("line2", "Line 2", form.line2, "text") %}
+    <div class="grid grid-cols-[1fr_70px_100px] gap-3">
+      {% call field("city", "City", form.city, "text") %}
+      {% call field("state", "State", form.state, "text") %}
+      {% call field("postal_code", "Postal code", form.postal_code, "text") %}
+    </div>
+    {% call field("country", "Country", form.country, "text") %}
+    {% endif %}
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("label", "Label (optional)", form.label, "text") %}
+      {% call field("comment", "Comment (optional)", form.comment, "text") %}
+    </div>
+    <fieldset class="flex flex-wrap gap-4"><legend class="text-[12px] muted mb-1">Use for</legend>
+      {% call check("billing", "Billing") %}{% call check("shipping", "Shipping") %}{% call check("mailing", "Mailing") %}
+    </fieldset>
+    {% call check("primary", "Primary") %}
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">{% if edit %}Save{% else %}Add{% endif %}</button>
+  </div>
+</form>
