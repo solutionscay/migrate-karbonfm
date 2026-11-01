@@ -181,11 +181,32 @@ fn every_dirty_row_has_its_expected_outcome() {
     assert_eq!(deprecated.map(|d| d.0), Some(dirty::DEPRECATED_VALUES));
 }
 
+/// Appends a copy of the first data row of `<table>.csv`: a duplicate key (or a second System row), so it is rejected.
+fn duplicate_first_row(export: &Path, table: &str) {
+    let path = export.join(format!("{table}.csv"));
+    let text = std::fs::read_to_string(&path).unwrap();
+    let first = text.split("\r\n").nth(1).unwrap().to_string();
+    std::fs::write(&path, format!("{text}{first}\r\n")).unwrap();
+}
+
 #[test]
 fn secrets_and_pii_of_d09_are_not_imported() {
-    // BR-IMPORT-02: the export carries an SSN, an SMTP password and an API token; none reaches the database.
-    let r = run(0.05, false);
-    drop(r.conn);
+    // BR-IMPORT-02: the export carries an SSN, an SMTP password and an API token; none reaches the database, not even
+    // through a rejected row's raw_json (an Employee with a duplicate key, a second System row).
+    let dir = tempfile::tempdir().unwrap();
+    let export = dir.path().join("export");
+    karbon_synth::generate(karbon_synth::Config { scale: 0.05, dirty: false, ..Default::default() }, &export).unwrap();
+    duplicate_first_row(&export, "Employee");
+    duplicate_first_row(&export, "System");
+    let data = dir.path().join("data");
+    let report = import_export(&export, &data, &fixed()).unwrap();
+    let r = Run { data, export, report, conn: Connection::open_in_memory().unwrap(), _dir: dir };
+    let rejected: Vec<(&str, &str)> =
+        r.report.rejected.iter().map(|x| (x.source_table.as_str(), x.reason.as_str())).collect();
+    assert_eq!(rejected, [("System", "more than one System row"), ("Employee", "duplicate key r-mara-emp")]);
+    for x in &r.report.rejected {
+        assert!(x.raw_json.contains(karbon_server::import::REDACTED), "{}", x.raw_json);
+    }
     let bytes = std::fs::read(db::database_path(&r.data)).unwrap();
     let text = String::from_utf8_lossy(&bytes);
     for secret in ["synthetic-secret-not-imported", "synthetic-token-not-imported", "900-00-0001"] {
