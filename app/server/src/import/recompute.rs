@@ -79,8 +79,20 @@ fn sales_lines_and_totals(tx: &Transaction, report: &mut Report, name_of: &NameO
             let qty_text: Option<String> = r.get(2)?;
             let qty = qty_text.as_deref().and_then(|q| Qty::parse_optional(q).ok()).flatten();
             let stored: Option<i64> = r.get(4)?;
-            // A line with an amount and no unit price keeps its amount as the unit price of one (BR-SALES-01).
-            let unit: i64 = r.get::<_, Option<i64>>(3)?.or(stored).unwrap_or(0);
+            // A line with an amount and no unit price: the unit price is amount / qty, half away from zero, so the
+            // recomputed amount stays the exported one up to the cent (BR-SALES-01).
+            let unit: i64 = match (r.get::<_, Option<i64>>(3)?, stored, qty) {
+                (Some(u), _, _) => u,
+                (None, Some(a), Some(q)) if q.scaled() != 0 => i64::try_from(
+                    karbon_money::round::div_round_half_away(
+                        i128::from(a) * i128::from(karbon_money::QTY_SCALE),
+                        i128::from(q.scaled()).abs(),
+                    ) * i128::from(q.scaled()).signum(),
+                )
+                .unwrap_or(0),
+                (None, Some(a), _) => a,
+                (None, None, _) => 0,
+            };
             let taxable: f64 = r.get::<_, rusqlite::types::Value>(5).map(|v| match v {
                 rusqlite::types::Value::Integer(i) => i as f64,
                 rusqlite::types::Value::Real(f) => f,

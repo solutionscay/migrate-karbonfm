@@ -334,6 +334,7 @@ fn money_rounding_examples_of_br_sales_01() {
             ("e", "0.5", "-0.05", "-0.025"), // -> -0.03
             ("f", "", "12.5", "12.5"),       // empty quantity counts as 1
             ("g", "3", "33.3333333", "100"), // import of 33.3333333 -> 33.33; 3 x 33.33 = 99.99
+            ("h", "3", "", "30"),            // no unit price: 30.00 / 3 = 10.00, amount stays 30.00
         ],
     );
     let r = import_export(&export, &dir.path().join("data"), &fixed()).unwrap();
@@ -349,6 +350,7 @@ fn money_rounding_examples_of_br_sales_01() {
     assert_eq!(line("e"), (-5, -3));
     assert_eq!(line("f"), (1250, 1250));
     assert_eq!(line("g"), (3333, 9999));
+    assert_eq!(line("h"), (1000, 3000));
     // Listed: the amounts exported with 3 decimals (rounded on load), and g, whose unit price was rounded and whose
     // amount was recomputed. a, b and f are exact.
     let changed: Vec<(String, String, Option<String>, Option<String>)> = r
@@ -375,8 +377,37 @@ fn money_rounding_examples_of_br_sales_01() {
             Ok((x.get(0)?, x.get(1)?, x.get(2)?))
         })
         .unwrap();
-    let expect = 240000 + 57000 + 5000 + 3 - 3 + 1250 + 9999;
+    let expect = 240000 + 57000 + 5000 + 3 - 3 + 1250 + 9999 + 3000;
     assert_eq!((sub, total, balance), (expect, expect, expect));
+}
+
+#[test]
+fn keys_with_spaces_are_trimmed_and_still_match() {
+    // FileMaker text ids often carry a trailing space; the stored key is the trimmed one, so the row and its children
+    // load and foreign_key_check stays empty.
+    let dir = tempfile::tempdir().unwrap();
+    let export = dir.path().join("export");
+    std::fs::create_dir_all(&export).unwrap();
+    std::fs::write(export.join("Party.csv"), "\"Id\",\"NameCached\",\"OrganizationInd\"\r\n\"p1 \",\"Acme\",\"1\"\r\n")
+        .unwrap();
+    std::fs::write(
+        export.join("ContactMethod.csv"),
+        "\"Id\",\"PartyId\",\"PhoneInd\"\r\n\"cm1\",\"p1\",\"1\"\r\n\"cm2\",\" p1\",\"1\"\r\n",
+    )
+    .unwrap();
+    std::fs::write(
+        export.join("File.csv"),
+        "\"Id\",\"Container\"\r\n\"f1\",\"/etc/hosts\"\r\n\"f2\",\"Container/../../x\"\r\n",
+    )
+    .unwrap();
+    let r = import_export(&export, &dir.path().join("data"), &fixed()).unwrap();
+    let conn = Connection::open(db::database_path(&dir.path().join("data"))).unwrap();
+    assert_eq!(count(&conn, "SELECT COUNT(*) FROM party WHERE id = 'p1'"), 1);
+    assert_eq!(count(&conn, "SELECT COUNT(*) FROM contact_method WHERE party_id = 'p1'"), 2);
+    assert!(r.changed.iter().any(|c| c.source_table == "Party" && c.source_field == "Id"));
+    // Container paths outside the export folder are not read.
+    assert_eq!(count(&conn, "SELECT COUNT(*) FROM file WHERE container_path IS NULL"), 2);
+    assert_eq!(r.containers_missing, 2);
 }
 
 #[test]

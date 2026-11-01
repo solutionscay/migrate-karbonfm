@@ -314,6 +314,8 @@ struct TargetTable {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Conv {
     Text,
+    /// A text primary or foreign key: stored trimmed, as the key checks compare it.
+    Key,
     Number,
     /// Number field into an INTEGER money column (OD-04-02).
     Money,
@@ -618,6 +620,11 @@ impl Loader<'_> {
                         _ if t == "sales_line" && column == "qty" => Conv::Qty,
                         ("Text", "INTEGER") => Conv::CreditLimit,
                         ("Text", "NUMERIC") => Conv::NumberFromText,
+                        ("Text", _)
+                            if column == self.targets[target].pk || self.targets[target].fks.contains_key(column) =>
+                        {
+                            Conv::Key
+                        }
                         ("Text", _) => Conv::Text,
                         ("Number", "INTEGER") => Conv::Money,
                         ("Number", _) => Conv::Number,
@@ -781,6 +788,10 @@ impl Loader<'_> {
         let bad = |what: &str| format!("{what} in {}: '{raw}'", c.field);
         Ok(match c.conv {
             Conv::Text => (if raw.is_empty() { Value::Null } else { Value::Text(raw.to_string()) }, None),
+            Conv::Key => {
+                let change = (v != raw).then(|| (Some(v.to_string()), "spaces around a key removed (BR-IMPORT-01)"));
+                (Value::Text(v.to_string()), change)
+            }
             Conv::Number | Conv::NumberFromText => {
                 if !convert::is_number(v) {
                     return Err(bad("not a number"));
@@ -820,13 +831,16 @@ impl Loader<'_> {
 
     /// Copies `Container/<...>` from the export into `files/` of the data folder (D-17) and returns the stored path.
     fn copy_container(&mut self, value: &str, table: &str, column: &str, key: &str) -> Option<String> {
+        // Only a relative path inside the export folder: no `..`, no drive or root, no link leading out of it.
         let rel = value.trim_start_matches(['/', '\\']).replace('\\', "/");
-        if rel.split('/').any(|p| p == "..") {
-            self.report.containers_missing += 1;
-            return None;
-        }
+        let inside = !rel.split('/').any(|p| p == ".." || p.contains(':')) && !rel.is_empty();
         let from = self.export_dir.join(&rel);
-        if !from.is_file() {
+        let contained = inside
+            && match (from.canonicalize(), self.export_dir.canonicalize()) {
+                (Ok(f), Ok(base)) => f.starts_with(base) && f.is_file(),
+                _ => false,
+            };
+        if !contained {
             self.report.containers_missing += 1;
             return None;
         }
