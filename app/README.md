@@ -4,11 +4,12 @@ Tauri 2 window on a local axum server (127.0.0.1), server-rendered askama pages 
 Tailwind/DaisyUI, SQLite through rusqlite. See `migration/02_recommendations.md` and spikes S-01, S-05.
 
 ```bash
-cargo run -p karbon-desktop                          # the app (window)
+cargo run -p karbon-desktop                          # the app (window); a new data folder gets the big demo
 cargo run -p karbon-server --bin karbon-dev-server   # the same pages in a browser: open the one-time URL it prints
 cargo run -p karbon-server --bin karbon-dev-server -- 3000 --fresh   # a new install (no demo seed): starts on /setup
 KARBONFM_DATA_DIR=/tmp/kfm cargo run -p karbon-desktop --no-default-features   # fresh non-demo app, data in /tmp/kfm
-KARBONFM_DATA_DIR=/tmp/kfm-demo cargo run -p karbon-desktop   # demo app with its data in /tmp/kfm-demo (try backup/restore)
+KARBONFM_DATA_DIR=/tmp/kfm-demo cargo run -p karbon-desktop   # big demo app with its data in /tmp/kfm-demo (try backup/restore)
+KARBONFM_DATA_DIR=/tmp/kfm-small cargo run -p karbon-desktop --no-default-features --features demo   # the small 04_demo_seed
 cargo run -p karbon-server --bin karbon-dev-server -- 3000 --data-dir /tmp/kfm-dev --backup-folder /tmp/kfm-backups   # backup/restore in a browser
 cargo run --release -p karbon-server --features big-demo --bin karbon-dev-server -- 3917 --big-demo   # ~470 parties, ~3,700 invoices (I3)
 cargo run --release -p karbon-synth -- /tmp/kfm-export                                  # the synthetic FileMaker export (never commit it)
@@ -27,8 +28,9 @@ cd desktop && cargo tauri build                      # bundles (needs: cargo ins
 | `tools/build-css.sh` | Tailwind standalone CLI, pinned and checksummed; no Node |
 
 The database is `karbonfm.db` in the app data folder (macOS `~/Library/Application Support/com.solutionscay.karbonfm`),
-migrated by refinery at every start; the demo build loads `04_demo_seed.sql` while it has no party, so delete the file to
-reseed. The log is `karbonfm.log` in the app log folder (macOS `~/Library/Logs/com.solutionscay.karbonfm`). Rule and
+migrated by refinery at every start. When the folder has no database, the app creates the big demo (karbon-synth
+imported by karbon-import, about 0.7 s in release); it never replaces an existing one, so move `karbonfm.db` and
+`files/` away to get a new demo. The log is `karbonfm.log` in the app log folder (macOS `~/Library/Logs/com.solutionscay.karbonfm`). Rule and
 folders per OS: `migration/03_migration_plan.md`, "Demo seed data".
 
 The local server only answers the app window (AP-13): the window opens a one-time `/session/{token}` URL that sets a
