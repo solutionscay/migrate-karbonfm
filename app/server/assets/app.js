@@ -26,7 +26,28 @@ if (window.htmx) {
   });
   // Server events sent with the HX-Trigger header.
   document.addEventListener("karbon-close-dialog", () => document.getElementById("modal").close());
-  document.addEventListener("karbon-toast", (e) => window.karbonToast(e.detail.value));
+  // A response with HX-Redirect fires its HX-Trigger events and then htmx loads the new page, which would remove a
+  // toast at once ("Created" after the New contact wizard, "Archived"). Such a toast waits in sessionStorage and the
+  // next page shows it.
+  let redirecting = false;
+  document.addEventListener("htmx:beforeOnLoad", (e) => {
+    const xhr = e.detail.xhr;
+    redirecting = Boolean(xhr && xhr.getResponseHeader("HX-Redirect"));
+  });
+  document.addEventListener("karbon-toast", (e) => {
+    if (redirecting) {
+      try { sessionStorage.setItem("karbon-toast-next", e.detail.value); return; } catch (_) {}
+    }
+    window.karbonToast(e.detail.value);
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    let text = null;
+    try {
+      text = sessionStorage.getItem("karbon-toast-next");
+      sessionStorage.removeItem("karbon-toast-next");
+    } catch (_) {}
+    if (text) window.karbonToast(text);
+  });
 
   // A request that failed and was not swapped (any 4xx or 5xx except 422, see responseHandling above) says so.
   // Before this, a failed save looked as if nothing had happened. It never says "saved".

@@ -552,6 +552,7 @@ async fn wizard_creates_an_organization_customer_and_its_contact() {
     let (status, headers, html) = send(&app, form("POST", "/parties/wizard", &save)).await;
     assert_eq!(status, StatusCode::OK, "{html}");
     assert_eq!(headers.get("hx-redirect").unwrap(), &format!("/parties/{org_id}"));
+    assert!(headers.get("hx-trigger").unwrap().to_str().unwrap().contains(r#""karbon-toast":"Created""#));
     let (_, html) = get(&app, &format!("/parties/{org_id}")).await;
     assert!(html.contains("Tidewater Kayak") && html.contains("Current customer") && html.contains("Nell Barrow"));
     assert!(html.contains("Owner · Billing contact"));
@@ -630,4 +631,19 @@ async fn sales_lists_of_a_fresh_install_are_empty() {
     let (status, html) = get(&app, "/payments").await;
     assert_eq!(status, StatusCode::OK);
     assert!(html.contains("0 payments"));
+}
+
+/// Ep03: the "Created" toast of the wizard (and "Archived") never showed, because htmx loads the page of HX-Redirect
+/// right after the HX-Trigger events. app.js keeps such a toast for the next page. The page has no JS test runner, so
+/// this checks that the handler is served; the headless check is in the Ep03 bug-check report.
+#[tokio::test]
+async fn a_toast_sent_with_a_redirect_waits_for_the_next_page() {
+    let app = demo();
+    let (status, js) = get(&app, "/assets/app.js").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        js.contains(r#"addEventListener("htmx:beforeOnLoad""#) && js.contains(r#"getResponseHeader("HX-Redirect")"#)
+    );
+    assert!(js.contains(r#"sessionStorage.setItem("karbon-toast-next""#));
+    assert!(js.contains(r#"sessionStorage.getItem("karbon-toast-next")"#));
 }
