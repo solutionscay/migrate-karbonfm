@@ -647,3 +647,19 @@ async fn a_toast_sent_with_a_redirect_waits_for_the_next_page() {
     assert!(js.contains(r#"sessionStorage.setItem("karbon-toast-next""#));
     assert!(js.contains(r#"sessionStorage.getItem("karbon-toast-next")"#));
 }
+
+/// Ep03: at 1440 px the header cut the email and the address ("studio…", "48 Wh…") because four action buttons took
+/// the width. As design/customer.html: Edit, an Add menu and a More menu; a long contact method wraps, never cut.
+#[tokio::test]
+async fn the_party_header_keeps_contact_methods_whole() {
+    let app = demo();
+    let (_, html) = get(&app, "/parties/p-hp").await;
+    let header = &html[html.find(r#"id="party-header""#).unwrap()..];
+    let header = &header[..header.find("</section>").unwrap()];
+    assert!(!header.contains("truncate"), "no contact method is cut");
+    assert!(header.contains("studio@haldenpryce.example") && header.contains("48 Wharf Street, Suite 3"));
+    let actions = &header[header.find(r#"aria-label="Actions""#).unwrap()..];
+    assert_eq!(actions.matches("<summary").count(), 2, "Add and More actions");
+    assert!(actions.contains(">Add</summary>") && actions.contains(r#"aria-label="More actions""#));
+    assert!(actions.contains("Add contact method") && actions.contains("Add role") && actions.contains("Archive…"));
+}

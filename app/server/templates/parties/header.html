@@ -16,17 +16,20 @@
       {% if d.methods.is_empty() %}
       <p class="muted text-[12.5px] mt-4">No phone, email or address yet.</p>
       {% else %}
-      <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5 mt-4">
+      <dl class="grid grid-cols-1 xl:grid-cols-2 gap-x-8 gap-y-2.5 mt-4">
         {% for m in d.methods %}
-        <div class="flex items-center gap-2.5 min-w-0">
+        {# A long address or email wraps and its chips go below it; nothing is cut (Ep03 saw "studio…" at 1440 px). #}
+        <div class="flex items-start gap-2.5 min-w-0">
           <dt class="sr-only">{{ m.kind.label() }}</dt>
-          <svg class="i muted" aria-hidden="true"><use href="#i-{{ self.icon(m) }}"/></svg>
-          <dd class="truncate {% if m.kind == crate::contacts::MethodKind::Phone %}num{% endif %}">{% if m.kind == crate::contacts::MethodKind::Email %}<a class="link link-hover" href="mailto:{{ m.address }}">{{ m.display() }}</a>{% else %}{{ m.display() }}{% endif %}</dd>
-          {% if !m.label.is_empty() %}<span class="chip">{{ m.label }}</span>{% endif %}
-          {% for p in m.purposes() %}<span class="chip">{{ p }}</span>{% endfor %}
-          {% if m.primary %}<span class="text-[11px] text-primary font-medium">Primary</span>{% endif %}
+          <svg class="i muted shrink-0 mt-[3px]" aria-hidden="true"><use href="#i-{{ self.icon(m) }}"/></svg>
+          <dd class="flex flex-wrap items-center gap-x-2.5 gap-y-1 min-w-0 flex-1">
+            <span class="min-w-0 [overflow-wrap:anywhere] {% if m.kind == crate::contacts::MethodKind::Phone %}num{% endif %}">{% if m.kind == crate::contacts::MethodKind::Email %}<a class="link link-hover" href="mailto:{{ m.address }}">{{ m.display() }}</a>{% else %}{{ m.display() }}{% endif %}</span>
+            {% if !m.label.is_empty() %}<span class="chip">{{ m.label }}</span>{% endif %}
+            {% for p in m.purposes() %}<span class="chip">{{ p }}</span>{% endfor %}
+            {% if m.primary %}<span class="text-[11px] text-primary font-medium">Primary</span>{% endif %}
+          </dd>
           {% if !d.archived %}
-          <details class="dropdown ml-auto">
+          <details class="dropdown dropdown-end shrink-0 -my-1">
             <summary class="icon-btn" aria-label="Actions for {{ m.display() }}"><svg class="i i-sm" aria-hidden="true"><use href="#i-more"/></svg></summary>
             <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-48 p-1 shadow border hairline text-[12.5px]">
               <li><button hx-get="{{ self.method_href(m) }}/edit" hx-target="#modal-body">Edit</button></li>
@@ -45,27 +48,30 @@
       {% endif %}
     </div>
     {% if !d.archived %}
-    <div class="flex flex-wrap gap-2" role="group" aria-label="Actions">
+    {# As design/customer.html: a few compact buttons, the rest in menus, so the contact methods keep the width. #}
+    <div class="flex gap-2" role="group" aria-label="Actions">
       <button class="btn btn-sm btn-quiet" hx-get="{{ href }}/edit" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button>
-      {% if !self.missing_roles().is_empty() %}
       <details class="dropdown dropdown-end">
-        <summary class="btn btn-sm btn-quiet"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add role</summary>
-        <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-44 p-1 shadow border hairline">
-          {% for role in self.missing_roles() %}
-          <li><button hx-post="{{ href }}/roles" hx-vals='{"role": "{{ role.key() }}"}' hx-target="#party-header" hx-swap="outerHTML">{{ role.label() }}</button></li>
-          {% endfor %}
-        </ul>
-      </details>
-      {% endif %}
-      <details class="dropdown dropdown-end">
-        <summary class="btn btn-sm btn-quiet"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add contact method</summary>
-        <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-44 p-1 shadow border hairline">
+        <summary class="btn btn-sm btn-quiet"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add</summary>
+        <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-48 p-1 shadow border hairline text-[12.5px]">
+          <li class="menu-title">Add contact method</li>
           {% for (kind, label) in [("phone", "Phone"), ("email", "Email"), ("web", "Website"), ("address", "Address")] %}
           <li><button hx-get="{{ href }}/contact-methods/new?kind={{ kind }}" hx-target="#modal-body">{{ label }}</button></li>
           {% endfor %}
+          {% if !self.missing_roles().is_empty() %}
+          <li class="menu-title">Add role</li>
+          {% for role in self.missing_roles() %}
+          <li><button hx-post="{{ href }}/roles" hx-vals='{"role": "{{ role.key() }}"}' hx-target="#party-header" hx-swap="outerHTML">{{ role.label() }}</button></li>
+          {% endfor %}
+          {% endif %}
         </ul>
       </details>
-      <button class="btn btn-sm btn-quiet" hx-get="{{ href }}/archive" hx-target="#modal-body">Archive</button>
+      <details class="dropdown dropdown-end">
+        <summary class="btn btn-sm btn-quiet px-2" aria-label="More actions"><svg class="i i-sm" aria-hidden="true"><use href="#i-more"/></svg></summary>
+        <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-44 p-1 shadow border hairline text-[12.5px]">
+          <li><button hx-get="{{ href }}/archive" hx-target="#modal-body">Archive…</button></li>
+        </ul>
+      </details>
     </div>
     {% endif %}
   </div>
