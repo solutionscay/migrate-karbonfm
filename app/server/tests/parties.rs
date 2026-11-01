@@ -556,6 +556,8 @@ async fn wizard_creates_an_organization_customer_and_its_contact() {
     let (_, html) = get(&app, &format!("/parties/{org_id}")).await;
     assert!(html.contains("Tidewater Kayak") && html.contains("Current customer") && html.contains("Nell Barrow"));
     assert!(html.contains("Owner · Billing contact"));
+    // A new customer is taxable, as in the source (kontroller 229 step 154); Ep03 saw "Not taxable".
+    assert!(html.contains(r#"<span class="chip">Taxable</span>"#) && !html.contains("Not taxable"));
     // A resubmitted save opens the same party and creates nothing.
     let (_, headers, _) = send(&app, form("POST", "/parties/wizard", &save)).await;
     assert_eq!(headers.get("hx-redirect").unwrap(), &format!("/parties/{org_id}"));

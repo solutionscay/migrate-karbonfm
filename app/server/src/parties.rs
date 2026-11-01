@@ -748,7 +748,8 @@ fn create_in(tx: &Connection, new: &NewParty, stamp: &Stamp) -> Result<(), Comma
     }
     refresh_caches(tx, &new.id)?;
     if let Some(role) = new.role {
-        add_role(tx, &new.id, role, stamp)?;
+        // A customer made with its party is taxable, as Create Customer V3 does (kontroller 229 step 154).
+        add_role(tx, &new.id, role, true, stamp)?;
     }
     Ok(())
 }
@@ -874,16 +875,20 @@ pub fn party_role_add(
     if archived {
         return Err(CommandError::Refused("An archived party cannot get a new role.".into()));
     }
-    let id = add_role(&tx, party_id, role, &Stamp::now(actor))?;
+    // A customer role added to an existing party starts not taxable: Add Customer to Party (kontroller 705 step 180)
+    // writes the Taxable it is given, and its callers give none.
+    let id = add_role(&tx, party_id, role, false, &Stamp::now(actor))?;
     tx.commit()?;
     Ok(id)
 }
 
-/// [`party_role_add`] inside the caller's transaction.
+/// [`party_role_add`] inside the caller's transaction. `taxable`: the Taxable of a new customer row (an existing
+/// customer row is kept as it is).
 pub(crate) fn add_role(
     conn: &Connection,
     party_id: &str,
     role: RoleKind,
+    taxable: bool,
     stamp: &Stamp,
 ) -> Result<String, CommandError> {
     let col = role.column();
@@ -925,8 +930,8 @@ pub(crate) fn add_role(
     let inserted = match role {
         RoleKind::Customer => conn.execute(
             "INSERT OR IGNORE INTO customer (id, display_name, balance, retainer_balance_cached, retainer_adjustment, taxable)
-             VALUES (?1, ?2, 0, 0, 0, 0)",
-            params![id, name],
+             VALUES (?1, ?2, 0, 0, 0, ?3)",
+            params![id, name, i64::from(taxable)],
         )?,
         RoleKind::Lead | RoleKind::Employee | RoleKind::Vendor => {
             conn.execute(&format!("INSERT OR IGNORE INTO {table} (id, name_cached) VALUES (?1, ?2)"), params![id, name])?
@@ -1631,6 +1636,28 @@ mod tests {
             "BR-PARTY-10"
         );
         assert!(customer_roles_without_customer_row(&conn).unwrap().is_empty());
+    }
+
+    /// Ep03: a customer made in the wizard showed "Not taxable". The source makes a new customer taxable (kontroller
+    /// 229 step 154) and leaves a customer role added later as given, which is empty (705 step 180).
+    #[test]
+    fn a_new_customer_is_taxable_and_a_customer_role_added_later_is_not() {
+        let (mut conn, actor) = demo_user();
+        let taxable = |conn: &Connection, id: &str| party_get(conn, id).unwrap().customer.unwrap().taxable;
+        let made = party_create(&mut conn, &org("Pier Nine Ropes", Some(RoleKind::Customer)), &actor).unwrap();
+        assert!(taxable(&conn, &made), "created with its customer role");
+        let input = WizardInput {
+            organization: Some(org("Tidewater Kayak", Some(RoleKind::Customer))),
+            person: None,
+            relationship: String::new(),
+            billing_contact: false,
+        };
+        let (wizard, _) = party_create_wizard(&mut conn, &input, &actor).unwrap();
+        assert!(taxable(&conn, &wizard.unwrap()), "created in the wizard");
+        let plain = party_create(&mut conn, &org("Gull Rock Ferry", None), &actor).unwrap();
+        party_role_add(&mut conn, &plain, RoleKind::Customer, &actor).unwrap();
+        assert!(!taxable(&conn, &plain), "customer role added to an existing party");
+        assert!(taxable(&conn, "p-hp") && !taxable(&conn, "p-bm"), "existing customers are not changed");
     }
 
     #[test]
