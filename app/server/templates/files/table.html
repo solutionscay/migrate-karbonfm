@@ -1,4 +1,5 @@
-{# UI-19 file list (layouts 142/185): search, rows and pager. htmx replaces #files-table with it. #}
+{# UI-19 file list (layouts 142/185): search, rows and pager. htmx replaces #files-table with it. Below 1280 px the
+   Category column is hidden and "Attached to" wraps, so the six columns fit the panel at 1024 (B7). #}
 <form class="flex flex-wrap items-center gap-2 px-4 py-3 border-b hairline" role="search"
       hx-get="/files" hx-target="#files-table" hx-push-url="true" hx-trigger="input changed delay:250ms from:input[name=q]">
   <label class="flex items-center gap-2 h-8 px-2.5 w-72 rounded-field border hairline bg-base-200/50 focus-within:border-primary">
@@ -8,7 +9,7 @@
 </form>
 <div class="overflow-x-auto">
   <table class="tbl">
-    <thead><tr><th class="w-12"><span class="sr-only">Preview</span></th><th>Name</th><th>Attached to</th><th>Category</th><th>Added</th><th class="r">Size</th></tr></thead>
+    <thead><tr><th class="w-12"><span class="sr-only">Preview</span></th><th>Name</th><th>Attached to</th><th class="hidden xl:table-cell">Category</th><th>Added</th><th class="r">Size</th></tr></thead>
     <tbody>
       {% for f in rows %}
       <tr data-file="{{ f.id }}">
@@ -17,8 +18,8 @@
           {% if f.present %}<button type="button" class="link link-hover font-medium text-left truncate block max-w-full" data-open-file="{{ f.id }}">{{ f.name }}</button>{% else %}<span class="font-medium truncate block">{{ f.name }}</span><span class="text-[11.5px] text-error">File missing from the file store</span>{% endif %}
           {% if !f.tag.is_empty() || !f.note.is_empty() %}<div class="text-[11.5px] muted truncate">{% if !f.tag.is_empty() %}<span class="chip text-[10.5px] mr-1">{{ f.tag }}</span>{% endif %}{{ f.note }}</div>{% endif %}
         </td>
-        <td>{% if f.attached_to.is_empty() %}<span class="muted">—</span>{% else %}{{ f.attached_to }}{% endif %}</td>
-        <td>{{ f.category }}</td>
+        <td class="whitespace-normal min-w-[9rem]">{% if f.attached_to.is_empty() %}<span class="muted">—</span>{% else %}{{ f.attached_to }}{% endif %}</td>
+        <td class="hidden xl:table-cell">{{ f.category }}</td>
         <td class="num">{{ f.date }}</td>
         <td class="r num">{{ f.size }}</td>
       </tr>

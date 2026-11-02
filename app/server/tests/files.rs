@@ -479,6 +479,20 @@ async fn open_never_hands_a_program_to_the_system() {
 }
 
 #[tokio::test]
+async fn the_file_list_fits_1024_px() {
+    // B7: every .tbl cell is nowrap; at 1024 px the Category column made the table wider than its panel.
+    let (dir, conn, _) = demo();
+    drop(conn);
+    let app = app(dir.path(), None);
+    let (status, _, html) = send(&app, Request::get("/files").body(Body::empty()).unwrap()).await;
+    let html = text(&html);
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"<th class="hidden xl:table-cell">Category</th>"#));
+    assert_eq!(html.matches(r#"<td class="hidden xl:table-cell">Document</td>"#).count(), 4);
+    assert_eq!(html.matches(r#"<td class="whitespace-normal min-w-[9rem]">"#).count(), 4);
+}
+
+#[tokio::test]
 async fn open_hands_a_zip_to_the_system() {
     // B6 (Admiral's ruling): macOS only unpacks a zip and runs nothing, so the seed's site photos open.
     let (dir, conn, _) = demo();
