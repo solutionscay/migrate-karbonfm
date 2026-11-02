@@ -378,6 +378,10 @@ async fn a_comment_is_added_and_notifies_the_subscriber() {
     assert_eq!(status, StatusCode::OK);
     assert!(html.contains(r#"id="comments""#) && html.contains("Warmer it is"));
     assert!(h.get("HX-Trigger").unwrap().to_str().unwrap().contains("Comment added"));
+    // The bell reloads itself on this event, so a new notification shows without a page load.
+    assert!(h.get("HX-Trigger").unwrap().to_str().unwrap().contains("karbon-notifications"));
+    let (_, bell) = get(&app, "/notifications").await;
+    assert!(bell.contains(r#"hx-trigger="karbon-notifications from:body""#), "{bell}");
     let (status, _, text) = send(&app, form("POST", "/discussions/a-disc-light/comments", "comment=+")).await;
     assert_eq!(status, StatusCode::CONFLICT);
     assert!(text.contains("Write a comment first"));

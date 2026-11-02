@@ -265,7 +265,11 @@ pub async fn comment(
         Ok(_) => {
             let d = discussions::discussion_get(&conn, &id).map_err(|e| AppError::Internal(e.to_string()))?;
             let html = Comments { d: &d }.render()?;
-            Ok(([("HX-Trigger", toast("Comment added", false))], Html(html)).into_response())
+            // The toast, and the event the bell reloads on: the comment may have notified the current user (422).
+            let trigger = serde_json::json!({ "karbon-toast": "Comment added", "karbon-notifications": null });
+            let trigger = axum::http::HeaderValue::from_str(&super::party_forms::ascii_json(&trigger.to_string()))
+                .map_err(|e| AppError::Internal(e.to_string()))?;
+            Ok(([("HX-Trigger", trigger)], Html(html)).into_response())
         }
         Err(CommandError::Validation(errors)) => {
             let message = errors.first().map(|e| e.message.clone()).unwrap_or_default();
