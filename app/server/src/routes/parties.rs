@@ -333,6 +333,8 @@ struct DetailPage<'a> {
     sales: Vec<SalesView>,
     sales_matched: i64,
     archived_on: String,
+    /// The Files panel (UI-19, `routes::files::FilesPanel`).
+    files: String,
 }
 
 /// `GET /parties/{id}` (UI-04). An archived party opens too, marked archived and without edit actions (D3).
@@ -349,6 +351,7 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
     };
     let header = Header::new(&d).render()?;
     let relations = Relations { d: &d, oob: false }.render()?;
+    let files = super::files::FilesPanel::load(&state, &conn, &d.id)?.render()?;
     render(&DetailPage {
         nav: Nav::Parties,
         demo: crate::db::has_demo_data(&conn)?,
@@ -358,6 +361,7 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
         relations,
         sales,
         sales_matched,
+        files,
     })
 }
 

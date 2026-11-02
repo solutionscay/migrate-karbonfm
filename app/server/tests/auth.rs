@@ -75,6 +75,10 @@ fn sample(path: &str) -> String {
         "cm-001"
     } else if path.starts_with("/relations/") {
         "rel-mara"
+    } else if path.starts_with("/files/") {
+        "f-001"
+    } else if path.starts_with("/attachments/") {
+        "fa-001"
     } else {
         "p-hp"
     };

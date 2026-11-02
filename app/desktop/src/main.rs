@@ -77,9 +77,13 @@ fn main() {
             // Saving a file (the invoice PDF): the native save dialog, then the system viewer (fix/pdf-view).
             let handle = app.handle().clone();
             let save: karbon_server::SaveHook = Arc::new(move |name, bytes| save_file(&handle, name, bytes));
+            // Opening a stored file (UI-19): the server resolves the path inside the file store, the shell hands it
+            // to the system app. The page only names a file id (AP-01).
+            let open: karbon_server::OpenHook = Arc::new(|path| open_in_viewer(&path));
             let state = karbon_server::AppState::new(db)
                 .with_print(print)
                 .with_save(save)
+                .with_open(open)
                 .with_session(session)
                 .with_secrets(secrets)
                 .with_folder_picker(folder)
@@ -157,9 +161,9 @@ fn save_file(handle: &AppHandle, name: String, bytes: Vec<u8>) -> Result<Option<
     Ok(Some(path))
 }
 
-/// Opens a file the user just saved in the system's default app (Preview, the Windows default, xdg-open on Linux).
+/// Opens a file the user just saved, or a stored file (UI-19), in the system's default app (Preview, the Windows default, xdg-open on Linux).
 /// A direct process call instead of tauri-plugin-opener, so the shell links no Tauri plugin at all (T-08-01). The path
-/// comes from the native save dialog, never from the page, and goes to the program as one argument (no shell).
+/// comes from the native save dialog or the server's file store, never from the page, and goes to the program as one argument (no shell).
 fn open_in_viewer(path: &std::path::Path) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     let program = "open";
