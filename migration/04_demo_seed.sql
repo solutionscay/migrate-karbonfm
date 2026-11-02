@@ -423,14 +423,16 @@ INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, p
 INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-013', 'a-mail-1048', 'p-hp-jw', 55, 'Joanna Whitfield', 'JW');
 INSERT INTO email_message (id, sent_ind, smtp_timestamp, use_system_settings_ind) VALUES ('a-mail-1048', 1, '2026-10-14 16:40:00', 1);
 
--- Files: rows only. The demo ships no file bodies; container_path names where a copied file would be (D-17).
-INSERT INTO file (id, file_name, extension, file_size, container_path, creation_timestamp, created_by, modified_by) VALUES ('f-001', 'Phase 2 proposal v3.pdf', 'pdf', 1887.44, 'files/2026/f-001.pdf', '2026-10-26 12:00:00', 'mara', 'mara');
+-- Files: the stored copies are small placeholders in migration/demo_files, written to the data folder's file store
+-- when the seed loads (db::DEMO_FILES; D-17). file_size is the copy's KB (617 s104); content_type and category as 617
+-- s117-120 set them (pdf: application/pdf; zip and xlsx: none; every one a Document).
+INSERT INTO file (id, file_name, extension, file_size, content_type, category, container_path, creation_timestamp, created_by, modified_by) VALUES ('f-001', 'Phase 2 proposal v3.pdf', 'pdf', 0.71, 'application/pdf', 'Document', 'files/2026/f-001.pdf', '2026-10-26 12:00:00', 'mara', 'mara');
 INSERT INTO file_attachment (id, attachment_id, entity_type_id, entity_id, created_by, modified_by) VALUES ('fa-001', 'f-001', 10, 'p-hp', 'mara', 'mara');
-INSERT INTO file (id, file_name, extension, file_size, container_path, creation_timestamp, created_by, modified_by) VALUES ('f-002', 'Reception — site photos.zip', 'zip', 25165.82, 'files/2026/f-002.zip', '2026-10-16 12:00:00', 'mara', 'mara');
+INSERT INTO file (id, file_name, extension, file_size, content_type, category, container_path, creation_timestamp, created_by, modified_by) VALUES ('f-002', 'Reception — site photos.zip', 'zip', 0.56, NULL, 'Document', 'files/2026/f-002.zip', '2026-10-16 12:00:00', 'mara', 'mara');
 INSERT INTO file_attachment (id, attachment_id, entity_type_id, entity_id, created_by, modified_by) VALUES ('fa-002', 'f-002', 10, 'p-hp', 'mara', 'mara');
-INSERT INTO file (id, file_name, extension, file_size, container_path, creation_timestamp, created_by, modified_by) VALUES ('f-003', 'Lighting schedule.xlsx', 'xlsx', 90.11, 'files/2026/f-003.xlsx', '2026-10-12 12:00:00', 'mara', 'mara');
+INSERT INTO file (id, file_name, extension, file_size, content_type, category, container_path, creation_timestamp, created_by, modified_by) VALUES ('f-003', 'Lighting schedule.xlsx', 'xlsx', 1.72, NULL, 'Document', 'files/2026/f-003.xlsx', '2026-10-12 12:00:00', 'mara', 'mara');
 INSERT INTO file_attachment (id, attachment_id, entity_type_id, entity_id, created_by, modified_by) VALUES ('fa-003', 'f-003', 10, 'p-hp', 'mara', 'mara');
-INSERT INTO file (id, file_name, extension, file_size, container_path, creation_timestamp, created_by, modified_by) VALUES ('f-004', 'Signed engagement letter.pdf', 'pdf', 327.68, 'files/2026/f-004.pdf', '2021-03-04 12:00:00', 'mara', 'mara');
+INSERT INTO file (id, file_name, extension, file_size, content_type, category, container_path, creation_timestamp, created_by, modified_by) VALUES ('f-004', 'Signed engagement letter.pdf', 'pdf', 0.72, 'application/pdf', 'Document', 'files/2026/f-004.pdf', '2021-03-04 12:00:00', 'mara', 'mara');
 INSERT INTO file_attachment (id, attachment_id, entity_type_id, entity_id, created_by, modified_by) VALUES ('fa-004', 'f-004', 10, 'p-hp', 'mara', 'mara');
 
 COMMIT;

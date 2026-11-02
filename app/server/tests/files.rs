@@ -43,7 +43,7 @@ fn party(id: &str) -> Option<LinkInput> {
     Some(LinkInput { entity_type_id: 10, entity_id: id.into(), include_on_send: false })
 }
 
-/// Every regular file under the data folder's file store.
+/// Every regular file under the data folder's file store, but the small demo seed's own copies (db::DEMO_FILES).
 fn stored(dir: &Path) -> Vec<PathBuf> {
     fn walk(p: &Path, out: &mut Vec<PathBuf>) {
         if let Ok(rd) = std::fs::read_dir(p) {
@@ -59,6 +59,7 @@ fn stored(dir: &Path) -> Vec<PathBuf> {
     }
     let mut out = Vec::new();
     walk(&dir.join("files"), &mut out);
+    out.retain(|p| !db::DEMO_FILES.iter().any(|(rel, _)| *p == dir.join(rel)));
     out.sort();
     out
 }
@@ -70,6 +71,29 @@ fn count(conn: &Connection, sql: &str) -> i64 {
 // ---------------------------------------------------------------------------------------------------------------
 // OP-FILE-01 (BR-FILE-01, BR-FILE-02)
 // ---------------------------------------------------------------------------------------------------------------
+
+#[test]
+fn the_small_demo_ships_a_stored_copy_of_each_seed_file() {
+    // B3: the seed's file rows have their copies in the data folder's store, so nothing reads "File missing".
+    let (dir, conn, _) = demo();
+    let page = files::file_list(&conn, Some(dir.path()), "", 1).unwrap();
+    assert_eq!(page.rows.len(), 4);
+    for row in &page.rows {
+        assert!(row.present, "{} has a stored copy", row.file_name);
+        assert_eq!(row.category, "Document", "{} has its 617 category", row.file_name);
+        let f = files::stored_file(&conn, Some(dir.path()), &row.id).unwrap();
+        let bytes = std::fs::read(f.path.unwrap()).unwrap();
+        let kb = files::size_hundredths_kb(bytes.len() as u64) as f64 / 100.0;
+        assert_eq!(row.size_kb, Some(kb), "{}: the row's size is the copy's (617 s104)", row.file_name);
+    }
+    // Opening the database again writes nothing and leaves a changed copy as it is.
+    let first = dir.path().join(db::DEMO_FILES[0].0);
+    std::fs::write(&first, b"changed").unwrap();
+    drop(conn);
+    let (_, report) = db::open(&db::database_path(dir.path()), db::Seed::Demo).unwrap();
+    assert!(!report.demo_seed_loaded);
+    assert_eq!(std::fs::read(&first).unwrap(), b"changed");
+}
 
 #[test]
 fn twenty_480_004_bytes_are_accepted_and_20_480_005_refused() {
@@ -270,7 +294,7 @@ fn the_backup_includes_a_new_file() {
     files::file_add(&mut conn, dir.path(), &upload("p.png", png(30, 30), None), &actor).unwrap();
     let out = tempfile::tempdir().unwrap();
     let b = karbon_server::backup::create(&conn, &karbon_server::backup::files_dir(dir.path()), out.path()).unwrap();
-    assert_eq!(b.manifest.files, 2, "the file and its thumbnail");
+    assert_eq!(b.manifest.files, 2 + db::DEMO_FILES.len() as u64, "the file and its thumbnail, and the seed's");
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -326,7 +350,7 @@ fn app(dir: &Path, open: Option<OpenHook>) -> axum::Router {
 }
 
 #[tokio::test]
-async fn the_party_panel_shows_the_seed_files_as_missing() {
+async fn the_party_panel_shows_the_seed_files_and_a_missing_copy() {
     let (dir, conn, _) = demo();
     drop(conn);
     let app = app(dir.path(), None);
@@ -337,7 +361,14 @@ async fn the_party_panel_shows_the_seed_files_as_missing() {
     for name in ["Phase 2 proposal v3.pdf", "Lighting schedule.xlsx", "Signed engagement letter.pdf"] {
         assert!(html.contains(name), "{name}");
     }
-    assert_eq!(html.matches("File missing from the file store").count(), 4, "the seed rows point at no stored copy");
+    assert!(!html.contains("File missing from the file store"), "the seed ships its copies (B3)");
+    let (status, _, body) = send(&app, Request::get("/files/f-001/content").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.starts_with(b"%PDF-"));
+    // A copy removed from the store: the row says so, and serve and open answer 410.
+    std::fs::remove_file(dir.path().join("files/2026/f-001.pdf")).unwrap();
+    let (_, _, html) = send(&app, Request::get("/parties/p-hp").body(Body::empty()).unwrap()).await;
+    assert_eq!(text(&html).matches("File missing from the file store").count(), 1);
     let (status, _, body) = send(&app, Request::get("/files/f-001/content").body(Body::empty()).unwrap()).await;
     assert_eq!((status, text(&body).as_str()), (StatusCode::GONE, "File missing from the file store"));
     let (status, _, _) = send(&app, Request::post("/files/f-001/open").body(Body::empty()).unwrap()).await;

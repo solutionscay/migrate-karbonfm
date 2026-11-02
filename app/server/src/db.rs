@@ -11,7 +11,7 @@
 //! 3. Reference seed (OP-ADMIN-02) once per database, marked by `app_meta.reference_seed`.
 //! 4. Demo build only: the demo seed (`migration/04_demo_seed.sql`) once, when the database has no party and no
 //!    `app_meta.demo_data` row, in one transaction that ends with an empty `PRAGMA foreign_key_check` (03, "Demo seed
-//!    data").
+//!    data"). A database file in a data folder also gets the seed's stored files ([`DEMO_FILES`]).
 
 use crate::audit::Actor;
 use crate::reference;
@@ -33,6 +33,15 @@ const SCHEMA_04: &str = include_str!("../migrations/V1__schema_04.sql");
 /// V2: the fixes of the DDR schema audit (migration/10_ddr_schema_audit.md).
 const V2_DDR_AUDIT: &str = include_str!("../migrations/V2__ddr_audit.sql");
 const DEMO_SEED: &str = include_str!("../../../migration/04_demo_seed.sql");
+
+/// The stored copies of the demo seed's file rows (B3): small placeholder files, each at its row's container_path
+/// inside the data folder. Each row's file_size is the size of its copy (617 s104).
+pub const DEMO_FILES: &[(&str, &[u8])] = &[
+    ("files/2026/f-001.pdf", include_bytes!("../../../migration/demo_files/f-001.pdf")),
+    ("files/2026/f-002.zip", include_bytes!("../../../migration/demo_files/f-002.zip")),
+    ("files/2026/f-003.xlsx", include_bytes!("../../../migration/demo_files/f-003.xlsx")),
+    ("files/2026/f-004.pdf", include_bytes!("../../../migration/demo_files/f-004.pdf")),
+];
 
 /// What to seed into a database that has none yet.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -94,7 +103,29 @@ pub fn open(path: &Path, seed: Seed) -> Result<(Connection, OpenReport), DbError
     if let Some(dir) = path.parent() {
         std::fs::create_dir_all(dir).map_err(|e| DbError::Pragma(format!("create {}: {e}", dir.display())))?;
     }
-    prepare(Connection::open(path)?, seed, true)
+    let (conn, report) = prepare(Connection::open(path)?, seed, true)?;
+    if report.demo_seed_loaded {
+        if let Some(dir) = path.parent() {
+            write_demo_files(dir)?;
+        }
+    }
+    Ok((conn, report))
+}
+
+/// Writes the demo seed's stored copies into the data folder's file store; a file already there is left alone.
+pub fn write_demo_files(data_dir: &Path) -> Result<(), DbError> {
+    for (rel, bytes) in DEMO_FILES {
+        let to = data_dir.join(rel);
+        if to.exists() {
+            continue;
+        }
+        if let Some(parent) = to.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|e| DbError::Pragma(format!("create {}: {e}", parent.display())))?;
+        }
+        std::fs::write(&to, bytes).map_err(|e| DbError::Pragma(format!("write {}: {e}", to.display())))?;
+    }
+    Ok(())
 }
 
 /// An in-memory database, migrated and seeded the same way (tests, the dev server).
