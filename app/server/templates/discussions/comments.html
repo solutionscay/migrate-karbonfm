@@ -1,0 +1,14 @@
+{# The comments of a discussion, oldest first (OP-ACTIVITY-07 answers with this list). #}
+<div id="comments" class="px-5 py-4 space-y-4" aria-live="polite">
+  {% for c in d.comments %}
+  <div class="flex gap-3">
+    <span class="av av-sm {% if c.organization %}org{% endif %} c{{ self.color(c.party_id) }}" aria-hidden="true">{{ self.initials(c.who) }}</span>
+    <div class="min-w-0 flex-1">
+      <div class="flex items-baseline gap-2"><b class="font-medium text-[13px]">{% if c.who.is_empty() %}(unknown){% else %}{{ c.who }}{% endif %}</b><span class="text-[11.5px] muted">{{ self.when(c.date, c.time) }}</span></div>
+      <p class="text-[13px] mt-0.5 whitespace-pre-line">{{ c.text }}</p>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-[12.5px] muted">No comments yet.</p>
+  {% endfor %}
+</div>

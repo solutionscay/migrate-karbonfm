@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ d.title }} · Discussion · KarbonFM{% endblock %}
+{% block content %}
+<div class="flex items-center gap-2 mb-3 text-[12.5px]">
+  <a class="link link-hover muted" href="/activities?kind=disc">Discussions</a>
+  <svg class="i i-sm muted" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+  <span>{{ d.title }}</span>
+</div>
+<section class="panel max-w-3xl" aria-labelledby="disc-title">
+  <div class="px-5 pt-4 pb-3 border-b hairline">
+    <div class="flex items-center gap-1.5 text-[12px] muted">
+      <svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Discussion
+      {% for e in d.activity.entities %} · {% if e.href.is_empty() %}{{ e.label }}{% else %}<a class="link link-hover" href="{{ e.href }}">{{ e.label }}</a>{% endif %}{% endfor %}
+      {% if !d.active %}<span class="chip ml-1">Closed</span>{% endif %}
+    </div>
+    <div class="flex items-start gap-3 mt-1">
+      <h1 id="disc-title" class="page-title flex-1">{{ d.title }}</h1>
+      <button class="btn btn-sm btn-quiet" hx-delete="{{ self.delete_href() }}" hx-target="#modal-body" aria-label="Delete this discussion"><svg class="i i-sm" aria-hidden="true"><use href="#i-x"/></svg>Delete</button>
+    </div>
+    <div class="flex items-center gap-2 mt-2">
+      {% let subs = d.subscribers() %}
+      <div class="flex -space-x-1.5">{% for s in subs.iter() %}<span class="av av-xs ring-2 ring-base-100 c{{ self.color(s.party_id) }}" title="{{ s.name }}" aria-hidden="true">{{ self.initials(s.name) }}</span>{% endfor %}</div>
+      <span class="text-[12px] muted">{{ subs.len() }} subscriber{% if subs.len() != 1 %}s{% endif %}{% if !d.activity.creator.is_empty() %} · started by {{ d.activity.creator }}{% endif %}{% if !self.started().is_empty() %} · {{ self.started() }}{% endif %}</span>
+      <button class="btn btn-xs btn-quiet ml-auto" hx-get="{{ self.href() }}/subscribers" hx-target="#modal-body">Manage</button>
+    </div>
+  </div>
+  {{ comments|safe }}
+  <form class="px-5 pb-4" hx-post="{{ self.href() }}/comments" hx-target="#comments" hx-swap="outerHTML" hx-on::after-request="if (event.detail.successful) this.reset()">
+    <div class="rounded-box border hairline focus-within:border-primary">
+      <textarea name="comment" rows="2" class="w-full bg-transparent outline-none p-3 text-[13px] resize-none" placeholder="Reply to the discussion…" aria-label="Comment" required></textarea>
+      <div class="flex items-center gap-2 px-2 pb-2">
+        <span class="text-[11.5px] muted">Subscribers get a notification</span>
+        <button class="btn btn-sm btn-primary ml-auto">Comment</button>
+      </div>
+    </div>
+  </form>
+</section>
+{% endblock %}

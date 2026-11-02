@@ -294,3 +294,95 @@ async fn the_top_bar_new_task_and_note_open_the_dialog() {
     assert!(html.contains(r##"hx-get="/activities/new?kind=note" hx-target="#modal-body""##));
     assert!(!html.contains(r#"data-soon="New task""#));
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// S3: discussions and notifications (OP-ACTIVITY-06, 07, 09; UI-09)
+// ---------------------------------------------------------------------------------------------------------------
+
+#[tokio::test]
+async fn a_discussion_page_shows_its_comments_and_subscribers() {
+    let app = demo();
+    let (status, html) = page(&app, "/discussions/a-disc-light").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"id="disc-title" class="page-title flex-1">Lighting spec for the reception area</h1>"#));
+    assert!(html.contains("Can we see the warmer 2700K option?") && html.contains("Elena Halden"));
+    assert!(html.contains("1 subscriber"));
+    assert!(html.contains(r#"href="/parties/p-hp""#) || html.contains("Halden"), "what it is about");
+    assert!(html.contains(r#"aria-label="Comment""#));
+    assert!(!html.contains("get an email"), "the design's email promise is not in the source (670 s114)");
+    let (_, html) = page(&app, "/activities/a-disc-light").await;
+    assert!(html.is_empty() || !html.contains("<h1"), "the activity page sends a discussion to its own page");
+    let (status, _, _) = send(&app, Request::get("/activities/a-disc-light").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::SEE_OTHER);
+    let (status, _) = page(&app, "/discussions/a-task-quote").await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn a_comment_is_added_and_notifies_the_subscriber() {
+    let app = demo();
+    let (status, h, html) =
+        send(&app, form("POST", "/discussions/a-disc-light/comments", "comment=Warmer+it+is")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"id="comments""#) && html.contains("Warmer it is"));
+    assert!(h.get("HX-Trigger").unwrap().to_str().unwrap().contains("Comment added"));
+    let (status, _, text) = send(&app, form("POST", "/discussions/a-disc-light/comments", "comment=+")).await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    assert!(text.contains("Write a comment first"));
+    let (_, html) = page(&app, "/activities?kind=disc").await;
+    assert!(html.contains("3 comments"));
+}
+
+#[tokio::test]
+async fn a_discussion_is_started_on_a_party_and_its_subscribers_managed() {
+    let app = demo();
+    let (status, html) = get(&app, "/discussions/new?entity_type_id=10&entity_id=p-hp").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Title: <b") && html.contains("Halden &#38; Pryce Architects"));
+    assert!(html.contains(r#"name="subscriber" value="p-hp-eh" class="checkbox checkbox-xs" >"#), "unchecked");
+    let (status, _) = get(&app, "/discussions/new?entity_type_id=10&entity_id=nobody").await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+
+    let body = "entity_type_id=10&entity_id=p-hp&notes=Kick-off&subscriber=p-hp-eh&subscriber=p-hp-mp";
+    let (status, h, _) = send(&app, form("POST", "/discussions", body)).await;
+    assert_eq!(status, StatusCode::OK);
+    let to = redirect(&h);
+    assert!(to.starts_with("/discussions/"), "{to}");
+    let (_, html) = page(&app, &to).await;
+    assert!(html.contains("2 subscribers") && html.contains("Kick-off"));
+
+    let (status, html) = get(&app, &format!("{to}/subscribers")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"value="p-hp-eh" class="checkbox checkbox-xs" checked"#));
+    let (status, h, _) = send(&app, form("PATCH", &to, "subscriber=p-hp-jw")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(redirect(&h), to);
+    let (_, html) = page(&app, &to).await;
+    assert!(html.contains("1 subscriber") && html.contains("Closed"), "no active box: closed");
+    let (status, _, _) = send(&app, form("PATCH", &to, "subscriber=p-hp-jw&bogus=1")).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "unknown fields are refused");
+    let (status, _, _) = send(&app, form("POST", "/discussions", "entity_type_id=14&entity_id=x")).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+#[tokio::test]
+async fn the_bell_counts_unread_notifications_and_marks_one_read() {
+    let app = demo();
+    let (_, html) = page(&app, "/").await;
+    assert!(html.contains(r#"<div id="bell" hx-get="/notifications" hx-trigger="load""#));
+    let (status, html) = get(&app, "/notifications").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"aria-label="Notifications""#) && html.contains("No notifications."));
+    // A discussion with no subscribers notifies everyone on it, the commenter (the current user) too (422).
+    let (_, h, _) = send(&app, form("POST", "/discussions", "entity_type_id=10&entity_id=p-bm")).await;
+    let disc = redirect(&h);
+    send(&app, form("POST", &format!("{disc}/comments"), "comment=Hello")).await;
+    let (_, html) = get(&app, "/notifications").await;
+    assert!(html.contains("Notifications, 1 unread") && html.contains(&format!(r#"href="{disc}""#)));
+    let id = html.split(r#"{"id": ""#).nth(1).unwrap().split('"').next().unwrap().to_owned();
+    let (status, _, html) = send(&app, form("POST", "/notifications/read", &format!("id={id}"))).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(" read</span>") && !html.contains("unread"), "{html}");
+    let (status, _, _) = send(&app, form("POST", "/notifications/read", "id=nope")).await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+}

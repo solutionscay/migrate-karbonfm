@@ -705,7 +705,7 @@ async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
     for kind in ["task", "note"] {
         assert!(menu.contains(&format!(r##"hx-get="/activities/new?kind={kind}" hx-target="#modal-body""##)), "{kind}");
     }
-    assert_eq!(topbar.matches("hx-get").count(), 2, "only Task and Note open a dialog");
+    assert_eq!(topbar.matches(r#"hx-get="/activities/new"#).count(), 2, "only Task and Note open a dialog");
 }
 
 #[tokio::test]

@@ -26,14 +26,7 @@ pub fn activity_href(id: &str) -> String {
     format!("/activities/{}", urlencode(id))
 }
 
-/// The page that shows an activity of this type: a discussion has its own (UI-09), an email its own (UI-08) once
-/// S3 and S5 add them; every other type opens here.
-pub fn page_href(id: &str, type_id: i64) -> String {
-    match ActivityType::from_id(type_id) {
-        Some(ActivityType::Discussion) => format!("/discussions/{}", urlencode(id)),
-        _ => activity_href(id),
-    }
-}
+pub use crate::activities::page_href;
 
 /// Command errors that are neither field errors nor a confirmation: 404, 409 with the rule's message, else 500.
 pub fn command_error(op: &str, e: CommandError) -> Result<Response, AppError> {

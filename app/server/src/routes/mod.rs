@@ -6,6 +6,7 @@ mod contact_forms;
 pub mod current_user;
 mod customers;
 mod dashboard;
+mod discussions;
 mod parties;
 mod party_forms;
 mod relation_forms;
@@ -72,6 +73,14 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/activity-parties/{id}/edit"),
     ("DELETE", "/activity-parties/{id}"),
     ("POST", "/tasks/{id}/complete"),
+    ("GET", "/discussions/new"),
+    ("POST", "/discussions"),
+    ("GET", "/discussions/{id}"),
+    ("PATCH", "/discussions/{id}"),
+    ("GET", "/discussions/{id}/subscribers"),
+    ("POST", "/discussions/{id}/comments"),
+    ("GET", "/notifications"),
+    ("POST", "/notifications/read"),
     ("GET", "/sales"),
     ("GET", "/payments"),
     ("GET", "/sales/{doc_number}"),
@@ -130,6 +139,13 @@ pub fn router() -> Router<AppState> {
         .route("/activity-parties/{id}/edit", get(activities::party_edit_dialog))
         .route("/activity-parties/{id}", delete(activities::party_remove))
         .route("/tasks/{id}/complete", post(timeline::complete))
+        .route("/discussions/new", get(discussions::new_dialog))
+        .route("/discussions", post(discussions::create))
+        .route("/discussions/{id}", get(discussions::detail).patch(discussions::update))
+        .route("/discussions/{id}/subscribers", get(discussions::subscribers_dialog))
+        .route("/discussions/{id}/comments", post(discussions::comment))
+        .route("/notifications", get(discussions::notifications))
+        .route("/notifications/read", post(discussions::mark_read))
         .route("/sales", get(sales_lists::sales))
         .route("/payments", get(sales_lists::payments))
         .route("/sales/{doc_number}", get(sales::page))
