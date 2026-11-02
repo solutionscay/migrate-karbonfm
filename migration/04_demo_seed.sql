@@ -391,7 +391,7 @@ INSERT INTO opportunity (id, party_id, name, opportunity_status_id, probability,
 -- Activities on Halden & Pryce, each linked to the customer (Regarding, 63) and to Mara (Creator, 50). Each row caches
 -- its party's name and initials, and the activity caches are what a recompute writes (376 s222-251), so saving a seed
 -- activity changes nothing on screen.
-INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, discussion_ind, comment_count_cached, creation_timestamp, creation_user_id) VALUES ('a-disc-light', 10, 'Lighting spec for the reception area', '2026-10-27', '15:10:00', 'Mara Ellison', 'Halden & Pryce Architects, Elena Halden, Mara Ellison', 1, 2, '2026-10-28 08:00:00', 'u-mara');
+INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, discussion_ind, comment_count_cached, creation_timestamp, creation_user_id) VALUES ('a-disc-light', 10, 'Lighting spec for the reception area', '2026-10-22', '10:00:00', 'Mara Ellison', 'Halden & Pryce Architects, Elena Halden, Mara Ellison', 1, 2, '2026-10-28 08:00:00', 'u-mara');
 INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-001', 'a-disc-light', 'p-mara', 50, 'Mara Ellison', 'ME');
 INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-002', 'a-disc-light', 'p-hp', 63, 'Halden & Pryce Architects', 'H');
 INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-003', 'a-disc-light', 'p-hp-eh', 64, 'Elena Halden', 'EH');

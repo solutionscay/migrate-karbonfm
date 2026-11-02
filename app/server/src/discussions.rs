@@ -530,6 +530,22 @@ mod tests {
     }
 
     #[test]
+    fn the_demo_seed_discussion_is_dated_when_it_started() {
+        // B10: create writes the same date and time to the activity and the discussion (421; discussion_create), so
+        // the timeline and the page's "started" agree. The seed did not.
+        let (conn, _) = demo();
+        let (a, d): (String, String) = conn
+            .query_row(
+                "SELECT a.date_display || ' ' || a.time_display, d.date || ' ' || d.time
+                 FROM activity a JOIN discussion d ON d.id = a.id WHERE a.id = 'a-disc-light'",
+                [],
+                |r| Ok((r.get(0)?, r.get(1)?)),
+            )
+            .unwrap();
+        assert_eq!(a, d);
+    }
+
+    #[test]
     fn the_demo_seed_gives_mara_one_unread_notification() {
         // B4: the seed's comments notified the subscribers (422 s162-187, 670 s106-110); Mara read the first.
         let (conn, actor) = demo();
