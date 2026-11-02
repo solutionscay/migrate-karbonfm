@@ -182,6 +182,7 @@ pub fn router(state: AppState) -> Router {
     routes::router()
         .merge(assets::router())
         .merge(session::router())
+        .fallback(routes::page_not_found)
         .layer(axum::middleware::from_fn_with_state(state.clone(), routes::setup_gate))
         .layer(axum::middleware::from_fn_with_state(state.clone(), web::origin_guard))
         .layer(axum::middleware::from_fn(web::log_errors))

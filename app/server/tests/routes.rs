@@ -89,6 +89,15 @@ async fn dashboard_has_the_chart_data() {
 }
 
 #[tokio::test]
+async fn an_unknown_page_says_so_in_the_app_layout() {
+    // B13: a path no route serves answered 404 with an empty body, a blank white window.
+    let (status, html) = get("/email").await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+    assert!(html.contains("Page not found") && html.contains(r#"href="/""#), "{html}");
+    assert!(html.contains("/assets/app.css"), "the app layout, with the sidebar");
+}
+
+#[tokio::test]
 async fn invoice_lives_at_sales() {
     // S-01's /invoices/{doc} is replaced by /sales/{doc} (S-02; totals tested in tests/invoice_pdf.rs).
     let (status, _) = get("/invoices/INV-1048").await;

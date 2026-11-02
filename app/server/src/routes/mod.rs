@@ -218,6 +218,27 @@ async fn not_found() -> StatusCode {
     StatusCode::NOT_FOUND
 }
 
+#[derive(askama::Template)]
+#[template(path = "not_found.html")]
+struct NotFoundPage {
+    nav: Nav,
+    demo: bool,
+}
+
+/// The router's fallback (B13): a GET of a path no route serves gets a "Page not found" page in the app layout, still
+/// 404; any other method gets a bare 404. The guards run before it, so a request without the cookie is refused first.
+pub async fn page_not_found(State(state): State<AppState>, method: axum::http::Method) -> axum::response::Response {
+    use axum::response::IntoResponse;
+    if method != axum::http::Method::GET {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    let page = demo(&state).and_then(|demo| crate::web::render(&NotFoundPage { nav: Nav::Dashboard, demo }));
+    match page {
+        Ok(html) => (StatusCode::NOT_FOUND, html).into_response(),
+        Err(e) => e.into_response(),
+    }
+}
+
 /// Whether the sidebar shows the DEMO badge: the database holds the demo data (see [`crate::db::has_demo_data`]).
 pub fn demo(state: &AppState) -> Result<bool, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
