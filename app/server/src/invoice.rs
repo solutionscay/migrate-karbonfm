@@ -241,6 +241,14 @@ pub fn display_date(iso: &str) -> String {
     }
 }
 
+/// A D-05 stamp ("2026-11-01 19:40:30") as the pages show dates: "Nov 1, 2026 · 19:40".
+pub fn display_stamp(ts: &str) -> String {
+    match (ts.get(..10), ts.get(11..16)) {
+        (Some(d), Some(t)) => format!("{} · {t}", display_date(d)),
+        _ => display_date(ts),
+    }
+}
+
 fn line(description: String, item: String, qty: Option<Qty>, rate: Cents, taxable: bool, item_name: String) -> Line {
     let amount = sales::line_amount(qty, rate).unwrap_or(Cents::ZERO);
     Line { description, item, qty, rate, amount, taxable, retainer: item_name == RETAINER_ITEM_NAME }

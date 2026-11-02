@@ -145,6 +145,15 @@ async fn about_shows_the_regarding_party_and_the_entity_link_and_created_is_a_da
 }
 
 #[tokio::test]
+async fn a_sent_email_says_when_and_with_which_account() {
+    // B9: the seed's INV-1048 went out through the system account (use_system_settings_ind = 1).
+    let app = demo();
+    let (_, html) = get(&app, "/email-messages/a-mail-1048").await;
+    assert!(html.contains("Sent Oct 14, 2026 · 16:40 with the system account"), "{html}");
+    assert!(!html.contains("2026-10-14 16:40:00"));
+}
+
+#[tokio::test]
 async fn edit_saves_and_an_empty_activity_offers_the_discard() {
     let app = demo();
     let (status, html) = get(&app, "/activities/a-meet-walk/edit").await;

@@ -112,10 +112,7 @@ impl DetailPage<'_> {
     }
     /// A D-05 stamp as the page shows dates: "Nov 1, 2026 · 19:40" (B8).
     fn stamp(&self, ts: &str) -> String {
-        match (ts.get(..10), ts.get(11..16)) {
-            (Some(d), Some(t)) => format!("{} · {t}", display_date(d)),
-            _ => display_date(ts),
-        }
+        crate::invoice::display_stamp(ts)
     }
     fn editable(&self) -> bool {
         self.a.kind().is_some() && !self.a.sent()

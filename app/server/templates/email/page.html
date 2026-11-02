@@ -19,7 +19,9 @@
       {% if e.sent %}
       {# Read only after it is sent (AP-08; layouts 118 and 167). #}
       <div class="p-5 space-y-3">
-        <p class="text-[12.5px] muted">Sent {{ e.smtp_timestamp }}{% if !e.smtp_result.is_empty() %} · server reply <span class="mono">{{ e.smtp_result }}</span>{% endif %}{% if e.use_system_settings %} · system account{% else %} · your account{% endif %}</p>
+        {# B9: the From header was the account's address (337 s135); the From person in People keeps the address the
+           draft was written with (521 s97 reads it and nothing rewrites it), so the line names the account used. #}
+        <p class="text-[12.5px] muted">Sent {{ self.stamp(e.smtp_timestamp) }} with {% if e.use_system_settings %}the system account{% else %}your email account{% endif %}{% if !e.smtp_result.is_empty() %} · server reply <span class="mono">{{ e.smtp_result }}</span>{% endif %}</p>
         <div class="text-[13px] whitespace-pre-line">{{ a.message }}</div>
       </div>
       {% else %}

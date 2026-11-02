@@ -196,6 +196,9 @@ impl EmailPage<'_> {
     fn system(&self) -> bool {
         self.a.email.as_ref().is_some_and(|e| e.use_system_settings)
     }
+    fn stamp(&self, ts: &str) -> String {
+        crate::invoice::display_stamp(ts)
+    }
     fn error(&self, field: &str) -> Option<&str> {
         self.errors.iter().find(|e| e.field == field).map(|e| e.message.as_str())
     }
