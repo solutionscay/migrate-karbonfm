@@ -126,3 +126,100 @@ impl From<rusqlite::Error> for AppError {
         }
     }
 }
+
+/// A url-encoded form as its (name, value) pairs, for forms with a repeated field (checkbox lists): axum's `Form`
+/// keeps one value per name. The handler names the fields it accepts ([`FormPairs::only`]): anything else is refused
+/// with 422, as `deny_unknown_fields` does for the typed forms (05).
+#[derive(Debug, Default)]
+pub struct FormPairs(pub Vec<(String, String)>);
+
+impl FormPairs {
+    pub fn parse(body: &str) -> Self {
+        FormPairs(
+            body.split('&')
+                .filter(|p| !p.is_empty())
+                .map(|p| {
+                    let (k, v) = p.split_once('=').unwrap_or((p, ""));
+                    (form_decode(k), form_decode(v))
+                })
+                .collect(),
+        )
+    }
+    /// The first value of `name`, or "".
+    pub fn one(&self, name: &str) -> String {
+        self.0.iter().find(|(k, _)| k == name).map(|(_, v)| v.clone()).unwrap_or_default()
+    }
+    /// Every value of `name`, in order.
+    pub fn all(&self, name: &str) -> Vec<String> {
+        self.0.iter().filter(|(k, _)| k == name).map(|(_, v)| v.clone()).collect()
+    }
+    /// 422 when the form has a field not in `names`.
+    pub fn only(&self, names: &[&str]) -> Result<(), Box<axum::response::Response>> {
+        match self.0.iter().find(|(k, _)| !names.contains(&k.as_str())) {
+            None => Ok(()),
+            Some((k, _)) => {
+                Err(Box::new((StatusCode::UNPROCESSABLE_ENTITY, format!("unknown field `{k}`")).into_response()))
+            }
+        }
+    }
+}
+
+impl<S: Send + Sync> axum::extract::FromRequest<S> for FormPairs {
+    type Rejection = axum::response::Response;
+
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
+        let form = req
+            .headers()
+            .get(axum::http::header::CONTENT_TYPE)
+            .and_then(|v| v.to_str().ok())
+            .is_some_and(|v| v.starts_with("application/x-www-form-urlencoded"));
+        if !form {
+            return Err((StatusCode::UNSUPPORTED_MEDIA_TYPE, "expected a form").into_response());
+        }
+        let body = String::from_request(req, state).await.map_err(IntoResponse::into_response)?;
+        Ok(FormPairs::parse(&body))
+    }
+}
+
+/// Decodes one url-encoded form component: `+` is a space, `%XX` a byte; invalid UTF-8 is replaced.
+fn form_decode(s: &str) -> String {
+    let bytes = s.as_bytes();
+    let mut out = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        match bytes[i] {
+            b'+' => out.push(b' '),
+            b'%' if i + 2 < bytes.len() => {
+                match std::str::from_utf8(&bytes[i + 1..i + 3]).ok().and_then(|h| u8::from_str_radix(h, 16).ok()) {
+                    Some(b) => {
+                        out.push(b);
+                        i += 2;
+                    }
+                    None => out.push(b'%'),
+                }
+            }
+            b => out.push(b),
+        }
+        i += 1;
+    }
+    String::from_utf8_lossy(&out).into_owned()
+}
+
+#[cfg(test)]
+mod form_tests {
+    use super::FormPairs;
+
+    #[test]
+    fn repeated_fields_and_decoding() {
+        let f = FormPairs::parse("subscriber=p-1&subscriber=p%2D2&notes=Hello+world%21&empty=&active=on&x=%E2%9C%93");
+        assert_eq!(f.all("subscriber"), ["p-1", "p-2"]);
+        assert_eq!(f.one("notes"), "Hello world!");
+        assert_eq!(f.one("empty"), "");
+        assert_eq!(f.one("x"), "✓");
+        assert_eq!(f.one("missing"), "");
+        assert!(f.only(&["subscriber", "notes", "empty", "active", "x"]).is_ok());
+        assert!(f.only(&["subscriber"]).is_err());
+        assert_eq!(FormPairs::parse("a=%zz&b=%4").one("a"), "%zz");
+        assert_eq!(FormPairs::parse("b=%4").one("b"), "%4");
+    }
+}

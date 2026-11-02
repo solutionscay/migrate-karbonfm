@@ -77,6 +77,7 @@ struct G<'a> {
     leads: Vec<(String, String, String)>, // (party id, role id, name)
     items: Vec<Item>,
     txns: Vec<(String, String, NaiveDate, String)>, // (txn id, customer party id, date, doc number)
+    discussions: Vec<(String, String)>,             // (activity id, title)
     serial: BTreeMap<&'static str, u32>,
 }
 
@@ -90,6 +91,7 @@ pub fn build(x: &mut Export, cfg: Config) {
         leads: Vec::new(),
         items: Vec::new(),
         txns: Vec::new(),
+        discussions: Vec::new(),
         serial: BTreeMap::new(),
     };
     g.reference();
@@ -1673,6 +1675,7 @@ impl G<'_> {
                         ("ActiveInd", fm_bool(date > end() - Duration::days(60))),
                     ]);
                     self.push("Discussion", r, at);
+                    self.discussions.push((id.clone(), subject.clone()));
                     for k in 0..self.r.range(1, 4) {
                         let when = at + Duration::hours(k * 20 + 2);
                         let r = row(&[
@@ -1816,13 +1819,21 @@ impl G<'_> {
         let n = ((200.0 * self.scale).round() as usize).max(2);
         for _ in 0..n {
             let date = end() - Duration::days(self.r.range(0, 400));
-            let (party, _, name) = self.r.pick(&self.employees[..3]).clone();
+            let (party, _, _) = self.r.pick(&self.employees[..3]).clone();
             let at = self.at(date);
+            // A comment notification (kontroller 422 s176, 670 s100-110): about a discussion (entity type 11), with
+            // the discussion's title as its text.
+            let (entity, title) = if self.discussions.is_empty() {
+                (String::new(), String::new())
+            } else {
+                self.r.pick(&self.discussions).clone()
+            };
             let r = row(&[
                 ("Id", self.r.uuid()),
                 ("PartyId", party),
                 ("Date", fm_date(date)),
-                ("Description", format!("New comment for {name}")),
+                ("Description", title),
+                ("EntityId", entity),
                 ("ReadInd", fm_bool(date < end() - Duration::days(14))),
                 ("SentInd", "1".into()),
                 ("EntityTypeId", "11".into()),

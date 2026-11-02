@@ -13,6 +13,7 @@ pub mod backup;
 pub mod big_demo;
 pub mod contacts;
 pub mod db;
+pub mod discussions;
 pub mod ids;
 pub mod import;
 pub mod invoice;

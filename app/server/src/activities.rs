@@ -1332,6 +1332,15 @@ pub fn tasks_due(conn: &Connection, actor: &Actor, limit: i64) -> Result<ListPag
     )
 }
 
+/// The page of an activity: a discussion opens its own (UI-09), every other type the activity page (UI-07).
+pub fn page_href(id: &str, type_id: i64) -> String {
+    let id = crate::web::urlencode(id);
+    match ActivityType::from_id(type_id) {
+        Some(ActivityType::Discussion) => format!("/discussions/{id}"),
+        _ => format!("/activities/{id}"),
+    }
+}
+
 /// Whether a refusal text belongs to AlreadySent (used by the routes' 409 answers).
 pub fn already_sent_text() -> &'static str {
     ALREADY_SENT
