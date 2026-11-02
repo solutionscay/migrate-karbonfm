@@ -22,9 +22,9 @@ pub mod pdf;
 pub mod reference;
 mod routes;
 pub mod sales_list;
-pub mod templates;
 pub mod secrets;
 pub mod session;
+pub mod templates;
 mod web;
 
 use axum::Router;

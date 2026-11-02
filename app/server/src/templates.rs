@@ -335,12 +335,7 @@ pub fn template_create(conn: &mut Connection, input: &TemplateInput, actor: &Act
 /// Saves the name, subject, message and activity types (layout 112) and creates the merge field row of each new
 /// placeholder, matched on (template_id, name) (480 s95). A row whose placeholder is gone is kept; the editor marks
 /// it "not in use". The subject is trimmed (table 187 field 6 auto-enter `Trim ( Self )`).
-pub fn template_save(
-    conn: &mut Connection,
-    id: i64,
-    input: &TemplateInput,
-    actor: &Actor,
-) -> Result<(), CommandError> {
+pub fn template_save(conn: &mut Connection, id: i64, input: &TemplateInput, actor: &Actor) -> Result<(), CommandError> {
     let input = TemplateInput { subject: input.subject.trim().to_string(), ..input.clone() };
     let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let exists: bool = tx.query_row("SELECT EXISTS (SELECT 1 FROM template WHERE id = ?1)", [id], |r| r.get(0))?;
@@ -531,10 +526,10 @@ mod tests {
 
     #[test]
     fn tokens_are_parsed_in_order_without_repeats() {
-        assert_eq!(parse_tokens("Hi {{FirstName}}, {{ Invoice Number }} {{FirstName}}").unwrap(), [
-            "FirstName",
-            "InvoiceNumber"
-        ]);
+        assert_eq!(
+            parse_tokens("Hi {{FirstName}}, {{ Invoice Number }} {{FirstName}}").unwrap(),
+            ["FirstName", "InvoiceNumber"]
+        );
         assert_eq!(parse_tokens("no tokens").unwrap(), Vec::<String>::new());
         assert_eq!(parse_tokens("").unwrap(), Vec::<String>::new());
     }
