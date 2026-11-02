@@ -1700,27 +1700,33 @@ impl G<'_> {
         }
     }
 
+    /// Six templates with merge placeholders in the source's form, `<<Name>>` (kontroller 478 s3, MergeFieldConfig
+    /// field 31), named from the app's fixed list (BR-TEMPLATE-01). The import stores them as `{{Name}}` (OD-07-03).
     fn templates(&mut self) {
         let list = [
             (
                 "Invoice email",
-                "Invoice [Invoice Number] from Ellison Studio",
-                "Hi [First Name],\n\nPlease find invoice [Invoice Number] attached.\n\nThank you,\n[Sender Name]",
+                "Invoice <<InvoiceNumber>> from Ellison Studio",
+                "Hi <<FirstName>>,\n\nPlease find invoice <<InvoiceNumber>> attached.\n\nThank you,\n<<SenderName>>",
                 1,
             ),
             (
                 "Payment reminder",
-                "Reminder: invoice [Invoice Number]",
-                "Hi [First Name],\n\nA friendly reminder that invoice [Invoice Number] is due on [Due Date].",
+                "Reminder: invoice <<InvoiceNumber>>",
+                "Hi <<FirstName>>,\n\nA friendly reminder that invoice <<InvoiceNumber>> is due on <<DueDate>>.",
                 1,
             ),
             ("Thank you", "Thank you", "Thank you for choosing Ellison Studio.", 1),
-            ("Site visit follow-up", "Site visit [Date]", "Notes from our site visit on [Date].", 2),
-            ("Proposal cover", "Proposal: [Project]", "Please find our proposal for [Project] attached.", 1),
-            ("Email signature", "", "[Sender Name]\nEllison Studio\n(207) 555-0100", 1),
+            ("Site visit follow-up", "Site visit <<Date>>", "Notes from our site visit on <<Date>>.", 2),
+            (
+                "Proposal cover",
+                "Proposal for <<OrganizationName>>",
+                "Please find our proposal for <<OrganizationName>> attached.",
+                1,
+            ),
+            ("Email signature", "", "<<SenderName>>\nEllison Studio\n(207) 555-0100", 1),
         ];
         let t0 = NaiveDate::from_ymd_opt(2022, 1, 10).unwrap().and_hms_opt(9, 0, 0).unwrap();
-        let mut merge = 0;
         for (i, (name, subject, message, kind)) in list.iter().enumerate() {
             let id = (i + 1) as u32;
             let r = row(&[
@@ -1732,21 +1738,27 @@ impl G<'_> {
                 ("UserId", "u-mara".into()),
             ]);
             self.push("Template", r, t0 + Duration::days(i as i64 * 30));
-            for field in ["[First Name]", "[Invoice Number]", "[Due Date]", "[Sender Name]", "[Date]", "[Project]"] {
+            for field in [
+                "<<FirstName>>",
+                "<<InvoiceNumber>>",
+                "<<DueDate>>",
+                "<<SenderName>>",
+                "<<Date>>",
+                "<<OrganizationName>>",
+            ] {
                 if message.contains(field) || subject.contains(field) {
-                    merge += 1;
                     let n = self.next_serial("MergeField", 1);
+                    // MergeField::Name keeps the delimiters, as MergeFieldConfig field 31 does.
                     let r = row(&[
                         ("Id", n.to_string()),
                         ("TemplateId", id.to_string()),
-                        ("Name", field.trim_matches(['[', ']']).to_string()),
-                        ("RequiredInd", fm_bool(field == "[Invoice Number]")),
+                        ("Name", field.to_string()),
+                        ("RequiredInd", fm_bool(field == "<<InvoiceNumber>>")),
                     ]);
                     self.push("MergeField", r, t0);
                 }
             }
         }
-        let _ = merge;
     }
 
     fn files(&mut self) {

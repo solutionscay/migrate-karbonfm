@@ -651,3 +651,52 @@ async fn the_app_serves_an_imported_database() {
     let found = &seen["/customers?q=Halden"];
     assert!(found.contains("Halden &amp; Pryce") || found.contains("Halden &#38; Pryce"), "search finds the anchor");
 }
+
+#[test]
+fn source_merge_placeholders_are_stored_as_braces() {
+    // OD-07-03: the source writes <<Name>> (kontroller 478, MergeFieldConfig field 31); the big demo's older
+    // templates wrote [First Name]. Both are stored as {{Name}}, so imported templates merge; each change is listed.
+    let dir = tempfile::tempdir().unwrap();
+    let export = dir.path().join("export");
+    std::fs::create_dir_all(&export).unwrap();
+    std::fs::write(export.join("Party.csv"), "\"Id\",\"NameCached\",\"OrganizationInd\"\r\n\"p1\",\"Acme\",\"1\"\r\n")
+        .unwrap();
+    std::fs::write(
+        export.join("Template.csv"),
+        "\"Id\",\"Name\",\"Subject\",\"Message\"\r\n\
+         \"1\",\"Reminder\",\"Invoice <<InvoiceNumber>>\",\"Hi [First Name], [Project] is due <<DueDate>>.\"\r\n\
+         \"2\",\"Plain\",\"Thanks\",\"Thank you.\"\r\n",
+    )
+    .unwrap();
+    std::fs::write(
+        export.join("MergeField.csv"),
+        "\"Id\",\"TemplateId\",\"Name\"\r\n\"1\",\"1\",\"<<InvoiceNumber>>\"\r\n\"2\",\"1\",\"<<Due Date>>\"\r\n",
+    )
+    .unwrap();
+    let r = import_export(&export, &dir.path().join("data"), &fixed()).unwrap();
+    let conn = Connection::open(db::database_path(&dir.path().join("data"))).unwrap();
+    let (subject, message): (String, String) = conn
+        .query_row("SELECT subject, message FROM template WHERE id = 1", [], |x| Ok((x.get(0)?, x.get(1)?)))
+        .unwrap();
+    assert_eq!(subject, "Invoice {{InvoiceNumber}}");
+    assert_eq!(message, "Hi {{FirstName}}, [Project] is due {{DueDate}}.", "a bracket that is no field stays text");
+    let names: Vec<String> = conn
+        .prepare("SELECT name FROM merge_field ORDER BY id")
+        .unwrap()
+        .query_map([], |x| x.get(0))
+        .unwrap()
+        .collect::<Result<_, _>>()
+        .unwrap();
+    assert_eq!(names, ["{{InvoiceNumber}}", "{{DueDate}}"]);
+    let listed: Vec<(&str, &str)> = r
+        .changed
+        .iter()
+        .filter(|c| c.reason.contains("OD-07-03"))
+        .map(|c| (c.source_table.as_str(), c.source_field.as_str()))
+        .collect();
+    assert_eq!(
+        listed,
+        [("Template", "Subject"), ("Template", "Message"), ("MergeField", "Name"), ("MergeField", "Name")]
+    );
+    assert_eq!(count(&conn, "SELECT COUNT(*) FROM template WHERE id = 2 AND message = 'Thank you.'"), 1);
+}

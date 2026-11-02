@@ -329,7 +329,13 @@ enum Conv {
     Time,
     Timestamp,
     Container,
+    /// template.subject, template.message and merge_field.name: the source's `<<Name>>` placeholders (and the
+    /// `[First Name]` form) are stored as `{{Name}}` (OD-07-03; `templates::from_source_tokens`).
+    TemplateText,
 }
+
+/// The columns whose text holds merge placeholders (OD-07-03).
+const TEMPLATE_TEXT: &[(&str, &str)] = &[("template", "subject"), ("template", "message"), ("merge_field", "name")];
 
 struct Col {
     idx: usize,
@@ -625,6 +631,7 @@ impl Loader<'_> {
                         {
                             Conv::Key
                         }
+                        ("Text", _) if TEMPLATE_TEXT.contains(&(t, column)) => Conv::TemplateText,
                         ("Text", _) => Conv::Text,
                         ("Number", "INTEGER") => Conv::Money,
                         ("Number", _) => Conv::Number,
@@ -782,12 +789,20 @@ impl Loader<'_> {
         key: &str,
     ) -> Result<(Value, Option<(Option<String>, &'static str)>), String> {
         let v = raw.trim();
-        if v.is_empty() && c.conv != Conv::Text {
+        if v.is_empty() && !matches!(c.conv, Conv::Text | Conv::TemplateText) {
             return Ok((Value::Null, None));
         }
         let bad = |what: &str| format!("{what} in {}: '{raw}'", c.field);
         Ok(match c.conv {
             Conv::Text => (if raw.is_empty() { Value::Null } else { Value::Text(raw.to_string()) }, None),
+            Conv::TemplateText => match crate::templates::from_source_tokens(raw) {
+                std::borrow::Cow::Borrowed(_) => {
+                    (if raw.is_empty() { Value::Null } else { Value::Text(raw.to_string()) }, None)
+                }
+                std::borrow::Cow::Owned(text) => {
+                    (Value::Text(text.clone()), Some((Some(text), "merge placeholders written as {{Name}} (OD-07-03)")))
+                }
+            },
             Conv::Key => {
                 let change = (v != raw).then(|| (Some(v.to_string()), "spaces around a key removed (BR-IMPORT-01)"));
                 (Value::Text(v.to_string()), change)
