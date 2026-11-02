@@ -72,6 +72,46 @@ reference_enum! {
     }
 }
 
+impl ActivityPartyRole {
+    /// The activity types this role may take part in (BR-ACTIVITY-03): activity_party_role.ActivityTypeIds of
+    /// kontroller 710 step 34, in the source's order. Commands check eligibility against this list, not the table.
+    pub const fn activity_types(self) -> &'static [i64] {
+        match self {
+            Self::Creator => &[5, 4, 2, 3, 1, 6, 8, 9, 10],
+            Self::CompletedBy => &[5, 1, 4, 2, 3, 6, 8],
+            Self::AssignedBy | Self::AssignedTo => &[3, 5],
+            Self::From | Self::To | Self::Cc | Self::Bcc => &[1, 7],
+            Self::NotificationFrom | Self::NotificationTo => &[5, 1, 4, 2, 3, 8],
+            Self::Invited | Self::Organizer => &[4, 6],
+            Self::Unused => &[],
+            Self::Regarding => &[2, 3, 8],
+            Self::Subscriber => &[10],
+            Self::SpokenWith => &[8],
+        }
+    }
+
+    /// Whether the role may take part in an activity of type `type_id` (BR-ACTIVITY-03; kontroller 376 s133-141).
+    pub fn eligible_for(self, type_id: i64) -> bool {
+        self.activity_types().contains(&type_id)
+    }
+
+    /// CreateActivityPartyEmailInd (710 s34): the party row gets an activity_party_email row (376 s190-199).
+    pub const fn creates_email_row(self) -> bool {
+        matches!(self, Self::From | Self::To | Self::Cc | Self::Bcc)
+    }
+
+    /// CreateActivityPartyEventInd (710 s34): the party row gets an activity_party_event row (376 s206-215).
+    pub const fn creates_event_row(self) -> bool {
+        matches!(self, Self::Invited | Self::Organizer)
+    }
+
+    /// ActivityTypeIds as the source stores the list: one id per line (710 s34 separates them with returns, which the
+    /// import reads as newlines, `import::csv`).
+    pub fn activity_type_ids_text(self) -> String {
+        self.activity_types().iter().map(i64::to_string).collect::<Vec<_>>().join("\n")
+    }
+}
+
 reference_enum! {
     /// opportunity_status (kontroller 607). `is_active` is the active_ind column.
     OpportunityStatus {
@@ -183,6 +223,20 @@ pub fn reference_seed(conn: &mut Connection, actor: &Actor) -> rusqlite::Result<
             inserted += 1;
         }
     }
+    // The role columns of 710 s34: which activity types a role fits and which subtype rows it makes.
+    for role in ActivityPartyRole::ALL {
+        tx.execute(
+            "UPDATE activity_party_role SET activity_type_ids = ?2, create_activity_party_email_ind = ?3,
+                    create_activity_party_event_ind = ?4
+             WHERE id = ?1 AND activity_type_ids IS NULL",
+            params![
+                role.id(),
+                role.activity_type_ids_text(),
+                i64::from(role.creates_email_row()),
+                i64::from(role.creates_event_row())
+            ],
+        )?;
+    }
     tx.execute("INSERT INTO app_meta (key, value) VALUES (?1, ?2)", params![SEEDED_KEY, stamp.at])?;
     tx.commit()?;
     Ok(inserted)
@@ -210,5 +264,31 @@ mod tests {
         keys.dedup();
         assert_eq!(keys.len(), n);
         assert_eq!(n, 44, "03 lists 44 reference rows");
+    }
+
+    #[test]
+    fn role_eligibility_is_the_source_list() {
+        use ActivityPartyRole as R;
+        assert!(R::Creator.eligible_for(10) && !R::Creator.eligible_for(7));
+        assert!(R::Subscriber.eligible_for(10) && !R::Subscriber.eligible_for(2));
+        assert!(R::Regarding.eligible_for(2) && R::Regarding.eligible_for(3) && !R::Regarding.eligible_for(1));
+        assert!(R::Invited.eligible_for(6) && R::Invited.creates_event_row());
+        assert!(R::Bcc.creates_email_row() && !R::Creator.creates_email_row());
+        assert!(R::Unused.activity_types().is_empty());
+        assert_eq!(R::Creator.activity_type_ids_text(), "5\n4\n2\n3\n1\n6\n8\n9\n10");
+    }
+
+    #[test]
+    fn the_seed_writes_the_role_columns() {
+        let (conn, _) = crate::db::open_in_memory(crate::db::Seed::Reference).unwrap();
+        let (types, email, event): (String, i64, i64) = conn
+            .query_row(
+                "SELECT activity_type_ids, create_activity_party_email_ind, create_activity_party_event_ind
+                 FROM activity_party_role WHERE id = 55",
+                [],
+                |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            )
+            .unwrap();
+        assert_eq!((types.as_str(), email, event), ("1\n7", 1, 0));
     }
 }

@@ -374,11 +374,26 @@ impl G<'_> {
             let id = 50 + i;
             let email = matches!(id, 54..=57);
             let event = matches!(id, 60 | 62);
+            // ActivityTypeIds of kontroller 710 s34: the activity types each role fits (BR-ACTIVITY-03).
+            let types: &[u8] = match id {
+                50 => &[5, 4, 2, 3, 1, 6, 8, 9, 10],
+                51 => &[5, 1, 4, 2, 3, 6, 8],
+                52 | 53 => &[3, 5],
+                54..=57 => &[1, 7],
+                58 | 59 => &[5, 1, 4, 2, 3, 8],
+                60 | 62 => &[4, 6],
+                63 => &[2, 3, 8],
+                64 => &[10],
+                65 => &[8],
+                _ => &[],
+            };
+            let types = fm_text(&types.iter().map(u8::to_string).collect::<Vec<_>>().join("\n"));
             self.push(
                 "ActivityPartyRole",
                 row(&[
                     ("Id", id.to_string()),
                     ("Name", n.to_string()),
+                    ("ActivityTypeIds", types),
                     ("CreateActivityPartyEmailInd", if email { "1".into() } else { String::new() }),
                     ("CreateActivityPartyEventInd", if event { "1".into() } else { String::new() }),
                 ]),
