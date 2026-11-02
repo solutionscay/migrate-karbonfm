@@ -891,6 +891,24 @@ impl Activity {
     pub fn sent(&self) -> bool {
         self.email.as_ref().is_some_and(|e| e.sent)
     }
+    /// What the activity is about (B8): its activity_entity links (an event or meeting started on a record, 392
+    /// s130-133), then its Regarding (63) parties (a note, task or call, 390 s121, 641 s129) not linked already.
+    pub fn about(&self) -> Vec<EntityLink> {
+        let mut about = self.entities.clone();
+        for p in
+            self.parties.iter().filter(|p| p.role_id == ActivityPartyRole::Regarding.id() && !p.party_id.is_empty())
+        {
+            if !about.iter().any(|e| e.type_id == EntityType::Party.id() && e.id == p.party_id) {
+                about.push(EntityLink {
+                    type_id: EntityType::Party.id(),
+                    id: p.party_id.clone(),
+                    label: p.name.clone(),
+                    href: format!("/parties/{}", crate::web::urlencode(&p.party_id)),
+                });
+            }
+        }
+        about
+    }
 }
 
 fn s(v: Option<String>) -> String {
@@ -1237,7 +1255,8 @@ pub struct ListPage {
 /// OP-ACTIVITY-08 `activity_list` (497). A party matches through its activity_party rows (in the given role, or any
 /// role when none is given, s78-79), and, with no role given, through an activity_entity link to it, so a
 /// discussion or meeting started on the party shows there too (I4 plan Q3: 497 finds by ActivityParty only and the
-/// source has no list of activities linked by entity). Distinct activities, newest first, 100 a page (05).
+/// source has no list of activities linked by entity). Distinct activities, newest first, 100 a page (05). A row with
+/// no party names the parties it is linked to by activity_entity (a meeting started on a party, 392 s130-133; B8).
 pub fn activity_list(conn: &Connection, q: &ListQuery) -> Result<ListPage, CommandError> {
     let mut wh: Vec<String> = Vec::new();
     let mut args: Vec<rusqlite::types::Value> = Vec::new();
@@ -1293,7 +1312,10 @@ pub fn activity_list(conn: &Connection, q: &ListQuery) -> Result<ListPage, Comma
     let order = if q.oldest_first { "ASC" } else { "DESC" };
     let sql = format!(
         "SELECT a.id, CAST(a.activity_type_id AS INTEGER), COALESCE(ty.description, ''), a.subject, a.message,
-                a.date_display, a.time_display, a.creator_cached, a.parties_cached,
+                a.date_display, a.time_display, a.creator_cached,
+                COALESCE(NULLIF(a.parties_cached, ''),
+                         (SELECT group_concat(p.name_cached, ', ') FROM activity_entity ae JOIN party p ON p.id = ae.entity_id
+                          WHERE ae.activity_id = a.id AND CAST(ae.entity_type_id AS INTEGER) = 10)),
                 CAST(COALESCE(a.comment_count_cached, 0) AS INTEGER), t.due_date, t.completed_at, t.completed_by_cached,
                 t.id IS NOT NULL, CASE WHEN e.id IS NULL THEN NULL ELSE COALESCE(e.sent_ind, 0) = 1 END
          FROM activity a

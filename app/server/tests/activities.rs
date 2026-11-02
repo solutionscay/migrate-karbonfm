@@ -109,6 +109,42 @@ async fn a_task_assigned_to_me_has_me_as_assignee() {
 }
 
 #[tokio::test]
+async fn about_shows_the_regarding_party_and_the_entity_link_and_created_is_a_date() {
+    // B8: a task, note or call is about its Regarding (63) party (390 s121, 641 s129); an event or meeting started on
+    // a party is about its activity_entity link (392 s130-133). The page shows either under About, and the timeline
+    // row of a meeting with no party shows the party it is linked to.
+    let app = demo();
+    let (_, h, _) = send(
+        &app,
+        form("POST", "/activities", "kind=task&subject=Send+glaze+quote&due_date=2026-11-06&regarding_id=p-hp"),
+    )
+    .await;
+    let (_, html) = get(&app, &redirect(&h)).await;
+    let about = html.split(r#"<dt class="muted">About</dt>"#).nth(1).unwrap().split("</dd>").next().unwrap();
+    assert!(about.contains(r#"href="/parties/p-hp""#) && about.contains("Halden &#38; Pryce Architects"), "{about}");
+    let created = html.split(r#"<dt class="muted">Created</dt>"#).nth(1).unwrap().split("</dd>").next().unwrap();
+    assert!(!created.contains(':') || created.contains(" · "), "{created}");
+    assert!(!created.contains('-'), "no raw D-05 stamp: {created}");
+
+    let (_, h, _) = send(
+        &app,
+        form(
+            "POST",
+            "/activities",
+            "kind=meeting&subject=Glaze+review&start_date=2026-11-04&start_time=10%3A00&entity_type_id=10&entity_id=p-bm",
+        ),
+    )
+    .await;
+    let meeting = redirect(&h);
+    let (_, html) = get(&app, &meeting).await;
+    let about = html.split(r#"<dt class="muted">About</dt>"#).nth(1).unwrap().split("</dd>").next().unwrap();
+    assert!(about.contains("Bluefin Marine Supply"), "{about}");
+    let (_, html) = page(&app, "/activities?kind=meet").await;
+    let row = html.split("Glaze review").nth(1).unwrap().split("</a>").next().unwrap();
+    assert!(row.contains("Bluefin Marine Supply"), "the meeting row names its party: {row}");
+}
+
+#[tokio::test]
 async fn edit_saves_and_an_empty_activity_offers_the_discard() {
     let app = demo();
     let (status, html) = get(&app, "/activities/a-meet-walk/edit").await;

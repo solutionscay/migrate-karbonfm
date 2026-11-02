@@ -62,8 +62,9 @@
           {% if e.sent %}<dt class="muted">Sent</dt><dd>{{ e.smtp_timestamp }}{% if !e.smtp_result.is_empty() %} · <span class="mono">{{ e.smtp_result }}</span>{% endif %}</dd>{% endif %}
         {% endif %}
         <dt class="muted">About</dt>
-        <dd>{% if a.entities.is_empty() %}<span class="muted">—</span>{% else %}{% for e in a.entities %}{% if e.href.is_empty() %}{{ e.label }}{% else %}<a class="link link-hover" href="{{ e.href }}">{{ e.label }}</a>{% endif %}{% if !loop.last %}, {% endif %}{% endfor %}{% endif %}</dd>
-        <dt class="muted">Created</dt><dd>{% if a.created.is_empty() %}<span class="muted">—</span>{% else %}{{ a.created }}{% endif %}</dd>
+        {% let about = a.about() %}
+        <dd>{% if about.is_empty() %}<span class="muted">—</span>{% else %}{% for e in about %}{% if e.href.is_empty() %}{{ e.label }}{% else %}<a class="link link-hover" href="{{ e.href }}">{{ e.label }}</a>{% endif %}{% if !loop.last %}, {% endif %}{% endfor %}{% endif %}</dd>
+        <dt class="muted">Created</dt><dd>{% if a.created.is_empty() %}<span class="muted">—</span>{% else %}{{ self.stamp(a.created) }}{% endif %}</dd>
       </dl>
     </section>
   </div>
