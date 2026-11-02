@@ -450,4 +450,5 @@ async fn the_party_activity_tab_offers_a_new_email() {
     let app = demo();
     let (_, html) = page(&app, "/parties/p-hp").await;
     assert!(html.contains(r#"hx-get="/email-messages/new?party_id=p-hp""#));
+    assert!(html.contains(r#"<a class="nav-link" href="/activities?kind=email">"#), "the sidebar's Email link is live");
 }
