@@ -350,6 +350,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: implementation-ready (static)
 - Use case and users: Shows what the FileMaker chat screen looked like, as a static mock with sample data (owner decision, 2026-10-28). It sends and receives nothing: Twilio SMS/chat is out of scope (OD-05-02). A banner reads "Sample data. SMS is not available in this version."
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt`; target design: `design/messages.html`
+- Built (I4 S7, 2026-11-01, branch `i4/chat`): `GET /chat` renders design/messages.html from constants in `routes/chat.rs`: the banner, seven sample conversations (the first one open), the Elena Halden thread and the contact panel. Every button, the search box and the message box are disabled; there is no form and no htmx call; `POST /chat` is 405. The sidebar gets "Messages" under Activity (no unread count: there is no data). The handler reads the database only for the sidebar's DEMO badge, as every page does; no chat data is read. Links of the design that lead to other screens (open customer, the invoice and discussion cards) are plain text in the mock.
 - Page: `GET /chat` (one askama template with hard-coded sample conversations; no route reads or writes the database)
 - Fragments and actions: none. The message box and send button are disabled.
 - Rules shown or enforced: none

@@ -2,6 +2,7 @@
 
 mod activities;
 mod backup;
+mod chat;
 mod contact_forms;
 pub mod current_user;
 mod customers;
@@ -35,6 +36,7 @@ use axum::Router;
 pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/"),
     ("GET", "/customers"),
+    ("GET", "/chat"),
     ("GET", "/parties"),
     ("GET", "/parties/new"),
     ("POST", "/parties/wizard"),
@@ -115,6 +117,7 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(dashboard::page))
         .route("/customers", get(customers::list))
+        .route("/chat", get(chat::page))
         .route("/parties", get(parties::list))
         .route("/parties/new", get(wizard::page))
         .route("/parties/wizard", post(wizard::submit))
@@ -199,6 +202,7 @@ pub fn demo(state: &AppState) -> Result<bool, AppError> {
 pub enum Nav {
     Dashboard,
     Activity,
+    Messages,
     Customers,
     Parties,
     Invoices,
