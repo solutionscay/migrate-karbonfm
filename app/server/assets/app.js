@@ -53,6 +53,12 @@ if (window.htmx) {
   // Before this, a failed save looked as if nothing had happened. It never says "saved".
   document.addEventListener("htmx:responseError", (e) => {
     const status = e.detail.xhr ? e.detail.xhr.status : 0;
+    // A refusal by a rule (409, e.g. "This email has already been sent") carries its message as plain text.
+    const text = e.detail.xhr ? (e.detail.xhr.responseText || "").trim() : "";
+    if (status === 409 && text && text.length < 300 && !text.startsWith("<")) {
+      window.karbonToast(text, { error: true });
+      return;
+    }
     window.karbonToast(
       status >= 500
         ? "Something went wrong, so this may not have been saved. The log has the details."

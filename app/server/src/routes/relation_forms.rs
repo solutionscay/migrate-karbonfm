@@ -258,7 +258,7 @@ pub struct ContactPicker {
     pub matched: i64,
 }
 
-fn contact_picker(conn: &rusqlite::Connection, q: &str, exclude: &str, selected: &str) -> Result<String, AppError> {
+pub fn contact_picker(conn: &rusqlite::Connection, q: &str, exclude: &str, selected: &str) -> Result<String, AppError> {
     let found =
         parties::party_search(conn, &Search { query: q.into(), kind: Kind::All, page_size: 8, ..Default::default() })
             .map_err(|e| page_error("party_search", e))?;

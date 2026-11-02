@@ -75,6 +75,10 @@ fn sample(path: &str) -> String {
         "cm-001"
     } else if path.starts_with("/relations/") {
         "rel-mara"
+    } else if path.starts_with("/activities/") {
+        "a-task-quote"
+    } else if path.starts_with("/activity-parties/") {
+        "ap-004"
     } else {
         "p-hp"
     };

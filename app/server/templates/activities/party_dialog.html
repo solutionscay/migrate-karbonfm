@@ -1,0 +1,29 @@
+{# Add a person or organization to an activity, or change one row (OP-ACTIVITY-04). The roles offered are the ones
+   that fit the activity type (BR-ACTIVITY-03). #}
+<form hx-put="{{ self.action() }}" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">{% if row.is_some() %}Change person{% else %}Add person{% endif %}</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3">
+    {% if let Some(r) = row %}<input type="hidden" name="activity_party_id" value="{{ r }}">{% endif %}
+    <input type="hidden" name="contact_method_id" value="{{ contact_method_id }}">
+    {% if let Some(e) = self.error("contact_method_id") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    <label class="block">
+      <span class="text-[12px] muted">Role</span>
+      <select name="role" class="select select-sm w-full mt-1 {% if self.error("role").is_some() %}select-error{% endif %}" {% if self.error("role").is_some() %}aria-invalid="true" aria-describedby="err-role"{% endif %}>
+        {% for (id, name) in roles %}<option value="{{ id }}" {% if *id == role %}selected{% endif %}>{{ name }}</option>{% endfor %}
+      </select>
+      {% if let Some(e) = self.error("role") %}<span class="text-[12px] text-error" id="err-role">{{ e }}</span>{% endif %}
+    </label>
+    <fieldset>
+      <legend class="text-[12px] muted mb-1">Person or organization</legend>
+      {{ picker|safe }}
+      {% if let Some(e) = self.error("other_id") %}<span class="text-[12px] text-error" role="alert">{{ e }}</span>{% endif %}
+    </fieldset>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">{% if row.is_some() %}Save{% else %}Add{% endif %}</button>
+  </div>
+</form>

@@ -1,5 +1,6 @@
 //! Route handlers (05). Each handler queries or calls a command, then renders a template.
 
+mod activities;
 mod backup;
 mod contact_forms;
 pub mod current_user;
@@ -21,7 +22,7 @@ use crate::web::AppError;
 use crate::AppState;
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::routing::{get, patch, post, put};
+use axum::routing::{delete, get, patch, post, put};
 use axum::Router;
 
 /// Every route the server registers, as (method, path) (AP-01). The page has no other way to reach SQLite: no generic
@@ -58,6 +59,16 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/relations/{id}/edit"),
     ("PATCH", "/relations/{id}"),
     ("DELETE", "/relations/{id}"),
+    ("GET", "/activities/new"),
+    ("POST", "/activities"),
+    ("GET", "/activities/{id}"),
+    ("PATCH", "/activities/{id}"),
+    ("DELETE", "/activities/{id}"),
+    ("GET", "/activities/{id}/edit"),
+    ("GET", "/activities/{id}/parties/new"),
+    ("PUT", "/activities/{id}/parties"),
+    ("GET", "/activity-parties/{id}/edit"),
+    ("DELETE", "/activity-parties/{id}"),
     ("GET", "/sales"),
     ("GET", "/payments"),
     ("GET", "/sales/{doc_number}"),
@@ -107,6 +118,14 @@ pub fn router() -> Router<AppState> {
         .route("/parties/{id}/relations", post(relation_forms::create))
         .route("/relations/{id}/edit", get(relation_forms::edit_dialog))
         .route("/relations/{id}", patch(relation_forms::update).delete(relation_forms::delete))
+        .route("/activities/new", get(activities::new_dialog))
+        .route("/activities", post(activities::create))
+        .route("/activities/{id}", get(activities::detail).patch(activities::update).delete(activities::delete))
+        .route("/activities/{id}/edit", get(activities::edit_dialog))
+        .route("/activities/{id}/parties/new", get(activities::party_new))
+        .route("/activities/{id}/parties", put(activities::party_set))
+        .route("/activity-parties/{id}/edit", get(activities::party_edit_dialog))
+        .route("/activity-parties/{id}", delete(activities::party_remove))
         .route("/sales", get(sales_lists::sales))
         .route("/payments", get(sales_lists::payments))
         .route("/sales/{doc_number}", get(sales::page))
@@ -146,6 +165,7 @@ pub fn demo(state: &AppState) -> Result<bool, AppError> {
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Nav {
     Dashboard,
+    Activity,
     Customers,
     Parties,
     Invoices,

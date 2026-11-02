@@ -1,0 +1,76 @@
+{# Create or edit a note, task, event, meeting or call (OP-ACTIVITY-01/02), the body of the shared <dialog>. Field
+   errors come back with 422 and this body again; a save opens the activity. #}
+{% macro field(name, label, value, kind) %}
+<label class="block">
+  <span class="text-[12px] muted">{{ label }}</span>
+  <input name="{{ name }}" value="{{ value }}" type="{{ kind }}" class="input input-sm w-full mt-1 {% if self.error(name).is_some() %}input-error{% endif %}" autocomplete="off"
+         {% if let Some(e) = self.error(name) %}aria-invalid="true" aria-describedby="err-{{ name }}"{% endif %}>
+  {% if let Some(e) = self.error(name) %}<span class="text-[12px] text-error" id="err-{{ name }}">{{ e }}</span>{% endif %}
+</label>
+{% endmacro %}
+<form {% if edit.is_some() %}hx-patch{% else %}hx-post{% endif %}="{{ self.action() }}" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">{{ self.title() }}</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3 max-h-[70vh] overflow-y-auto">
+    {% if !errors.is_empty() %}<div role="alert" class="sr-only">Check the highlighted fields.</div>{% endif %}
+    {% if let Some(e) = self.error("creator") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    {% if let Some(e) = self.error("entity_id") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    {% if let Some(e) = self.error("other_id") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    <input type="hidden" name="kind" value="{{ form.kind }}">
+    {% if edit.is_none() %}
+    <input type="hidden" name="regarding_id" value="{{ form.regarding_id }}">
+    <input type="hidden" name="entity_type_id" value="{{ form.entity_type_id }}">
+    <input type="hidden" name="entity_id" value="{{ form.entity_id }}">
+    {% if !regarding_name.is_empty() %}<p class="text-[12.5px] muted">About <b class="text-base-content font-medium">{{ regarding_name }}</b></p>{% endif %}
+    {% endif %}
+    {% call field("subject", "Subject", form.subject, "text") %}
+    {% if self.is("task") %}
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("due_date", "Due date", form.due_date, "date") %}
+      {% call field("due_time", "Due time (optional)", form.due_time, "time") %}
+    </div>
+    {% if edit.is_none() %}
+    <label class="block">
+      <span class="text-[12px] muted">Assigned to</span>
+      <select name="assigned_to" class="select select-sm w-full mt-1">
+        <option value="me" {% if form.assigned_to == "me" %}selected{% endif %}>Me{% if !me.is_empty() %} ({{ me }}){% endif %}</option>
+        <option value="" {% if form.assigned_to.is_empty() %}selected{% endif %}>Nobody yet</option>
+      </select>
+    </label>
+    {% endif %}
+    {% endif %}
+    {% if self.timed_event() %}
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("start_date", "Start date", form.start_date, "date") %}
+      {% call field("start_time", "Start time (optional)", form.start_time, "time") %}
+      {% call field("end_date", "End date (optional)", form.end_date, "date") %}
+      {% call field("end_time", "End time (optional)", form.end_time, "time") %}
+    </div>
+    {% call field("location", "Location (optional)", form.location, "text") %}
+    <label class="flex items-center gap-1.5 text-[12.5px]"><input type="checkbox" name="all_day" class="checkbox checkbox-xs" {% if !form.all_day.is_empty() %}checked{% endif %}>All day</label>
+    {% endif %}
+    {% if self.dated() %}
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("date", "Date", form.date, "date") %}
+      {% call field("time", "Time", form.time, "time") %}
+    </div>
+    {% endif %}
+    {% if self.is("call") %}
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("caller_name", "Caller (optional)", form.caller_name, "text") %}
+      {% call field("callback_number", "Callback number (optional)", form.callback_number, "tel") %}
+    </div>
+    {% call field("result", "Result (optional)", form.result, "text") %}
+    {% endif %}
+    <label class="block">
+      <span class="text-[12px] muted">{% if self.is("note") %}Note{% else %}Notes (optional){% endif %}</span>
+      <textarea name="message" rows="4" class="textarea textarea-sm w-full mt-1">{{ form.message }}</textarea>
+    </label>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">{% if edit.is_some() %}Save{% else %}Create{% endif %}</button>
+  </div>
+</form>
