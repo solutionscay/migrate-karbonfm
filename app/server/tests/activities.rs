@@ -178,9 +178,11 @@ async fn people_are_added_changed_and_removed() {
 #[tokio::test]
 async fn t_08_08_a_sent_email_is_read_only() {
     let app = demo();
-    let (_, before) = get(&app, "/activities/a-mail-1048").await;
+    let (status, _, _) = send(&app, Request::get("/activities/a-mail-1048").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::SEE_OTHER, "an email opens its own page (UI-08)");
+    let (_, before) = get(&app, "/email-messages/a-mail-1048").await;
     assert!(before.contains("Sent</span>"));
-    assert!(!before.contains("/activities/a-mail-1048/edit"), "no Edit button on a sent email");
+    assert!(!before.contains(r#"name="subject""#), "no edit form on a sent email");
     assert!(!before.contains("Add person"), "no people actions on a sent email");
 
     let (status, _, text) = send(&app, form("PATCH", "/activities/a-mail-1048", "kind=email&subject=Changed")).await;
@@ -194,7 +196,12 @@ async fn t_08_08_a_sent_email_is_read_only() {
     let (status, _) = get(&app, "/activities/a-mail-1048/parties/new").await;
     assert_eq!(status, StatusCode::CONFLICT);
 
-    let (_, after) = get(&app, "/activities/a-mail-1048").await;
+    let (status, _, _) =
+        send(&app, form("PATCH", "/email-messages/a-mail-1048", "subject=x&message=y&account=user")).await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    let (status, _, _) = send(&app, form("POST", "/email-messages/a-mail-1048/template", "template_id=1")).await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    let (_, after) = get(&app, "/email-messages/a-mail-1048").await;
     assert_eq!(before, after, "nothing changed");
 }
 
@@ -385,4 +392,62 @@ async fn the_bell_counts_unread_notifications_and_marks_one_read() {
     assert!(html.contains(" read</span>") && !html.contains("unread"), "{html}");
     let (status, _, _) = send(&app, form("POST", "/notifications/read", "id=nope")).await;
     assert_eq!(status, StatusCode::NOT_FOUND);
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// S5: email compose (UI-08); the send itself is in tests/smtp_contract.rs
+// ---------------------------------------------------------------------------------------------------------------
+
+#[tokio::test]
+async fn an_email_is_composed_from_a_party_and_its_recipients_managed() {
+    let app = demo();
+    let (status, html) = get(&app, "/email-messages/new?party_id=p-hp-eh").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("New email</h2>") && html.contains("To Elena Halden") && html.contains(r#"name="email_id""#));
+    let (status, h, _) = send(
+        &app,
+        form(
+            "POST",
+            "/email-messages",
+            "party_id=p-hp-eh&email_id=cm-037&entity_type_id=&entity_id=&subject=Hello&message=Hi",
+        ),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    let to = redirect(&h);
+    assert!(to.starts_with("/email-messages/"), "{to}");
+    assert!(h.get("HX-Trigger").unwrap().to_str().unwrap().contains("not sent"));
+    let (_, html) = page(&app, &to).await;
+    assert!(html.contains("Not sent</span>") && html.contains(r#"name="subject" value="Hello""#));
+    assert!(
+        html.contains(">From<") || html.contains("From ·") || html.contains("From</span>") || html.contains("From"),
+        "the From default"
+    );
+    assert!(html.contains("Elena Halden") && html.contains("To"));
+    assert!(html.contains(r#"hx-post="/email-messages/"#) && html.contains("/send"));
+    let id = to.trim_start_matches("/email-messages/");
+    let (status, html) = get(&app, &format!("/activities/{id}/parties/new")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        html.contains(r#"<option value="55""#)
+            && html.contains(r#"<option value="57""#)
+            && html.contains("Email address")
+    );
+    assert!(!html.contains(r#"<option value="63""#), "Regarding does not fit an email (710 s34)");
+    let (status, _, html) = send(&app, form("PATCH", &to, "subject=Hello+again&message=Hi&account=system")).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    let (_, html) = page(&app, &to).await;
+    assert!(html.contains(r#"value="system" class="radio radio-xs" checked"#));
+    let (status, html) = get(&app, "/pickers/email?other_id=p-hp-mp").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"name="email_id""#));
+    let (status, html) = get(&app, "/pickers/email?other_id=").await;
+    assert_eq!((status, html.as_str()), (StatusCode::OK, ""), "nobody chosen yet");
+}
+
+#[tokio::test]
+async fn the_party_activity_tab_offers_a_new_email() {
+    let app = demo();
+    let (_, html) = page(&app, "/parties/p-hp").await;
+    assert!(html.contains(r#"hx-get="/email-messages/new?party_id=p-hp""#));
 }

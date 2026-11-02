@@ -73,6 +73,35 @@
     </div>
   </section>
 
+  <section class="panel" aria-labelledby="s-user-email">
+    <div class="panel-head"><h2 id="s-user-email" class="panel-title">Your email account</h2></div>
+    <div class="p-5 grid grid-cols-2 gap-3">
+      <p class="col-span-2 muted text-[12.5px]">Emails you send go out through this account unless the email says "system account". Leave the server, port, encryption or authentication empty to use the system account's.</p>
+      {% call field("user_full_name", "Your name", form.user_full_name, "Mara Ellison") %}
+      {% call field("user_email_address", "Your email address", form.user_email_address, "you@example.com") %}
+      {% call field("user_smtp_server", "SMTP server (optional)", form.user_smtp_server, "as the system account") %}
+      {% call field("user_smtp_port", "Port (optional)", form.user_smtp_port, "as the system account") %}
+      <label class="block">
+        <span class="text-[12px] muted">Encryption</span>
+        <select name="user_smtp_encryption" class="select select-sm w-full mt-1">
+          <option value="" {% if form.user_smtp_encryption.is_empty() %}selected{% endif %}>As the system account</option>
+          {% for o in ENCRYPTION %}<option {% if *o == form.user_smtp_encryption %}selected{% endif %}>{{ o }}</option>{% endfor %}
+        </select>
+        {% if let Some(e) = error("user_smtp_encryption") %}<span class="text-error text-[12px]">{{ e }}</span>{% endif %}
+      </label>
+      <label class="block">
+        <span class="text-[12px] muted">Authentication</span>
+        <select name="user_smtp_authentication" class="select select-sm w-full mt-1">
+          <option value="" {% if form.user_smtp_authentication.is_empty() %}selected{% endif %}>As the system account</option>
+          {% for o in AUTHENTICATION %}<option {% if *o == form.user_smtp_authentication %}selected{% endif %}>{{ o }}</option>{% endfor %}
+        </select>
+        {% if let Some(e) = error("user_smtp_authentication") %}<span class="text-error text-[12px]">{{ e }}</span>{% endif %}
+      </label>
+      {% call field("user_user_name", "SMTP user name", form.user_user_name, "you@example.com") %}
+      <div>{{ user_smtp_password|safe }}</div>
+    </div>
+  </section>
+
   <section class="panel" aria-labelledby="s-integrations">
     <div class="panel-head"><h2 id="s-integrations" class="panel-title">Integrations</h2></div>
     <div class="p-5 space-y-3">

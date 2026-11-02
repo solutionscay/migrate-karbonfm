@@ -8,6 +8,7 @@ pub mod current_user;
 mod customers;
 mod dashboard;
 mod discussions;
+mod email;
 mod files;
 mod parties;
 mod party_forms;
@@ -77,6 +78,12 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/activity-parties/{id}/edit"),
     ("DELETE", "/activity-parties/{id}"),
     ("POST", "/tasks/{id}/complete"),
+    ("GET", "/email-messages/new"),
+    ("POST", "/email-messages"),
+    ("GET", "/email-messages/{id}"),
+    ("PATCH", "/email-messages/{id}"),
+    ("POST", "/email-messages/{id}/template"),
+    ("POST", "/email-messages/{id}/send"),
     ("GET", "/discussions/new"),
     ("POST", "/discussions"),
     ("GET", "/discussions/{id}"),
@@ -158,6 +165,11 @@ pub fn router() -> Router<AppState> {
         .route("/activity-parties/{id}/edit", get(activities::party_edit_dialog))
         .route("/activity-parties/{id}", delete(activities::party_remove))
         .route("/tasks/{id}/complete", post(timeline::complete))
+        .route("/email-messages/new", get(email::new_dialog))
+        .route("/email-messages", post(email::create))
+        .route("/email-messages/{id}", get(email::page).patch(email::update))
+        .route("/email-messages/{id}/template", post(email::apply_template))
+        .route("/email-messages/{id}/send", post(email::send))
         .route("/discussions/new", get(discussions::new_dialog))
         .route("/discussions", post(discussions::create))
         .route("/discussions/{id}", get(discussions::detail).patch(discussions::update))

@@ -1,0 +1,36 @@
+{# Compose an email (OP-ACTIVITY-01, 389): saved unsent; the message page sends it. #}
+<form hx-post="/email-messages" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">New email</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3 max-h-[70vh] overflow-y-auto">
+    {% if !errors.is_empty() %}<div role="alert" class="sr-only">Check the highlighted fields.</div>{% endif %}
+    {% if let Some(e) = self.error("creator") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    <input type="hidden" name="party_id" value="{{ party_id }}">
+    <input type="hidden" name="entity_type_id" value="{{ entity_type_id }}">
+    <input type="hidden" name="entity_id" value="{{ entity_id }}">
+    {% if !party_name.is_empty() %}
+    <fieldset>
+      <legend class="text-[12px] muted mb-1">To {{ party_name }}</legend>
+      {{ picker|safe }}
+    </fieldset>
+    {% else %}
+    <p class="text-[12.5px] muted">Add the recipients on the next page.</p>
+    {% endif %}
+    <label class="block">
+      <span class="text-[12px] muted">Subject</span>
+      <input name="subject" value="{{ subject }}" class="input input-sm w-full mt-1 {% if self.error("subject").is_some() %}input-error{% endif %}" autocomplete="off"
+             {% if self.error("subject").is_some() %}aria-invalid="true" aria-describedby="err-subject"{% endif %}>
+      {% if let Some(e) = self.error("subject") %}<span class="text-[12px] text-error" id="err-subject">{{ e }}</span>{% endif %}
+    </label>
+    <label class="block">
+      <span class="text-[12px] muted">Message</span>
+      <textarea name="message" rows="6" class="textarea textarea-sm w-full mt-1">{{ message }}</textarea>
+    </label>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">Save draft</button>
+  </div>
+</form>

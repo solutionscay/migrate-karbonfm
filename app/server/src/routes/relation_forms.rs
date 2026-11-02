@@ -299,6 +299,9 @@ pub struct PickerQuery {
     exclude: String,
     selected: String,
     party_id: String,
+    /// The contact picker's radio name: the add-person dialog of an email (UI-08) sends its form, so the email
+    /// picker also takes the chosen party as `other_id`.
+    other_id: String,
 }
 
 /// `GET /pickers/{kind}`: `contact` (`?q=&exclude=&selected=`), `email` or `phone` (`?party_id=`).
@@ -311,7 +314,12 @@ pub async fn picker(
     match kind.as_str() {
         "contact" => Ok(Html(contact_picker(&conn, &q.q, &q.exclude, &q.selected)?).into_response()),
         "email" | "phone" => {
-            let d = parties::party_get(&conn, &q.party_id).map_err(|e| page_error("party_get", e))?;
+            let party = if q.party_id.is_empty() { &q.other_id } else { &q.party_id };
+            if party.is_empty() {
+                // Nobody chosen yet (the add-person dialog asks again on change).
+                return Ok(Html(String::new()).into_response());
+            }
+            let d = parties::party_get(&conn, party).map_err(|e| page_error("party_get", e))?;
             let want = if kind == "email" { MethodKind::Email } else { MethodKind::Phone };
             let rows = contacts::methods_of(&conn, &d.id)?
                 .into_iter()

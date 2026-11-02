@@ -21,6 +21,13 @@
       {{ picker|safe }}
       {% if let Some(e) = self.error("other_id") %}<span class="text-[12px] text-error" role="alert">{{ e }}</span>{% endif %}
     </fieldset>
+    {% if email %}
+    {# An email recipient's address: the chosen party's email addresses (UI-06 email picker). #}
+    <fieldset>
+      <legend class="text-[12px] muted mb-1">Email address</legend>
+      <div hx-get="/pickers/email" hx-include="closest form" hx-trigger="change[target.name==='other_id'] from:closest form" hx-swap="innerHTML">{{ email_picker|safe }}</div>
+    </fieldset>
+    {% endif %}
   </div>
   <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
     <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>

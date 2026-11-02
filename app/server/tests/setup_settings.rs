@@ -632,3 +632,46 @@ async fn t_08_03_settings_page_never_shows_a_saved_secret() {
         }
     }
 }
+
+/// I4 (BR-INTEG-01, AP-03): the user's own email account saves on the user row; its password goes to the keychain
+/// and never back to the page; empty server, port, encryption and authentication mean "as the system account".
+#[tokio::test]
+async fn the_user_email_account_round_trip() {
+    let app = start(Seed::Demo).await;
+    const USER_PW: &str = "user-Sm7p-0042";
+    let body = settings_body(&[
+        ("user_email_address", "mara@ellisonstudio.example"),
+        ("user_full_name", "Mara Ellison"),
+        ("user_user_name", "mara"),
+        ("user_smtp_server", ""),
+        ("user_smtp_port", ""),
+        ("user_smtp_encryption", ""),
+        ("user_smtp_authentication", "Password"),
+        ("user_smtp_password", USER_PW),
+    ]);
+    let (status, _, html) = app.put("/settings", &body).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(!html.contains(USER_PW));
+    let (address, name, user, server, auth): (String, String, String, Option<String>, String) = app
+        .db()
+        .query_row(
+            "SELECT smtp_email_address, smtp_full_name, smtp_user_name, smtp_server, smtp_server_authentication
+             FROM user WHERE id = 'u-mara'",
+            [],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
+        )
+        .unwrap();
+    assert_eq!(
+        (address.as_str(), name.as_str(), user.as_str(), server, auth.as_str()),
+        ("mara@ellisonstudio.example", "Mara Ellison", "mara", None, "Password")
+    );
+    let (_, _, html) = app.get("/settings").await;
+    assert!(html.contains("Your email account") && html.contains(r#"name="user_smtp_password" value="""#));
+    assert!(!html.contains(USER_PW));
+    assert_eq!(app.count(&format!("SELECT COUNT(*) FROM user WHERE CAST(smtp_server AS TEXT) LIKE '%{USER_PW}%'")), 0);
+
+    let (status, _, html) =
+        app.put("/settings", &settings_body(&[("user_smtp_port", "99999"), ("user_email_address", "nope")])).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Enter a port from 1 to 65535, or leave it empty."));
+}

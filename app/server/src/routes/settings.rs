@@ -23,8 +23,9 @@ use serde::Deserialize;
 
 /// The secrets the page manages: the system email account password (BR-ADMIN-05) and the optional integration keys
 /// (EXT-02, EXT-03; integrations stay off until I6, AP-12).
-const SECRETS: [(SecretKey, &str); 4] = [
+const SECRETS: [(SecretKey, &str); 5] = [
     (SecretKey::SystemSmtpPassword, "SMTP password"),
+    (SecretKey::UserSmtpPassword, "Your SMTP password"),
     (SecretKey::GooglePlacesApiKey, "Google Places API key"),
     (SecretKey::SmartyStreetsApiKey, "SmartyStreets API key"),
     (SecretKey::FullContactApiKey, "FullContact API key"),
@@ -56,14 +57,31 @@ pub struct SettingsForm {
     pub smtp_encryption: String,
     pub smtp_authentication: String,
     pub system_smtp_password: String,
+    /// The user's own email account (BR-INTEG-01; user.smtp_*). Empty server, port, encryption or authentication
+    /// mean "as the system account" (337 s85-88).
+    pub user_email_address: String,
+    pub user_full_name: String,
+    pub user_user_name: String,
+    pub user_smtp_server: String,
+    pub user_smtp_port: String,
+    pub user_smtp_encryption: String,
+    pub user_smtp_authentication: String,
+    pub user_smtp_password: String,
     pub google_places: String,
     pub smartystreets: String,
     pub fullcontact: String,
 }
 
 impl SettingsForm {
-    fn from_settings(s: &SystemSettings) -> Self {
+    fn from_settings(s: &SystemSettings, u: &admin::UserEmail) -> Self {
         Self {
+            user_email_address: u.address.clone().unwrap_or_default(),
+            user_full_name: u.full_name.clone().unwrap_or_default(),
+            user_user_name: u.user_name.clone().unwrap_or_default(),
+            user_smtp_server: u.server.clone().unwrap_or_default(),
+            user_smtp_port: u.port.map(|p| p.to_string()).unwrap_or_default(),
+            user_smtp_encryption: u.encryption.clone().unwrap_or_default(),
+            user_smtp_authentication: u.authentication.clone().unwrap_or_default(),
             owner_id: s.owner_id.clone().unwrap_or_default(),
             tax_rate: admin::format_percent(s.tax_rate_bp),
             default_tax_code: s.default_tax_code.clone().unwrap_or_default(),
@@ -79,6 +97,51 @@ impl SettingsForm {
             smtp_authentication: s.smtp_authentication.clone().unwrap_or_else(|| "Password".into()),
             ..Default::default()
         }
+    }
+
+    /// The user's email account to save, or the field errors.
+    fn parse_user(&self) -> Result<admin::UserEmail, Vec<FieldError>> {
+        let mut errors = Vec::new();
+        let address = admin::parse_email(&self.user_email_address);
+        if let Err(message) = &address {
+            errors.push(FieldError { field: "user_email_address", message: message.clone() });
+        }
+        let port = match self.user_smtp_port.trim() {
+            "" => None,
+            p => match p.parse::<u16>().ok().filter(|p| *p > 0) {
+                Some(p) => Some(i64::from(p)),
+                None => {
+                    errors.push(FieldError {
+                        field: "user_smtp_port",
+                        message: "Enter a port from 1 to 65535, or leave it empty.".into(),
+                    });
+                    None
+                }
+            },
+        };
+        if !self.user_smtp_encryption.is_empty() && !ENCRYPTION.contains(&self.user_smtp_encryption.as_str()) {
+            errors.push(FieldError { field: "user_smtp_encryption", message: "Choose an encryption type.".into() });
+        }
+        if !self.user_smtp_authentication.is_empty()
+            && !AUTHENTICATION.contains(&self.user_smtp_authentication.as_str())
+        {
+            errors.push(FieldError {
+                field: "user_smtp_authentication",
+                message: "Choose an authentication method.".into(),
+            });
+        }
+        if !errors.is_empty() {
+            return Err(errors);
+        }
+        Ok(admin::UserEmail {
+            address: address.unwrap_or_default(),
+            full_name: admin::optional(&self.user_full_name),
+            user_name: admin::optional(&self.user_user_name),
+            server: admin::optional(&self.user_smtp_server),
+            port,
+            encryption: admin::optional(&self.user_smtp_encryption),
+            authentication: admin::optional(&self.user_smtp_authentication),
+        })
     }
 
     /// The settings to save, or the field errors.
@@ -148,15 +211,19 @@ impl SettingsForm {
             SecretKey::GooglePlacesApiKey => &self.google_places,
             SecretKey::SmartyStreetsApiKey => &self.smartystreets,
             SecretKey::FullContactApiKey => &self.fullcontact,
-            SecretKey::UserSmtpPassword => "",
+            SecretKey::UserSmtpPassword => &self.user_smtp_password,
         }
     }
 
     /// The form to render again: the secret values are dropped, so they never go back to the page.
     fn without_secrets(mut self) -> Self {
-        for s in
-            [&mut self.system_smtp_password, &mut self.google_places, &mut self.smartystreets, &mut self.fullcontact]
-        {
+        for s in [
+            &mut self.system_smtp_password,
+            &mut self.user_smtp_password,
+            &mut self.google_places,
+            &mut self.smartystreets,
+            &mut self.fullcontact,
+        ] {
             s.clear();
         }
         self
@@ -168,8 +235,10 @@ impl SettingsForm {
 pub struct FormView {
     pub form: SettingsForm,
     pub owners: Vec<(String, String)>,
-    /// The rendered `SecretField`s (name and has_secret only): SMTP password first, then the API keys.
+    /// The rendered `SecretField`s (name and has_secret only): SMTP password first, then the user's, then the API
+    /// keys.
     pub smtp_password: String,
+    pub user_smtp_password: String,
     pub api_keys: Vec<String>,
     pub errors: Vec<FieldError>,
     pub saved: bool,
@@ -233,6 +302,7 @@ async fn view(
     let store = panel.render()?;
     let mut fields = fields.into_iter().map(|f| f.render());
     let smtp_password = fields.next().transpose()?.unwrap_or_default();
+    let user_smtp_password = fields.next().transpose()?.unwrap_or_default();
     let api_keys = fields.collect::<Result<Vec<_>, _>>()?;
     Ok(FormView {
         store,
@@ -240,6 +310,7 @@ async fn view(
         form: form.without_secrets(),
         owners,
         smtp_password,
+        user_smtp_password,
         api_keys,
         errors,
         saved,
@@ -268,14 +339,14 @@ fn respond(
 pub async fn page(
     State(state): State<AppState>,
     headers: HeaderMap,
-    _user: CurrentUser,
+    CurrentUser(actor): CurrentUser,
     Query(restored): Query<super::backup::RestoredQuery>,
 ) -> Result<Response, AppError> {
-    let settings = {
+    let (settings, user) = {
         let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
-        admin::settings_get(&conn)?
+        (admin::settings_get(&conn)?, admin::user_email_get(&conn, &actor)?)
     };
-    let view = view(&state, SettingsForm::from_settings(&settings), Vec::new(), false).await?;
+    let view = view(&state, SettingsForm::from_settings(&settings, &user), Vec::new(), false).await?;
     respond(&state, &headers, view, StatusCode::OK, restored.notice())
 }
 
@@ -286,7 +357,15 @@ pub async fn update(
     CurrentUser(actor): CurrentUser,
     Form(form): Form<SettingsForm>,
 ) -> Result<Response, AppError> {
-    let settings = match form.parse() {
+    let parsed = match (form.parse(), form.parse_user()) {
+        (Ok(s), Ok(u)) => Ok((s, u)),
+        (Err(mut a), Err(b)) => {
+            a.extend(b);
+            Err(a)
+        }
+        (Err(a), _) | (_, Err(a)) => Err(a),
+    };
+    let (settings, user) = match parsed {
         Ok(s) => s,
         Err(errors) => {
             let view = view(&state, form, errors, false).await?;
@@ -326,10 +405,11 @@ pub async fn update(
     let result = {
         let mut conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
         admin::settings_update(&mut conn, &settings, &actor)
+            .and_then(|()| admin::user_email_update(&mut conn, &user, &actor))
     };
     match result {
         Ok(()) => {
-            let saved = SettingsForm::from_settings(&settings);
+            let saved = SettingsForm::from_settings(&settings, &user);
             let view = view(&state, saved, Vec::new(), true).await?;
             let mut res = respond(&state, &headers, view, StatusCode::OK, None)?;
             res.headers_mut().insert("HX-Trigger", r#"{"karbon-toast":"Settings saved"}"#.parse().unwrap());

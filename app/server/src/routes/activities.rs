@@ -122,11 +122,9 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
         Ok(a) => a,
         Err(e) => return command_error("activity_get", e),
     };
-    if a.discussion {
-        let to = page_href(&a.id, a.type_id);
-        if to != activity_href(&a.id) {
-            return Ok(axum::response::Redirect::to(&to).into_response());
-        }
+    let to = page_href(&a.id, a.type_id);
+    if to != activity_href(&a.id) {
+        return Ok(axum::response::Redirect::to(&to).into_response());
     }
     let parties = PartiesPanel { a: &a, oob: false }.render()?;
     Ok(render(&DetailPage { nav: Nav::Activity, demo: crate::db::has_demo_data(&conn)?, a: &a, parties })?
@@ -476,6 +474,9 @@ pub struct PartyDialog {
     pub picker: String,
     pub contact_method_id: String,
     pub errors: Vec<FieldError>,
+    /// An email message: the dialog also asks for the recipient's email address (UI-08).
+    pub email: bool,
+    pub email_picker: String,
 }
 
 impl PartyDialog {
@@ -532,6 +533,8 @@ pub async fn party_new(State(state): State<AppState>, Path(id): Path<String>) ->
             picker,
             contact_method_id: String::new(),
             errors: vec![],
+            email: target.type_id == ActivityType::Email.id(),
+            email_picker: String::new(),
         },
         StatusCode::OK,
     )
@@ -559,9 +562,29 @@ pub async fn party_edit_dialog(State(state): State<AppState>, Path(row): Path<St
             picker,
             contact_method_id: p.contact_method_id.clone(),
             errors: vec![],
+            email: a.type_id == ActivityType::Email.id(),
+            email_picker: if a.type_id == ActivityType::Email.id() {
+                method_picker(&conn, &p.party_id)?
+            } else {
+                String::new()
+            },
         },
         StatusCode::OK,
     )
+}
+
+/// The email picker of a party (UI-06), empty when no party is chosen.
+fn method_picker(conn: &rusqlite::Connection, party_id: &str) -> Result<String, AppError> {
+    if party_id.is_empty() {
+        return Ok(String::new());
+    }
+    let Ok(d) = crate::parties::party_get(conn, party_id) else { return Ok(String::new()) };
+    let rows = crate::contacts::methods_of(conn, &d.id)?
+        .into_iter()
+        .filter(|m| m.kind == crate::contacts::MethodKind::Email)
+        .map(|m| (m.id.clone(), m.display(), m.label.clone(), m.primary))
+        .collect();
+    Ok(super::relation_forms::MethodPicker { kind: "email", name: d.name, rows }.render()?)
 }
 
 fn parties_response(conn: &rusqlite::Connection, activity_id: &str, text: &str) -> Result<Response, AppError> {
@@ -584,7 +607,7 @@ pub async fn party_set(
         None => Err(CommandError::Validation(vec![FieldError { field: "role", message: "Choose a role.".into() }])),
         Some(role) => {
             let cm = if form.email_id.is_empty() { form.contact_method_id.clone() } else { form.email_id.clone() };
-            let p = PartyInput { role, party_id: form.other_id.clone(), contact_method_id: cm };
+            let p = PartyInput { contact_method_id: cm, ..PartyInput::new(role, &form.other_id) };
             if form.activity_party_id.is_empty() {
                 activities::activity_party_add(&mut conn, &id, &p, &actor).map(|_| ())
             } else {
@@ -609,6 +632,12 @@ pub async fn party_set(
                 picker,
                 contact_method_id: form.contact_method_id,
                 errors,
+                email: target.type_id == ActivityType::Email.id(),
+                email_picker: if target.type_id == ActivityType::Email.id() {
+                    method_picker(&conn, &form.other_id)?
+                } else {
+                    String::new()
+                },
             };
             dialog(view, StatusCode::UNPROCESSABLE_ENTITY)
         }
