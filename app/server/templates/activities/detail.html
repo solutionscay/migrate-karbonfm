@@ -25,7 +25,12 @@
           </div>
         </div>
         <div class="flex gap-2 shrink-0">
-          {% if a.open_task() %}<span id="task-actions"></span>{% endif %}
+          {% if a.task.is_some() %}
+          <form hx-post="/tasks/{{ a.id|urlencode }}/complete">
+            {% if a.open_task() %}<input type="hidden" name="complete" value="true"><button class="btn btn-sm btn-primary"><svg class="i i-sm" aria-hidden="true"><use href="#i-check"/></svg>Complete</button>
+            {% else %}<input type="hidden" name="complete" value="false"><button class="btn btn-sm btn-quiet">Reopen</button>{% endif %}
+          </form>
+          {% endif %}
           {% if self.editable() %}
           <button class="btn btn-sm btn-quiet" hx-get="{{ self.href() }}/edit" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button>
           {% endif %}

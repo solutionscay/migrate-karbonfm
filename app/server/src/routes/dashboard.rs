@@ -21,6 +21,20 @@ struct Dashboard {
     open_opportunities: i64,
     /// JSON for the chart: {"labels": [...], "revenue": [...dollars]}; read by app.js from a data attribute.
     chart_json: String,
+    /// Home "Tasks due" (UI-02, layout 101): (task id, subject, who it is about, due text, overdue).
+    tasks: Vec<TaskRow>,
+    tasks_open: i64,
+    /// "Recent activity": the latest activities (OP-ACTIVITY-08).
+    recent: String,
+}
+
+struct TaskRow {
+    id: String,
+    href: String,
+    subject: String,
+    who: String,
+    due: String,
+    late: bool,
 }
 
 pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppError> {
@@ -60,7 +74,48 @@ pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppErro
     let revenue: Vec<f64> = months.iter().map(|(_, cents)| *cents as f64 / 100.0).collect();
     let this_month = months.last().map(|(_, c)| *c).unwrap_or(0);
 
+    let actor = crate::admin::current_user(&conn)?;
+    let today = crate::audit::local_now()[..10].to_owned();
+    let (tasks, tasks_open) = match &actor {
+        Some(a) => {
+            let due = crate::activities::tasks_due(&conn, a, 8).map_err(|e| AppError::Internal(e.to_string()))?;
+            let rows = due
+                .rows
+                .iter()
+                .map(|r| TaskRow {
+                    id: r.id.clone(),
+                    href: super::activities::activity_href(&r.id),
+                    subject: if r.subject.is_empty() { "Task".into() } else { r.subject.clone() },
+                    who: r.parties.clone(),
+                    due: match r.due_date.as_str() {
+                        "" => String::new(),
+                        d if d == today => "Today".into(),
+                        d => crate::invoice::display_date(d),
+                    },
+                    late: !r.due_date.is_empty() && r.due_date <= today,
+                })
+                .collect();
+            (rows, due.matched)
+        }
+        None => (Vec::new(), 0),
+    };
+    let recent_page =
+        crate::activities::activity_list(&conn, &crate::activities::ListQuery { page_size: 6, ..Default::default() })
+            .map_err(|e| AppError::Internal(e.to_string()))?;
+    let recent = super::timeline::Rows {
+        rows: super::timeline::rows(&recent_page, false),
+        matched: recent_page.rows.len() as i64,
+        page: 1,
+        page_size: 6,
+        base: "/activities?kind=all".into(),
+        empty: "No activities yet.",
+    }
+    .render()?;
+
     render(&Dashboard {
+        tasks,
+        tasks_open,
+        recent,
         nav: Nav::Dashboard,
         demo: crate::db::has_demo_data(&conn)?,
         owner_first_name,

@@ -14,6 +14,7 @@ mod sales_lists;
 mod secrets_store;
 mod settings;
 mod setup;
+mod timeline;
 mod wizard;
 
 pub use setup::setup_gate;
@@ -59,6 +60,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/relations/{id}/edit"),
     ("PATCH", "/relations/{id}"),
     ("DELETE", "/relations/{id}"),
+    ("GET", "/activities"),
     ("GET", "/activities/new"),
     ("POST", "/activities"),
     ("GET", "/activities/{id}"),
@@ -69,6 +71,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("PUT", "/activities/{id}/parties"),
     ("GET", "/activity-parties/{id}/edit"),
     ("DELETE", "/activity-parties/{id}"),
+    ("POST", "/tasks/{id}/complete"),
     ("GET", "/sales"),
     ("GET", "/payments"),
     ("GET", "/sales/{doc_number}"),
@@ -119,13 +122,14 @@ pub fn router() -> Router<AppState> {
         .route("/relations/{id}/edit", get(relation_forms::edit_dialog))
         .route("/relations/{id}", patch(relation_forms::update).delete(relation_forms::delete))
         .route("/activities/new", get(activities::new_dialog))
-        .route("/activities", post(activities::create))
+        .route("/activities", get(timeline::page).post(activities::create))
         .route("/activities/{id}", get(activities::detail).patch(activities::update).delete(activities::delete))
         .route("/activities/{id}/edit", get(activities::edit_dialog))
         .route("/activities/{id}/parties/new", get(activities::party_new))
         .route("/activities/{id}/parties", put(activities::party_set))
         .route("/activity-parties/{id}/edit", get(activities::party_edit_dialog))
         .route("/activity-parties/{id}", delete(activities::party_remove))
+        .route("/tasks/{id}/complete", post(timeline::complete))
         .route("/sales", get(sales_lists::sales))
         .route("/payments", get(sales_lists::payments))
         .route("/sales/{doc_number}", get(sales::page))

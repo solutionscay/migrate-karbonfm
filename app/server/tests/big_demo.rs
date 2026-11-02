@@ -96,12 +96,26 @@ async fn new_data_folder_gets_the_big_demo_and_opens_without_setup() {
         "/sales/INV-1048",
         "/sales/INV-12000",
         "/settings",
+        "/activities",
+        "/activities?kind=task&status=overdue",
+        "/activities?page=3",
     ] {
         let (status, html) = get(&state, uri).await;
         assert_eq!(status, StatusCode::OK, "{uri}");
         assert!(html.contains(BADGE), "{uri} shows DEMO");
     }
     assert_eq!(get(&state, "/setup").await.0, StatusCode::SEE_OTHER, "setup is done");
+
+    // 06 "Data-density": a page of a long list renders fast. Some 3,000 activities here; the debug build gets a
+    // generous margin over the 200 ms of 06 (a release build is several times faster).
+    for uri in ["/activities?page=2", "/activities?kind=task&status=incomplete"] {
+        let start = std::time::Instant::now();
+        let (status, html) = get(&state, uri).await;
+        let took = start.elapsed();
+        assert_eq!(status, StatusCode::OK);
+        assert!(html.contains("tl-item"), "{uri} lists activities");
+        assert!(took.as_millis() < 600, "{uri} took {took:?}");
+    }
 }
 
 #[test]

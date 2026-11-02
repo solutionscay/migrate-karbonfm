@@ -333,6 +333,9 @@ struct DetailPage<'a> {
     sales: Vec<SalesView>,
     sales_matched: i64,
     archived_on: String,
+    /// The Activity tab (OP-ACTIVITY-08): the party's activities, newest first.
+    activity: String,
+    activity_count: i64,
 }
 
 /// `GET /parties/{id}` (UI-04). An archived party opens too, marked archived and without edit actions (D3).
@@ -349,6 +352,18 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
     };
     let header = Header::new(&d).render()?;
     let relations = Relations { d: &d, oob: false }.render()?;
+    let q = crate::activities::ListQuery { party_id: Some(d.id.clone()), ..Default::default() };
+    let found = crate::activities::activity_list(&conn, &q).map_err(|e| page_error("activity_list", e))?;
+    let activity_count = found.matched;
+    let activity = super::timeline::Rows {
+        rows: super::timeline::rows(&found, true),
+        matched: found.matched,
+        page: found.page,
+        page_size: found.page_size,
+        base: format!("/activities?kind=all&party_id={}", urlencode(&d.id)),
+        empty: "No activities yet.",
+    }
+    .render()?;
     render(&DetailPage {
         nav: Nav::Parties,
         demo: crate::db::has_demo_data(&conn)?,
@@ -358,6 +373,8 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
         relations,
         sales,
         sales_matched,
+        activity,
+        activity_count,
     })
 }
 

@@ -197,3 +197,100 @@ async fn t_08_08_a_sent_email_is_read_only() {
     let (_, after) = get(&app, "/activities/a-mail-1048").await;
     assert_eq!(before, after, "nothing changed");
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// S2: the timeline, tasks and home (OP-ACTIVITY-05, OP-ACTIVITY-08, UI-02)
+// ---------------------------------------------------------------------------------------------------------------
+
+async fn page(app: &axum::Router, uri: &str) -> (StatusCode, String) {
+    let (s, _, b) = send(app, Request::get(uri).body(Body::empty()).unwrap()).await;
+    (s, b)
+}
+
+#[tokio::test]
+async fn the_timeline_lists_activities_by_day_with_filters() {
+    let app = demo();
+    let (status, html) = page(&app, "/activities").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("<!doctype html>"));
+    assert!(html.contains(r#"href="/activities" aria-current="page""#), "the sidebar marks Activity");
+    assert!(html.contains("Send revised fit-out quote") && html.contains("Phase 2 walkthrough on site"));
+    assert!(html.contains("Oct 28, 2026") && html.contains("Oct 16, 2026"), "day headers");
+    assert!(html.contains(r#"href="/discussions/a-disc-light""#), "a discussion opens its own page");
+    assert!(html.contains("2 comments"));
+    assert!(!html.contains("Payment received"), "payments are not activities (design-only row left out)");
+
+    let (_, html) = page(&app, "/activities?kind=meet").await;
+    assert!(html.contains("Phase 2 walkthrough") && !html.contains("Send revised fit-out quote"));
+    assert!(html.contains(r#"class="filter-chip on" href="/activities?kind=meet" aria-current="true""#));
+    let (_, html) = page(&app, "/activities?kind=task&status=complete").await;
+    assert!(html.contains("No activities match."));
+    let req = Request::get("/activities?kind=email").header("HX-Request", "true").header("HX-Target", "activity-rows");
+    let (status, _, html) = send(&app, req.body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        html.trim_start().starts_with(r#"<div id="activity-rows">"#)
+            && html.contains("Invoice INV-1048")
+            && html.contains("Sent")
+    );
+}
+
+#[tokio::test]
+async fn a_task_is_completed_and_reopened_from_its_page() {
+    let app = demo();
+    let (_, html) = page(&app, "/activities/a-task-quote").await;
+    assert!(html.contains(r#"hx-post="/tasks/a-task-quote/complete""#) && html.contains(">Complete</button>"));
+    let req = form("POST", "/tasks/a-task-quote/complete", "complete=true");
+    let (status, h, _) = send(&app, req).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(redirect(&h), "/activities/a-task-quote");
+    assert!(h.get("HX-Trigger").unwrap().to_str().unwrap().contains("Task completed"));
+    let (_, html) = page(&app, "/activities/a-task-quote").await;
+    assert!(html.contains("Completed</span>") && html.contains(">Reopen</button>") && html.contains("Completed By"));
+    let (status, _, text) = send(&app, form("POST", "/tasks/a-task-quote/complete", "complete=true")).await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    assert!(text.contains("complete already"));
+    let mut req = form("POST", "/tasks/a-task-quote/complete", "complete=false");
+    req.headers_mut().insert("HX-Current-URL", "http://127.0.0.1:5555/?x=1".parse().unwrap());
+    let (_, h, _) = send(&app, req).await;
+    assert_eq!(redirect(&h), "/?x=1", "back to the page it was done on");
+    let (status, _, _) = send(&app, form("POST", "/tasks/a-meet-walk/complete", "complete=true")).await;
+    assert_eq!(status, StatusCode::NOT_FOUND, "a meeting is not a task");
+}
+
+#[tokio::test]
+async fn the_dashboard_shows_my_tasks_and_recent_activity() {
+    let app = demo();
+    let (status, html) = page(&app, "/").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains(r#"id="tasks-title""#) && html.contains("1 open"));
+    assert!(html.contains("Send revised fit-out quote"));
+    assert!(html.contains(r#"aria-label="Complete Send revised fit-out quote""#));
+    assert!(html.contains(r#"id="recent-title""#) && html.contains("Lighting spec for the reception area"));
+    send(&app, form("POST", "/tasks/a-task-quote/complete", "complete=true")).await;
+    let (_, html) = page(&app, "/").await;
+    assert!(html.contains("0 open") && html.contains("No open tasks."));
+}
+
+#[tokio::test]
+async fn the_party_activity_tab_lists_its_activities_and_new_buttons() {
+    let app = demo();
+    let (status, html) = page(&app, "/parties/p-hp").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(!html.contains("Activities come in a later release"));
+    assert!(html.contains(r#"aria-selected="tab === 'activity'">Activity <span class="n">4</span>"#));
+    assert!(html.contains("Send revised fit-out quote") && html.contains("Invoice INV-1048"));
+    assert!(html.contains(r#"hx-get="/activities/new?kind=note&amp;party_id=p-hp""#));
+    assert!(html.contains(r#"href="/activities?party_id=p-hp""#));
+    let (_, html) = page(&app, "/activities?party_id=p-hp").await;
+    assert!(html.contains("Activity · Halden &#38; Pryce Architects</h1>"));
+}
+
+#[tokio::test]
+async fn the_top_bar_new_task_and_note_open_the_dialog() {
+    let app = demo();
+    let (_, html) = page(&app, "/").await;
+    assert!(html.contains(r##"hx-get="/activities/new?kind=task" hx-target="#modal-body""##));
+    assert!(html.contains(r##"hx-get="/activities/new?kind=note" hx-target="#modal-body""##));
+    assert!(!html.contains(r#"data-soon="New task""#));
+}

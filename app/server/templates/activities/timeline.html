@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Activity · KarbonFM{% endblock %}
+{% block content %}
+<div class="flex items-end justify-between gap-4 mb-5">
+  <div>
+    <div class="eyebrow mb-1.5">Workspace</div>
+    <h1 class="page-title">Activity{% if !party_name.is_empty() %} · {{ party_name }}{% endif %}</h1>
+  </div>
+  <div class="flex gap-2">
+    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=task{% if !party_id.is_empty() %}&party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-task"/></svg>Task</button>
+    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=note{% if !party_id.is_empty() %}&party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-note"/></svg>Note</button>
+    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=meeting{% if !party_id.is_empty() %}&party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-video"/></svg>Meeting</button>
+    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=call{% if !party_id.is_empty() %}&party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-phone"/></svg>Call</button>
+  </div>
+</div>
+<nav class="flex flex-wrap gap-2 mb-3" aria-label="Kind of activity">
+  {% for (href, label, on) in kinds %}<a class="filter-chip {% if *on %}on{% endif %}" href="{{ href }}" {% if *on %}aria-current="true"{% endif %}>{{ label }}</a>{% endfor %}
+</nav>
+<nav class="flex flex-wrap gap-2 mb-5" aria-label="Status">
+  {% for (href, label, on) in statuses %}<a class="filter-chip {% if *on %}on{% endif %}" href="{{ href }}" {% if *on %}aria-current="true"{% endif %}>{{ label }}</a>{% endfor %}
+</nav>
+<section aria-label="Timeline" class="max-w-3xl">
+  {{ rows|safe }}
+</section>
+{% endblock %}
