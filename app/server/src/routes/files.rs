@@ -336,9 +336,12 @@ fn file_response(path: &std::path::Path, content_type: &str, name: Option<&str>)
     Ok(res)
 }
 
-/// Open refuses a type that could run a program (`files::openable`): 409 with this text.
-pub const NOT_OPENABLE: &str =
-    "KarbonFM opens documents and images only. This type of file could run a program, so it is not opened.";
+/// Open refuses a type that could run a program (`files::openable`): 409 with this text. It names the type, not a
+/// category, since 617's category calls every non-image a Document (B6).
+pub fn not_openable(ext: &str) -> String {
+    let what = if ext.is_empty() { "Files with no extension".to_owned() } else { format!("“.{ext}” files") };
+    format!("{what} could run a program, so KarbonFM does not open them.")
+}
 
 /// 410 Gone: the row is there, its stored copy is not.
 fn missing() -> Response {
@@ -383,7 +386,7 @@ pub async fn open(State(state): State<AppState>, Path(id): Path<String>) -> Resu
     // The type the system goes by is the stored copy's extension.
     let ext = path.extension().map(|e| e.to_string_lossy().into_owned()).unwrap_or_default();
     if !files::openable(&ext) {
-        return Ok((StatusCode::CONFLICT, NOT_OPENABLE).into_response());
+        return Ok((StatusCode::CONFLICT, not_openable(&ext.to_ascii_lowercase())).into_response());
     }
     let Some(hook) = state.open.clone() else { return Ok(StatusCode::NOT_IMPLEMENTED.into_response()) };
     tokio::task::spawn_blocking(move || hook(path))

@@ -78,8 +78,9 @@ pub fn category(ext: &str) -> &'static str {
     }
 }
 
-/// The types "Open" hands to the system app: documents and images. Anything else (a script, an app, an installer, an
-/// archive) could run a program when the system opens it, so it is never opened from KarbonFM; the page says so.
+/// The types "Open" hands to the system app: documents, images and zip archives (the system only unpacks a zip and
+/// runs nothing; Admiral's ruling, 2026-11-01, B6). Anything else (a script, an app, an installer, a disk image) could
+/// run a program when the system opens it, so it is never opened from KarbonFM; the page says so.
 pub fn openable(ext: &str) -> bool {
     matches!(
         ext.to_ascii_lowercase().as_str(),
@@ -108,6 +109,7 @@ pub fn openable(ext: &str) -> bool {
             | "tiff"
             | "heic"
             | "webp"
+            | "zip"
     )
 }
 
@@ -550,8 +552,9 @@ mod tests {
         assert_eq!(content_type("bmp"), "", "617 s117 has no type for bmp or tif");
         assert_eq!(content_type("xlsx"), "");
         assert_eq!(serve_type("image/jpg"), "image/jpeg");
-        assert!(openable("PDF") && openable("xlsx") && openable("jpeg"));
-        for ext in ["command", "sh", "exe", "app", "zip", "html", "js", "pkg", "dmg", "bat", "ps1", "jar", ""] {
+        // B6 (Admiral's ruling): a zip opens too; the system only unpacks it and runs nothing.
+        assert!(openable("PDF") && openable("xlsx") && openable("jpeg") && openable("ZIP"));
+        for ext in ["command", "sh", "exe", "app", "html", "js", "pkg", "dmg", "bat", "ps1", "jar", ""] {
             assert!(!openable(ext), "{ext}");
         }
         assert_eq!(serve_type(""), "application/octet-stream");

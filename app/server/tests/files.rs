@@ -468,11 +468,33 @@ async fn open_never_hands_a_program_to_the_system() {
     let (status, _, body) =
         send(&app, Request::post(format!("/files/{script}/open")).body(Body::empty()).unwrap()).await;
     assert_eq!(status, StatusCode::CONFLICT);
-    assert!(text(&body).contains("documents and images only"));
+    // B6: the refusal names the type, and does not contradict the row's 617 category ("Document").
+    let refusal = text(&body);
+    assert!(refusal.contains("“.command” files") && refusal.contains("could run a program"), "{refusal}");
+    assert!(!refusal.contains("documents and images only"), "{refusal}");
     assert!(calls.lock().unwrap().is_empty(), "the hook is never called");
     let (_, headers, _) =
         send(&app, Request::get(format!("/files/{script}/content")).body(Body::empty()).unwrap()).await;
     assert!(headers[header::CONTENT_DISPOSITION].to_str().unwrap().starts_with("attachment;"), "it only downloads");
+}
+
+#[tokio::test]
+async fn open_hands_a_zip_to_the_system() {
+    // B6 (Admiral's ruling): macOS only unpacks a zip and runs nothing, so the seed's site photos open.
+    let (dir, conn, _) = demo();
+    drop(conn);
+    let calls: Arc<Mutex<Vec<PathBuf>>> = Arc::default();
+    let seen = calls.clone();
+    let hook: OpenHook = Arc::new(move |p| {
+        seen.lock().unwrap().push(p);
+        Ok(())
+    });
+    let app = app(dir.path(), Some(hook));
+    let (status, _, _) = send(&app, Request::post("/files/f-002/open").body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::NO_CONTENT);
+    let calls = calls.lock().unwrap();
+    assert_eq!(calls.len(), 1);
+    assert!(calls[0].ends_with("f-002.zip"));
 }
 
 #[tokio::test]
