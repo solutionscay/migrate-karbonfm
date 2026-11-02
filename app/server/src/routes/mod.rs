@@ -15,6 +15,7 @@ mod sales_lists;
 mod secrets_store;
 mod settings;
 mod setup;
+mod templates;
 mod timeline;
 mod wizard;
 
@@ -97,6 +98,13 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/settings/secrets/file"),
     ("POST", "/settings/secrets/file"),
     ("POST", "/settings/secrets/keychain"),
+    ("GET", "/templates"),
+    ("GET", "/templates/new"),
+    ("POST", "/templates"),
+    ("GET", "/templates/{id}"),
+    ("PUT", "/templates/{id}"),
+    ("PUT", "/templates/{id}/merge-fields"),
+    ("POST", "/templates/{id}/merge"),
     // assets.rs: the embedded static files.
     ("GET", "/assets/{*path}"),
     // session.rs: the one-time launch URL of AP-13.
@@ -159,6 +167,11 @@ pub fn router() -> Router<AppState> {
         .route("/settings/restore", post(backup::restore))
         .route("/settings/secrets/file", get(secrets_store::confirm).post(secrets_store::use_file))
         .route("/settings/secrets/keychain", post(secrets_store::use_keychain))
+        .route("/templates", get(templates::list).post(templates::create))
+        .route("/templates/new", get(templates::new_dialog))
+        .route("/templates/{id}", get(templates::detail).put(templates::save))
+        .route("/templates/{id}/merge-fields", put(templates::save_merge_fields))
+        .route("/templates/{id}/merge", post(templates::merge))
 }
 
 /// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a
@@ -190,6 +203,7 @@ pub enum Nav {
     Parties,
     Invoices,
     Payments,
+    Templates,
     Settings,
 }
 

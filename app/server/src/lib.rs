@@ -27,6 +27,7 @@ mod routes;
 pub mod sales_list;
 pub mod secrets;
 pub mod session;
+pub mod templates;
 mod web;
 
 use axum::Router;

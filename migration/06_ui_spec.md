@@ -286,9 +286,10 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: inventory-only
 - Use case and users: Template list and detail with merge fields; the single local user (ROLE-OWNER).
+- Built (I4 S4, 2026-11-01, branch `i4/templates`): `/templates` lists Name, Subject, Activity types and the merge field count (layout 111), with an empty state and a New template dialog (a name, then the editor). `/templates/{id}` (layout 112) edits Name, Subject, Body and the Activity type(s) checkbox set in place (Save → toast; a token mismatch or an unknown placeholder re-renders with field errors and saves nothing). Beside it: the Merge fields panel (one row per placeholder, a Required checkbox, "not in use" for a placeholder that is gone; Save merge fields), the list of available `{{field}}` placeholders, and a merge preview against one of the latest emails (writes nothing). Linked from the sidebar (Library → Templates). No delete (no source evidence, Q4).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/111-Templates.txt`, `objects/karbon_kontacts.fmp12/layouts/112-Template_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/114-MergeField.txt`
 - Page: `GET /templates` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /templates/{id}/merge` (OP-TEMPLATE-01 `template_merge`), `PUT /templates/{id}/merge-fields` (OP-TEMPLATE-02 `merge_fields_save`)
+- Fragments and actions: `POST /templates/{id}/merge` (OP-TEMPLATE-01 `template_merge`), `PUT /templates/{id}/merge-fields` (OP-TEMPLATE-02 `merge_fields_save`), `GET /templates/new`, `POST /templates`, `PUT /templates/{id}` (OP-TEMPLATE-03 `template_create`, `template_save`)
 - Rules shown or enforced: BR-TEMPLATE-01, BR-TEMPLATE-02
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).

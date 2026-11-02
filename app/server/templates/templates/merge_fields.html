@@ -1,0 +1,22 @@
+{# The merge fields portal of layout 112 (OP-TEMPLATE-02 merge_fields_save): one row per placeholder the template
+   has had, with its Required checkbox. A row whose placeholder is gone is kept and marked "not in use". #}
+<form id="merge-fields" class="panel" hx-put="/templates/{{ id }}/merge-fields" hx-target="#merge-fields" hx-swap="outerHTML" aria-labelledby="t-fields"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <div class="panel-head"><h2 id="t-fields" class="panel-title">Merge fields</h2></div>
+  {% if let Some(e) = error %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2 mx-4 mt-3">{{ e }}</div>{% endif %}
+  {% if rows.is_empty() %}
+  <p class="p-4 text-[12.5px] muted">No merge fields. Type a placeholder like <code class="mono">&#123;&#123;FirstName&#125;&#125;</code> in the subject or body and save.</p>
+  {% else %}
+  <table class="tbl">
+    <thead><tr><th>Name</th><th class="r">Required</th></tr></thead>
+    <tbody>
+      {% for f in rows %}
+      <tr>
+        <td><code class="mono">{{ f.name }}</code>{% if !f.in_use %} <span class="chip text-[11px]">not in use</span>{% endif %}</td>
+        <td class="r"><input type="checkbox" name="required" value="{{ f.id }}" class="checkbox checkbox-xs" aria-label="{{ f.name }} is required" {% if f.required %}checked{% endif %}></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="px-4 py-3 border-t hairline flex justify-end"><button class="btn btn-sm">Save merge fields</button></div>
+  {% endif %}
+</form>

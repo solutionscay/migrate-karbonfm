@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Templates · KarbonFM{% endblock %}
+{# UI-16 template list (layout 111: Name, Subject). New opens the name dialog, then the editor. #}
+{% block content %}
+<div class="flex items-end justify-between gap-4 mb-5">
+  <div>
+    <div class="eyebrow mb-1.5">Library</div>
+    <h1 class="page-title">Templates</h1>
+  </div>
+  <button type="button" class="btn btn-primary btn-sm" hx-get="/templates/new" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>New template</button>
+</div>
+<section class="panel overflow-hidden" aria-label="Templates">
+  <div class="overflow-x-auto">
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>Subject</th><th>Activity types</th><th class="r">Merge fields</th></tr></thead>
+      <tbody>
+        {% for t in rows %}
+        <tr>
+          <td class="font-medium"><a class="link link-hover" href="{{ t.href }}">{{ t.name }}</a></td>
+          <td>{% if t.subject.is_empty() %}<span class="muted">—</span>{% else %}{{ t.subject }}{% endif %}</td>
+          <td>{% if t.types.is_empty() %}<span class="muted">—</span>{% else %}{{ t.types }}{% endif %}</td>
+          <td class="r num">{{ t.merge_fields }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center muted py-10">No templates yet. New template makes one.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

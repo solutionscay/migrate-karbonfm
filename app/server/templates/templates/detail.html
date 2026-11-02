@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Templates · KarbonFM{% endblock %}
+{# UI-16 template detail (layout 112): the editor saves in place; the merge fields portal; a merge preview. #}
+{% block content %}
+<div class="flex items-end justify-between gap-4 mb-5">
+  <div>
+    <div class="eyebrow mb-1.5"><a class="link link-hover" href="/templates">Templates</a></div>
+    <h1 class="page-title">{{ title }}</h1>
+  </div>
+</div>
+<div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+  <div class="space-y-5 min-w-0">
+    {{ editor|safe }}
+    <section class="panel" aria-labelledby="t-preview">
+      <div class="panel-head"><h2 id="t-preview" class="panel-title">Preview a merge</h2></div>
+      <form class="p-5 space-y-3" hx-post="/templates/{{ editor.id }}/merge" hx-target="#merge-result" hx-swap="innerHTML">
+        <label class="block">
+          <span class="text-[12px] muted">Email</span>
+          <select name="activity_id" class="select select-sm w-full mt-1">
+            {% for e in emails %}<option value="{{ e.id }}">{{ e.label }}</option>{% else %}<option value="">No emails yet</option>{% endfor %}
+          </select>
+        </label>
+        <p class="text-[12px] muted">Merges the saved template with the email's To and From people and its linked invoice. Nothing is changed.</p>
+        <button class="btn btn-sm">Preview</button>
+        <div id="merge-result" aria-live="polite"></div>
+      </form>
+    </section>
+  </div>
+  <aside class="space-y-5">
+    {{ editor.fields|safe }}
+    <section class="panel" aria-labelledby="t-available">
+      <div class="panel-head"><h2 id="t-available" class="panel-title">Available merge fields</h2></div>
+      <ul class="p-4 space-y-1.5 text-[12.5px]">
+        {% for f in fields %}
+        <li><code class="mono">&#123;&#123;{{ f.name }}&#125;&#125;</code> <span class="muted">{{ f.help }}</span></li>
+        {% endfor %}
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

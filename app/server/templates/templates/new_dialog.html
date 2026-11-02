@@ -1,0 +1,19 @@
+{# The template list's New button (template_create). The template opens in the editor after. #}
+<form hx-post="/templates" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">New template</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3">
+    <label class="block">
+      <span class="text-[12px] muted">Name</span>
+      <input name="name" value="{{ name }}" class="input input-sm w-full mt-1" autocomplete="off" autofocus
+             {% if self.error("name").is_some() %}aria-invalid="true" aria-describedby="err-name"{% endif %}>
+      {% if let Some(e) = self.error("name") %}<span id="err-name" class="text-error text-[12px]" role="alert">{{ e }}</span>{% endif %}
+    </label>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">Create</button>
+  </div>
+</form>
