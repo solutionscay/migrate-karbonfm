@@ -1029,6 +1029,309 @@ pub fn activity_get(conn: &Connection, id: &str) -> Result<Activity, CommandErro
     Ok(a)
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// OP-ACTIVITY-05 task_set_complete (BR-ACTIVITY-04, 09)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// OP-ACTIVITY-05 `task_set_complete`. Complete (690 s85-108): completed_at = now (D-29: replaces CompletedInd and
+/// AlertInd), the completer's name cached, date_display = today, and a Completed By (51) row for the current user's
+/// party (kontacts 758 s3 always passes it). Incomplete (691 s72, s102-109): completed_at and the cache cleared,
+/// date_display = the due date or the creation date, the Completed By rows deleted (759 fails when there is none:
+/// built as intended). Completing a complete task, or reopening an open one, is refused: layout 91 shows only the
+/// button that applies, and a second complete would add a second role-51 row (690 has no guard).
+pub fn task_set_complete(conn: &mut Connection, id: &str, complete: bool, actor: &Actor) -> Result<(), CommandError> {
+    let stamp = Stamp::now(actor);
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let state: Option<(Option<String>, Option<String>, String)> = tx
+        .query_row(
+            "SELECT t.completed_at, t.due_date, COALESCE(substr(a.creation_timestamp, 1, 10), ?2)
+             FROM task t JOIN activity a ON a.id = t.id WHERE t.id = ?1",
+            params![id, &stamp.at[..10]],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+        )
+        .optional()?;
+    let (completed_at, due, created) = state.ok_or(CommandError::NotFound)?;
+    if complete {
+        if completed_at.is_some() {
+            return Err(CommandError::Refused("This task is complete already.".into()));
+        }
+        let me = current_party(&tx, actor)?.ok_or_else(no_party)?;
+        let name = party_name(&tx, &me)?;
+        tx.execute(
+            "UPDATE task SET completed_at = ?2, completed_by_cached = ?3 WHERE id = ?1",
+            params![id, stamp.at, name],
+        )?;
+        tx.execute("UPDATE activity SET date_display = ?2 WHERE id = ?1", params![id, &stamp.at[..10]])?;
+        let target = Target::of(&tx, id)?;
+        add_party_in(&tx, &target, &PartyInput::new(ActivityPartyRole::CompletedBy, &me), &stamp)?;
+    } else {
+        if completed_at.is_none() {
+            return Err(CommandError::Refused("This task is open already.".into()));
+        }
+        tx.execute("UPDATE task SET completed_at = NULL, completed_by_cached = NULL WHERE id = ?1", [id])?;
+        tx.execute("UPDATE activity SET date_display = ?2 WHERE id = ?1", params![id, due.unwrap_or(created)])?;
+        tx.execute(
+            "DELETE FROM activity_party WHERE activity_id = ?1 AND CAST(activity_party_role_id AS INTEGER) = 51",
+            [id],
+        )?;
+    }
+    refresh_caches(&tx, id)?;
+    touch(&tx, id, &stamp)?;
+    tx.commit()?;
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// OP-ACTIVITY-08 activity_list (BR-ACTIVITY-10)
+// ---------------------------------------------------------------------------------------------------------------
+
+/// Rows per page of the activity list (05 query contract: page 100).
+pub const LIST_PAGE: i64 = 100;
+
+/// The status filter of 497 (s83-98).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Status {
+    /// No status filter (any other value, 497).
+    #[default]
+    Any,
+    /// Omits completed tasks; every other activity counts as incomplete (s83-87).
+    Incomplete,
+    /// Completed tasks only (s89-91).
+    Complete,
+    /// date_display on or before today, completed tasks omitted (s93-98).
+    Overdue,
+}
+
+impl Status {
+    pub fn parse(s: &str) -> Self {
+        match s {
+            "incomplete" => Status::Incomplete,
+            "complete" => Status::Complete,
+            "overdue" => Status::Overdue,
+            _ => Status::Any,
+        }
+    }
+    pub fn key(self) -> &'static str {
+        match self {
+            Status::Any => "",
+            Status::Incomplete => "incomplete",
+            Status::Complete => "complete",
+            Status::Overdue => "overdue",
+        }
+    }
+}
+
+/// The kind chips of the timeline (design/activity.html). 497 has no type filter; this is a screen filter on top.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum KindFilter {
+    #[default]
+    All,
+    Discussions,
+    Tasks,
+    Notes,
+    MeetingsAndCalls,
+    Email,
+}
+
+impl KindFilter {
+    pub const ALL: [KindFilter; 6] = [
+        KindFilter::All,
+        KindFilter::Discussions,
+        KindFilter::Tasks,
+        KindFilter::Notes,
+        KindFilter::MeetingsAndCalls,
+        KindFilter::Email,
+    ];
+    pub fn parse(s: &str) -> Self {
+        Self::ALL.into_iter().find(|k| k.key() == s).unwrap_or_default()
+    }
+    pub fn key(self) -> &'static str {
+        match self {
+            KindFilter::All => "all",
+            KindFilter::Discussions => "disc",
+            KindFilter::Tasks => "task",
+            KindFilter::Notes => "note",
+            KindFilter::MeetingsAndCalls => "meet",
+            KindFilter::Email => "email",
+        }
+    }
+    pub fn label(self) -> &'static str {
+        match self {
+            KindFilter::All => "All",
+            KindFilter::Discussions => "Discussions",
+            KindFilter::Tasks => "Tasks",
+            KindFilter::Notes => "Notes",
+            KindFilter::MeetingsAndCalls => "Meetings & calls",
+            KindFilter::Email => "Email",
+        }
+    }
+    fn type_ids(self) -> &'static [i64] {
+        match self {
+            KindFilter::All => &[],
+            KindFilter::Discussions => &[10],
+            KindFilter::Tasks => &[3],
+            KindFilter::Notes => &[2],
+            KindFilter::MeetingsAndCalls => &[4, 6, 8],
+            KindFilter::Email => &[1],
+        }
+    }
+}
+
+/// The activity list query: a party (optional: the timeline shows everyone's), a role, a status, a kind, a page.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ListQuery {
+    pub party_id: Option<String>,
+    pub role_id: Option<i64>,
+    pub status: Status,
+    pub kind: KindFilter,
+    /// 1-based.
+    pub page: i64,
+    pub page_size: i64,
+    /// Oldest first (the home task list, layout 101 sorts by date ascending); newest first otherwise (05).
+    pub oldest_first: bool,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ListRow {
+    pub id: String,
+    pub type_id: i64,
+    pub type_name: String,
+    pub subject: String,
+    pub message: String,
+    pub date_display: String,
+    pub time_display: String,
+    pub creator: String,
+    pub parties: String,
+    pub comment_count: i64,
+    pub due_date: String,
+    pub completed_at: String,
+    pub completed_by: String,
+    pub is_task: bool,
+    pub sent: Option<bool>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ListPage {
+    pub rows: Vec<ListRow>,
+    pub matched: i64,
+    pub page: i64,
+    pub page_size: i64,
+}
+
+/// OP-ACTIVITY-08 `activity_list` (497). A party matches through its activity_party rows (in the given role, or any
+/// role when none is given, s78-79), and, with no role given, through an activity_entity link to it, so a
+/// discussion or meeting started on the party shows there too (I4 plan Q3: 497 finds by ActivityParty only and the
+/// source has no list of activities linked by entity). Distinct activities, newest first, 100 a page (05).
+pub fn activity_list(conn: &Connection, q: &ListQuery) -> Result<ListPage, CommandError> {
+    let mut wh: Vec<String> = Vec::new();
+    let mut args: Vec<rusqlite::types::Value> = Vec::new();
+    let mut arg = |v: rusqlite::types::Value| {
+        args.push(v);
+        format!("?{}", args.len())
+    };
+    if let Some(party) = &q.party_id {
+        let p = arg(party.clone().into());
+        match q.role_id {
+            Some(role) => {
+                let r = arg(role.into());
+                wh.push(format!(
+                    "EXISTS (SELECT 1 FROM activity_party ap WHERE ap.activity_id = a.id AND ap.party_id = {p}
+                                                              AND CAST(ap.activity_party_role_id AS INTEGER) = {r})"
+                ));
+            }
+            None => wh.push(format!(
+                "(EXISTS (SELECT 1 FROM activity_party ap WHERE ap.activity_id = a.id AND ap.party_id = {p})
+                  OR EXISTS (SELECT 1 FROM activity_entity ae WHERE ae.activity_id = a.id
+                                AND CAST(ae.entity_type_id AS INTEGER) = 10 AND ae.entity_id = {p}))"
+            )),
+        }
+    } else if let Some(role) = q.role_id {
+        let r = arg(role.into());
+        wh.push(format!(
+            "EXISTS (SELECT 1 FROM activity_party ap WHERE ap.activity_id = a.id
+                                                      AND CAST(ap.activity_party_role_id AS INTEGER) = {r})"
+        ));
+    }
+    let done = "EXISTS (SELECT 1 FROM task t WHERE t.id = a.id AND t.completed_at IS NOT NULL)";
+    match q.status {
+        Status::Any => {}
+        Status::Incomplete => wh.push(format!("NOT {done}")),
+        Status::Complete => wh.push(done.to_owned()),
+        Status::Overdue => {
+            let today = arg(crate::audit::local_now()[..10].to_owned().into());
+            wh.push(format!("a.date_display <= {today} AND NOT {done}"));
+        }
+    }
+    let types = q.kind.type_ids();
+    if !types.is_empty() {
+        let list = types.iter().map(i64::to_string).collect::<Vec<_>>().join(", ");
+        wh.push(format!("CAST(a.activity_type_id AS INTEGER) IN ({list})"));
+    }
+    let filter = if wh.is_empty() { String::new() } else { format!("WHERE {}", wh.join(" AND ")) };
+    let matched: i64 =
+        conn.query_row(&format!("SELECT COUNT(*) FROM activity a {filter}"), rusqlite::params_from_iter(&args), |r| {
+            r.get(0)
+        })?;
+    let size = if q.page_size > 0 { q.page_size } else { LIST_PAGE };
+    let page = q.page.max(1);
+    let order = if q.oldest_first { "ASC" } else { "DESC" };
+    let sql = format!(
+        "SELECT a.id, CAST(a.activity_type_id AS INTEGER), COALESCE(ty.description, ''), a.subject, a.message,
+                a.date_display, a.time_display, a.creator_cached, a.parties_cached,
+                CAST(COALESCE(a.comment_count_cached, 0) AS INTEGER), t.due_date, t.completed_at, t.completed_by_cached,
+                t.id IS NOT NULL, CASE WHEN e.id IS NULL THEN NULL ELSE COALESCE(e.sent_ind, 0) = 1 END
+         FROM activity a
+         LEFT JOIN activity_type ty ON ty.id = a.activity_type_id
+         LEFT JOIN task t ON t.id = a.id
+         LEFT JOIN email_message e ON e.id = a.id
+         {filter}
+         ORDER BY COALESCE(a.date_display, '') {order}, COALESCE(a.time_display, '') {order}, a.rowid {order}
+         LIMIT {size} OFFSET {}",
+        (page - 1) * size
+    );
+    let mut stmt = conn.prepare(&sql)?;
+    let rows = stmt
+        .query_map(rusqlite::params_from_iter(&args), |r| {
+            Ok(ListRow {
+                id: r.get(0)?,
+                type_id: r.get::<_, Option<i64>>(1)?.unwrap_or(0),
+                type_name: r.get(2)?,
+                subject: s(r.get(3)?),
+                message: s(r.get(4)?),
+                date_display: s(r.get(5)?),
+                time_display: s(r.get(6)?),
+                creator: s(r.get(7)?),
+                parties: s(r.get(8)?),
+                comment_count: r.get(9)?,
+                due_date: s(r.get(10)?),
+                completed_at: s(r.get(11)?),
+                completed_by: s(r.get(12)?),
+                is_task: r.get(13)?,
+                sent: r.get(14)?,
+            })
+        })?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    Ok(ListPage { rows, matched, page, page_size: size })
+}
+
+/// Home "Tasks due" (UI-02; layout 101 portal Selected_Task, kontacts 418/365): the open tasks of the current user's
+/// party in any role, oldest date first. The status global has no default in the source (365 s14 empties the list);
+/// the plan's default is Incomplete (I4 plan Q1).
+pub fn tasks_due(conn: &Connection, actor: &Actor, limit: i64) -> Result<ListPage, CommandError> {
+    let Some(me) = current_party(conn, actor)? else { return Ok(ListPage::default()) };
+    activity_list(
+        conn,
+        &ListQuery {
+            party_id: Some(me),
+            status: Status::Incomplete,
+            kind: KindFilter::Tasks,
+            page_size: limit,
+            oldest_first: true,
+            ..Default::default()
+        },
+    )
+}
+
 /// Whether a refusal text belongs to AlreadySent (used by the routes' 409 answers).
 pub fn already_sent_text() -> &'static str {
     ALREADY_SENT
@@ -1379,5 +1682,87 @@ mod tests {
         let n: i64 =
             conn.query_row("SELECT COUNT(*) FROM activity WHERE subject = 'Rollback'", [], |r| r.get(0)).unwrap();
         assert_eq!(n, 0);
+    }
+
+    #[test]
+    fn complete_and_reopen_round_trip() {
+        let (mut conn, actor) = demo();
+        task_set_complete(&mut conn, "a-task-quote", true, &actor).unwrap();
+        let a = activity_get(&conn, "a-task-quote").unwrap();
+        let t = a.task.clone().unwrap();
+        assert!(crate::audit::is_timestamp(&t.completed_at));
+        assert_eq!(t.completed_by, "Mara Ellison");
+        assert_eq!(a.date_display, crate::audit::local_now()[..10]);
+        assert_eq!(a.parties.iter().filter(|p| p.role_id == 51).count(), 1);
+        assert!(matches!(task_set_complete(&mut conn, "a-task-quote", true, &actor), Err(CommandError::Refused(_))));
+
+        task_set_complete(&mut conn, "a-task-quote", false, &actor).unwrap();
+        let a = activity_get(&conn, "a-task-quote").unwrap();
+        assert_eq!(a.task.clone().unwrap().completed_at, "");
+        assert_eq!(a.date_display, "2026-10-28", "back to the due date");
+        assert_eq!(a.parties.iter().filter(|p| p.role_id == 51).count(), 0);
+        assert!(matches!(task_set_complete(&mut conn, "a-task-quote", false, &actor), Err(CommandError::Refused(_))));
+        assert!(matches!(task_set_complete(&mut conn, "a-meet-walk", true, &actor), Err(CommandError::NotFound)));
+    }
+
+    #[test]
+    fn reopening_a_task_without_a_due_date_shows_its_creation_date() {
+        let (mut conn, actor) = demo();
+        conn.execute("UPDATE task SET due_date = NULL WHERE id = 'a-task-quote'", []).unwrap();
+        task_set_complete(&mut conn, "a-task-quote", true, &actor).unwrap();
+        task_set_complete(&mut conn, "a-task-quote", false, &actor).unwrap();
+        assert_eq!(activity_get(&conn, "a-task-quote").unwrap().date_display, "2026-10-28");
+    }
+
+    fn ids(page: &ListPage) -> Vec<&str> {
+        page.rows.iter().map(|r| r.id.as_str()).collect()
+    }
+
+    #[test]
+    fn the_list_filters_by_party_role_and_status() {
+        let (mut conn, actor) = demo();
+        let q = |party: &str, status| ListQuery { party_id: Some(party.into()), status, ..Default::default() };
+        let all = activity_list(&conn, &q("p-hp", Status::Any)).unwrap();
+        assert_eq!(ids(&all), ["a-task-quote", "a-disc-light", "a-meet-walk", "a-mail-1048"], "newest first");
+        // Incomplete keeps every activity that is not a completed task (497 s83-87).
+        assert_eq!(activity_list(&conn, &q("p-hp", Status::Incomplete)).unwrap().matched, 4);
+        assert_eq!(activity_list(&conn, &q("p-hp", Status::Complete)).unwrap().matched, 0);
+        task_set_complete(&mut conn, "a-task-quote", true, &actor).unwrap();
+        assert_eq!(ids(&activity_list(&conn, &q("p-hp", Status::Complete)).unwrap()), ["a-task-quote"]);
+        assert_eq!(activity_list(&conn, &q("p-hp", Status::Incomplete)).unwrap().matched, 3);
+        // Overdue: on or before today and not a completed task; the seed's dates are all in the past.
+        assert_eq!(activity_list(&conn, &q("p-hp", Status::Overdue)).unwrap().matched, 3);
+        let role = ListQuery { role_id: Some(64), ..q("p-hp-eh", Status::Any) };
+        assert_eq!(ids(&activity_list(&conn, &role).unwrap()), ["a-disc-light"]);
+        let kind = ListQuery { kind: KindFilter::MeetingsAndCalls, ..q("p-hp", Status::Any) };
+        assert_eq!(ids(&activity_list(&conn, &kind).unwrap()), ["a-meet-walk"]);
+    }
+
+    #[test]
+    fn a_meeting_linked_to_a_party_shows_on_it_and_paging_works() {
+        let (mut conn, actor) = demo();
+        let mut m = note("On site");
+        m.kind = Kind::Meeting;
+        m.fields.start_date = "2026-11-03".into();
+        m.entity = Some((10, "p-bm".into()));
+        let id = activity_create(&mut conn, &m, &actor).unwrap();
+        let q = ListQuery { party_id: Some("p-bm".into()), ..Default::default() };
+        assert!(ids(&activity_list(&conn, &q).unwrap()).contains(&id.as_str()));
+        let q = ListQuery { page_size: 2, page: 2, ..Default::default() };
+        let page = activity_list(&conn, &q).unwrap();
+        assert_eq!((page.rows.len(), page.matched), (2, 5));
+    }
+
+    #[test]
+    fn tasks_due_are_my_open_tasks_oldest_first() {
+        let (mut conn, actor) = demo();
+        let mut t = note("Later task");
+        t.kind = Kind::Task;
+        t.fields.due_date = "2026-12-01".into();
+        let later = activity_create(&mut conn, &t, &actor).unwrap();
+        let due = tasks_due(&conn, &actor, 10).unwrap();
+        assert_eq!(ids(&due), ["a-task-quote", later.as_str()]);
+        task_set_complete(&mut conn, "a-task-quote", true, &actor).unwrap();
+        assert_eq!(ids(&tasks_due(&conn, &actor, 10).unwrap()), [later.as_str()]);
     }
 }
