@@ -14,6 +14,7 @@ pub mod big_demo;
 pub mod contacts;
 pub mod db;
 pub mod discussions;
+pub mod email;
 pub mod files;
 pub mod ids;
 pub mod import;
@@ -75,6 +76,8 @@ pub struct AppState {
     save: Option<SaveHook>,
     /// Opens a stored file with the system app; none in the dev server and the tests (`POST /files/{id}/open` 501).
     open: Option<OpenHook>,
+    /// Sends email (OP-INTEG-01): lettre's SMTP transport; tests may pass another.
+    mailer: Arc<dyn email::Mailer>,
     /// The server's own origin, `http://127.0.0.1:<port>`. Requests must name it in Host (and in Origin for
     /// writes), which blocks DNS rebinding and cross-site requests from other pages (AP-13, R-07).
     origin: Option<String>,
@@ -102,6 +105,7 @@ impl AppState {
             print: None,
             save: None,
             open: None,
+            mailer: Arc::new(email::LettreMailer::default()),
             origin: None,
             session: None,
             secrets: Arc::new(MemoryStore::default()),
@@ -150,6 +154,12 @@ impl AppState {
     }
 
     /// The desktop shell passes its "open with the system app" function (the same one that shows a saved PDF).
+    /// The email sender (OP-INTEG-01); the default is lettre's SMTP transport.
+    pub fn with_mailer(mut self, mailer: Arc<dyn email::Mailer>) -> Self {
+        self.mailer = mailer;
+        self
+    }
+
     pub fn with_open(mut self, open: OpenHook) -> Self {
         self.open = Some(open);
         self

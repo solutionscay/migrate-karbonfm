@@ -102,11 +102,14 @@ pub struct PartyInput {
     pub role: ActivityPartyRole,
     pub party_id: String,
     pub contact_method_id: String,
+    /// The email address of an email role when there is no contact method (the From default of 389 s134-153 takes
+    /// `user.smtp_email_address`).
+    pub email_address: String,
 }
 
 impl PartyInput {
     pub fn new(role: ActivityPartyRole, party_id: &str) -> Self {
-        Self { role, party_id: party_id.into(), contact_method_id: String::new() }
+        Self { role, party_id: party_id.into(), contact_method_id: String::new(), email_address: String::new() }
     }
 }
 
@@ -470,16 +473,22 @@ pub fn add_party_in(conn: &Connection, target: &Target, p: &PartyInput, stamp: &
         params![id, target.id, opt(&p.party_id), p.role.id(), cm, name, initials],
     )?;
     audit::stamp_created(conn, "activity_party", &id, stamp)?;
-    write_subtypes(conn, &id, p.role, cm)?;
+    write_subtypes(conn, &id, p.role, cm, opt(&p.email_address))?;
     Ok(id)
 }
 
 /// The email and event subtype rows a role makes (710 s34, 376 s190-215); a row the role no longer makes is removed.
-fn write_subtypes(conn: &Connection, id: &str, role: ActivityPartyRole, cm: Option<&str>) -> rusqlite::Result<()> {
+fn write_subtypes(
+    conn: &Connection,
+    id: &str,
+    role: ActivityPartyRole,
+    cm: Option<&str>,
+    address: Option<&str>,
+) -> rusqlite::Result<()> {
     if role.creates_email_row() {
         let address = match cm {
             Some(cm) => method_address(conn, cm)?,
-            None => None,
+            None => address.map(str::to_owned),
         };
         conn.execute(
             "INSERT INTO activity_party_email (id, email_address, email_address_formatted) VALUES (?1, ?2, ?2)
@@ -587,7 +596,7 @@ pub fn activity_party_edit(
         params![activity_party_id, pid, p.role.id(), cm, name, initials],
     )?;
     audit::stamp_modified(&tx, "activity_party", &activity_party_id, &stamp)?;
-    write_subtypes(&tx, activity_party_id, p.role, cm)?;
+    write_subtypes(&tx, activity_party_id, p.role, cm, opt(&p.email_address))?;
     refresh_caches(&tx, &activity_id)?;
     touch(&tx, &activity_id, &stamp)?;
     tx.commit()?;
@@ -1332,11 +1341,13 @@ pub fn tasks_due(conn: &Connection, actor: &Actor, limit: i64) -> Result<ListPag
     )
 }
 
-/// The page of an activity: a discussion opens its own (UI-09), every other type the activity page (UI-07).
+/// The page of an activity: a discussion (UI-09) and an email (UI-08) open their own, every other type the activity
+/// page (UI-07).
 pub fn page_href(id: &str, type_id: i64) -> String {
     let id = crate::web::urlencode(id);
     match ActivityType::from_id(type_id) {
         Some(ActivityType::Discussion) => format!("/discussions/{id}"),
+        Some(ActivityType::Email) => format!("/email-messages/{id}"),
         _ => format!("/activities/{id}"),
     }
 }
@@ -1502,11 +1513,8 @@ mod tests {
         let mut task = note("Task");
         task.kind = Kind::Task;
         let t = activity_create(&mut conn, &task, &actor).unwrap();
-        let p = PartyInput {
-            role: ActivityPartyRole::Regarding,
-            party_id: "p-hp-eh".into(),
-            contact_method_id: cm.clone(),
-        };
+        let p =
+            PartyInput { contact_method_id: cm.clone(), ..PartyInput::new(ActivityPartyRole::Regarding, "p-hp-eh") };
         activity_party_add(&mut conn, &t, &p, &actor).unwrap();
         let Err(CommandError::Validation(e)) = activity_party_add(&mut conn, &t, &p, &actor) else { panic!() };
         assert_eq!(e[0].field, "contact_method_id");
