@@ -1702,7 +1702,7 @@ mod tests {
         };
         assert_eq!(
             summary,
-            "Deletes the discussion “Lighting spec for the reception area” with its 3 people on it and 2 comments. \
+            "Deletes the discussion “Lighting spec for the reception area” with its 4 people on it and 2 comments. \
              Attached files stay in Files."
         );
         let mut meeting = note("Walk");

@@ -475,10 +475,19 @@ mod tests {
         assert_eq!(d.activity.comment_count, 5, "2 in the seed + 3");
         assert_eq!(d.comments.len(), 5);
         let to: Vec<String> = {
-            let mut s = conn.prepare("SELECT party_id FROM notification WHERE entity_id = 'a-disc-light'").unwrap();
+            let mut s = conn
+                .prepare(
+                    "SELECT party_id FROM notification WHERE entity_id = 'a-disc-light' AND id NOT LIKE 'n-%'
+                     ORDER BY party_id",
+                )
+                .unwrap();
             s.query_map([], |r| r.get(0)).unwrap().map(Result::unwrap).collect()
         };
-        assert_eq!(to, ["p-hp-eh", "p-hp-eh", "p-hp-eh"], "the one subscriber, once per comment");
+        assert_eq!(
+            to,
+            ["p-hp-eh", "p-hp-eh", "p-hp-eh", "p-mara", "p-mara", "p-mara"],
+            "the two subscribers (Elena, and Mara, the commenter not left out), once per comment"
+        );
         let creator = d.activity.parties.iter().any(|p| p.role_id == 50);
         assert!(creator, "the Creator survives comments (422's rewrite is not built)");
         assert!(matches!(comment_add(&mut conn, "a-disc-light", "  ", &actor), Err(CommandError::Validation(_))));
@@ -521,22 +530,36 @@ mod tests {
     }
 
     #[test]
+    fn the_demo_seed_gives_mara_one_unread_notification() {
+        // B4: the seed's comments notified the subscribers (422 s162-187, 670 s106-110); Mara read the first.
+        let (conn, actor) = demo();
+        let (list, unread) = notification_list(&conn, &actor, 20).unwrap();
+        assert_eq!((list.len(), unread), (2, 1));
+        assert_eq!(list[0].description, "Lighting spec for the reception area");
+        assert_eq!(list[0].href, "/discussions/a-disc-light");
+        let cached: i64 = conn
+            .query_row("SELECT unread_notification_count_cached FROM user WHERE id = 'u-mara'", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(cached, 1, "the seed's cached count is the recount");
+    }
+
+    #[test]
     fn notifications_are_listed_and_marked_read_one_at_a_time() {
         let (mut conn, actor) = demo();
         let id = discussion_create(&mut conn, &on(10, "p-hp"), &actor).unwrap();
         comment_add(&mut conn, &id, "one", &actor).unwrap();
         comment_add(&mut conn, &id, "two", &actor).unwrap();
         let (list, unread) = notification_list(&conn, &actor, 20).unwrap();
-        assert_eq!((list.len(), unread), (2, 2));
+        assert_eq!((list.len(), unread), (4, 3), "two new, and the seed's two (one read)");
         assert_eq!(list[0].href, format!("/discussions/{id}"));
         assert_eq!(list[0].description, "Halden & Pryce Architects");
         notification_mark_read(&mut conn, &list[0].id, &actor).unwrap();
         let (_, unread) = notification_list(&conn, &actor, 20).unwrap();
-        assert_eq!(unread, 1);
+        assert_eq!(unread, 2);
         let cached: i64 = conn
             .query_row("SELECT unread_notification_count_cached FROM user WHERE id = 'u-mara'", [], |r| r.get(0))
             .unwrap();
-        assert_eq!(cached, 1, "the recount of 373");
+        assert_eq!(cached, 2, "the recount of 373");
         assert!(matches!(notification_mark_read(&mut conn, "nope", &actor), Err(CommandError::NotFound)));
     }
 }

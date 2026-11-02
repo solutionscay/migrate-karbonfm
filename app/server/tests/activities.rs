@@ -313,7 +313,7 @@ async fn a_discussion_page_shows_its_comments_and_subscribers() {
     assert_eq!(status, StatusCode::OK);
     assert!(html.contains(r#"id="disc-title" class="page-title flex-1">Lighting spec for the reception area</h1>"#));
     assert!(html.contains("Can we see the warmer 2700K option?") && html.contains("Elena Halden"));
-    assert!(html.contains("1 subscriber"));
+    assert!(html.contains("2 subscribers"), "Elena, and Mara (the demo seed, B4)");
     assert!(html.contains(r#"href="/parties/p-hp""#) || html.contains("Halden"), "what it is about");
     assert!(html.contains(r#"aria-label="Comment""#));
     assert!(!html.contains("get an email"), "the design's email promise is not in the source (670 s114)");
@@ -379,17 +379,18 @@ async fn the_bell_counts_unread_notifications_and_marks_one_read() {
     assert!(html.contains(r#"<div id="bell" hx-get="/notifications" hx-trigger="load""#));
     let (status, html) = get(&app, "/notifications").await;
     assert_eq!(status, StatusCode::OK);
-    assert!(html.contains(r#"aria-label="Notifications""#) && html.contains("No notifications."));
+    // The demo seed's comments notified Mara as a subscriber: one read, one unread (B4).
+    assert!(html.contains("Notifications, 1 unread") && html.contains(r#"href="/discussions/a-disc-light""#));
     // A discussion with no subscribers notifies everyone on it, the commenter (the current user) too (422).
     let (_, h, _) = send(&app, form("POST", "/discussions", "entity_type_id=10&entity_id=p-bm")).await;
     let disc = redirect(&h);
     send(&app, form("POST", &format!("{disc}/comments"), "comment=Hello")).await;
     let (_, html) = get(&app, "/notifications").await;
-    assert!(html.contains("Notifications, 1 unread") && html.contains(&format!(r#"href="{disc}""#)));
+    assert!(html.contains("Notifications, 2 unread") && html.contains(&format!(r#"href="{disc}""#)));
     let id = html.split(r#"{"id": ""#).nth(1).unwrap().split('"').next().unwrap().to_owned();
     let (status, _, html) = send(&app, form("POST", "/notifications/read", &format!("id={id}"))).await;
     assert_eq!(status, StatusCode::OK);
-    assert!(html.contains(" read</span>") && !html.contains("unread"), "{html}");
+    assert!(html.contains(" read</span>") && html.contains("Notifications, 1 unread"), "{html}");
     let (status, _, _) = send(&app, form("POST", "/notifications/read", "id=nope")).await;
     assert_eq!(status, StatusCode::NOT_FOUND);
 }
