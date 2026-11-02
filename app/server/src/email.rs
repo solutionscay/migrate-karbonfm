@@ -509,7 +509,7 @@ pub fn email_send(
 
 /// Sends through lettre's blocking SMTP transport. Plain text only (337 s160 sends the plain message; message_html
 /// is never sent), no attachments (521 s115 never passes them). The From header is `"Full Name" <account address>`
-/// (337 s135); Bcc goes in the envelope only.
+/// (337 s135); Bcc goes in the envelope only; the Message-ID is a new id on the sender's domain.
 pub struct LettreMailer {
     /// Seconds before a connection or reply times out; the source sets none (I4 plan Q5: lettre's default).
     pub timeout: Option<std::time::Duration>,
@@ -527,7 +527,13 @@ pub fn build_message(m: &Outgoing) -> Result<lettre::Message, SendError> {
     let bad = |what: &str, v: &str| SendError::Other(format!("{what} is not a valid email address: {v}"));
     let from_addr: lettre::Address = m.from_address.parse().map_err(|_| bad("The sender", &m.from_address))?;
     let name = (!m.from_name.is_empty()).then(|| m.from_name.clone());
-    let mut b = lettre::Message::builder().from(Mailbox::new(name, from_addr)).subject(m.subject.clone());
+    // A Message-ID on the sender's domain (B12): servers may score a message without one as spam, and lettre's own
+    // would carry the machine's host name.
+    let message_id = format!("<{}@{}>", crate::ids::new_id(), from_addr.domain());
+    let mut b = lettre::Message::builder()
+        .from(Mailbox::new(name, from_addr))
+        .subject(m.subject.clone())
+        .message_id(Some(message_id));
     for t in &m.to {
         b = b.to(t.parse::<Mailbox>().map_err(|_| bad("A To recipient", t))?);
     }

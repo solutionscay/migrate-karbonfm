@@ -300,6 +300,9 @@ async fn success_sends_plain_text_with_bcc_in_the_envelope_and_marks_it_sent() {
     assert!(data.contains(&format!("Cc: {marcus}")), "{data}");
     assert!(!data.to_ascii_lowercase().contains("bcc:") && !data.contains(&joanna), "no Bcc header: {data}");
     assert!(data.contains("Subject: Lighting schedule"));
+    // B12: a Message-ID on the sender's domain, never the machine's host name.
+    let mid = data.lines().find(|l| l.to_ascii_lowercase().starts_with("message-id:")).expect("a Message-ID header");
+    assert!(mid.trim_end().ends_with("@ellisonstudio.example>"), "{mid}");
     assert!(data.contains("Content-Type: text/plain"));
     assert!(data.contains("the warmer option is attached."));
     assert!(!data.contains("text/html"), "no HTML part (337 s160)");
