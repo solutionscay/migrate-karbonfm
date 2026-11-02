@@ -78,6 +78,7 @@ struct G<'a> {
     items: Vec<Item>,
     txns: Vec<(String, String, NaiveDate, String)>, // (txn id, customer party id, date, doc number)
     discussions: Vec<(String, String)>,             // (activity id, title)
+    org_names: BTreeMap<String, String>,            // (party id, organization name)
     serial: BTreeMap<&'static str, u32>,
 }
 
@@ -92,6 +93,7 @@ pub fn build(x: &mut Export, cfg: Config) {
         items: Vec::new(),
         txns: Vec::new(),
         discussions: Vec::new(),
+        org_names: BTreeMap::new(),
         serial: BTreeMap::new(),
     };
     g.reference();
@@ -483,6 +485,7 @@ impl G<'_> {
 
     fn organization(&mut self, id: &str, name: &str, kind: &str, tax_id: String, created: NaiveDateTime) {
         self.party(id, name, true, created);
+        self.org_names.insert(id.to_string(), name.to_string());
         let r = row(&[
             ("Id", id.into()),
             ("OrganizationName", name.into()),
@@ -493,9 +496,21 @@ impl G<'_> {
     }
 
     fn person(&mut self, id: &str, first: &str, last: &str, job: &str, created: NaiveDateTime) {
+        self.person_at(id, first, last, job, "", created);
+    }
+
+    /// A person made with their organization: EmployerName is the organization's name, as Create Customer V3
+    /// plucks it (kontroller 229 s229; 246 s143). `{{OrganizationName}}` of a person merges from it.
+    fn person_at(&mut self, id: &str, first: &str, last: &str, job: &str, org: &str, created: NaiveDateTime) {
         self.party(id, &format!("{first} {last}"), false, created);
-        let r =
-            row(&[("Id", id.into()), ("FirstName", first.into()), ("LastName", last.into()), ("JobTitle", job.into())]);
+        let employer = self.org_names.get(org).cloned().unwrap_or_default();
+        let r = row(&[
+            ("Id", id.into()),
+            ("FirstName", first.into()),
+            ("LastName", last.into()),
+            ("JobTitle", job.into()),
+            ("EmployerName", employer),
+        ]);
         self.push("Person", r, created);
     }
 
@@ -750,7 +765,7 @@ impl G<'_> {
         let first = *self.r.pick(FIRST);
         let last = *self.r.pick(LAST);
         let job = *self.r.pick(JOBS);
-        self.person(&id, first, last, job, at);
+        self.person_at(&id, first, last, job, org, at);
         let mail =
             format!("{}.{}@{domain}.example", first.to_lowercase(), last.to_lowercase().replace(['\'', 'ü'], ""));
         self.network(&id, "Work", &mail, false, &[], at);
@@ -1014,7 +1029,7 @@ impl G<'_> {
             ("p-hp-mp", "Marcus", "Pryce", "Partner", false),
             ("p-hp-jw", "June", "Whitlock", "Office manager", true),
         ] {
-            self.person(pid, first, last, what, at);
+            self.person_at(pid, first, last, what, ANCHOR_HP, at);
             self.network(pid, "Work", &format!("{}@haldenpryce.example", first.to_lowercase()), false, &[], at);
             self.relation(pid, ANCHOR_HP, what, billing, at);
         }

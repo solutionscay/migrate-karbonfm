@@ -570,6 +570,16 @@ mod tests {
     }
 
     #[test]
+    fn organization_name_of_a_person_is_their_employer() {
+        // B2: the seed email INV-1048 goes To Joanna Whitfield of Halden & Pryce. A person's OrganizationName is
+        // Person::EmployerName (156 f131), which a person made with their organization takes (kontroller 229 s229).
+        let (conn, _) = crate::db::open_in_memory(crate::db::Seed::Demo).unwrap();
+        let v = merge_values(&conn, "a-mail-1048").unwrap();
+        assert_eq!(v.get("FirstName").map(String::as_str), Some("Joanna"));
+        assert_eq!(v.get("OrganizationName").map(String::as_str), Some("Halden & Pryce Architects"));
+    }
+
+    #[test]
     fn type_ids_round_trip() {
         assert_eq!(parse_type_ids("1\r2\n3"), [1, 2, 3]);
         assert_eq!(type_ids_text(&[3, 1, 1]).as_deref(), Some("1\n3"));

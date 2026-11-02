@@ -1150,6 +1150,21 @@ fn wizard_field(prefix: &str, field: &'static str) -> &'static str {
     }
 }
 
+/// The person made with an organization takes its name as EmployerName when none is given: Create Customer V3
+/// plucks the customer's OrganizationName into the person's EmployerName (kontroller 229 s229), which Create Person
+/// writes (246 s143). `{{OrganizationName}}` of a person merges from it (templates::merge_values).
+fn with_employer(person: &NewParty, organization: Option<&NewParty>) -> NewParty {
+    let mut person = person.clone();
+    if let (PartyFields::Person(p), Some(PartyFields::Organization(o))) =
+        (&mut person.fields, organization.map(|o| &o.fields))
+    {
+        if p.employer_name.trim().is_empty() {
+            p.employer_name = o.organization_name.clone();
+        }
+    }
+    person
+}
+
 /// OP-PARTY-11 `party_create_wizard` (BR-PARTY-09), one transaction (D-08: a failure leaves nothing behind):
 /// the organization with a customer or lead role or none; the person with an employee role, a lead role (only when
 /// no organization is created) or none; then the relation pair between them (person -> organization is the
@@ -1196,7 +1211,7 @@ pub fn party_create_wizard(
         create_in(&tx, o, &stamp)?;
     }
     if let Some(p) = &input.person {
-        create_in(&tx, p, &stamp)?;
+        create_in(&tx, &with_employer(p, input.organization.as_ref()), &stamp)?;
     }
     if let (Some(o), Some(p)) = (&input.organization, &input.person) {
         let today = &stamp.at[..10];
@@ -1525,6 +1540,10 @@ mod tests {
         let person = party_get(&conn, &p).unwrap();
         assert!(person.has_role(RoleKind::Employee));
         assert_eq!(person.relations[0].relationship, "Employer");
+        // B2: the person made with the organization takes its name as EmployerName (kontroller 229 s229, 246 s143).
+        let employer: Option<String> =
+            conn.query_row("SELECT employer_name FROM person WHERE id = ?1", [&p], |r| r.get(0)).unwrap();
+        assert_eq!(employer.as_deref(), Some("Tidewater Kayak"));
         assert!(relations_without_reciprocal(&conn).unwrap().is_empty());
         assert!(customer_roles_without_customer_row(&conn).unwrap().is_empty());
     }

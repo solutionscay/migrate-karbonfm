@@ -374,6 +374,11 @@ INSERT INTO sales_transaction (id, doc_number, date, due_date, id_customer, subt
 INSERT INTO sales_receipt (id, payment_ref_num) VALUES ('t-ret-0044', 'Bank transfer');
 INSERT INTO sales_line (id, sales_transaction_id, item_id, description, qty, unit_price, amount, taxable, amount_taxable) VALUES ('l-021', 't-ret-0044', 'i-retainer', 'Retainer deposit', 1, 35000, 35000, 0, 0);
 
+-- A person made with their organization takes its name as EmployerName (kontroller 229 s229 plucks OrganizationName
+-- into the person's EmployerName; 246 s143 writes it). {{OrganizationName}} of a person merges from it (B2).
+UPDATE person SET employer_name = (SELECT o.organization_name FROM party_relation r JOIN organization o ON o.id = r.party_id_to
+                                   WHERE r.party_id_from = person.id AND r.current_ind = 1 ORDER BY r.rowid LIMIT 1);
+
 -- Opportunities. Stages map to the source statuses: Lead -> 1 New, Qualified -> 2 In process, Proposal and Negotiation -> 3 Proposal sent, Won -> 4 Won.
 INSERT INTO opportunity (id, party_id, name, opportunity_status_id, probability, end_date, value, active_ind, salesperson_id, referring_party_id, primary_contact_party_id) VALUES ('o-hp-fitout2', 'p-hp', 'Office fit-out, phase 2', 3, '60%', '2026-11-14', 1850000, 1, 'r-mara-emp', NULL, 'p-hp-eh');
 INSERT INTO opportunity (id, party_id, name, opportunity_status_id, probability, end_date, value, active_ind, salesperson_id, referring_party_id, primary_contact_party_id) VALUES ('o-hp-archive', 'p-hp', 'Annual drawing archive digitising', 2, '30%', '2027-01-20', 600000, 1, 'r-mara-emp', NULL, 'p-hp-eh');

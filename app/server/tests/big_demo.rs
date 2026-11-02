@@ -69,6 +69,11 @@ async fn new_data_folder_gets_the_big_demo_and_opens_without_setup() {
         )
         .unwrap();
     assert_eq!((tax, phones), (550, 1));
+    // B2: a client contact's EmployerName is the organization it was made with (kontroller 229 s229).
+    let employer: Option<String> =
+        conn.query_row("SELECT employer_name FROM person WHERE id = 'p-hp-eh'", [], |r| r.get(0)).unwrap();
+    assert_eq!(employer.as_deref(), Some("Halden & Pryce Architects"));
+    assert!(count("SELECT COUNT(*) FROM person WHERE employer_name IS NOT NULL") > 100);
     drop(conn);
 
     // No secret of the export reached the database (D-09, OD-05-02).
