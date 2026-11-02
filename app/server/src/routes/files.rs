@@ -336,6 +336,10 @@ fn file_response(path: &std::path::Path, content_type: &str, name: Option<&str>)
     Ok(res)
 }
 
+/// Open refuses a type that could run a program (`files::openable`): 409 with this text.
+pub const NOT_OPENABLE: &str =
+    "KarbonFM opens documents and images only. This type of file could run a program, so it is not opened.";
+
 /// 410 Gone: the row is there, its stored copy is not.
 fn missing() -> Response {
     (StatusCode::GONE, MISSING).into_response()
@@ -369,13 +373,18 @@ pub async fn thumbnail(State(state): State<AppState>, Path(id): Path<String>) ->
 
 /// `POST /files/{id}/open`: asks the desktop shell to open the stored copy with the system app (204). 501 without
 /// the shell (the page then opens the content route); 410 with "File missing from the file store" when the copy is
-/// gone.
+/// gone; 409 for a type that is not a document or an image (it could run a program).
 pub async fn open(State(state): State<AppState>, Path(id): Path<String>) -> Result<Response, AppError> {
     let f = {
         let conn = lock(&state)?;
         files::stored_file(&conn, state.data_dir.as_deref(), &id).map_err(|e| command_error("stored_file", e))?
     };
     let Some(path) = f.path else { return Ok(missing()) };
+    // The type the system goes by is the stored copy's extension.
+    let ext = path.extension().map(|e| e.to_string_lossy().into_owned()).unwrap_or_default();
+    if !files::openable(&ext) {
+        return Ok((StatusCode::CONFLICT, NOT_OPENABLE).into_response());
+    }
     let Some(hook) = state.open.clone() else { return Ok(StatusCode::NOT_IMPLEMENTED.into_response()) };
     tokio::task::spawn_blocking(move || hook(path))
         .await

@@ -86,7 +86,7 @@ if (window.htmx) {
       const res = await fetch(`/files/${id}/open`, { method: "POST" });
       if (res.status === 204) return;
       if (res.status === 501) { window.open(`/files/${id}/content`, "_blank", "noopener"); return; }
-      window.karbonToast(res.status === 410 ? await res.text() : "The file could not be opened.", { error: true });
+      window.karbonToast(res.status === 410 || res.status === 409 ? await res.text() : "The file could not be opened.", { error: true });
     } catch (_) {
       window.karbonToast("KarbonFM did not answer, so the file was not opened.", { error: true });
     }

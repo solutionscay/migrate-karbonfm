@@ -78,6 +78,39 @@ pub fn category(ext: &str) -> &'static str {
     }
 }
 
+/// The types "Open" hands to the system app: documents and images. Anything else (a script, an app, an installer, an
+/// archive) could run a program when the system opens it, so it is never opened from KarbonFM; the page says so.
+pub fn openable(ext: &str) -> bool {
+    matches!(
+        ext.to_ascii_lowercase().as_str(),
+        "pdf"
+            | "txt"
+            | "rtf"
+            | "csv"
+            | "doc"
+            | "docx"
+            | "xls"
+            | "xlsx"
+            | "ppt"
+            | "pptx"
+            | "odt"
+            | "ods"
+            | "odp"
+            | "pages"
+            | "numbers"
+            | "key"
+            | "png"
+            | "jpg"
+            | "jpeg"
+            | "gif"
+            | "bmp"
+            | "tif"
+            | "tiff"
+            | "heic"
+            | "webp"
+    )
+}
+
 /// The entity types a file attaches to (plan F7): party, activity, sales transaction, opportunity.
 pub const ATTACHABLE: &[EntityType] =
     &[EntityType::Party, EntityType::Activity, EntityType::SalesTransaction, EntityType::Opportunity];
@@ -517,6 +550,10 @@ mod tests {
         assert_eq!(content_type("bmp"), "", "617 s117 has no type for bmp or tif");
         assert_eq!(content_type("xlsx"), "");
         assert_eq!(serve_type("image/jpg"), "image/jpeg");
+        assert!(openable("PDF") && openable("xlsx") && openable("jpeg"));
+        for ext in ["command", "sh", "exe", "app", "zip", "html", "js", "pkg", "dmg", "bat", "ps1", "jar", ""] {
+            assert!(!openable(ext), "{ext}");
+        }
         assert_eq!(serve_type(""), "application/octet-stream");
         for ext in ["png", "jpg", "jpeg", "gif", "bmp", "tif", "tiff", "PNG"] {
             assert_eq!(category(ext), "Image", "{ext}");

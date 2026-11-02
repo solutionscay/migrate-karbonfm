@@ -421,6 +421,30 @@ async fn upload_from_the_party_panel_then_open_serve_and_detach() {
 }
 
 #[tokio::test]
+async fn open_never_hands_a_program_to_the_system() {
+    let (dir, mut conn, actor) = demo();
+    let script =
+        files::file_add(&mut conn, dir.path(), &upload("run me.command", b"#!/bin/sh\necho hi".to_vec(), None), &actor)
+            .unwrap();
+    drop(conn);
+    let calls: Arc<Mutex<Vec<PathBuf>>> = Arc::default();
+    let seen = calls.clone();
+    let hook: OpenHook = Arc::new(move |p| {
+        seen.lock().unwrap().push(p);
+        Ok(())
+    });
+    let app = app(dir.path(), Some(hook));
+    let (status, _, body) =
+        send(&app, Request::post(format!("/files/{script}/open")).body(Body::empty()).unwrap()).await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    assert!(text(&body).contains("documents and images only"));
+    assert!(calls.lock().unwrap().is_empty(), "the hook is never called");
+    let (_, headers, _) =
+        send(&app, Request::get(format!("/files/{script}/content")).body(Body::empty()).unwrap()).await;
+    assert!(headers[header::CONTENT_DISPOSITION].to_str().unwrap().starts_with("attachment;"), "it only downloads");
+}
+
+#[tokio::test]
 async fn open_answers_501_without_the_desktop_shell() {
     let (dir, mut conn, actor) = demo();
     let id = files::file_add(&mut conn, dir.path(), &upload("n.txt", b"note".to_vec(), None), &actor).unwrap();
