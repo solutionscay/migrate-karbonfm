@@ -510,24 +510,31 @@ fn write_subtypes(
 /// The activity caches 376 keeps (creator_cached s249-251, parties_cached s222-224, task from/to s234-240),
 /// recomputed from the rows. The source appends a name on every add and edit, so names piled up: built as intended.
 pub fn refresh_caches(conn: &Connection, activity_id: &str) -> rusqlite::Result<()> {
+    // The row's cached name, or the party's own when the row has none (an imported or seeded row), so a recompute
+    // never blanks a name the activity showed (B1).
+    const NAME: &str =
+        "COALESCE(NULLIF(ap.party_name_cached, ''), (SELECT name_cached FROM party WHERE id = ap.party_id))";
+    let first = |role: i64| {
+        format!(
+            "(SELECT {NAME} FROM activity_party ap WHERE ap.activity_id = ?1 \
+              AND CAST(ap.activity_party_role_id AS INTEGER) = {role} ORDER BY ap.rowid LIMIT 1)"
+        )
+    };
     conn.execute(
-        "UPDATE activity SET
-            parties_cached = (SELECT group_concat(n, ', ') FROM (
-                SELECT party_name_cached AS n FROM activity_party
-                WHERE activity_id = ?1 AND CAST(activity_party_role_id AS INTEGER) NOT IN (50, 51)
-                  AND COALESCE(party_name_cached, '') <> '' ORDER BY rowid)),
-            creator_cached = (SELECT party_name_cached FROM activity_party
-                              WHERE activity_id = ?1 AND CAST(activity_party_role_id AS INTEGER) = 50 ORDER BY rowid LIMIT 1)
-         WHERE id = ?1",
+        &format!(
+            "UPDATE activity SET
+                parties_cached = (SELECT group_concat(n, ', ') FROM (
+                    SELECT {NAME} AS n FROM activity_party ap
+                    WHERE ap.activity_id = ?1 AND CAST(ap.activity_party_role_id AS INTEGER) NOT IN (50, 51)
+                      AND COALESCE({NAME}, '') <> '' ORDER BY ap.rowid)),
+                creator_cached = {}
+             WHERE id = ?1",
+            first(50)
+        ),
         [activity_id],
     )?;
     conn.execute(
-        "UPDATE task SET
-            from_cached = (SELECT party_name_cached FROM activity_party
-                           WHERE activity_id = ?1 AND CAST(activity_party_role_id AS INTEGER) = 52 ORDER BY rowid LIMIT 1),
-            to_cached = (SELECT party_name_cached FROM activity_party
-                         WHERE activity_id = ?1 AND CAST(activity_party_role_id AS INTEGER) = 53 ORDER BY rowid LIMIT 1)
-         WHERE id = ?1",
+        &format!("UPDATE task SET from_cached = {}, to_cached = {} WHERE id = ?1", first(52), first(53)),
         [activity_id],
     )?;
     Ok(())
@@ -1392,6 +1399,59 @@ mod tests {
             })
             .collect();
         (type_id, set)
+    }
+
+    fn caches(conn: &Connection) -> Vec<(String, Option<String>, Option<String>)> {
+        let mut s = conn.prepare("SELECT id, creator_cached, parties_cached FROM activity ORDER BY id").unwrap();
+        let rows = s.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))).unwrap();
+        rows.collect::<Result<_, _>>().unwrap()
+    }
+
+    #[test]
+    fn the_demo_seed_caches_are_what_a_recompute_gives() {
+        // B1: every seeded activity_party row carries its party's name and initials, and the activity caches are
+        // the ones refresh_caches writes (376 s222-251), so saving a seed activity changes nothing on screen.
+        let (conn, _) = demo();
+        let mut s = conn
+            .prepare(
+                "SELECT ap.party_name_cached, ap.party_initials, p.name_cached, COALESCE(p.organization_ind, 0) = 1
+                 FROM activity_party ap JOIN party p ON p.id = ap.party_id",
+            )
+            .unwrap();
+        let rows: Vec<(Option<String>, Option<String>, String, bool)> = s
+            .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))
+            .unwrap()
+            .collect::<Result<_, _>>()
+            .unwrap();
+        assert!(!rows.is_empty());
+        for (cached, initials, name, org) in rows {
+            assert_eq!(cached.as_deref(), Some(name.as_str()), "party_name_cached of {name}");
+            assert_eq!(initials, Some(party_initials(&name, org)), "party_initials of {name}");
+        }
+        let before = caches(&conn);
+        for (id, ..) in &before {
+            refresh_caches(&conn, id).unwrap();
+        }
+        assert_eq!(caches(&conn), before);
+        let to: Option<String> =
+            conn.query_row("SELECT to_cached FROM task WHERE id = 'a-task-quote'", [], |r| r.get(0)).unwrap();
+        assert_eq!(to.as_deref(), Some("Mara Ellison"));
+    }
+
+    #[test]
+    fn a_recompute_reads_the_party_name_when_the_row_has_none() {
+        // B1: a row with no cached name (an import, an old seed) still gives the creator and the party list.
+        let (conn, _) = demo();
+        conn.execute("UPDATE activity_party SET party_name_cached = NULL WHERE activity_id = 'a-disc-light'", [])
+            .unwrap();
+        refresh_caches(&conn, "a-disc-light").unwrap();
+        let (creator, parties): (Option<String>, Option<String>) = conn
+            .query_row("SELECT creator_cached, parties_cached FROM activity WHERE id = 'a-disc-light'", [], |r| {
+                Ok((r.get(0)?, r.get(1)?))
+            })
+            .unwrap();
+        assert_eq!(creator.as_deref(), Some("Mara Ellison"));
+        assert!(parties.as_deref().unwrap_or("").starts_with("Halden & Pryce Architects"), "{parties:?}");
     }
 
     #[test]

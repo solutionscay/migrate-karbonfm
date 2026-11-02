@@ -383,29 +383,31 @@ INSERT INTO opportunity (id, party_id, name, opportunity_status_id, probability,
 INSERT INTO opportunity (id, party_id, name, opportunity_status_id, probability, end_date, value, active_ind, salesperson_id, referring_party_id, primary_contact_party_id) VALUES ('o-jr-sign', 'p-jr', 'Storefront signage', 3, '50%', '2026-11-21', 420000, 1, 'r-mara-emp', NULL, NULL);
 INSERT INTO opportunity (id, party_id, name, opportunity_status_id, probability, end_date, value, active_ind, salesperson_id, referring_party_id, primary_contact_party_id) VALUES ('o-od-support', 'p-od', 'Annual support plan', 1, '15%', '2027-01-06', 600000, 1, 'r-mara-emp', NULL, NULL);
 
--- Activities on Halden & Pryce, each linked to the customer (Regarding, 63) and to Mara (Creator, 50).
-INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, discussion_ind, comment_count_cached, creation_timestamp, creation_user_id) VALUES ('a-disc-light', 10, 'Lighting spec for the reception area', '2026-10-27', '15:10:00', 'Mara Ellison', 'Halden & Pryce Architects', 1, 2, '2026-10-28 08:00:00', 'u-mara');
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-001', 'a-disc-light', 'p-mara', 50);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-002', 'a-disc-light', 'p-hp', 63);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-003', 'a-disc-light', 'p-hp-eh', 64);
+-- Activities on Halden & Pryce, each linked to the customer (Regarding, 63) and to Mara (Creator, 50). Each row caches
+-- its party's name and initials, and the activity caches are what a recompute writes (376 s222-251), so saving a seed
+-- activity changes nothing on screen.
+INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, discussion_ind, comment_count_cached, creation_timestamp, creation_user_id) VALUES ('a-disc-light', 10, 'Lighting spec for the reception area', '2026-10-27', '15:10:00', 'Mara Ellison', 'Halden & Pryce Architects, Elena Halden', 1, 2, '2026-10-28 08:00:00', 'u-mara');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-001', 'a-disc-light', 'p-mara', 50, 'Mara Ellison', 'ME');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-002', 'a-disc-light', 'p-hp', 63, 'Halden & Pryce Architects', 'H');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-003', 'a-disc-light', 'p-hp-eh', 64, 'Elena Halden', 'EH');
 INSERT INTO discussion (id, title, date, time, active_ind) VALUES ('a-disc-light', 'Lighting spec for the reception area', '2026-10-22', '10:00:00', 1);
 INSERT INTO activity_comment (id, activity_id, creator_id, date, time, comment) VALUES ('c-001', 'a-disc-light', 'p-mara', '2026-10-27', '14:20:00', 'Attached the 3000K fixture schedule. Warmer option possible if the budget holds.');
 INSERT INTO activity_comment (id, activity_id, creator_id, date, time, comment) VALUES ('c-002', 'a-disc-light', 'p-hp-eh', '2026-10-28', '09:05:00', 'Can we see the warmer 2700K option?');
-INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, task_ind, creation_timestamp, creation_user_id) VALUES ('a-task-quote', 3, 'Send revised fit-out quote', '2026-10-28', NULL, 'Mara Ellison', 'Halden & Pryce Architects', 1, '2026-10-28 08:00:00', 'u-mara');
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-004', 'a-task-quote', 'p-mara', 50);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-005', 'a-task-quote', 'p-hp', 63);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-006', 'a-task-quote', 'p-mara', 53);
-INSERT INTO task (id, due_date, priority, completed_at) VALUES ('a-task-quote', '2026-10-28', 'High', NULL);
-INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, event_ind, creation_timestamp, creation_user_id) VALUES ('a-meet-walk', 6, 'Phase 2 walkthrough on site', '2026-10-16', '10:00:00', 'Mara Ellison', 'Halden & Pryce Architects', 1, '2026-10-28 08:00:00', 'u-mara');
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-007', 'a-meet-walk', 'p-mara', 50);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-008', 'a-meet-walk', 'p-hp', 63);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-009', 'a-meet-walk', 'p-hp-eh', 60);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-010', 'a-meet-walk', 'p-hp-mp', 60);
+INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, task_ind, creation_timestamp, creation_user_id) VALUES ('a-task-quote', 3, 'Send revised fit-out quote', '2026-10-28', NULL, 'Mara Ellison', 'Halden & Pryce Architects, Mara Ellison', 1, '2026-10-28 08:00:00', 'u-mara');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-004', 'a-task-quote', 'p-mara', 50, 'Mara Ellison', 'ME');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-005', 'a-task-quote', 'p-hp', 63, 'Halden & Pryce Architects', 'H');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-006', 'a-task-quote', 'p-mara', 53, 'Mara Ellison', 'ME');
+INSERT INTO task (id, due_date, priority, completed_at, to_cached) VALUES ('a-task-quote', '2026-10-28', 'High', NULL, 'Mara Ellison');
+INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, event_ind, creation_timestamp, creation_user_id) VALUES ('a-meet-walk', 6, 'Phase 2 walkthrough on site', '2026-10-16', '10:00:00', 'Mara Ellison', 'Halden & Pryce Architects, Elena Halden, Marcus Pryce', 1, '2026-10-28 08:00:00', 'u-mara');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-007', 'a-meet-walk', 'p-mara', 50, 'Mara Ellison', 'ME');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-008', 'a-meet-walk', 'p-hp', 63, 'Halden & Pryce Architects', 'H');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-009', 'a-meet-walk', 'p-hp-eh', 60, 'Elena Halden', 'EH');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-010', 'a-meet-walk', 'p-hp-mp', 60, 'Marcus Pryce', 'MP');
 INSERT INTO event (id, start_date, start_time, end_date, end_time, location, meeting_ind, all_day_event_ind) VALUES ('a-meet-walk', '2026-10-16', '10:00:00', '2026-10-16', '11:30:00', '48 Wharf Street, Portland', 1, 0);
-INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, email_message_ind, message, creation_timestamp, creation_user_id) VALUES ('a-mail-1048', 1, 'Invoice INV-1048', '2026-10-14', '16:40:00', 'Mara Ellison', 'Halden & Pryce Architects', 1, 'Please find invoice INV-1048 attached.', '2026-10-28 08:00:00', 'u-mara');
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-011', 'a-mail-1048', 'p-mara', 50);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-012', 'a-mail-1048', 'p-hp', 63);
-INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id) VALUES ('ap-013', 'a-mail-1048', 'p-hp-jw', 55);
+INSERT INTO activity (id, activity_type_id, subject, date_display, time_display, creator_cached, parties_cached, email_message_ind, message, creation_timestamp, creation_user_id) VALUES ('a-mail-1048', 1, 'Invoice INV-1048', '2026-10-14', '16:40:00', 'Mara Ellison', 'Halden & Pryce Architects, Joanna Whitfield', 1, 'Please find invoice INV-1048 attached.', '2026-10-28 08:00:00', 'u-mara');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-011', 'a-mail-1048', 'p-mara', 50, 'Mara Ellison', 'ME');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-012', 'a-mail-1048', 'p-hp', 63, 'Halden & Pryce Architects', 'H');
+INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-013', 'a-mail-1048', 'p-hp-jw', 55, 'Joanna Whitfield', 'JW');
 INSERT INTO email_message (id, sent_ind, smtp_timestamp, use_system_settings_ind) VALUES ('a-mail-1048', 1, '2026-10-14 16:40:00', 1);
 
 -- Files: rows only. The demo ships no file bodies; container_path names where a copied file would be (D-17).
