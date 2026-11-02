@@ -3,6 +3,7 @@
 //! The page talks to this server only (no Tauri IPC). Each route renders an askama template: a full page for a
 //! normal request, a fragment for an htmx request (`HX-Request` header).
 
+pub mod activities;
 pub mod admin;
 pub mod applog;
 pub mod assets;
@@ -17,6 +18,7 @@ pub mod import;
 pub mod invoice;
 pub mod money;
 pub mod net;
+pub mod notifications;
 pub mod parties;
 pub mod pdf;
 pub mod reference;

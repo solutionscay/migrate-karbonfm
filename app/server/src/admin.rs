@@ -28,6 +28,8 @@ pub enum CommandError {
     ConfirmationRequired(String),
     /// The command is refused by a rule (409), like a duplicate relation pair (BR-PARTY-03); carries the message.
     Refused(String),
+    /// An email message that was sent already cannot be edited or sent again (AP-08, BR-ACTIVITY-08; T-08-08).
+    AlreadySent,
     Storage(rusqlite::Error),
 }
 
@@ -40,12 +42,16 @@ impl fmt::Display for CommandError {
             CommandError::AlreadyExists(id) => write!(f, "{id} exists already"),
             CommandError::ConfirmationRequired(summary) => write!(f, "confirmation required: {summary}"),
             CommandError::Refused(message) => f.write_str(message),
+            CommandError::AlreadySent => f.write_str(ALREADY_SENT),
             CommandError::Storage(e) => write!(f, "database: {e}"),
         }
     }
 }
 
 impl std::error::Error for CommandError {}
+
+/// The AlreadySent message (kontroller 522 s124-125: "This Email has already been sent").
+pub const ALREADY_SENT: &str = "This email has already been sent. A sent email cannot be changed or sent again.";
 
 impl From<rusqlite::Error> for CommandError {
     fn from(e: rusqlite::Error) -> Self {
