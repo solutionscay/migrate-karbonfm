@@ -53,6 +53,12 @@ if (window.htmx) {
   // Before this, a failed save looked as if nothing had happened. It never says "saved".
   document.addEventListener("htmx:responseError", (e) => {
     const status = e.detail.xhr ? e.detail.xhr.status : 0;
+    // A refusal by a rule (409, e.g. "This email has already been sent") carries its message as plain text.
+    const text = e.detail.xhr ? (e.detail.xhr.responseText || "").trim() : "";
+    if (status === 409 && text && text.length < 300 && !text.startsWith("<")) {
+      window.karbonToast(text, { error: true });
+      return;
+    }
     window.karbonToast(
       status >= 500
         ? "Something went wrong, so this may not have been saved. The log has the details."
@@ -74,6 +80,22 @@ if (window.htmx) {
       if (res.status === 204) return;
     } catch (_) {}
     window.print();
+  });
+
+  // Open a stored file (UI-19): the desktop shell opens it with the system app, so the window stays on the app. In a
+  // plain browser the server answers 501 and the file opens in a new tab; a missing copy says so.
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-open-file]");
+    if (!btn) return;
+    const id = encodeURIComponent(btn.dataset.openFile);
+    try {
+      const res = await fetch(`/files/${id}/open`, { method: "POST" });
+      if (res.status === 204) return;
+      if (res.status === 501) { window.open(`/files/${id}/content`, "_blank", "noopener"); return; }
+      window.karbonToast(res.status === 410 || res.status === 409 ? await res.text() : "The file could not be opened.", { error: true });
+    } catch (_) {
+      window.karbonToast("KarbonFM did not answer, so the file was not opened.", { error: true });
+    }
   });
 
   // Invoice PDF: shown in an in-app <dialog>, never as the page itself, so the window always keeps the app (S-02's

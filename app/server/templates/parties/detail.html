@@ -18,7 +18,7 @@
     <nav class="ktabs mb-4" role="tablist" aria-label="Party records">
       <button type="button" class="ktab" :class="tab === 'contacts' && 'on'" @click="tab = 'contacts'" role="tab" id="tab-contacts" aria-controls="panel-contacts" :aria-selected="tab === 'contacts'">Contacts <span class="n">{{ d.relations.len() }}</span></button>
       <button type="button" class="ktab" :class="tab === 'sales' && 'on'" @click="tab = 'sales'" role="tab" id="tab-sales" aria-controls="panel-sales" :aria-selected="tab === 'sales'">Sales transactions <span class="n">{{ sales_matched }}</span></button>
-      <button type="button" class="ktab" :class="tab === 'activity' && 'on'" @click="tab = 'activity'" role="tab" id="tab-activity" aria-controls="panel-activity" :aria-selected="tab === 'activity'">Activity</button>
+      <button type="button" class="ktab" :class="tab === 'activity' && 'on'" @click="tab = 'activity'" role="tab" id="tab-activity" aria-controls="panel-activity" :aria-selected="tab === 'activity'">Activity <span class="n">{{ activity_count }}</span></button>
       <button type="button" class="ktab" :class="tab === 'opps' && 'on'" @click="tab = 'opps'" role="tab" id="tab-opps" aria-controls="panel-opps" :aria-selected="tab === 'opps'">Opportunities</button>
     </nav>
 
@@ -43,7 +43,19 @@
       {% endif %}
     </section>
 
-    <section x-show="tab === 'activity'" x-cloak role="tabpanel" id="panel-activity" aria-labelledby="tab-activity" class="panel p-8 text-center muted">Activities come in a later release.</section>
+    <section x-show="tab === 'activity'" x-cloak role="tabpanel" id="panel-activity" aria-labelledby="tab-activity">
+      {% if !d.archived %}
+      <div class="flex flex-wrap justify-end gap-2 mb-3">
+        {% for (kind, label, icon) in [("note", "Note", "note"), ("task", "Task", "task"), ("meeting", "Meeting", "video"), ("call", "Call", "phone")] %}
+        <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind={{ kind }}&amp;party_id={{ d.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-{{ icon }}"/></svg>{{ label }}</button>
+        {% endfor %}
+        <button class="btn btn-sm btn-quiet" hx-get="/email-messages/new?party_id={{ d.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-mail"/></svg>Email</button>
+        <button class="btn btn-sm btn-primary" hx-get="/discussions/new?entity_type_id=10&amp;entity_id={{ d.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Start discussion</button>
+      </div>
+      {% endif %}
+      {{ activity|safe }}
+      {% if activity_count > 0 %}<a class="inline-block mt-2 text-[12.5px] link link-hover muted" href="/activities?party_id={{ d.id|urlencode }}">Open full timeline</a>{% endif %}
+    </section>
     <section x-show="tab === 'opps'" x-cloak role="tabpanel" id="panel-opps" aria-labelledby="tab-opps" class="panel p-8 text-center muted">Opportunities come in a later release.</section>
   </div>
 
@@ -63,6 +75,7 @@
         <dt class="muted">Comments</dt><dd class="whitespace-pre-line">{% if d.comments.is_empty() %}<span class="muted">—</span>{% else %}{{ d.comments }}{% endif %}</dd>
       </dl>
     </section>
+    {{ files|safe }}
   </aside>
 </div>
 {% endblock %}

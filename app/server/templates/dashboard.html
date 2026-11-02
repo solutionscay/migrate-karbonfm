@@ -23,4 +23,39 @@
   </div>
   <div class="p-4 h-72"><canvas data-revenue-chart="{{ chart_json }}" aria-label="Monthly revenue chart" role="img"></canvas></div>
 </section>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-5">
+  {# Tasks due (UI-02; layout 101 Selected_Task): my open tasks, oldest first; the box completes a task (OP-ACTIVITY-05). #}
+  <section class="panel flex flex-col" aria-labelledby="tasks-title">
+    <div class="panel-head">
+      <h2 id="tasks-title" class="panel-title">Tasks due</h2>
+      <span class="chip">{{ tasks_open }} open</span>
+      <a href="/activities?kind=task&amp;status=incomplete" class="ml-auto text-[12px] muted hover:text-base-content">View all</a>
+    </div>
+    {% if tasks.is_empty() %}
+    <p class="p-6 text-center muted text-[12.5px]">No open tasks.</p>
+    {% else %}
+    <ul class="flex-1 py-1">
+      {% for t in tasks %}
+      <li class="flex items-center gap-3 px-4 py-2 hover:bg-base-200/60">
+        <input type="checkbox" class="checkbox checkbox-xs checkbox-primary" aria-label="Complete {{ t.subject }}"
+               hx-post="/tasks/{{ t.id|urlencode }}/complete" hx-vals='{"complete": "true"}' hx-trigger="change">
+        <a class="min-w-0 flex-1" href="{{ t.href }}">
+          <div class="truncate">{{ t.subject }}</div>
+          {% if !t.who.is_empty() %}<div class="text-[12px] muted truncate">{{ t.who }}</div>{% endif %}
+        </a>
+        <span class="text-[11.5px] num {% if t.late %}text-error font-medium{% else %}muted{% endif %}">{{ t.due }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+  <section class="panel" aria-labelledby="recent-title">
+    <div class="panel-head">
+      <h2 id="recent-title" class="panel-title">Recent activity</h2>
+      <a href="/activities" class="ml-auto text-[12px] muted hover:text-base-content">Timeline</a>
+    </div>
+    <div class="p-4 pb-1">{{ recent|safe }}</div>
+  </section>
+</div>
 {% endblock %}

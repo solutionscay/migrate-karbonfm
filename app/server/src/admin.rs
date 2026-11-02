@@ -28,6 +28,8 @@ pub enum CommandError {
     ConfirmationRequired(String),
     /// The command is refused by a rule (409), like a duplicate relation pair (BR-PARTY-03); carries the message.
     Refused(String),
+    /// An email message that was sent already cannot be edited or sent again (AP-08, BR-ACTIVITY-08; T-08-08).
+    AlreadySent,
     Storage(rusqlite::Error),
 }
 
@@ -40,12 +42,16 @@ impl fmt::Display for CommandError {
             CommandError::AlreadyExists(id) => write!(f, "{id} exists already"),
             CommandError::ConfirmationRequired(summary) => write!(f, "confirmation required: {summary}"),
             CommandError::Refused(message) => f.write_str(message),
+            CommandError::AlreadySent => f.write_str(ALREADY_SENT),
             CommandError::Storage(e) => write!(f, "database: {e}"),
         }
     }
 }
 
 impl std::error::Error for CommandError {}
+
+/// The AlreadySent message (kontroller 522 s124-125: "This Email has already been sent").
+pub const ALREADY_SENT: &str = "This email has already been sent. A sent email cannot be changed or sent again.";
 
 impl From<rusqlite::Error> for CommandError {
     fn from(e: rusqlite::Error) -> Self {
@@ -242,6 +248,72 @@ pub fn settings_get(conn: &Connection) -> rusqlite::Result<SystemSettings> {
         )
         .optional()?
         .unwrap_or_default())
+}
+
+/// The user's own email account (user.smtp_*, table 130 #111-117; BR-INTEG-01, kontroller 337 s84-89). Its password
+/// is in the keychain (`SecretKey::UserSmtpPassword`, AP-03). An empty server, port, encryption or authentication
+/// means "the system account's" (337 s85-88).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct UserEmail {
+    pub address: Option<String>,
+    pub full_name: Option<String>,
+    pub user_name: Option<String>,
+    pub server: Option<String>,
+    pub port: Option<i64>,
+    pub encryption: Option<String>,
+    pub authentication: Option<String>,
+}
+
+/// The current user's email account (empty before setup).
+pub fn user_email_get(conn: &Connection, actor: &Actor) -> rusqlite::Result<UserEmail> {
+    let Some(user) = &actor.user_id else { return Ok(UserEmail::default()) };
+    Ok(conn
+        .query_row(
+            "SELECT smtp_email_address, smtp_full_name, smtp_user_name, smtp_server, CAST(smtp_server_port AS INTEGER),
+                    smtp_server_encryption_type, smtp_server_authentication
+             FROM user WHERE id = ?1",
+            [user],
+            |r| {
+                Ok(UserEmail {
+                    address: r.get(0)?,
+                    full_name: r.get(1)?,
+                    user_name: r.get(2)?,
+                    server: r.get(3)?,
+                    port: r.get(4)?,
+                    encryption: r.get(5)?,
+                    authentication: r.get(6)?,
+                })
+            },
+        )
+        .optional()?
+        .unwrap_or_default())
+}
+
+/// Saves the current user's email account (one transaction, modification stamps).
+pub fn user_email_update(conn: &mut Connection, e: &UserEmail, actor: &Actor) -> Result<(), CommandError> {
+    let Some(user) = &actor.user_id else { return Err(CommandError::NotFound) };
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let n = tx.execute(
+        "UPDATE user SET smtp_email_address = ?2, smtp_full_name = ?3, smtp_user_name = ?4, smtp_server = ?5,
+                         smtp_server_port = ?6, smtp_server_encryption_type = ?7, smtp_server_authentication = ?8
+         WHERE id = ?1",
+        params![
+            user,
+            e.address,
+            e.full_name,
+            e.user_name,
+            e.server,
+            e.port.map(|p| p.to_string()),
+            e.encryption,
+            e.authentication
+        ],
+    )?;
+    if n == 0 {
+        return Err(CommandError::NotFound);
+    }
+    audit::stamp_modified(&tx, "user", user, &Stamp::now(actor))?;
+    tx.commit()?;
+    Ok(())
 }
 
 /// The organizations the owner can be: current, not archived.

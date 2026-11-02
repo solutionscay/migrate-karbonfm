@@ -262,7 +262,9 @@ pub struct PersonFields {
     pub nickname: String,
     pub job_title: String,
     pub department: String,
-    pub employer_name: String,
+    /// `None` when the form does not carry it: an edit then keeps the stored value, as Edit Person writes
+    /// EmployerName only when the payload has it (kontroller 284 s131-132).
+    pub employer_name: Option<String>,
 }
 
 /// The organization fields of a party.
@@ -434,7 +436,7 @@ pub fn party_get(conn: &Connection, id: &str) -> Result<PartyDetail, CommandErro
         .query_row(
             "SELECT COALESCE(prefix, ''), COALESCE(first_name, ''), COALESCE(middle_name, ''), COALESCE(last_name, ''),
                     COALESCE(suffix, ''), COALESCE(nickname, ''), COALESCE(job_title, ''), COALESCE(department, ''),
-                    COALESCE(employer_name, '')
+                    employer_name
              FROM person WHERE id = ?1",
             [&id],
             |r| {
@@ -758,7 +760,8 @@ fn write_fields(conn: &Connection, id: &str, fields: &PartyFields) -> rusqlite::
     match fields {
         PartyFields::Person(p) => conn.execute(
             "UPDATE person SET prefix = ?2, first_name = ?3, middle_name = ?4, last_name = ?5, suffix = ?6,
-                               nickname = ?7, job_title = ?8, department = ?9, employer_name = ?10 WHERE id = ?1",
+                               nickname = ?7, job_title = ?8, department = ?9,
+                               employer_name = CASE WHEN ?11 THEN ?10 ELSE employer_name END WHERE id = ?1",
             params![
                 id,
                 opt(&p.prefix),
@@ -769,7 +772,8 @@ fn write_fields(conn: &Connection, id: &str, fields: &PartyFields) -> rusqlite::
                 opt(&p.nickname),
                 opt(&p.job_title),
                 opt(&p.department),
-                opt(&p.employer_name),
+                p.employer_name.as_deref().and_then(opt),
+                p.employer_name.is_some(),
             ],
         )?,
         PartyFields::Organization(o) => conn.execute(
@@ -1150,6 +1154,21 @@ fn wizard_field(prefix: &str, field: &'static str) -> &'static str {
     }
 }
 
+/// The person made with an organization takes its name as EmployerName when none is given: Create Customer V3
+/// plucks the customer's OrganizationName into the person's EmployerName (kontroller 229 s229), which Create Person
+/// writes (246 s143). `{{OrganizationName}}` of a person merges from it (templates::merge_values).
+fn with_employer(person: &NewParty, organization: Option<&NewParty>) -> NewParty {
+    let mut person = person.clone();
+    if let (PartyFields::Person(p), Some(PartyFields::Organization(o))) =
+        (&mut person.fields, organization.map(|o| &o.fields))
+    {
+        if p.employer_name.as_deref().is_none_or(|e| e.trim().is_empty()) {
+            p.employer_name = Some(o.organization_name.clone());
+        }
+    }
+    person
+}
+
 /// OP-PARTY-11 `party_create_wizard` (BR-PARTY-09), one transaction (D-08: a failure leaves nothing behind):
 /// the organization with a customer or lead role or none; the person with an employee role, a lead role (only when
 /// no organization is created) or none; then the relation pair between them (person -> organization is the
@@ -1196,7 +1215,7 @@ pub fn party_create_wizard(
         create_in(&tx, o, &stamp)?;
     }
     if let Some(p) = &input.person {
-        create_in(&tx, p, &stamp)?;
+        create_in(&tx, &with_employer(p, input.organization.as_ref()), &stamp)?;
     }
     if let (Some(o), Some(p)) = (&input.organization, &input.person) {
         let today = &stamp.at[..10];
@@ -1525,6 +1544,10 @@ mod tests {
         let person = party_get(&conn, &p).unwrap();
         assert!(person.has_role(RoleKind::Employee));
         assert_eq!(person.relations[0].relationship, "Employer");
+        // B2: the person made with the organization takes its name as EmployerName (kontroller 229 s229, 246 s143).
+        let employer: Option<String> =
+            conn.query_row("SELECT employer_name FROM person WHERE id = ?1", [&p], |r| r.get(0)).unwrap();
+        assert_eq!(employer.as_deref(), Some("Tidewater Kayak"));
         assert!(relations_without_reciprocal(&conn).unwrap().is_empty());
         assert!(customer_roles_without_customer_row(&conn).unwrap().is_empty());
     }
@@ -1689,6 +1712,10 @@ mod tests {
             ..Default::default()
         });
         party_update(&mut conn, "p-mara", &fields, "\tLikes early calls. ", &actor).unwrap();
+        // B2: the edit form has no EmployerName, so the stored one stays (kontroller 284 s131-132).
+        let employer: Option<String> =
+            conn.query_row("SELECT employer_name FROM person WHERE id = 'p-mara'", [], |r| r.get(0)).unwrap();
+        assert_eq!(employer.as_deref(), Some("Ellison Studio"));
         let d = party_get(&conn, "p-mara").unwrap();
         assert_eq!(d.name, "Mara Ellison-Hart");
         assert_eq!(d.person.as_ref().unwrap().job_title, "Principal");

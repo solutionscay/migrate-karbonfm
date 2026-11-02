@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{% if a.subject.is_empty() %}{{ a.type_name }}{% else %}{{ a.subject }}{% endif %} · KarbonFM{% endblock %}
+{% block content %}
+<div class="flex items-center gap-2 mb-3 text-[12.5px]">
+  <a class="link link-hover muted" href="/activities">Activity</a>
+  <svg class="i i-sm muted" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+  <span>{{ a.type_name }}</span>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-5">
+  <div class="min-w-0 space-y-4">
+    <section class="panel p-5" aria-labelledby="activity-title">
+      <div class="flex items-start gap-4">
+        <span class="av av-lg c0" aria-hidden="true"><svg class="i"><use href="#i-{{ self.icon() }}"/></svg></span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="page-title" id="activity-title">{% if a.subject.is_empty() %}<span class="muted">No subject</span>{% else %}{{ a.subject }}{% endif %}</h1>
+            <span class="chip">{{ a.type_name }}</span>
+            {% if let Some(t) = a.task %}
+              {% if t.completed_at.is_empty() %}<span class="chip info"><span class="dot"></span>Open</span>{% else %}<span class="chip ok"><span class="dot"></span>Completed</span>{% endif %}
+            {% endif %}
+            {% if let Some(e) = a.email %}{% if e.sent %}<span class="chip ok"><span class="dot"></span>Sent</span>{% else %}<span class="chip"><span class="dot"></span>Not sent</span>{% endif %}{% endif %}
+          </div>
+          <div class="muted mt-1 text-[12.5px]">
+            {% if !a.date_display.is_empty() %}{{ self.date(a.date_display) }}{% endif %}{% if !a.time_display.is_empty() %} · {{ self.time(a.time_display) }}{% endif %}{% if !a.creator.is_empty() %} · by {{ a.creator }}{% endif %}
+          </div>
+        </div>
+        <div class="flex gap-2 shrink-0">
+          {% if a.task.is_some() %}
+          <form hx-post="/tasks/{{ a.id|urlencode }}/complete">
+            {% if a.open_task() %}<input type="hidden" name="complete" value="true"><button class="btn btn-sm btn-primary"><svg class="i i-sm" aria-hidden="true"><use href="#i-check"/></svg>Complete</button>
+            {% else %}<input type="hidden" name="complete" value="false"><button class="btn btn-sm btn-quiet">Reopen</button>{% endif %}
+          </form>
+          {% endif %}
+          {% if self.editable() %}
+          <button class="btn btn-sm btn-quiet" hx-get="{{ self.href() }}/edit" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button>
+          {% endif %}
+          <button class="btn btn-sm btn-quiet" hx-delete="{{ self.href() }}" hx-target="#modal-body" aria-label="Delete this {{ a.type_name|lower }}"><svg class="i i-sm" aria-hidden="true"><use href="#i-x"/></svg>Delete</button>
+        </div>
+      </div>
+      {% if !a.message.is_empty() %}<p class="mt-4 text-[13px] whitespace-pre-line">{{ a.message }}</p>{% endif %}
+    </section>
+
+    <section class="panel" aria-labelledby="details-title">
+      <div class="panel-head"><h2 class="panel-title" id="details-title">Details</h2></div>
+      <dl class="p-4 grid grid-cols-[130px_1fr] gap-y-2 text-[12.5px]">
+        {% if let Some(t) = a.task %}
+          <dt class="muted">Due</dt><dd>{% if t.due_date.is_empty() %}<span class="muted">—</span>{% else %}{{ self.date(t.due_date) }}{% if !t.due_time.is_empty() %} · {{ self.time(t.due_time) }}{% endif %}{% endif %}</dd>
+          {% if !t.priority.is_empty() %}<dt class="muted">Priority</dt><dd>{{ t.priority }}</dd>{% endif %}
+          {% if !t.completed_at.is_empty() %}<dt class="muted">Completed</dt><dd>{{ self.date(t.completed_at[..10]) }}{% if !t.completed_by.is_empty() %} by {{ t.completed_by }}{% endif %}</dd>{% endif %}
+        {% endif %}
+        {% if let Some(e) = a.event %}
+          <dt class="muted">Starts</dt><dd>{% if e.start_date.is_empty() %}<span class="muted">—</span>{% else %}{{ self.date(e.start_date) }}{% if !e.start_time.is_empty() %} · {{ self.time(e.start_time) }}{% endif %}{% endif %}{% if e.all_day %} · All day{% endif %}</dd>
+          {% if !e.end_date.is_empty() || !e.end_time.is_empty() %}<dt class="muted">Ends</dt><dd>{% if !e.end_date.is_empty() %}{{ self.date(e.end_date) }}{% endif %}{% if !e.end_time.is_empty() %} · {{ self.time(e.end_time) }}{% endif %}</dd>{% endif %}
+          {% if !e.location.is_empty() %}<dt class="muted">Location</dt><dd>{{ e.location }}</dd>{% endif %}
+        {% endif %}
+        {% if let Some(c) = a.call %}
+          {% if !c.caller_name.is_empty() %}<dt class="muted">Caller</dt><dd>{{ c.caller_name }}</dd>{% endif %}
+          {% if !c.callback_number.is_empty() %}<dt class="muted">Callback number</dt><dd class="num">{{ c.callback_number }}</dd>{% endif %}
+          {% if !c.result.is_empty() %}<dt class="muted">Result</dt><dd>{{ c.result }}</dd>{% endif %}
+        {% endif %}
+        {% if let Some(e) = a.email %}
+          {% if e.sent %}<dt class="muted">Sent</dt><dd>{{ self.stamp(e.smtp_timestamp) }}{% if !e.smtp_result.is_empty() %} · <span class="mono">{{ e.smtp_result }}</span>{% endif %}</dd>{% endif %}
+        {% endif %}
+        <dt class="muted">About</dt>
+        {% let about = a.about() %}
+        <dd>{% if about.is_empty() %}<span class="muted">—</span>{% else %}{% for e in about %}{% if e.href.is_empty() %}{{ e.label }}{% else %}<a class="link link-hover" href="{{ e.href }}">{{ e.label }}</a>{% endif %}{% if !loop.last %}, {% endif %}{% endfor %}{% endif %}</dd>
+        <dt class="muted">Created</dt><dd>{% if a.created.is_empty() %}<span class="muted">—</span>{% else %}{{ self.stamp(a.created) }}{% endif %}</dd>
+      </dl>
+    </section>
+  </div>
+  <aside class="space-y-4" aria-label="People">
+    {{ parties|safe }}
+  </aside>
+</div>
+{% endblock %}

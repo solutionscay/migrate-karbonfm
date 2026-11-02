@@ -1,0 +1,26 @@
+{# Activity rows (OP-ACTIVITY-08) with a day header on each new day, and the pager. The timeline, the party's
+   Activity tab and the dashboard share it. #}
+<div id="activity-rows">
+  {% if rows.is_empty() %}
+  <div class="panel p-8 text-center muted">{{ empty }}</div>
+  {% else %}
+  {% for r in rows %}
+    {% if let Some(day) = r.day %}{% if !loop.first %}</div>{% endif %}<div class="eyebrow {% if !loop.first %}mt-3 {% endif %}mb-3">{{ day }}</div><div class="tl">{% elif loop.first %}<div class="tl">{% endif %}
+    <div class="tl-item"><div class="tl-icon {{ r.tone }}" aria-hidden="true"><svg class="i i-sm"><use href="#i-{{ r.icon }}"/></svg></div>
+      <a class="tl-card -mt-1.5 block" href="{{ r.href }}">
+        <div class="flex items-center gap-2"><b class="font-medium">{{ r.title }}</b>{% if let Some((text, class)) = r.chip %}<span class="chip {{ class }} ml-auto">{{ text }}</span>{% endif %}</div>
+        {% if !r.meta.is_empty() %}<div class="text-[12.5px] muted mt-0.5">{{ r.meta }}</div>{% endif %}
+        {% if !r.excerpt.is_empty() %}<p class="mt-1 text-[13px]">{{ r.excerpt }}</p>{% endif %}
+      </a>
+    </div>
+    {% if loop.last %}</div>{% endif %}
+  {% endfor %}
+  {% if matched > page_size %}
+  <nav class="flex items-center gap-2 mt-3 text-[12.5px]" aria-label="Pages">
+    <span class="muted">{{ self.first() }}–{{ self.last() }} of {{ matched }}</span>
+    {% if page > 1 %}<a class="btn btn-xs btn-quiet ml-auto" href="{{ self.page_href(page - 1) }}" hx-get="{{ self.page_href(page - 1) }}" hx-target="#activity-rows" hx-swap="outerHTML">Previous</a>{% endif %}
+    {% if self.more() %}<a class="btn btn-xs btn-quiet {% if page == 1 %}ml-auto{% endif %}" href="{{ self.page_href(page + 1) }}" hx-get="{{ self.page_href(page + 1) }}" hx-target="#activity-rows" hx-swap="outerHTML">Next</a>{% endif %}
+  </nav>
+  {% endif %}
+  {% endif %}
+</div>

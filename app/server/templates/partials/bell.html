@@ -1,0 +1,26 @@
+{# The notification bell (OP-ACTIVITY-09): the unread count (kontacts 373) and the latest notifications; a click
+   marks one read (layout 101). Loaded by the top bar once per page, and again on the karbon-notifications event (a
+   comment added on the page). #}
+<details class="dropdown dropdown-end" id="bell" {% if open %}open{% endif %} hx-get="/notifications" hx-trigger="karbon-notifications from:body" hx-swap="outerHTML">
+  <summary class="icon-btn relative" aria-label="Notifications{% if unread > 0 %}, {{ unread }} unread{% endif %}">
+    <svg class="i" aria-hidden="true"><use href="#i-bell"/></svg>
+    {% if unread > 0 %}<span class="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-content text-[10px] leading-4 text-center num" aria-hidden="true">{{ unread }}</span>{% endif %}
+  </summary>
+  <div class="dropdown-content bg-base-100 rounded-box z-20 w-80 shadow border hairline mt-1">
+    <div class="px-3 py-2 border-b hairline text-[12.5px] font-medium">Notifications</div>
+    <ul class="max-h-80 overflow-y-auto py-1" aria-label="Notifications">
+      {% for n in rows %}
+      <li class="flex items-start gap-2 px-3 py-2 {% if !n.read %}bg-base-200/50{% endif %}">
+        <div class="min-w-0 flex-1">
+          {% if n.href.is_empty() %}<span class="text-[12.5px] block truncate">{% if n.description.is_empty() %}Notification{% else %}{{ n.description }}{% endif %}</span>
+          {% else %}<a class="text-[12.5px] block truncate link link-hover" href="{{ n.href }}">{% if n.description.is_empty() %}Notification{% else %}{{ n.description }}{% endif %}</a>{% endif %}
+          <span class="text-[11px] muted">{{ self.date(n.date) }}{% if n.read %} · read{% endif %}</span>
+        </div>
+        {% if !n.read %}<button class="btn btn-xs btn-quiet" hx-post="/notifications/read" hx-vals='{"id": "{{ n.id }}"}' hx-target="#bell" hx-swap="outerHTML">Mark read</button>{% endif %}
+      </li>
+      {% else %}
+      <li class="px-3 py-4 text-[12.5px] muted text-center">No notifications.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</details>

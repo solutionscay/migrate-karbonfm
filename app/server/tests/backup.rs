@@ -57,7 +57,9 @@ fn backup_writes_a_consistent_copy_and_manifest() {
     assert_eq!(m.tables, backup::table_counts(&i.conn).unwrap(), "every table, same counts as the live database");
     assert_eq!(m.rows("party"), 30);
     assert!(karbon_server::audit::is_timestamp(&m.created_at));
-    assert_eq!((m.files, m.file_bytes), (2, 13 + 4));
+    // The two files written here, and the small demo seed's stored copies (B3).
+    let seed_bytes: u64 = db::DEMO_FILES.iter().map(|(_, b)| b.len() as u64).sum();
+    assert_eq!((m.files, m.file_bytes), (2 + db::DEMO_FILES.len() as u64, 13 + 4 + seed_bytes));
     assert_eq!(file_bytes(&b.dir.join("files/2026/10/contract.pdf")), b"%PDF-1.7 demo");
     // The manifest on disk is the one returned, and the folder passes the restore checks.
     assert_eq!(&backup::validate(&b.dir).unwrap().manifest, m);

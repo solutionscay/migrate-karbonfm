@@ -286,9 +286,10 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: inventory-only
 - Use case and users: Template list and detail with merge fields; the single local user (ROLE-OWNER).
+- Built (I4 S4, 2026-11-01, branch `i4/templates`): `/templates` lists Name, Subject, Activity types and the merge field count (layout 111), with an empty state and a New template dialog (a name, then the editor). `/templates/{id}` (layout 112) edits Name, Subject, Body and the Activity type(s) checkbox set in place (Save → toast; a token mismatch or an unknown placeholder re-renders with field errors and saves nothing). Beside it: the Merge fields panel (one row per placeholder, a Required checkbox, "not in use" for a placeholder that is gone; Save merge fields), the list of available `{{field}}` placeholders, and a merge preview against one of the latest emails (writes nothing). Linked from the sidebar (Library → Templates). No delete (no source evidence, Q4).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/111-Templates.txt`, `objects/karbon_kontacts.fmp12/layouts/112-Template_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/114-MergeField.txt`
 - Page: `GET /templates` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /templates/{id}/merge` (OP-TEMPLATE-01 `template_merge`), `PUT /templates/{id}/merge-fields` (OP-TEMPLATE-02 `merge_fields_save`)
+- Fragments and actions: `POST /templates/{id}/merge` (OP-TEMPLATE-01 `template_merge`), `PUT /templates/{id}/merge-fields` (OP-TEMPLATE-02 `merge_fields_save`), `GET /templates/new`, `POST /templates`, `PUT /templates/{id}` (OP-TEMPLATE-03 `template_create`, `template_save`)
 - Rules shown or enforced: BR-TEMPLATE-01, BR-TEMPLATE-02
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
@@ -324,9 +325,10 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: inventory-only
 - Use case and users: Files list, thumbnails and attachment viewer; the single local user (ROLE-OWNER).
+- Built (I4 S6, 2026-11-01, branch `i4/files`): `/files` lists every file newest first (a thumbnail for an image, else an extension badge; name, what it is attached to, category, date added, size; search by name, tag or note; pages of 50) with Add file. The party detail gets the Files panel of design/customer.html in its aside: count, Add file (the native file chooser; the upload starts on choosing and links the file to the party), each file with Open and Remove (detach, no confirmation). Open asks the desktop shell to open the stored copy with the system app (`POST /files/{id}/open`, 204); in a browser (no shell, 501) the file opens in a new tab from `GET /files/{id}/content`. Open hands only documents, images and zip archives to the system (a zip is only unpacked; ruling 2026-11-01, B6); any other type answers 409 with "“.ext” files could run a program, so KarbonFM does not open them." (it names the type, since the 617 category calls every non-image a Document). A row whose stored copy is missing says "File missing from the file store" and has no Open; its content route answers 410. The small demo's four seed rows ship small placeholder copies (`migration/demo_files`, written to the file store when the seed loads; B3, 2026-11-01). A stored file is served with its type (inline only for PDF, plain text, PNG, JPEG, GIF; anything else downloads) and a sandbox CSP. The sidebar's Files link goes live.
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/142-Card_-_FilesList.txt`, `objects/karbon_kontacts.fmp12/layouts/185-Thumbnails.txt`
 - Page: `GET /files` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /files (multipart upload)` (OP-FILE-01 `file_add`), `POST /attachments` (OP-FILE-02 `file_attach`), `DELETE /attachments/{id}` (OP-FILE-03 `file_detach`)
+- Fragments and actions: `POST /files (multipart upload)` (OP-FILE-01 `file_add`), `POST /attachments` (OP-FILE-02 `file_attach`), `DELETE /attachments/{id}` (OP-FILE-03 `file_detach`), `GET /files/{id}/content`, `GET /files/{id}/thumbnail`, `POST /files/{id}/open` (the desktop shell's open hook; 501 without it)
 - Rules shown or enforced: BR-FILE-01, BR-FILE-02, BR-FILE-03
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
@@ -349,6 +351,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: implementation-ready (static)
 - Use case and users: Shows what the FileMaker chat screen looked like, as a static mock with sample data (owner decision, 2026-10-28). It sends and receives nothing: Twilio SMS/chat is out of scope (OD-05-02). A banner reads "Sample data. SMS is not available in this version."
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/184-Chat.txt`; target design: `design/messages.html`
+- Built (I4 S7, 2026-11-01, branch `i4/chat`): `GET /chat` renders design/messages.html from constants in `routes/chat.rs`: the banner, seven sample conversations (the first one open), the Elena Halden thread and the contact panel. Every button, the search box and the message box are disabled; there is no form and no htmx call; `POST /chat` is 405. The sidebar gets "Messages" under Activity (no unread count: there is no data). The handler reads the database only for the sidebar's DEMO badge, as every page does; no chat data is read. Links of the design that lead to other screens (open customer, the invoice and discussion cards) are plain text in the mock.
 - Page: `GET /chat` (one askama template with hard-coded sample conversations; no route reads or writes the database)
 - Fragments and actions: none. The message box and send button are disabled.
 - Rules shown or enforced: none

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Messages · KarbonFM{% endblock %}
+{# UI-21 Messages: a static mock (OD-05-02), from design/messages.html. Sample conversations only: no chat data is
+   read, nothing is sent, and the page has no form. The message box and the send button are disabled. #}
+{% block main %}
+<main class="content !overflow-hidden">
+  <div class="h-full flex flex-col">
+    <div role="note" class="alert alert-info alert-soft rounded-none border-0 border-b hairline text-[13px] py-2 px-5 flex-none" data-sample-banner>
+      <svg class="i i-sm" aria-hidden="true"><use href="#i-message"/></svg>
+      <span><b class="font-medium">Sample data.</b> SMS is not available in this version.</span>
+    </div>
+    <div class="flex-1 min-h-0 grid grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_290px]">
+      <section class="border-r hairline bg-base-100 flex flex-col min-h-0" aria-label="Conversations">
+        <div class="p-3 border-b hairline">
+          <div class="flex items-center justify-between mb-2.5 px-1">
+            <h1 class="font-semibold text-[15px]">Messages</h1>
+            <button type="button" class="icon-btn" aria-label="New message" disabled><svg class="i"><use href="#i-pencil"/></svg></button>
+          </div>
+          <label class="flex items-center gap-2 h-8 px-2.5 rounded-field bg-base-200 text-[13px]"><svg class="i i-sm muted" aria-hidden="true"><use href="#i-search"/></svg><input class="bg-transparent outline-none w-full" placeholder="Search conversations" aria-label="Search conversations" disabled></label>
+        </div>
+        <ul class="flex-1 overflow-y-auto scroll p-1.5">
+          {% for c in conversations %}
+          <li>
+            <div class="flex gap-3 p-2.5 rounded-field {% if loop.first %}bg-primary/10{% endif %}" {% if loop.first %}aria-current="true"{% endif %}>
+              <span class="av {{ c.color }}" aria-hidden="true">{{ c.initials }}</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex justify-between gap-2"><b class="{% if c.unread %}font-semibold{% else %}font-medium{% endif %} truncate">{{ c.name }}</b><span class="text-[11px] num {% if c.unread %}text-primary font-medium{% else %}muted{% endif %}">{{ c.when }}</span></div>
+                <div class="flex items-center gap-2"><span class="text-[12px] truncate flex-1 {% if !c.unread %}muted{% endif %}">{{ c.last }}</span>{% if c.unread %}<span class="w-2 h-2 rounded-full bg-primary flex-none" aria-label="Unread"></span>{% endif %}</div>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section class="flex flex-col min-h-0 chat-bg" aria-label="Conversation with Elena Halden">
+        <header class="flex items-center gap-3 px-5 h-14 border-b hairline bg-base-100/90 backdrop-blur flex-none">
+          <span class="av c4" aria-hidden="true">EH</span>
+          <div class="leading-tight"><div class="font-medium">Elena Halden</div><div class="text-[12px] muted"><span class="num">(207) 555-0148</span> · Halden &amp; Pryce Architects</div></div>
+          <div class="ml-auto flex items-center gap-1">
+            <span class="chip mr-2" title="Sample data: not connected to an SMS provider">Sample · not sending</span>
+            <button type="button" class="icon-btn" aria-label="Call" disabled><svg class="i"><use href="#i-phone"/></svg></button>
+            <button type="button" class="icon-btn" aria-label="More" disabled><svg class="i"><use href="#i-more"/></svg></button>
+          </div>
+        </header>
+        <div class="flex-1 overflow-y-auto scroll px-6 py-5 space-y-1.5" role="log" aria-label="Messages">
+          {% for line in lines %}
+          {% match line %}
+          {% when Line::Day(d) %}
+          <div class="text-center text-[11.5px] muted font-medium py-3">{{ d }}</div>
+          {% when Line::System with { text, at } %}
+          <div class="flex justify-center py-2"><span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-field bg-base-100 border hairline text-[12px]"><svg class="i i-sm text-success" aria-hidden="true"><use href="#i-card"/></svg>{{ text }}<span class="muted">{{ at }}</span></span></div>
+          {% when Line::Message with { outgoing, text, meta } %}
+          <div class="flex flex-col {% if *outgoing %}items-end{% else %}items-start{% endif %}">
+            <div class="bubble {% if *outgoing %}out{% else %}in{% endif %}">{{ text }}</div>
+            {% if let Some(m) = meta %}<div class="text-[10.5px] muted mt-0.5 px-1">{{ m }}</div>{% endif %}
+          </div>
+          {% endmatch %}
+          {% endfor %}
+        </div>
+        <footer class="p-3 border-t hairline bg-base-100 flex-none">
+          <div class="flex gap-1.5 mb-2 overflow-x-auto">
+            {% for q in quick_replies %}<button type="button" class="chip" disabled>{{ q }}</button>{% endfor %}
+          </div>
+          <div class="flex items-end gap-2">
+            <button type="button" class="icon-btn mb-0.5" aria-label="Attach" disabled><svg class="i"><use href="#i-image"/></svg></button>
+            <textarea rows="1" class="flex-1 resize-none rounded-field border hairline bg-base-200/60 px-4 py-2 outline-none text-[13.5px]" placeholder="SMS is not available in this version" aria-label="Message" disabled></textarea>
+            <button type="button" class="btn btn-primary btn-sm btn-square mb-0.5" aria-label="Send" disabled><svg class="i i-sm"><use href="#i-send"/></svg></button>
+          </div>
+          <div class="text-[11px] muted mt-1.5 px-1">From Ellison Studio · <span class="num">(207) 555-0190</span></div>
+        </footer>
+      </section>
+
+      <aside class="hidden xl:flex flex-col border-l hairline bg-base-100 overflow-y-auto scroll" aria-label="Contact details">
+        <div class="p-5 text-center border-b hairline">
+          <span class="av c4 av-lg !rounded-full mx-auto" aria-hidden="true">EH</span>
+          <div class="font-semibold mt-2.5">Elena Halden</div>
+          <div class="text-[12px] muted">Principal · Halden &amp; Pryce</div>
+        </div>
+        <dl class="p-5 grid grid-cols-[80px_1fr] gap-y-2 text-[12.5px] border-b hairline">
+          <dt class="muted">Mobile</dt><dd class="num">(207) 555-0148</dd>
+          <dt class="muted">Email</dt><dd class="truncate">elena@haldenpryce.example</dd>
+          <dt class="muted">Balance</dt><dd class="num font-medium">$3,057.15</dd>
+          <dt class="muted">Retainer</dt><dd class="num">$1,500.00</dd>
+        </dl>
+        <div class="p-5">
+          <div class="eyebrow mb-2.5">Open items</div>
+          <div class="flex items-center gap-2.5 p-2.5 rounded-field border hairline mb-2"><svg class="i text-primary" aria-hidden="true"><use href="#i-receipt"/></svg><div class="flex-1"><div class="mono text-[12px] font-medium">INV-1048</div><div class="text-[11.5px] muted">Due tomorrow</div></div><span class="num text-[12.5px] font-medium">$2,057.15</span></div>
+          <div class="flex items-center gap-2.5 p-2.5 rounded-field border hairline"><svg class="i text-primary" aria-hidden="true"><use href="#i-comment"/></svg><div class="flex-1 min-w-0"><div class="text-[12.5px] font-medium truncate">Lighting spec</div><div class="text-[11.5px] muted">Discussion · 6 comments</div></div></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+{% endblock %}

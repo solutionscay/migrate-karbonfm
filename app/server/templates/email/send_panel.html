@@ -1,0 +1,20 @@
+{# The send panel of UI-08: Send, what is missing (337 s103), the password question (775 s4-9) or the failure. #}
+<div id="send-panel" class="space-y-2">
+  {% if !errors.is_empty() %}
+  <div role="alert" class="alert alert-warning alert-soft text-[12.5px] py-2 block">
+    <b class="font-medium">Not sent yet:</b>
+    <ul class="list-disc pl-5 mt-1">{% for e in errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+  {% if let Some(f) = failure %}<div role="alert" class="alert alert-error alert-soft text-[12.5px] py-2">{{ f }}</div>{% endif %}
+  <form hx-post="{{ self.href() }}/send" hx-target="#send-panel" hx-swap="outerHTML" class="flex items-end gap-2 flex-wrap">
+    {% if ask_password %}
+    <label class="block flex-1 min-w-[200px]">
+      <span class="text-[12px] muted">SMTP password</span>
+      <input type="password" name="password" class="input input-sm w-full mt-1" autocomplete="off" required aria-describedby="pw-note">
+      <span class="text-[11.5px] muted" id="pw-note">Kept in the system keychain once the email is sent.</span>
+    </label>
+    {% endif %}
+    <button class="btn btn-sm btn-primary"><svg class="i i-sm" aria-hidden="true"><use href="#i-send"/></svg>Send</button>
+  </form>
+</div>

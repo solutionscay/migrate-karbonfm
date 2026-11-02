@@ -1,0 +1,36 @@
+{# The party Files panel (design/customer.html aside, UI-19). Add file uploads at once (OP-FILE-01, linked to this
+   party); Open asks the desktop shell; Remove detaches the link only, with no confirmation (OP-FILE-03). htmx swaps
+   the whole panel with the answer. #}
+<section class="panel" id="party-files" aria-labelledby="files-title">
+  <div class="panel-head">
+    <h2 class="panel-title" id="files-title">Files</h2><span class="chip">{{ rows.len() }}</span>
+    {% if can_add %}
+    <form class="ml-auto" hx-post="{{ self.upload_href() }}" hx-encoding="multipart/form-data" hx-target="#party-files" hx-swap="outerHTML" hx-trigger="change">
+      <input type="hidden" name="entity_type_id" value="10">
+      <input type="hidden" name="entity_id" value="{{ party_id }}">
+      <label class="icon-btn cursor-pointer" title="Add file">
+        <svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+        <input type="file" name="file" class="sr-only" aria-label="Add file">
+      </label>
+    </form>
+    {% endif %}
+  </div>
+  {% if let Some(e) = error %}<div role="alert" class="alert alert-error alert-soft text-[12.5px] py-2 mx-3 mt-2">{{ e }}</div>{% endif %}
+  {% if rows.is_empty() %}
+  <p class="p-4 text-[12.5px] muted">No files yet.{% if can_add %} Add file attaches one.{% endif %}</p>
+  {% else %}
+  <ul class="p-2 text-[12.5px]">
+    {% for f in rows %}
+    <li class="flex items-center gap-2.5 px-2 py-1.5 rounded-field hover:bg-base-200 group" data-file="{{ f.id }}">
+      {% if f.thumbnail %}<img src="/files/{{ f.id }}/thumbnail" alt="" class="w-7 h-7 rounded-field object-cover flex-none">{% else %}<span class="w-7 h-7 rounded-field grid place-items-center {{ f.badge_color }} text-[9px] font-bold flex-none" aria-hidden="true">{{ f.badge }}</span>{% endif %}
+      <div class="min-w-0 flex-1">
+        {% if f.present %}<button type="button" class="truncate block max-w-full text-left link link-hover" data-open-file="{{ f.id }}">{{ f.name }}</button>{% else %}<div class="truncate">{{ f.name }}</div>{% endif %}
+        <div class="text-[11px] {% if f.present %}muted{% else %}text-error{% endif %}">{% if f.present %}{{ f.size }}{% if !f.size.is_empty() %} · {% endif %}{{ f.date }}{% else %}File missing from the file store{% endif %}</div>
+      </div>
+      <button type="button" class="icon-btn" aria-label="Remove {{ f.name }} from this record" title="Remove from this record"
+              hx-delete="/attachments/{{ f.attachment_id }}" hx-target="#party-files" hx-swap="outerHTML"><svg class="i i-sm" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>

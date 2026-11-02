@@ -77,6 +77,8 @@ struct G<'a> {
     leads: Vec<(String, String, String)>, // (party id, role id, name)
     items: Vec<Item>,
     txns: Vec<(String, String, NaiveDate, String)>, // (txn id, customer party id, date, doc number)
+    discussions: Vec<(String, String)>,             // (activity id, title)
+    org_names: BTreeMap<String, String>,            // (party id, organization name)
     serial: BTreeMap<&'static str, u32>,
 }
 
@@ -90,6 +92,8 @@ pub fn build(x: &mut Export, cfg: Config) {
         leads: Vec::new(),
         items: Vec::new(),
         txns: Vec::new(),
+        discussions: Vec::new(),
+        org_names: BTreeMap::new(),
         serial: BTreeMap::new(),
     };
     g.reference();
@@ -374,11 +378,26 @@ impl G<'_> {
             let id = 50 + i;
             let email = matches!(id, 54..=57);
             let event = matches!(id, 60 | 62);
+            // ActivityTypeIds of kontroller 710 s34: the activity types each role fits (BR-ACTIVITY-03).
+            let types: &[u8] = match id {
+                50 => &[5, 4, 2, 3, 1, 6, 8, 9, 10],
+                51 => &[5, 1, 4, 2, 3, 6, 8],
+                52 | 53 => &[3, 5],
+                54..=57 => &[1, 7],
+                58 | 59 => &[5, 1, 4, 2, 3, 8],
+                60 | 62 => &[4, 6],
+                63 => &[2, 3, 8],
+                64 => &[10],
+                65 => &[8],
+                _ => &[],
+            };
+            let types = fm_text(&types.iter().map(u8::to_string).collect::<Vec<_>>().join("\n"));
             self.push(
                 "ActivityPartyRole",
                 row(&[
                     ("Id", id.to_string()),
                     ("Name", n.to_string()),
+                    ("ActivityTypeIds", types),
                     ("CreateActivityPartyEmailInd", if email { "1".into() } else { String::new() }),
                     ("CreateActivityPartyEventInd", if event { "1".into() } else { String::new() }),
                 ]),
@@ -466,6 +485,7 @@ impl G<'_> {
 
     fn organization(&mut self, id: &str, name: &str, kind: &str, tax_id: String, created: NaiveDateTime) {
         self.party(id, name, true, created);
+        self.org_names.insert(id.to_string(), name.to_string());
         let r = row(&[
             ("Id", id.into()),
             ("OrganizationName", name.into()),
@@ -476,9 +496,21 @@ impl G<'_> {
     }
 
     fn person(&mut self, id: &str, first: &str, last: &str, job: &str, created: NaiveDateTime) {
+        self.person_at(id, first, last, job, "", created);
+    }
+
+    /// A person made with their organization: EmployerName is the organization's name, as Create Customer V3
+    /// plucks it (kontroller 229 s229; 246 s143). `{{OrganizationName}}` of a person merges from it.
+    fn person_at(&mut self, id: &str, first: &str, last: &str, job: &str, org: &str, created: NaiveDateTime) {
         self.party(id, &format!("{first} {last}"), false, created);
-        let r =
-            row(&[("Id", id.into()), ("FirstName", first.into()), ("LastName", last.into()), ("JobTitle", job.into())]);
+        let employer = self.org_names.get(org).cloned().unwrap_or_default();
+        let r = row(&[
+            ("Id", id.into()),
+            ("FirstName", first.into()),
+            ("LastName", last.into()),
+            ("JobTitle", job.into()),
+            ("EmployerName", employer),
+        ]);
         self.push("Person", r, created);
     }
 
@@ -733,7 +765,7 @@ impl G<'_> {
         let first = *self.r.pick(FIRST);
         let last = *self.r.pick(LAST);
         let job = *self.r.pick(JOBS);
-        self.person(&id, first, last, job, at);
+        self.person_at(&id, first, last, job, org, at);
         let mail =
             format!("{}.{}@{domain}.example", first.to_lowercase(), last.to_lowercase().replace(['\'', 'ü'], ""));
         self.network(&id, "Work", &mail, false, &[], at);
@@ -997,7 +1029,7 @@ impl G<'_> {
             ("p-hp-mp", "Marcus", "Pryce", "Partner", false),
             ("p-hp-jw", "June", "Whitlock", "Office manager", true),
         ] {
-            self.person(pid, first, last, what, at);
+            self.person_at(pid, first, last, what, ANCHOR_HP, at);
             self.network(pid, "Work", &format!("{}@haldenpryce.example", first.to_lowercase()), false, &[], at);
             self.relation(pid, ANCHOR_HP, what, billing, at);
         }
@@ -1658,6 +1690,7 @@ impl G<'_> {
                         ("ActiveInd", fm_bool(date > end() - Duration::days(60))),
                     ]);
                     self.push("Discussion", r, at);
+                    self.discussions.push((id.clone(), subject.clone()));
                     for k in 0..self.r.range(1, 4) {
                         let when = at + Duration::hours(k * 20 + 2);
                         let r = row(&[
@@ -1700,27 +1733,33 @@ impl G<'_> {
         }
     }
 
+    /// Six templates with merge placeholders in the source's form, `<<Name>>` (kontroller 478 s3, MergeFieldConfig
+    /// field 31), named from the app's fixed list (BR-TEMPLATE-01). The import stores them as `{{Name}}` (OD-07-03).
     fn templates(&mut self) {
         let list = [
             (
                 "Invoice email",
-                "Invoice [Invoice Number] from Ellison Studio",
-                "Hi [First Name],\n\nPlease find invoice [Invoice Number] attached.\n\nThank you,\n[Sender Name]",
+                "Invoice <<InvoiceNumber>> from Ellison Studio",
+                "Hi <<FirstName>>,\n\nPlease find invoice <<InvoiceNumber>> attached.\n\nThank you,\n<<SenderName>>",
                 1,
             ),
             (
                 "Payment reminder",
-                "Reminder: invoice [Invoice Number]",
-                "Hi [First Name],\n\nA friendly reminder that invoice [Invoice Number] is due on [Due Date].",
+                "Reminder: invoice <<InvoiceNumber>>",
+                "Hi <<FirstName>>,\n\nA friendly reminder that invoice <<InvoiceNumber>> is due on <<DueDate>>.",
                 1,
             ),
             ("Thank you", "Thank you", "Thank you for choosing Ellison Studio.", 1),
-            ("Site visit follow-up", "Site visit [Date]", "Notes from our site visit on [Date].", 2),
-            ("Proposal cover", "Proposal: [Project]", "Please find our proposal for [Project] attached.", 1),
-            ("Email signature", "", "[Sender Name]\nEllison Studio\n(207) 555-0100", 1),
+            ("Site visit follow-up", "Site visit <<Date>>", "Notes from our site visit on <<Date>>.", 2),
+            (
+                "Proposal cover",
+                "Proposal for <<OrganizationName>>",
+                "Please find our proposal for <<OrganizationName>> attached.",
+                1,
+            ),
+            ("Email signature", "", "<<SenderName>>\nEllison Studio\n(207) 555-0100", 1),
         ];
         let t0 = NaiveDate::from_ymd_opt(2022, 1, 10).unwrap().and_hms_opt(9, 0, 0).unwrap();
-        let mut merge = 0;
         for (i, (name, subject, message, kind)) in list.iter().enumerate() {
             let id = (i + 1) as u32;
             let r = row(&[
@@ -1732,29 +1771,37 @@ impl G<'_> {
                 ("UserId", "u-mara".into()),
             ]);
             self.push("Template", r, t0 + Duration::days(i as i64 * 30));
-            for field in ["[First Name]", "[Invoice Number]", "[Due Date]", "[Sender Name]", "[Date]", "[Project]"] {
+            for field in [
+                "<<FirstName>>",
+                "<<InvoiceNumber>>",
+                "<<DueDate>>",
+                "<<SenderName>>",
+                "<<Date>>",
+                "<<OrganizationName>>",
+            ] {
                 if message.contains(field) || subject.contains(field) {
-                    merge += 1;
                     let n = self.next_serial("MergeField", 1);
+                    // MergeField::Name keeps the delimiters, as MergeFieldConfig field 31 does.
                     let r = row(&[
                         ("Id", n.to_string()),
                         ("TemplateId", id.to_string()),
-                        ("Name", field.trim_matches(['[', ']']).to_string()),
-                        ("RequiredInd", fm_bool(field == "[Invoice Number]")),
+                        ("Name", field.to_string()),
+                        ("RequiredInd", fm_bool(field == "<<InvoiceNumber>>")),
                     ]);
                     self.push("MergeField", r, t0);
                 }
             }
         }
-        let _ = merge;
     }
 
     fn files(&mut self) {
         let n = ((350.0 * self.scale).round() as usize).max(3);
+        // ContentType and Category as kontroller 617 s117 and s120 set them: jpg is "image/jpg", xlsx has no type,
+        // and the category is Image or Document.
         let kinds = [
             ("Signed proposal", "pdf", "application/pdf", 0.35),
-            ("Site photos", "jpg", "image/jpeg", 0.3),
-            ("Sign schedule", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 0.15),
+            ("Site photos", "jpg", "image/jpg", 0.3),
+            ("Sign schedule", "xlsx", "", 0.15),
             ("Concept boards", "pdf", "application/pdf", 0.2),
         ];
         let w: Vec<f64> = kinds.iter().map(|k| k.3).collect();
@@ -1779,8 +1826,9 @@ impl G<'_> {
                 ("FileName", name.clone()),
                 ("Extension", ext.into()),
                 ("ContentType", ctype.into()),
-                ("FileSize", self.r.range(40_000, 9_000_000).to_string()),
-                ("Category", if on_txn { "Invoice".into() } else { "Client".into() }),
+                // FileSize is in KB, rounded to 2 decimals (617 s104).
+                ("FileSize", format!("{:.2}", self.r.range(40_000, 9_000_000) as f64 / 1000.0)),
+                ("Category", if ext == "jpg" { "Image".into() } else { "Document".into() }),
                 ("Container", format!("Container/{path}")),
             ]);
             self.push("File", r, at);
@@ -1801,13 +1849,21 @@ impl G<'_> {
         let n = ((200.0 * self.scale).round() as usize).max(2);
         for _ in 0..n {
             let date = end() - Duration::days(self.r.range(0, 400));
-            let (party, _, name) = self.r.pick(&self.employees[..3]).clone();
+            let (party, _, _) = self.r.pick(&self.employees[..3]).clone();
             let at = self.at(date);
+            // A comment notification (kontroller 422 s176, 670 s100-110): about a discussion (entity type 11), with
+            // the discussion's title as its text.
+            let (entity, title) = if self.discussions.is_empty() {
+                (String::new(), String::new())
+            } else {
+                self.r.pick(&self.discussions).clone()
+            };
             let r = row(&[
                 ("Id", self.r.uuid()),
                 ("PartyId", party),
                 ("Date", fm_date(date)),
-                ("Description", format!("New comment for {name}")),
+                ("Description", title),
+                ("EntityId", entity),
                 ("ReadInd", fm_bool(date < end() - Duration::days(14))),
                 ("SentInd", "1".into()),
                 ("EntityTypeId", "11".into()),

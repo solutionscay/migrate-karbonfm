@@ -1,0 +1,20 @@
+{# Manage subscribers (layout 187): the checked people follow the discussion; Active closes or reopens it (739). #}
+<form hx-patch="/discussions/{{ id|urlencode }}" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">Subscribers</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3">
+    {% if choices.is_empty() %}<p class="text-[12.5px] muted">Nobody to choose yet.</p>{% endif %}
+    <div class="max-h-64 overflow-y-auto space-y-1" role="group" aria-label="Subscribers">
+      {% for (pid, name, on) in choices %}
+      <label class="flex items-center gap-2 text-[13px]"><input type="checkbox" name="subscriber" value="{{ pid }}" class="checkbox checkbox-xs" {% if *on %}checked{% endif %}>{{ name }}</label>
+      {% endfor %}
+    </div>
+    <label class="flex items-center gap-2 text-[12.5px] pt-2 border-t hairline"><input type="checkbox" name="active" class="toggle toggle-xs" {% if active %}checked{% endif %}>Active</label>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">Save</button>
+  </div>
+</form>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Files · KarbonFM{% endblock %}
+{# UI-19 Files: every file in the file store, newest first. Add file uploads one (OP-FILE-01) with no link. #}
+{% block content %}
+<div class="flex items-end justify-between gap-4 mb-5">
+  <div>
+    <div class="eyebrow mb-1.5">Library</div>
+    <h1 class="page-title">Files</h1>
+  </div>
+  {% if can_add %}
+  <form hx-post="/files" hx-encoding="multipart/form-data" hx-target="#file-upload-result" hx-trigger="change">
+    <label class="btn btn-primary btn-sm cursor-pointer">
+      <svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add file
+      <input type="file" name="file" class="sr-only" aria-label="Add file">
+    </label>
+  </form>
+  {% endif %}
+</div>
+<div id="file-upload-result" class="mb-3" aria-live="polite">{% if let Some(e) = error %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}</div>
+<section class="panel overflow-hidden" id="files-table">
+  {{ table|safe }}
+</section>
+{% endblock %}

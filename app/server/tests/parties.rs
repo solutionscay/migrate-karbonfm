@@ -698,10 +698,14 @@ async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
     assert_eq!(menu.matches("<li>").count(), 5, "Invoice, Sales receipt, Customer, Task, Note");
     assert_eq!(menu.matches("<a ").count(), 1, "one real link, no fake ones");
     assert!(menu.contains(r#"<a href="/parties/new?role=customer">"#));
-    for soon in ["New invoice", "New sales receipt", "New task", "New note"] {
+    for soon in ["New invoice", "New sales receipt"] {
         assert!(menu.contains(&format!(r#"<button type="button" class="muted" data-soon="{soon}">"#)), "{soon}");
     }
-    assert!(!topbar.contains("hx-get"), "the top bar opens no dialog");
+    // I4: Task and Note open the activity dialog.
+    for kind in ["task", "note"] {
+        assert!(menu.contains(&format!(r##"hx-get="/activities/new?kind={kind}" hx-target="#modal-body""##)), "{kind}");
+    }
+    assert_eq!(topbar.matches(r#"hx-get="/activities/new"#).count(), 2, "only Task and Note open a dialog");
 }
 
 #[tokio::test]

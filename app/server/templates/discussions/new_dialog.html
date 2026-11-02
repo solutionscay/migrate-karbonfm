@@ -1,0 +1,33 @@
+{# Start a discussion on a record (OP-ACTIVITY-06). The title comes from the record (BR-ACTIVITY-07); the people
+   offered as subscribers start unchecked (421). #}
+<form hx-post="/discussions" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">Start a discussion</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3">
+    {% if let Some(e) = self.error("creator") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    {% if let Some(e) = self.error("entity_id") %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
+    <input type="hidden" name="entity_type_id" value="{{ entity_type_id }}">
+    <input type="hidden" name="entity_id" value="{{ entity_id }}">
+    <p class="text-[12.5px] muted">Title: <b class="text-base-content font-medium">{{ title }}</b></p>
+    <label class="block">
+      <span class="text-[12px] muted">First comment (optional)</span>
+      <textarea name="notes" rows="4" class="textarea textarea-sm w-full mt-1">{{ notes }}</textarea>
+    </label>
+    {% if !choices.is_empty() %}
+    <fieldset>
+      <legend class="text-[12px] muted mb-1">Subscribers</legend>
+      <div class="max-h-48 overflow-y-auto space-y-1">
+        {% for (id, name, on) in choices %}
+        <label class="flex items-center gap-2 text-[13px]"><input type="checkbox" name="subscriber" value="{{ id }}" class="checkbox checkbox-xs" {% if *on %}checked{% endif %}>{{ name }}</label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    {% endif %}
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">Start discussion</button>
+  </div>
+</form>

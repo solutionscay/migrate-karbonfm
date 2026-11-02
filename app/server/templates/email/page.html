@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{% if a.subject.is_empty() %}Email{% else %}{{ a.subject }}{% endif %} · KarbonFM{% endblock %}
+{% block content %}
+<div class="flex items-center gap-2 mb-3 text-[12.5px]">
+  <a class="link link-hover muted" href="/activities?kind=email">Email</a>
+  <svg class="i i-sm muted" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+  <span>{% if a.subject.is_empty() %}No subject{% else %}{{ a.subject }}{% endif %}</span>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-5">
+  <div class="min-w-0 space-y-4">
+    <section class="panel" aria-labelledby="email-title">
+      <div class="px-5 pt-4 pb-3 border-b hairline flex items-center gap-2 flex-wrap">
+        <svg class="i muted" aria-hidden="true"><use href="#i-mail"/></svg>
+        <h1 id="email-title" class="page-title flex-1">{% if a.subject.is_empty() %}<span class="muted">No subject</span>{% else %}{{ a.subject }}{% endif %}</h1>
+        {% if a.sent() %}<span class="chip ok"><span class="dot"></span>Sent</span>{% else %}<span class="chip"><span class="dot"></span>Not sent</span>{% endif %}
+        <button class="btn btn-sm btn-quiet" hx-delete="{{ self.delete_href() }}" hx-target="#modal-body" aria-label="Delete this email"><svg class="i i-sm" aria-hidden="true"><use href="#i-x"/></svg>Delete</button>
+      </div>
+      {% if let Some(e) = a.email %}
+      {% if e.sent %}
+      {# Read only after it is sent (AP-08; layouts 118 and 167). #}
+      <div class="p-5 space-y-3">
+        {# B9: the From header was the account's address (337 s135); the From person in People keeps the address the
+           draft was written with (521 s97 reads it and nothing rewrites it), so the line names the account used. #}
+        <p class="text-[12.5px] muted">Sent {{ self.stamp(e.smtp_timestamp) }} with {% if e.use_system_settings %}the system account{% else %}your email account{% endif %}{% if !e.smtp_result.is_empty() %} · server reply <span class="mono">{{ e.smtp_result }}</span>{% endif %}</p>
+        <div class="text-[13px] whitespace-pre-line">{{ a.message }}</div>
+      </div>
+      {% else %}
+      <form class="p-5 space-y-3" hx-patch="{{ self.href() }}">
+        {% if !errors.is_empty() %}<div role="alert" class="sr-only">Check the highlighted fields.</div>{% endif %}
+        <label class="block">
+          <span class="text-[12px] muted">Subject</span>
+          <input name="subject" value="{{ a.subject }}" class="input input-sm w-full mt-1 {% if self.error("subject").is_some() %}input-error{% endif %}" autocomplete="off"
+                 {% if self.error("subject").is_some() %}aria-invalid="true" aria-describedby="err-subject"{% endif %}>
+          {% if let Some(e) = self.error("subject") %}<span class="text-[12px] text-error" id="err-subject">{{ e }}</span>{% endif %}
+        </label>
+        <label class="block">
+          <span class="text-[12px] muted">Message (plain text)</span>
+          <textarea name="message" rows="10" class="textarea textarea-sm w-full mt-1">{{ a.message }}</textarea>
+        </label>
+        <fieldset class="flex gap-4 text-[12.5px]">
+          <legend class="text-[12px] muted mb-1">Send with</legend>
+          <label class="flex items-center gap-1.5"><input type="radio" name="account" value="user" class="radio radio-xs" {% if !self.system() %}checked{% endif %}>Your email account</label>
+          <label class="flex items-center gap-1.5"><input type="radio" name="account" value="system" class="radio radio-xs" {% if self.system() %}checked{% endif %}>The system account</label>
+        </fieldset>
+        <div class="flex justify-end"><button class="btn btn-sm btn-quiet">Save</button></div>
+      </form>
+      {% endif %}
+      {% endif %}
+    </section>
+    {% if !a.sent() %}
+    <section class="panel p-5 space-y-3" aria-label="Template and send">
+      {% if !templates.is_empty() %}
+      <form class="flex items-end gap-2" hx-post="{{ self.href() }}/template">
+        <label class="block flex-1">
+          <span class="text-[12px] muted">Template (replaces the message)</span>
+          <select name="template_id" class="select select-sm w-full mt-1">
+            {% for (id, name) in templates %}<option value="{{ id }}">{{ name }}</option>{% endfor %}
+          </select>
+        </label>
+        <button class="btn btn-sm btn-quiet">Apply</button>
+      </form>
+      {% endif %}
+      {{ send|safe }}
+    </section>
+    {% endif %}
+  </div>
+  <aside class="space-y-4" aria-label="Recipients">
+    {{ parties|safe }}
+    {% if !a.entities.is_empty() %}
+    <section class="panel p-4 text-[12.5px]"><span class="muted">About</span> {% for e in a.entities %}{% if e.href.is_empty() %}{{ e.label }}{% else %}<a class="link link-hover" href="{{ e.href }}">{{ e.label }}</a>{% endif %}{% if !loop.last %}, {% endif %}{% endfor %}</section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

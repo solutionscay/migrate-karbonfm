@@ -1,10 +1,15 @@
 //! Route handlers (05). Each handler queries or calls a command, then renders a template.
 
+mod activities;
 mod backup;
+mod chat;
 mod contact_forms;
 pub mod current_user;
 mod customers;
 mod dashboard;
+mod discussions;
+mod email;
+mod files;
 mod parties;
 mod party_forms;
 mod relation_forms;
@@ -13,15 +18,17 @@ mod sales_lists;
 mod secrets_store;
 mod settings;
 mod setup;
+mod templates;
+mod timeline;
 mod wizard;
 
 pub use setup::setup_gate;
 
 use crate::web::AppError;
 use crate::AppState;
-use axum::extract::State;
+use axum::extract::{DefaultBodyLimit, State};
 use axum::http::StatusCode;
-use axum::routing::{get, patch, post, put};
+use axum::routing::{delete, get, patch, post, put};
 use axum::Router;
 
 /// Every route the server registers, as (method, path) (AP-01). The page has no other way to reach SQLite: no generic
@@ -31,6 +38,7 @@ use axum::Router;
 pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/"),
     ("GET", "/customers"),
+    ("GET", "/chat"),
     ("GET", "/parties"),
     ("GET", "/parties/new"),
     ("POST", "/parties/wizard"),
@@ -58,6 +66,32 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/relations/{id}/edit"),
     ("PATCH", "/relations/{id}"),
     ("DELETE", "/relations/{id}"),
+    ("GET", "/activities"),
+    ("GET", "/activities/new"),
+    ("POST", "/activities"),
+    ("GET", "/activities/{id}"),
+    ("PATCH", "/activities/{id}"),
+    ("DELETE", "/activities/{id}"),
+    ("GET", "/activities/{id}/edit"),
+    ("GET", "/activities/{id}/parties/new"),
+    ("PUT", "/activities/{id}/parties"),
+    ("GET", "/activity-parties/{id}/edit"),
+    ("DELETE", "/activity-parties/{id}"),
+    ("POST", "/tasks/{id}/complete"),
+    ("GET", "/email-messages/new"),
+    ("POST", "/email-messages"),
+    ("GET", "/email-messages/{id}"),
+    ("PATCH", "/email-messages/{id}"),
+    ("POST", "/email-messages/{id}/template"),
+    ("POST", "/email-messages/{id}/send"),
+    ("GET", "/discussions/new"),
+    ("POST", "/discussions"),
+    ("GET", "/discussions/{id}"),
+    ("PATCH", "/discussions/{id}"),
+    ("GET", "/discussions/{id}/subscribers"),
+    ("POST", "/discussions/{id}/comments"),
+    ("GET", "/notifications"),
+    ("POST", "/notifications/read"),
     ("GET", "/sales"),
     ("GET", "/payments"),
     ("GET", "/sales/{doc_number}"),
@@ -74,6 +108,20 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/settings/secrets/file"),
     ("POST", "/settings/secrets/file"),
     ("POST", "/settings/secrets/keychain"),
+    ("GET", "/templates"),
+    ("GET", "/templates/new"),
+    ("POST", "/templates"),
+    ("GET", "/templates/{id}"),
+    ("PUT", "/templates/{id}"),
+    ("PUT", "/templates/{id}/merge-fields"),
+    ("POST", "/templates/{id}/merge"),
+    ("GET", "/files"),
+    ("POST", "/files"),
+    ("GET", "/files/{id}/content"),
+    ("GET", "/files/{id}/thumbnail"),
+    ("POST", "/files/{id}/open"),
+    ("POST", "/attachments"),
+    ("DELETE", "/attachments/{id}"),
     // assets.rs: the embedded static files.
     ("GET", "/assets/{*path}"),
     // session.rs: the one-time launch URL of AP-13.
@@ -84,6 +132,7 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(dashboard::page))
         .route("/customers", get(customers::list))
+        .route("/chat", get(chat::page))
         .route("/parties", get(parties::list))
         .route("/parties/new", get(wizard::page))
         .route("/parties/wizard", post(wizard::submit))
@@ -107,6 +156,27 @@ pub fn router() -> Router<AppState> {
         .route("/parties/{id}/relations", post(relation_forms::create))
         .route("/relations/{id}/edit", get(relation_forms::edit_dialog))
         .route("/relations/{id}", patch(relation_forms::update).delete(relation_forms::delete))
+        .route("/activities/new", get(activities::new_dialog))
+        .route("/activities", get(timeline::page).post(activities::create))
+        .route("/activities/{id}", get(activities::detail).patch(activities::update).delete(activities::delete))
+        .route("/activities/{id}/edit", get(activities::edit_dialog))
+        .route("/activities/{id}/parties/new", get(activities::party_new))
+        .route("/activities/{id}/parties", put(activities::party_set))
+        .route("/activity-parties/{id}/edit", get(activities::party_edit_dialog))
+        .route("/activity-parties/{id}", delete(activities::party_remove))
+        .route("/tasks/{id}/complete", post(timeline::complete))
+        .route("/email-messages/new", get(email::new_dialog))
+        .route("/email-messages", post(email::create))
+        .route("/email-messages/{id}", get(email::page).patch(email::update))
+        .route("/email-messages/{id}/template", post(email::apply_template))
+        .route("/email-messages/{id}/send", post(email::send))
+        .route("/discussions/new", get(discussions::new_dialog))
+        .route("/discussions", post(discussions::create))
+        .route("/discussions/{id}", get(discussions::detail).patch(discussions::update))
+        .route("/discussions/{id}/subscribers", get(discussions::subscribers_dialog))
+        .route("/discussions/{id}/comments", post(discussions::comment))
+        .route("/notifications", get(discussions::notifications))
+        .route("/notifications/read", post(discussions::mark_read))
         .route("/sales", get(sales_lists::sales))
         .route("/payments", get(sales_lists::payments))
         .route("/sales/{doc_number}", get(sales::page))
@@ -120,6 +190,18 @@ pub fn router() -> Router<AppState> {
         .route("/settings/restore", post(backup::restore))
         .route("/settings/secrets/file", get(secrets_store::confirm).post(secrets_store::use_file))
         .route("/settings/secrets/keychain", post(secrets_store::use_keychain))
+        .route("/templates", get(templates::list).post(templates::create))
+        .route("/templates/new", get(templates::new_dialog))
+        .route("/templates/{id}", get(templates::detail).put(templates::save))
+        .route("/templates/{id}/merge-fields", put(templates::save_merge_fields))
+        .route("/templates/{id}/merge", post(templates::merge))
+        // The upload enforces its own limit (BR-FILE-01: 20,480 KB) while it reads, so axum's 2 MB default is off.
+        .route("/files", get(files::list).post(files::upload).layer(DefaultBodyLimit::disable()))
+        .route("/files/{id}/content", get(files::content))
+        .route("/files/{id}/thumbnail", get(files::thumbnail))
+        .route("/files/{id}/open", post(files::open))
+        .route("/attachments", post(files::attach))
+        .route("/attachments/{id}", delete(files::detach))
 }
 
 /// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a
@@ -136,6 +218,27 @@ async fn not_found() -> StatusCode {
     StatusCode::NOT_FOUND
 }
 
+#[derive(askama::Template)]
+#[template(path = "not_found.html")]
+struct NotFoundPage {
+    nav: Nav,
+    demo: bool,
+}
+
+/// The router's fallback (B13): a GET of a path no route serves gets a "Page not found" page in the app layout, still
+/// 404; any other method gets a bare 404. The guards run before it, so a request without the cookie is refused first.
+pub async fn page_not_found(State(state): State<AppState>, method: axum::http::Method) -> axum::response::Response {
+    use axum::response::IntoResponse;
+    if method != axum::http::Method::GET {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    let page = demo(&state).and_then(|demo| crate::web::render(&NotFoundPage { nav: Nav::Dashboard, demo }));
+    match page {
+        Ok(html) => (StatusCode::NOT_FOUND, html).into_response(),
+        Err(e) => e.into_response(),
+    }
+}
+
 /// Whether the sidebar shows the DEMO badge: the database holds the demo data (see [`crate::db::has_demo_data`]).
 pub fn demo(state: &AppState) -> Result<bool, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
@@ -146,10 +249,14 @@ pub fn demo(state: &AppState) -> Result<bool, AppError> {
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Nav {
     Dashboard,
+    Activity,
+    Messages,
     Customers,
     Parties,
     Invoices,
     Payments,
+    Templates,
+    Files,
     Settings,
 }
 

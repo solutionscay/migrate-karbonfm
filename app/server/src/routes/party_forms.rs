@@ -118,7 +118,7 @@ impl PersonForm {
             nickname: self.nickname.clone(),
             job_title: self.job_title.clone(),
             department: self.department.clone(),
-            employer_name: String::new(),
+            employer_name: None, // not on the form: an edit keeps it (284 s131-132)
         })
     }
 }

@@ -75,6 +75,18 @@ fn sample(path: &str) -> String {
         "cm-001"
     } else if path.starts_with("/relations/") {
         "rel-mara"
+    } else if path.starts_with("/email-messages/") {
+        "a-mail-1048"
+    } else if path.starts_with("/discussions/") {
+        "a-disc-light"
+    } else if path.starts_with("/activities/") || path.starts_with("/tasks/") {
+        "a-task-quote"
+    } else if path.starts_with("/activity-parties/") {
+        "ap-004"
+    } else if path.starts_with("/files/") {
+        "f-001"
+    } else if path.starts_with("/attachments/") {
+        "fa-001"
     } else {
         "p-hp"
     };
@@ -248,8 +260,21 @@ fn t_08_02_outbound_default_deny() {
 
     // Outbound calls exist only in Rust behind this policy: the server has no HTTP client crate of its own yet.
     let manifest = include_str!("../Cargo.toml");
-    for client in ["reqwest", "ureq", "isahc", "curl", "lettre"] {
+    for client in ["reqwest", "ureq", "isahc", "curl"] {
         assert!(!manifest.contains(client), "{client} added: route its calls through net::OutboundPolicy");
+    }
+    // The SMTP client (lettre, I4) lives in email.rs only, and the send checks the SMTP host first (AP-02).
+    let email = include_str!("../src/email.rs");
+    let check = email.find("policy.check_smtp(").expect("email_send checks the SMTP host");
+    let send = email.find("mailer.send(").expect("email_send sends through the mailer");
+    assert!(check < send, "the host is checked before the mailer connects");
+    for (name, src) in [
+        ("lib.rs", include_str!("../src/lib.rs")),
+        ("activities.rs", include_str!("../src/activities.rs")),
+        ("routes/email.rs", include_str!("../src/routes/email.rs")),
+        ("net.rs", include_str!("../src/net.rs")),
+    ] {
+        assert!(!src.contains("lettre::"), "{name} uses lettre directly: send through email::email_send");
     }
 }
 

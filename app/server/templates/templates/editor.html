@@ -1,0 +1,36 @@
+{# The editor of layout 112 (template_save). htmx PUTs it and swaps it with the answer: the same form, with field
+   errors (422, nothing saved) or saved (a toast; the merge fields come out of band). #}
+<form id="template-editor" class="panel" hx-put="/templates/{{ id }}" hx-target="#template-editor" hx-swap="outerHTML" novalidate aria-labelledby="t-editor">
+  <div class="panel-head"><h2 id="t-editor" class="panel-title">Template</h2></div>
+  <div class="p-5 space-y-3">
+    {% if !errors.is_empty() %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">Check the fields marked below. Nothing was saved.</div>{% endif %}
+    <label class="block">
+      <span class="text-[12px] muted">Name</span>
+      <input name="name" value="{{ name }}" class="input input-sm w-full mt-1" autocomplete="off">
+    </label>
+    <label class="block">
+      <span class="text-[12px] muted">Subject</span>
+      <input name="subject" value="{{ subject }}" class="input input-sm w-full mt-1" autocomplete="off"
+             {% if self.error("subject").is_some() %}aria-invalid="true" aria-describedby="err-subject"{% endif %}>
+      {% if let Some(e) = self.error("subject") %}<span id="err-subject" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+    </label>
+    <label class="block">
+      <span class="text-[12px] muted">Body</span>
+      <textarea name="message" rows="12" class="textarea textarea-sm w-full mt-1 mono text-[12.5px]"
+                {% if self.error("message").is_some() %}aria-invalid="true" aria-describedby="err-message"{% endif %}>{{ message }}</textarea>
+      {% if let Some(e) = self.error("message") %}<span id="err-message" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+    </label>
+    <fieldset>
+      <legend class="text-[12px] muted mb-1">Activity types</legend>
+      <div class="flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
+        {% for t in types %}
+        <label class="flex items-center gap-1.5"><input type="checkbox" name="activity_type" value="{{ t.id }}" class="checkbox checkbox-xs" {% if t.checked %}checked{% endif %}>{{ t.name }}</label>
+        {% endfor %}
+      </div>
+      {% if let Some(e) = self.error("activity_types") %}<span class="text-error text-[12px]" role="alert">{{ e }}</span>{% endif %}
+    </fieldset>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end">
+    <button class="btn btn-sm btn-primary">Save</button>
+  </div>
+</form>
