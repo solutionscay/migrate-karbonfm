@@ -14,6 +14,7 @@ pub mod big_demo;
 pub mod contacts;
 pub mod db;
 pub mod discussions;
+pub mod files;
 pub mod ids;
 pub mod import;
 pub mod invoice;
@@ -62,12 +63,18 @@ pub enum FolderPick {
 /// the server, the server asks the shell, the same pattern as the print hook.
 pub type FolderHook = Arc<dyn Fn(FolderPick) -> Result<Option<PathBuf>, String> + Send + Sync>;
 
+/// Opens a stored file in the system's default app through the desktop shell (UI-19 "Open"). The server resolves the
+/// path inside the file store first (`files::resolve`); the page only ever names a file id (AP-01, AP-02).
+pub type OpenHook = Arc<dyn Fn(PathBuf) -> Result<(), String> + Send + Sync>;
+
 /// Shared state of the server. One SQLite connection: the app is single-user and the server is the only writer.
 #[derive(Clone)]
 pub struct AppState {
     db: Arc<Mutex<Connection>>,
     print: Option<PrintHook>,
     save: Option<SaveHook>,
+    /// Opens a stored file with the system app; none in the dev server and the tests (`POST /files/{id}/open` 501).
+    open: Option<OpenHook>,
     /// The server's own origin, `http://127.0.0.1:<port>`. Requests must name it in Host (and in Origin for
     /// writes), which blocks DNS rebinding and cross-site requests from other pages (AP-13, R-07).
     origin: Option<String>,
@@ -94,6 +101,7 @@ impl AppState {
             db: Arc::new(Mutex::new(db)),
             print: None,
             save: None,
+            open: None,
             origin: None,
             session: None,
             secrets: Arc::new(MemoryStore::default()),
@@ -138,6 +146,12 @@ impl AppState {
     /// page and strand the window), and the page has no IPC, so the page asks the server and the server asks the shell.
     pub fn with_save(mut self, save: SaveHook) -> Self {
         self.save = Some(save);
+        self
+    }
+
+    /// The desktop shell passes its "open with the system app" function (the same one that shows a saved PDF).
+    pub fn with_open(mut self, open: OpenHook) -> Self {
+        self.open = Some(open);
         self
     }
 

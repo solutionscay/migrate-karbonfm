@@ -8,6 +8,7 @@ pub mod current_user;
 mod customers;
 mod dashboard;
 mod discussions;
+mod files;
 mod parties;
 mod party_forms;
 mod relation_forms;
@@ -24,7 +25,7 @@ pub use setup::setup_gate;
 
 use crate::web::AppError;
 use crate::AppState;
-use axum::extract::State;
+use axum::extract::{DefaultBodyLimit, State};
 use axum::http::StatusCode;
 use axum::routing::{delete, get, patch, post, put};
 use axum::Router;
@@ -107,6 +108,13 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("PUT", "/templates/{id}"),
     ("PUT", "/templates/{id}/merge-fields"),
     ("POST", "/templates/{id}/merge"),
+    ("GET", "/files"),
+    ("POST", "/files"),
+    ("GET", "/files/{id}/content"),
+    ("GET", "/files/{id}/thumbnail"),
+    ("POST", "/files/{id}/open"),
+    ("POST", "/attachments"),
+    ("DELETE", "/attachments/{id}"),
     // assets.rs: the embedded static files.
     ("GET", "/assets/{*path}"),
     // session.rs: the one-time launch URL of AP-13.
@@ -175,6 +183,13 @@ pub fn router() -> Router<AppState> {
         .route("/templates/{id}", get(templates::detail).put(templates::save))
         .route("/templates/{id}/merge-fields", put(templates::save_merge_fields))
         .route("/templates/{id}/merge", post(templates::merge))
+        // The upload enforces its own limit (BR-FILE-01: 20,480 KB) while it reads, so axum's 2 MB default is off.
+        .route("/files", get(files::list).post(files::upload).layer(DefaultBodyLimit::disable()))
+        .route("/files/{id}/content", get(files::content))
+        .route("/files/{id}/thumbnail", get(files::thumbnail))
+        .route("/files/{id}/open", post(files::open))
+        .route("/attachments", post(files::attach))
+        .route("/attachments/{id}", delete(files::detach))
 }
 
 /// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a
@@ -208,6 +223,7 @@ pub enum Nav {
     Invoices,
     Payments,
     Templates,
+    Files,
     Settings,
 }
 

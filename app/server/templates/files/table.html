@@ -1,0 +1,36 @@
+{# UI-19 file list (layouts 142/185): search, rows and pager. htmx replaces #files-table with it. #}
+<form class="flex flex-wrap items-center gap-2 px-4 py-3 border-b hairline" role="search"
+      hx-get="/files" hx-target="#files-table" hx-push-url="true" hx-trigger="input changed delay:250ms from:input[name=q]">
+  <label class="flex items-center gap-2 h-8 px-2.5 w-72 rounded-field border hairline bg-base-200/50 focus-within:border-primary">
+    <svg class="i muted" aria-hidden="true"><use href="#i-search"/></svg>
+    <input name="q" value="{{ q }}" class="bg-transparent outline-none w-full text-[13px]" placeholder="File name, tag or note" aria-label="Search files" autocomplete="off">
+  </label>
+</form>
+<div class="overflow-x-auto">
+  <table class="tbl">
+    <thead><tr><th class="w-12"><span class="sr-only">Preview</span></th><th>Name</th><th>Attached to</th><th>Category</th><th>Added</th><th class="r">Size</th></tr></thead>
+    <tbody>
+      {% for f in rows %}
+      <tr data-file="{{ f.id }}">
+        <td>{% if f.thumbnail %}<img src="/files/{{ f.id }}/thumbnail" alt="" class="w-9 h-9 rounded-field object-cover">{% else %}<span class="w-9 h-9 rounded-field grid place-items-center {{ f.badge_color }} text-[9px] font-bold" aria-hidden="true">{{ f.badge }}</span>{% endif %}</td>
+        <td class="max-w-[22rem]">
+          {% if f.present %}<button type="button" class="link link-hover font-medium text-left truncate block max-w-full" data-open-file="{{ f.id }}">{{ f.name }}</button>{% else %}<span class="font-medium truncate block">{{ f.name }}</span><span class="text-[11.5px] text-error">File missing from the file store</span>{% endif %}
+          {% if !f.tag.is_empty() || !f.note.is_empty() %}<div class="text-[11.5px] muted truncate">{% if !f.tag.is_empty() %}<span class="chip text-[10.5px] mr-1">{{ f.tag }}</span>{% endif %}{{ f.note }}</div>{% endif %}
+        </td>
+        <td>{% if f.attached_to.is_empty() %}<span class="muted">—</span>{% else %}{{ f.attached_to }}{% endif %}</td>
+        <td>{{ f.category }}</td>
+        <td class="num">{{ f.date }}</td>
+        <td class="r num">{{ f.size }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-center muted py-10">{% if q.is_empty() %}No files yet.{% else %}No files match.{% endif %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<nav class="flex items-center gap-3 px-4 py-2.5 border-t hairline text-[12px] muted" aria-label="Pages">
+  <span>{{ matched }} {% if matched == 1 %}file{% else %}files{% endif %}</span>
+  <span class="ml-auto">Page {{ page }} of {{ pages }}</span>
+  {% if page > 1 %}<a class="btn btn-xs btn-quiet" href="{{ self.href(page - 1) }}" hx-get="{{ self.href(page - 1) }}" hx-target="#files-table" hx-push-url="true">Previous</a>{% endif %}
+  {% if page < pages %}<a class="btn btn-xs btn-quiet" href="{{ self.href(page + 1) }}" hx-get="{{ self.href(page + 1) }}" hx-target="#files-table" hx-push-url="true">Next</a>{% endif %}
+</nav>

@@ -1781,10 +1781,12 @@ impl G<'_> {
 
     fn files(&mut self) {
         let n = ((350.0 * self.scale).round() as usize).max(3);
+        // ContentType and Category as kontroller 617 s117 and s120 set them: jpg is "image/jpg", xlsx has no type,
+        // and the category is Image or Document.
         let kinds = [
             ("Signed proposal", "pdf", "application/pdf", 0.35),
-            ("Site photos", "jpg", "image/jpeg", 0.3),
-            ("Sign schedule", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 0.15),
+            ("Site photos", "jpg", "image/jpg", 0.3),
+            ("Sign schedule", "xlsx", "", 0.15),
             ("Concept boards", "pdf", "application/pdf", 0.2),
         ];
         let w: Vec<f64> = kinds.iter().map(|k| k.3).collect();
@@ -1809,8 +1811,9 @@ impl G<'_> {
                 ("FileName", name.clone()),
                 ("Extension", ext.into()),
                 ("ContentType", ctype.into()),
-                ("FileSize", self.r.range(40_000, 9_000_000).to_string()),
-                ("Category", if on_txn { "Invoice".into() } else { "Client".into() }),
+                // FileSize is in KB, rounded to 2 decimals (617 s104).
+                ("FileSize", format!("{:.2}", self.r.range(40_000, 9_000_000) as f64 / 1000.0)),
+                ("Category", if ext == "jpg" { "Image".into() } else { "Document".into() }),
                 ("Container", format!("Container/{path}")),
             ]);
             self.push("File", r, at);

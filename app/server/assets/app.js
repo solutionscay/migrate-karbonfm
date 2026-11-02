@@ -82,6 +82,22 @@ if (window.htmx) {
     window.print();
   });
 
+  // Open a stored file (UI-19): the desktop shell opens it with the system app, so the window stays on the app. In a
+  // plain browser the server answers 501 and the file opens in a new tab; a missing copy says so.
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-open-file]");
+    if (!btn) return;
+    const id = encodeURIComponent(btn.dataset.openFile);
+    try {
+      const res = await fetch(`/files/${id}/open`, { method: "POST" });
+      if (res.status === 204) return;
+      if (res.status === 501) { window.open(`/files/${id}/content`, "_blank", "noopener"); return; }
+      window.karbonToast(res.status === 410 || res.status === 409 ? await res.text() : "The file could not be opened.", { error: true });
+    } catch (_) {
+      window.karbonToast("KarbonFM did not answer, so the file was not opened.", { error: true });
+    }
+  });
+
   // Invoice PDF: shown in an in-app <dialog>, never as the page itself, so the window always keeps the app (S-02's
   // stranded-window bug). Where the webview has no PDF viewer (WebKitGTK on Linux) the button saves the file instead.
   document.addEventListener("click", (e) => {

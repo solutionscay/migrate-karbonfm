@@ -81,6 +81,10 @@ fn sample(path: &str) -> String {
         "a-task-quote"
     } else if path.starts_with("/activity-parties/") {
         "ap-004"
+    } else if path.starts_with("/files/") {
+        "f-001"
+    } else if path.starts_with("/attachments/") {
+        "fa-001"
     } else {
         "p-hp"
     };

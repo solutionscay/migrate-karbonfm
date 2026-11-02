@@ -325,9 +325,10 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: inventory-only
 - Use case and users: Files list, thumbnails and attachment viewer; the single local user (ROLE-OWNER).
+- Built (I4 S6, 2026-11-01, branch `i4/files`): `/files` lists every file newest first (a thumbnail for an image, else an extension badge; name, what it is attached to, category, date added, size; search by name, tag or note; pages of 50) with Add file. The party detail gets the Files panel of design/customer.html in its aside: count, Add file (the native file chooser; the upload starts on choosing and links the file to the party), each file with Open and Remove (detach, no confirmation). Open asks the desktop shell to open the stored copy with the system app (`POST /files/{id}/open`, 204); in a browser (no shell, 501) the file opens in a new tab from `GET /files/{id}/content`. A row whose stored copy is missing (the small demo's four seed rows) says "File missing from the file store" and has no Open; its content route answers 410. A stored file is served with its type (inline only for PDF, plain text, PNG, JPEG, GIF; anything else downloads) and a sandbox CSP. The sidebar's Files link goes live.
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/142-Card_-_FilesList.txt`, `objects/karbon_kontacts.fmp12/layouts/185-Thumbnails.txt`
 - Page: `GET /files` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /files (multipart upload)` (OP-FILE-01 `file_add`), `POST /attachments` (OP-FILE-02 `file_attach`), `DELETE /attachments/{id}` (OP-FILE-03 `file_detach`)
+- Fragments and actions: `POST /files (multipart upload)` (OP-FILE-01 `file_add`), `POST /attachments` (OP-FILE-02 `file_attach`), `DELETE /attachments/{id}` (OP-FILE-03 `file_detach`), `GET /files/{id}/content`, `GET /files/{id}/thumbnail`, `POST /files/{id}/open` (the desktop shell's open hook; 501 without it)
 - Rules shown or enforced: BR-FILE-01, BR-FILE-02, BR-FILE-03
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
