@@ -1836,8 +1836,8 @@ impl G<'_> {
             ("Site visit follow-up", "Site visit <<Date>>", "Notes from our site visit on <<Date>>.", 2),
             (
                 "Proposal cover",
-                "Proposal for <<OrganizationName>>",
-                "Please find our proposal for <<OrganizationName>> attached.",
+                "Proposal for <<RecipientName>>",
+                "Please find our proposal for <<RecipientName>> attached.",
                 1,
             ),
             ("Email signature", "", "<<SenderName>>\nEllison Studio\n(207) 555-0100", 1),
@@ -1854,14 +1854,7 @@ impl G<'_> {
                 ("UserId", "u-mara".into()),
             ]);
             self.push("Template", r, t0 + Duration::days(i as i64 * 30));
-            for field in [
-                "<<RecipientName>>",
-                "<<InvoiceNumber>>",
-                "<<DueDate>>",
-                "<<SenderName>>",
-                "<<Date>>",
-                "<<OrganizationName>>",
-            ] {
+            for field in ["<<RecipientName>>", "<<InvoiceNumber>>", "<<DueDate>>", "<<SenderName>>", "<<Date>>"] {
                 if message.contains(field) || subject.contains(field) {
                     let n = self.next_serial("MergeField", 1);
                     // MergeField::Name keeps the delimiters, as MergeFieldConfig field 31 does.

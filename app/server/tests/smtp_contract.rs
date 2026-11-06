@@ -621,8 +621,161 @@ impl App {
             if name == "Invoice email" {
                 assert!(data.contains(&format!("invoice {doc} attached")), "{name} on {doc}: {data}");
             }
+            if name == "Proposal cover" {
+                assert!(data.contains(&format!("proposal for {recipient} attached")), "{name} on {doc}: {data}");
+            }
         }
     }
+}
+
+impl App {
+    /// The big demo's templates: (id, name, message).
+    fn seeded_templates(&self) -> Vec<(i64, String, String)> {
+        let c = self.read();
+        let mut stmt = c.prepare("SELECT id, name, COALESCE(message, '') FROM template ORDER BY id").unwrap();
+        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))).unwrap();
+        let seeded: Vec<(i64, String, String)> = rows.collect::<rusqlite::Result<_>>().unwrap();
+        assert_eq!(seeded.len(), 6);
+        assert!(seeded.iter().any(|(_, name, _)| name == "Invoice email"));
+        seeded
+    }
+
+    /// The small seed has no templates of its own: makes the big demo's text there, as a user would.
+    async fn copy_templates(&self, seeded: &[(i64, String, String)]) -> Vec<(i64, String)> {
+        let own: i64 = self.read().query_row("SELECT COUNT(*) FROM template", [], |r| r.get(0)).unwrap();
+        assert_eq!(own, 0, "the small seed has templates now: run them here too");
+        let mut copies = Vec::new();
+        for (_, name, message) in seeded {
+            copies.push((self.template(message).await, name.clone()));
+        }
+        copies
+    }
+
+    /// Up to `n` posted invoices of person customers with an email address, one per customer: (document, name).
+    fn person_invoices(&self, n: i64) -> Vec<(String, String)> {
+        let c = self.read();
+        let mut stmt = c
+            .prepare(
+                "SELECT st.doc_number, p.name_cached FROM sales_transaction st
+                 JOIN party_role r ON r.id = st.id_customer JOIN party p ON p.id = r.party_id
+                 WHERE st.invoice_ind = 1 AND st.locked_ind = 1 AND COALESCE(p.organization_ind, 0) = 0
+                   AND st.due_date IS NOT NULL AND p.name_cached NOT GLOB '*[^ -~]*'
+                   AND EXISTS (SELECT 1 FROM contact_method cm JOIN network_address n ON n.id = cm.id
+                               WHERE cm.party_id = p.id AND n.email_address_ind = 1)
+                 GROUP BY p.id ORDER BY MAX(st.date) DESC LIMIT ?1",
+            )
+            .unwrap();
+        let rows = stmt.query_map([n], |r| Ok((r.get(0)?, r.get(1)?))).unwrap();
+        rows.collect::<rusqlite::Result<_>>().unwrap()
+    }
+
+    /// No person customer has an empty name, which is what RecipientName reads.
+    fn assert_person_customers_have_names(&self) {
+        let c = self.read();
+        let (all, empty): (i64, i64) = c
+            .query_row(
+                "SELECT COUNT(*), COALESCE(SUM(TRIM(COALESCE(p.name_cached, '')) = ''), 0) FROM customer cu
+                 JOIN party_role r ON r.id = cu.id JOIN party p ON p.id = r.party_id
+                 WHERE COALESCE(p.organization_ind, 0) = 0",
+                [],
+                |r| Ok((r.get(0)?, r.get(1)?)),
+            )
+            .unwrap();
+        assert!(all > 0, "the data set has person customers");
+        assert_eq!(empty, 0, "a person customer with no name of {all}");
+    }
+}
+
+/// The same flow to a person customer, who has no employer here: every seeded template sends with no unfilled field.
+#[tokio::test]
+async fn every_seeded_template_sends_from_an_invoice_to_a_person() {
+    let server = Capture::start(Mode::Ok);
+    let big = App::big_demo(server.port);
+    big.assert_person_customers_have_names();
+    let seeded = big.seeded_templates();
+    let templates: Vec<(i64, String)> = seeded.iter().map(|(id, name, _)| (*id, name.clone())).collect();
+    let docs = big.person_invoices(3);
+    assert_eq!(docs.len(), 3);
+    for (doc, name) in &docs {
+        big.every_template_sends(&server, doc, name, &templates).await;
+    }
+
+    let small = App::new(server.port);
+    small.assert_person_customers_have_names();
+    let copies = small.copy_templates(&seeded).await;
+    // The small seed's person customers have receipts only, so this makes the invoice as New > Invoice does.
+    assert!(small.person_invoices(1).is_empty(), "the small seed has a person's invoice now: use it");
+    let (status, h, html) = small.send("POST", "/invoices", "customer_id=r-pr").await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    let doc = h["HX-Redirect"].to_str().unwrap().trim_start_matches("/sales/").to_owned();
+    let due: Option<String> = small
+        .read()
+        .query_row("SELECT due_date FROM sales_transaction WHERE doc_number = ?1", [&doc], |r| r.get(0))
+        .unwrap();
+    assert!(due.is_some_and(|d| !d.is_empty()), "{doc} has a due date from its terms");
+    small.every_template_sends(&server, &doc, "Priya Raman", &copies).await;
+}
+
+/// Sends a reminder that stops: the draft keeps the field, Send names it, and nothing connects.
+async fn reminder_stops(app: &App, server: &Capture, doc: &str, template: i64) {
+    let id = app.email_from_invoice(doc).await;
+    let (status, _, html) =
+        app.send("POST", &format!("/email-messages/{id}/template"), &format!("template_id={template}")).await;
+    assert_eq!(status, StatusCode::OK, "{doc}: {html}");
+    let message = app.message_of(&id);
+    assert!(message.contains("is due on {{DueDate}}") && message.contains(doc), "{doc}: {message}");
+    let (status, _, html) = app.send("POST", &format!("/email-messages/{id}/send"), "").await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{doc}: {html}");
+    assert!(html.contains("{{DueDate}} has no value on this email"), "{doc}: {html}");
+    assert!(
+        html.contains(r#"id="send-panel""#) && !html.contains("<html"),
+        "the send panel, not an error page: {html}"
+    );
+    assert_eq!(server.connections.load(Ordering::SeqCst), 0, "{doc}: nothing connects");
+    assert_eq!(app.sent_row(&id), (0, None, None), "{doc}: still unsent");
+    assert_eq!(app.message_of(&id), message, "{doc}: the draft stays as it was");
+}
+
+/// A reminder that a receipt is due makes no sense, so the send stops: owner's call. A sales receipt has no due date.
+#[tokio::test]
+async fn payment_reminder_on_a_sales_receipt_stops_and_names_the_due_date() {
+    let server = Capture::start(Mode::Ok);
+    let big = App::big_demo(server.port);
+    let seeded = big.seeded_templates();
+    let reminder = |list: &[(i64, String)]| list.iter().find(|(_, n)| n == "Payment reminder").unwrap().0;
+    let templates: Vec<(i64, String)> = seeded.iter().map(|(id, name, _)| (*id, name.clone())).collect();
+    let receipts: Vec<String> = {
+        let c = big.read();
+        let mut stmt = c
+            .prepare(
+                "SELECT MAX(st.doc_number) FROM sales_transaction st
+                 JOIN party_role r ON r.id = st.id_customer JOIN party p ON p.id = r.party_id
+                 WHERE COALESCE(st.sales_receipt_ind, 0) = 1 AND COALESCE(st.due_date, '') = ''
+                   AND EXISTS (SELECT 1 FROM contact_method cm JOIN network_address n ON n.id = cm.id
+                               WHERE cm.party_id = p.id AND n.email_address_ind = 1)
+                 GROUP BY substr(st.doc_number, 1, 3)",
+            )
+            .unwrap();
+        let rows = stmt.query_map([], |r| r.get(0)).unwrap();
+        rows.collect::<rusqlite::Result<_>>().unwrap()
+    };
+    assert!(
+        receipts.iter().any(|d| d.starts_with("SR-")) && receipts.iter().any(|d| d.starts_with("RET")),
+        "{receipts:?}"
+    );
+    for doc in &receipts {
+        reminder_stops(&big, &server, doc, reminder(&templates)).await;
+    }
+
+    let small = App::new(server.port);
+    let copies = small.copy_templates(&seeded).await;
+    for doc in ["SR-0311", "RET-0042"] {
+        reminder_stops(&small, &server, doc, reminder(&copies)).await;
+    }
+    // An invoice whose due date was cleared stops the same way: the one case left where a seeded template stops on an
+    // invoice.
+    small.read().execute("UPDATE sales_transaction SET due_date = NULL WHERE doc_number = 'INV-1048'", []).unwrap();
+    reminder_stops(&small, &server, "INV-1048", reminder(&copies)).await;
 }
 
 /// The demo's most obvious email flow: an invoice's Email button addresses an organization, which has no first name, so
@@ -632,14 +785,7 @@ impl App {
 async fn every_seeded_template_sends_from_an_invoice_to_an_organization() {
     let server = Capture::start(Mode::Ok);
     let big = App::big_demo(server.port);
-    let seeded: Vec<(i64, String, String)> = {
-        let c = big.read();
-        let mut stmt = c.prepare("SELECT id, name, COALESCE(message, '') FROM template ORDER BY id").unwrap();
-        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))).unwrap();
-        rows.collect::<rusqlite::Result<_>>().unwrap()
-    };
-    assert_eq!(seeded.len(), 6);
-    assert!(seeded.iter().any(|(_, name, _)| name == "Invoice email"));
+    let seeded = big.seeded_templates();
     let templates: Vec<(i64, String)> = seeded.iter().map(|(id, name, _)| (*id, name.clone())).collect();
     let docs: Vec<(String, String)> = {
         let c = big.read();
@@ -663,12 +809,7 @@ async fn every_seeded_template_sends_from_an_invoice_to_an_organization() {
     }
 
     let small = App::new(server.port);
-    let own: i64 = small.read().query_row("SELECT COUNT(*) FROM template", [], |r| r.get(0)).unwrap();
-    assert_eq!(own, 0, "the small seed has templates now: run them here too");
-    let mut copies = Vec::new();
-    for (_, name, message) in &seeded {
-        copies.push((small.template(message).await, name.clone()));
-    }
+    let copies = small.copy_templates(&seeded).await;
     small.every_template_sends(&server, "INV-1048", "Halden & Pryce Architects", &copies).await;
 }
 
