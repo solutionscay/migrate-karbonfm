@@ -468,7 +468,7 @@ async fn the_list_offers_edit_and_the_header_offers_new() {
     let (_, _, html) = send(&a, Request::get("/sales").body(Body::empty()).unwrap()).await;
     assert!(!html.contains("New invoice") && !html.contains("New sales receipt"), "the page repeats no create button");
     assert!(html.contains(r#"aria-label="Unpost INV-1051""#));
-    assert!(html.contains(r#"aria-label="Posted""#));
+    assert!(html.contains(r#"title="Posted. Unpost to edit""#));
 }
 
 // ---------------------------------------------------------------------------------------------------------------
