@@ -12,12 +12,11 @@
       {% if inv.locked %}<button class="btn btn-sm btn-quiet" hx-post="/sales-transactions/{{ inv.id|urlencode }}/lock" hx-vals='{"lock": "false"}'><svg class="i i-sm" aria-hidden="true"><use href="#i-lock"/></svg>Unlock</button>{% endif %}
       <button class="btn btn-sm btn-quiet" hx-get="/email-messages/new?party_id={{ inv.party_id|urlencode }}&amp;entity_type_id=12&amp;entity_id={{ inv.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-send"/></svg>Email</button>
       <button class="btn btn-sm btn-quiet" hx-get="/discussions/new?entity_type_id=12&amp;entity_id={{ inv.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Discuss</button>
-      {# S-02 compares the two PDF paths: the webview's print dialog and the PDF generated in Rust. #}
-      <button class="btn btn-sm btn-quiet" data-print><svg class="i i-sm"><use href="#i-printer"/></svg>Print (webview)</button>
-      {# Not a link: a PDF that replaces the app page strands the desktop window (no sidebar, no back button). #}
-      <button class="btn btn-sm btn-primary" data-pdf-open="pdf-preview" aria-haspopup="dialog"><svg class="i i-sm"><use href="#i-download"/></svg>PDF</button>
+      {# Not a link: a PDF that replaces the app page strands the desktop window (no sidebar, no back button). A sales receipt has no PDF (D-38). #}
+      {% if inv.is_invoice %}<button class="btn btn-sm btn-primary" data-pdf-open="pdf-preview" aria-haspopup="dialog"><svg class="i i-sm"><use href="#i-download"/></svg>PDF</button>{% endif %}
     </div>
   </div>
+  {% if inv.is_invoice %}
   {# PDF preview: the file in a frame inside the app. app.js opens it, or saves at once where the webview has no PDF
      viewer (WebKitGTK). Save goes server -> desktop shell -> native save dialog; in a browser it is a download link. #}
   <dialog id="pdf-preview" class="modal" aria-labelledby="pdf-preview-title" data-src="/sales/{{ inv.doc_number }}/invoice.pdf">
@@ -37,6 +36,7 @@
     </div>
     <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
   </dialog>
+  {% endif %}
 </div>
 <div class="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5 items-start">
   {% include "sales/document.html" %}

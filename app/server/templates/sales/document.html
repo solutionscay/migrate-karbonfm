@@ -1,4 +1,4 @@
-{# The invoice document (design/invoice.html, the paper), read only. src/pdf.rs draws the same layout. #}
+{# The invoice or sales receipt (design/invoice.html, the paper), read only. src/pdf/mod.rs draws the same layout for an invoice. #}
 <article class="paper inv-doc print-sheet">
   <header class="inv-head">
     <div>
@@ -9,7 +9,7 @@
       <div class="inv-small muted inv-seller-contact">{{ inv.seller.address }}<br>{{ inv.seller.contact }}</div>
     </div>
     <div class="inv-head-total">
-      <div class="eyebrow">Invoice {{ inv.doc_number }}</div>
+      <div class="eyebrow">{{ inv.kind_label() }} {{ inv.doc_number }}</div>
       <div class="inv-big num">{{ inv.total_before_retainer() }}</div>
       <div class="inv-small muted">Total</div>
     </div>
@@ -17,8 +17,8 @@
 
   <div class="inv-meta">
     <div><div class="muted">Bill to</div><div class="inv-strong">{{ inv.customer }}</div><div class="muted">{% for l in inv.bill_to %}{{ l }}{% if !loop.last %}<br>{% endif %}{% endfor %}</div></div>
-    <div><div class="muted">Invoice date</div><div class="num">{{ date_text }}</div>{% if !inv.terms.is_empty() %}<div class="muted inv-gap">Terms</div><div>{{ inv.terms }}</div>{% endif %}</div>
-    <div><div class="muted">Due date</div><div class="num">{{ due_text }}</div></div>
+    <div><div class="muted">{% if inv.is_invoice %}Invoice date{% else %}Date{% endif %}</div><div class="num">{{ date_text }}</div>{% if !inv.terms.is_empty() %}<div class="muted inv-gap">Terms</div><div>{{ inv.terms }}</div>{% endif %}</div>
+    <div>{% if inv.is_invoice %}<div class="muted">Due date</div><div class="num">{{ due_text }}</div>{% endif %}{% if !inv.ship_to.is_empty() %}<div class="muted {% if inv.is_invoice %}inv-gap{% endif %}">Ship to</div><div>{% for l in inv.ship_to %}{{ l }}{% if !loop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}</div>
     <div><div class="muted">Tax</div><div>{{ inv.tax_rate_label() }}</div></div>
   </div>
 
@@ -44,6 +44,7 @@
     <dl class="inv-totals">
       <dt class="muted">Subtotal</dt><dd class="num">{{ inv.subtotal_before_retainer() }}</dd>
       <dt class="muted">Sales tax ({{ inv.tax_rate_label() }} on taxable)</dt><dd class="num">{{ inv.totals.total_tax }}</dd>
+      {% if inv.ship_amt.0 != 0 %}<dt class="muted">Shipping</dt><dd class="num">{{ inv.ship_amt }}</dd>{% endif %}
       <dt class="inv-rule inv-bold">Total</dt><dd class="num inv-rule inv-bold">{{ inv.total_before_retainer() }}</dd>
       {% if inv.retainer().0 != 0 %}<dt class="muted">Retainer applied</dt><dd class="num">−{{ -inv.retainer() }}</dd>{% endif %}
       {% if inv.paid().0 != 0 %}<dt class="muted">Payments</dt><dd class="num">−{{ inv.paid() }}</dd>{% endif %}

@@ -4,7 +4,6 @@ use axum::body::Body;
 use axum::http::{header, Request, StatusCode};
 use http_body_util::BodyExt;
 use karbon_server::{db, router, AppState};
-use std::sync::{Arc, Mutex};
 use tower::ServiceExt;
 
 fn app() -> axum::Router {
@@ -112,22 +111,6 @@ async fn invoice_lives_at_sales() {
 }
 
 #[tokio::test]
-async fn print_uses_the_window_hook_when_there_is_one() {
-    let (status, _, _) = send(app(), Request::post("/print").body(Body::empty()).unwrap()).await;
-    assert_eq!(status, StatusCode::NOT_IMPLEMENTED, "no window: the page falls back to window.print()");
-
-    let calls = Arc::new(Mutex::new(0));
-    let counter = calls.clone();
-    let state = AppState::new(db::open_demo(None).unwrap()).with_print(Arc::new(move || {
-        *counter.lock().unwrap() += 1;
-        Ok(())
-    }));
-    let (status, _, _) = send(router(state), Request::post("/print").body(Body::empty()).unwrap()).await;
-    assert_eq!(status, StatusCode::NO_CONTENT);
-    assert_eq!(*calls.lock().unwrap(), 1);
-}
-
-#[tokio::test]
 async fn assets_are_embedded_and_pages_carry_a_csp() {
     for (path, ctype) in [
         ("/assets/app.css", "text/css"),
@@ -159,7 +142,7 @@ async fn origin_guard_refuses_other_hosts_and_cross_site_writes() {
     const ORIGIN: &str = "http://127.0.0.1:4321";
     let guarded = || router(AppState::new(db::open_demo(None).unwrap()).with_origin(ORIGIN));
     let req = |method: &str, host: &str, origin: Option<&str>| {
-        let mut r = Request::builder().method(method).uri("/print").header(header::HOST, host);
+        let mut r = Request::builder().method(method).uri("/sales/INV-1048/save-pdf").header(header::HOST, host);
         if let Some(o) = origin {
             r = r.header(header::ORIGIN, o);
         }

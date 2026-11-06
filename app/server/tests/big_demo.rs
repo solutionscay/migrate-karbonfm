@@ -366,3 +366,66 @@ fn sales_commands_agree_with_import_recompute() {
     let took = start.elapsed();
     assert!(took.as_millis() < 600, "a save took {took:?}");
 }
+
+/// "The PDF matches the totals" at full scale (S5): every invoice's model equals its stored totals, the printed rows on
+/// a sample with shipping and with a retainer line, and a long invoice's PDF is fast.
+#[tokio::test]
+async fn pdf_matches_totals_big_demo() {
+    use karbon_money::Cents;
+    use karbon_server::invoice::Invoice;
+    let tmp = tempfile::tempdir().unwrap();
+    let dir = tmp.path().join("data");
+    std::fs::create_dir_all(&dir).unwrap();
+    assert!(matches!(big_demo::create(&dir).unwrap(), Outcome::Created { .. }));
+    let conn = db::open(&db::database_path(&dir), Seed::Reference).unwrap().0;
+
+    type Row = (String, i64, i64, i64, i64, i64);
+    let rows: Vec<Row> = conn
+        .prepare(
+            "SELECT doc_number, COALESCE(total_tax, 0), COALESCE(total_amt, 0), COALESCE(retainer, 0),
+                    COALESCE(balance, 0), COALESCE(ship_amt, 0)
+             FROM sales_transaction
+             WHERE invoice_ind = 1 AND COALESCE(deleted, 0) = 0 AND doc_number IS NOT NULL",
+        )
+        .unwrap()
+        .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)))
+        .unwrap()
+        .collect::<Result<_, _>>()
+        .unwrap();
+    assert!(rows.len() > 2_000, "{} invoices", rows.len());
+    let mut wrong = Vec::new();
+    for (doc, tax, total, retainer, balance, ship) in &rows {
+        let inv = Invoice::load(&conn, doc).unwrap();
+        let t = inv.totals;
+        if (t.total_tax.0, t.total_amt.0, t.retainer.0, t.balance.0, inv.ship_amt.0)
+            != (*tax, *total, *retainer, *balance, *ship)
+        {
+            wrong.push(format!(
+                "{doc}: model {t:?}, stored tax {tax} total {total} retainer {retainer} balance {balance}"
+            ));
+        }
+    }
+    assert!(wrong.is_empty(), "{} of {}: {:#?}", wrong.len(), rows.len(), &wrong[..wrong.len().min(10)]);
+
+    let printed_row =
+        |texts: &[String], label: &str, value: String| texts.windows(2).any(|w| w[0] == label && w[1] == value);
+    let with_ship = rows.iter().find(|r| r.5 != 0).expect("an invoice with shipping");
+    let with_retainer = rows.iter().find(|r| r.3 != 0).expect("an invoice with a retainer line");
+    for (doc, _, total, retainer, balance, ship) in [with_ship, with_retainer] {
+        let inv = Invoice::load(&conn, doc).unwrap();
+        let t: Vec<String> = karbon_server::pdf::page_texts(&inv).into_iter().flatten().collect();
+        assert!(printed_row(&t, "Total", Cents(total - retainer).to_string()), "{doc}: {t:?}");
+        assert!(printed_row(&t, "Balance due", Cents(*balance).to_string()), "{doc}: {t:?}");
+        if *ship != 0 {
+            assert!(printed_row(&t, "Shipping", Cents(*ship).to_string()), "{doc}: {t:?}");
+        }
+    }
+    drop(conn);
+
+    let state = AppState::new(db::open(&db::database_path(&dir), Seed::Reference).unwrap().0);
+    let start = std::time::Instant::now();
+    let (status, _) = get(&state, "/sales/INV-12000/invoice.pdf").await;
+    let took = start.elapsed();
+    assert_eq!(status, StatusCode::OK);
+    assert!(took.as_millis() < 600, "the PDF took {took:?}");
+}

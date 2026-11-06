@@ -108,7 +108,6 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/sales/{doc_number}/save-pdf"),
-    ("POST", "/print"),
     ("GET", "/items"),
     ("POST", "/items"),
     ("GET", "/items/new"),
@@ -207,7 +206,6 @@ pub fn router() -> Router<AppState> {
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))
-        .route("/print", post(print))
         .route("/items", get(items::list).post(items::create))
         .route("/items/new", get(items::new_dialog))
         .route("/items/{id}/edit", get(items::edit_dialog))
@@ -231,15 +229,6 @@ pub fn router() -> Router<AppState> {
         .route("/files/{id}/open", post(files::open))
         .route("/attachments", post(files::attach))
         .route("/attachments/{id}", delete(files::detach))
-}
-
-/// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a
-/// browser) it answers 501 and the page falls back to window.print().
-async fn print(State(state): State<AppState>) -> Result<StatusCode, AppError> {
-    match &state.print {
-        Some(print) => print().map(|()| StatusCode::NO_CONTENT).map_err(AppError::Internal),
-        None => Ok(StatusCode::NOT_IMPLEMENTED),
-    }
 }
 
 /// A 404 for the other methods of a path (T-08-07: a party has no delete route, it is only archived).

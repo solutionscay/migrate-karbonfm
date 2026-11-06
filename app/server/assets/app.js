@@ -71,17 +71,6 @@ if (window.htmx) {
     window.karbonToast("KarbonFM did not answer, so this was not saved. Restart KarbonFM and try again.", { error: true }),
   );
 
-  // Print buttons: the native print dialog (it also saves as PDF). In the desktop app the server opens it, because
-  // window.print() does nothing in WKWebView on macOS; in a plain browser the server answers 501 and we print here.
-  document.addEventListener("click", async (e) => {
-    if (!e.target.closest("[data-print]")) return;
-    try {
-      const res = await fetch("/print", { method: "POST" });
-      if (res.status === 204) return;
-    } catch (_) {}
-    window.print();
-  });
-
   // Open a stored file (UI-19): the desktop shell opens it with the system app, so the window stays on the app. In a
   // plain browser the server answers 501 and the file opens in a new tab; a missing copy says so.
   document.addEventListener("click", async (e) => {
