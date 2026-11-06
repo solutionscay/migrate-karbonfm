@@ -695,7 +695,7 @@ async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
     let topbar = &topbar[..topbar.find("</header>").unwrap()];
     assert!(topbar.contains(r#"<details class="dropdown dropdown-end">"#) && topbar.contains("</svg>New<svg"));
     let menu = &topbar[topbar.find(r#"aria-label="New""#).unwrap()..topbar.find("</ul>").unwrap()];
-    assert_eq!(menu.matches("<li>").count(), 10, "Invoice, Sales receipt, Customer, Contact, 5 activities, Template");
+    assert_eq!(menu.matches("<li>").count(), 11, "Invoice, Sales receipt, Customer, Contact, 5 activities, Template, File");
     assert_eq!(menu.matches("<a ").count(), 2, "two real links, no fake ones");
     assert!(menu.contains(r#"<a href="/parties/new?role=customer">"#));
     assert!(menu.contains(r#"<a href="/parties/new">"#));

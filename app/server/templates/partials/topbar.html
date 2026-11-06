@@ -9,8 +9,8 @@
     <kbd>⌘K</kbd>
   </button>
   <div class="flex items-center gap-1">
-    {# design/partials/topbar.html:13-19. Customer opens the create wizard (UI-05, with the duplicate check of
-       BR-PARTY-02); Task, Note, Meeting and Call open the activity dialog and Email the compose dialog (I4); Template opens its name dialog; the other items come in later releases and show the "not part of the demo yet" toast, as the
+    {# design/partials/topbar.html:13-19. Customer and Contact open the create wizard (UI-05, with the duplicate check of
+       BR-PARTY-02); Task, Note, Meeting and Call open the activity dialog and Email the compose dialog (I4); Template opens its name dialog; File uploads; the other items come in later releases and show the "not part of the demo yet" toast, as the
        sidebar's unbuilt screens do. #}
     <details class="dropdown dropdown-end">
       <summary class="btn btn-primary btn-sm"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>New<svg class="i i-sm" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
@@ -25,6 +25,8 @@
         <li><button type="button" hx-get="/activities/new?kind=call" hx-target="#modal-body" @click="$el.closest('details').open = false"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg>Call</button></li>
         <li><button type="button" hx-get="/email-messages/new" hx-target="#modal-body" @click="$el.closest('details').open = false"><svg class="i" aria-hidden="true"><use href="#i-mail"/></svg>Email</button></li>
         <li><button type="button" hx-get="/templates/new" hx-target="#modal-body" @click="$el.closest('details').open = false"><svg class="i" aria-hidden="true"><use href="#i-file"/></svg>Template</button></li>
+        {# Choosing the file uploads it (OP-FILE-01, no link): the list opens on success, an error shows below the header. #}
+        <li><label class="cursor-pointer"><svg class="i" aria-hidden="true"><use href="#i-folder"/></svg>File<input type="file" name="file" class="sr-only" aria-label="New file" hx-post="/files" hx-encoding="multipart/form-data" hx-trigger="change" hx-target="#file-upload-result" @change="$el.closest('details').open = false"></label></li>
       </ul>
     </details>
     {# The notification bell (OP-ACTIVITY-09), loaded once per page. #}
@@ -34,3 +36,4 @@
     </button>
   </div>
 </header>
+<div id="file-upload-result" class="empty:hidden px-6 pt-3"></div>
