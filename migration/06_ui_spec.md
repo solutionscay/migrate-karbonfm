@@ -340,8 +340,9 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: inventory-only
 - Use case and users: The invoice PDF (the only print output; no sales receipt PDF) and the monthly sales summary screen with its chart (owner, 2026-10-28; D-38); the single local user (ROLE-OWNER).
-- Source layouts: `objects/karbon_kontacts.fmp12/layouts/103-SalesLine_pdf.txt`, `objects/karbon_charts.fmp12/layouts/25-SalesOpp_Chart.txt`, `objects/karbon_charts.fmp12/layouts/22-Opportunity_Referral_Report.txt`
-- Page: `GET /sales/{id}/print; GET /reports/sales-by-month` (full page; the same route returns the fragment to htmx)
+- Source layouts: `objects/karbon_kontacts.fmp12/layouts/103-SalesLine_pdf.txt`. Charts layout 25 is UI-10's chart; charts layout 22 is opened by no script and is not built.
+- Page: `GET /sales/{doc_number}/invoice.pdf` (the PDF, invoices only; a sales receipt answers 404), `POST /sales/{doc_number}/save-pdf` (through the desktop shell), `GET /reports/sales-by-month` (full page; the same route returns the fragment to htmx)
+- Built, PDF (I5 S5, 2026-11-06, branch `i5/pdf`): one model (`invoice.rs`) renders the page and the PDF, with krilla. It reads shipping (a Shipping row when not 0) and the address stored on the transaction, falling back to the party's on an older row. A sales receipt's page says "Sales receipt", shows a balance of 0 and has no PDF. The webview print button, `POST /print`, the print hook and the printpdf comparison are gone.
 - Fragments and actions: `POST /invoices; PUT /invoices/{id}` (OP-SALES-04 `invoice_save`), `GET /opportunities/status-totals?active=` (OP-SALES-03 `opportunity_status_totals`), `GET /reports/sales-by-month?from=&to=` (OP-SALES-11 `sales_summary_by_month`)
 - Rules shown or enforced: BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-05, BR-SALES-08, BR-SALES-14, BR-SALES-17
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
@@ -385,7 +386,7 @@ Per-layout hide rules and conditional formats are listed in the layout explorer 
 | Breakpoints/input devices | desktop window, min 1024 x 700; mouse and keyboard; macOS, Windows and Linux (keyboard shortcuts use Cmd on macOS and Ctrl on Windows and Linux) | owner, 2026-10-28; D-37 | resizes without horizontal scroll |
 | Data-density/table behavior | dense DaisyUI tables, sorted, filtered and paged on the server (50-100 rows); htmx swaps the table body | Karbon list layouts | a page of a 10,000-row list renders in under 200 ms |
 | Modal/tab/navigation behavior | FileMaker cards become DaisyUI modals on `<dialog>` (fragments loaded by htmx) or side drawers; one main window; tabs and dropdowns use Alpine.js | Card - * layouts | focus moves into the dialog and returns on close |
-| Print/PDF behavior | invoice print page only (askama template with print CSS) turned into a PDF locally (S-02); no other print output | SalesLine_pdf layout (owner, 2026-10-28; D-38) | PDF matches totals |
+| Print/PDF behavior | the invoice PDF only, drawn in Rust with krilla from the same model as the page (S-02, 03); no other print output | SalesLine_pdf layout (owner, 2026-10-28; D-38) | PDF matches totals |
 | Charts | Chart.js on a `<canvas>`; the fragment carries the data as JSON in a data attribute | karbon_charts layouts | chart totals equal the query |
 | Accessibility target | full keyboard use and good contrast (WCAG AA contrast ratios); semantic HTML (labels, buttons, landmarks) | owner, 2026-10-28; D-38 | route tests check labels and roles in the HTML; axe check by hand per screen |
 
