@@ -30,6 +30,8 @@ pub enum CommandError {
     Refused(String),
     /// An email message that was sent already cannot be edited or sent again (AP-08, BR-ACTIVITY-08; T-08-08).
     AlreadySent,
+    /// A posted transaction cannot be changed or deleted; unpost it first (AP-05, BR-SALES-05; T-08-05).
+    Locked,
     Storage(rusqlite::Error),
 }
 
@@ -43,6 +45,7 @@ impl fmt::Display for CommandError {
             CommandError::ConfirmationRequired(summary) => write!(f, "confirmation required: {summary}"),
             CommandError::Refused(message) => f.write_str(message),
             CommandError::AlreadySent => f.write_str(ALREADY_SENT),
+            CommandError::Locked => f.write_str(LOCKED),
             CommandError::Storage(e) => write!(f, "database: {e}"),
         }
     }
@@ -52,6 +55,9 @@ impl std::error::Error for CommandError {}
 
 /// The AlreadySent message (kontroller 522 s124-125: "This Email has already been sent").
 pub const ALREADY_SENT: &str = "This email has already been sent. A sent email cannot be changed or sent again.";
+
+/// The Locked message (kontroller 560 s56: "This transaction has been posted. You have to Un Post it...").
+pub const LOCKED: &str = "This transaction has been posted. Unpost it first.";
 
 impl From<rusqlite::Error> for CommandError {
     fn from(e: rusqlite::Error) -> Self {

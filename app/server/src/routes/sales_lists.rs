@@ -78,7 +78,8 @@ pub async fn sales(
         page: query.page,
         ..Default::default()
     };
-    let found = sales_list::sales_list(&conn, &q).map_err(|e| AppError::Internal(format!("sales_list: {e}")))?;
+    let found = sales_list::sales_list(&conn, &q, &state.today())
+        .map_err(|e| AppError::Internal(format!("sales_list: {e}")))?;
     let (first, last) = found.span();
     let table = SalesTable {
         query: &query,

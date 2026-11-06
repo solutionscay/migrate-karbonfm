@@ -1,0 +1,37 @@
+{# UI-11 summary (layout 156): name, status menu (OP-SALES-02), the fields. A status change swaps it; a save sends it out of band. #}
+<section class="panel p-5 mb-5" id="opportunity-summary" aria-labelledby="opportunity-name"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <div class="flex flex-wrap items-start gap-3">
+    <div class="flex-1 min-w-[280px]">
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <h1 class="page-title" id="opportunity-name">{{ self.title() }}</h1>
+        <span class="chip {% if o.active %}ok{% endif %}"><span class="dot"></span>{{ o.status }}</span>
+        <span class="chip">{{ o.type_display }}</span>
+      </div>
+      <div class="muted mt-1"><a class="link link-hover" href="{{ self.party_href() }}">{{ o.party }}</a></div>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-sm btn-quiet" hx-get="{{ self.href() }}/edit" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button>
+      <details class="dropdown dropdown-end">
+        <summary class="btn btn-sm btn-primary">Status<svg class="i i-sm" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+        <ul class="dropdown-content menu bg-base-100 rounded-box z-20 mt-2 w-48 p-1.5 border hairline shadow-lg text-[13px]" aria-label="Change status">
+          {% for (id, name) in statuses %}
+          <li><button type="button" hx-post="{{ self.href() }}/status" hx-vals='{"status_id": "{{ id }}"}' hx-target="#opportunity-summary" hx-swap="outerHTML">{{ name }}</button></li>
+          {% endfor %}
+        </ul>
+      </details>
+    </div>
+  </div>
+  <dl class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-2 mt-4 text-[12.5px]">
+    <div class="flex gap-3"><dt class="muted w-28 shrink-0">Value</dt><dd class="num font-medium">{{ self.value() }}</dd></div>
+    <div class="flex gap-3"><dt class="muted w-28 shrink-0">Probability</dt><dd>{{ o.probability }}</dd></div>
+    <div class="flex gap-3"><dt class="muted w-28 shrink-0">Date opened</dt><dd class="num">{{ self.date(&o.start_date) }}</dd></div>
+    <div class="flex gap-3"><dt class="muted w-28 shrink-0">Date closed</dt><dd class="num">{{ self.date(&o.end_date) }}</dd></div>
+    <div class="flex gap-3"><dt class="muted w-28 shrink-0">Salesperson</dt><dd>{% if o.salesperson.is_empty() %}<span class="muted">—</span>{% else %}{{ o.salesperson }}{% endif %}</dd></div>
+    <div class="flex gap-3"><dt class="muted w-28 shrink-0">Primary contact</dt><dd>{% if o.primary_contact.is_empty() %}<span class="muted">—</span>{% else %}<a class="link link-hover" href="{{ self.other_href(&o.primary_contact_party_id) }}">{{ o.primary_contact }}</a>{% endif %}</dd></div>
+    <div class="flex gap-3"><dt class="muted w-28 shrink-0">Referring party</dt><dd>{% if o.referring.is_empty() %}<span class="muted">—</span>{% elif o.referring_party_id.is_empty() %}{{ o.referring }}{% else %}<a class="link link-hover" href="{{ self.other_href(&o.referring_party_id) }}">{{ o.referring }}</a>{% endif %}</dd></div>
+    {% if let Some(b) = balance %}<div class="flex gap-3"><dt class="muted w-28 shrink-0">Customer balance</dt><dd class="num">{{ b }}</dd></div>{% endif %}
+    {% if let Some(r) = retainer %}<div class="flex gap-3"><dt class="muted w-28 shrink-0">Retainer balance</dt><dd class="num">{{ r }}</dd></div>{% endif %}
+    <div class="flex gap-3"><dt class="muted w-28 shrink-0">Created by</dt><dd>{% if o.created_by.is_empty() %}<span class="muted">—</span>{% else %}{{ o.created_by }}{% endif %}{% if !o.created_at.is_empty() %} <span class="muted num">{{ self.created() }}</span>{% endif %}</dd></div>
+    <div class="flex gap-3 lg:col-span-2"><dt class="muted w-28 shrink-0">Notes</dt><dd class="whitespace-pre-line">{% if o.notes.is_empty() %}<span class="muted">—</span>{% else %}{{ o.notes }}{% endif %}</dd></div>
+  </dl>
+</section>

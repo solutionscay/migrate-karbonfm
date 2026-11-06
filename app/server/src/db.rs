@@ -32,6 +32,8 @@ pub fn database_path(data_dir: &Path) -> PathBuf {
 const SCHEMA_04: &str = include_str!("../migrations/V1__schema_04.sql");
 /// V2: the fixes of the DDR schema audit (migration/10_ddr_schema_audit.md).
 const V2_DDR_AUDIT: &str = include_str!("../migrations/V2__ddr_audit.sql");
+/// V3: retainer lines are not revenue (BR-SALES-17).
+const V3_SALES_SUMMARY_VIEW: &str = include_str!("../migrations/V3__sales_summary_view.sql");
 const DEMO_SEED: &str = include_str!("../../../migration/04_demo_seed.sql");
 
 /// The stored copies of the demo seed's file rows (B3): small placeholder files, each at its row's container_path
@@ -48,8 +50,12 @@ pub const DEMO_FILES: &[(&str, &[u8])] = &[
 pub enum Seed {
     /// The reference rows only (OP-ADMIN-02). A real install: setup or an import adds the rest.
     Reference,
-    /// The reference rows, then the demo data of 04_demo_seed.sql when the database has no party (demo build).
+    /// The reference rows, then the demo data of 04_demo_seed.sql when the database has no party, at its fixed dates
+    /// (the tests).
     Demo,
+    /// The same demo data, with its dates moved so the seed's 2026-10-28 falls on this day (B11: the dev server and the
+    /// desktop's `demo` build pass the local date).
+    DemoAsOf(chrono::NaiveDate),
 }
 
 /// What happened while opening: for the start-up log line and the tests.
@@ -146,8 +152,10 @@ fn prepare(mut conn: Connection, seed: Seed, file: bool) -> Result<(Connection, 
     set_pragmas(&conn, file)?;
     let mut report = OpenReport { migrations_applied: migrate(&mut conn)?, ..Default::default() };
     report.reference_rows_inserted = reference::reference_seed(&mut conn, &Actor::system())?;
-    if seed == Seed::Demo {
-        report.demo_seed_loaded = load_demo_seed(&mut conn)?;
+    match seed {
+        Seed::Reference => {}
+        Seed::Demo => report.demo_seed_loaded = load_demo_seed(&mut conn, None)?,
+        Seed::DemoAsOf(today) => report.demo_seed_loaded = load_demo_seed(&mut conn, Some(today))?,
     }
     Ok((conn, report))
 }
@@ -174,6 +182,7 @@ pub fn migrations() -> Vec<Migration> {
     vec![
         Migration::unapplied("V1__schema_04", &strip_transaction(SCHEMA_04)).expect("V1 migration name"),
         Migration::unapplied("V2__ddr_audit", V2_DDR_AUDIT).expect("V2 migration name"),
+        Migration::unapplied("V3__sales_summary_view", V3_SALES_SUMMARY_VIEW).expect("V3 migration name"),
     ]
 }
 
@@ -216,8 +225,9 @@ pub fn has_demo_data(conn: &Connection) -> rusqlite::Result<bool> {
     conn.query_row("SELECT EXISTS (SELECT 1 FROM app_meta WHERE key = ?1)", [DEMO_KEY], |r| r.get(0))
 }
 
-/// Loads the demo seed when the database has no party and was never demo-seeded. Returns whether it loaded.
-pub fn load_demo_seed(conn: &mut Connection) -> Result<bool, DbError> {
+/// Loads the demo seed when the database has no party and was never demo-seeded. Returns whether it loaded. With a date,
+/// the seed's dates move so its 2026-10-28 falls on that day (B11, `demo_dates`), in the same transaction.
+pub fn load_demo_seed(conn: &mut Connection, as_of: Option<chrono::NaiveDate>) -> Result<bool, DbError> {
     let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
     let (parties, seeded): (i64, bool) = tx.query_row(
         "SELECT (SELECT COUNT(*) FROM party), EXISTS (SELECT 1 FROM app_meta WHERE key = ?1)",
@@ -228,6 +238,10 @@ pub fn load_demo_seed(conn: &mut Connection) -> Result<bool, DbError> {
         return Ok(false);
     }
     tx.execute_batch(&strip_transaction(DEMO_SEED))?;
+    if let Some(today) = as_of {
+        let anchor = crate::demo_dates::parse_date(crate::demo_dates::SMALL_SEED_ANCHOR).expect("the anchor is a date");
+        crate::demo_dates::shift(&tx, anchor, today)?;
+    }
     let orphans = foreign_key_check(&tx)?;
     if !orphans.is_empty() {
         return Err(DbError::ForeignKeyCheck(orphans));

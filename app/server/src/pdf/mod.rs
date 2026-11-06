@@ -1,15 +1,13 @@
-//! Invoice PDF generated in Rust (spike S-02, path b). It draws the same model as the HTML page
+//! Invoice PDF generated in Rust (S-02 chose this path, with krilla). It draws the same model as the HTML page
 //! (`crate::invoice`), so the totals are the money crate's; the layout follows design/invoice.html by hand.
 //!
 //! The layout is done once, into a display list of positioned, shaped text runs, hairlines and rectangles. Text is
-//! shaped with rustybuzz (kerning, and tabular figures for amounts, as CSS `tabular-nums`). Two backends write the
-//! list as PDF so the spike can compare the crates on equal terms: `printpdf` and `krilla`.
+//! shaped with rustybuzz (kerning, and tabular figures for amounts, as CSS `tabular-nums`); krilla writes the list.
 //!
 //! US Letter, Geist (static TTFs, subset into the file). Long invoices break between rows: the table header
 //! repeats on every page, a row is never split, the totals block stays whole, and each page has "Page n of N".
 
 mod krilla_backend;
-mod printpdf_backend;
 
 use crate::invoice::{display_date, Invoice, Line};
 use rustybuzz::{Feature, UnicodeBuffer};
@@ -17,21 +15,21 @@ use std::ops::Range;
 use std::str::FromStr;
 use std::sync::LazyLock;
 
-/// Which crate writes the PDF.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Engine {
-    Printpdf,
-    Krilla,
+/// Renders the invoice as a PDF file.
+pub fn invoice_pdf(inv: &Invoice) -> Vec<u8> {
+    krilla_backend::write(&format!("Invoice {}", inv.doc_number), &layout(inv))
 }
 
-/// Renders the invoice as a PDF file.
-pub fn invoice_pdf(inv: &Invoice, engine: Engine) -> Vec<u8> {
-    let pages = layout(inv);
-    let title = format!("Invoice {}", inv.doc_number);
-    match engine {
-        Engine::Printpdf => printpdf_backend::write(&title, &pages),
-        Engine::Krilla => krilla_backend::write(&title, &pages),
-    }
+/// The text runs of each page, in drawing order: what the PDF prints, for "the PDF matches the totals".
+pub fn page_texts(inv: &Invoice) -> Vec<Vec<String>> {
+    layout(inv)
+        .iter()
+        .map(|page| {
+            page.iter()
+                .filter_map(|d| if let Draw::Text { text, .. } = d { Some(text.clone()) } else { None })
+                .collect()
+        })
+        .collect()
 }
 
 pub(crate) const PAGE_W: f32 = 612.0; // US Letter, pt
@@ -302,6 +300,13 @@ fn meta(w: &mut Writer, inv: &Invoice) {
     pair(2, top, "Due date", &display_date(&inv.due_date));
     pair(3, top, "Tax", &inv.tax_rate_label());
     bottom = bottom.max(second + lh);
+    if !inv.ship_to.is_empty() {
+        w.text(label, Align::Left, x(2), second, "Ship to");
+        for (i, l) in inv.ship_to.iter().enumerate() {
+            bottom = bottom.max(second + lh * (i as f32 + 1.0));
+            w.text(value, Align::Left, x(2), second + lh * (i as f32 + 1.0), l);
+        }
+    }
 
     w.y = bottom + 4.0 + 18.0;
     w.hline(MARGIN, PAGE_W - MARGIN, w.y);
@@ -342,8 +347,11 @@ fn row(w: &mut Writer, inv: &Invoice, line: &Line) {
     let x_qty = x_item + COL_ITEM_W + COL_QTY_W;
     let x_rate = x_qty + COL_RATE_W;
     w.text(style(Face::Mono, SMALL * 0.94, MUTED), Align::Left, x_item, base, &line.item);
-    w.text(num(Face::Regular, BODY, CONTENT), Align::Right, x_qty, base, &line.qty_text());
-    w.text(num(Face::Regular, BODY, CONTENT), Align::Right, x_rate, base, &line.rate.to_string());
+    // X5: a line with no item carries text only.
+    if !line.description_only() {
+        w.text(num(Face::Regular, BODY, CONTENT), Align::Right, x_qty, base, &line.qty_text());
+        w.text(num(Face::Regular, BODY, CONTENT), Align::Right, x_rate, base, &line.rate.to_string());
+    }
     if line.taxable {
         w.text(style(Face::Regular, SMALL, MUTED), Align::Center, x_rate + COL_TAX_W / 2.0, base, "Yes");
     }
@@ -361,6 +369,11 @@ fn totals(w: &mut Writer, inv: &Invoice) {
         ("Subtotal".into(), inv.subtotal_before_retainer().to_string()),
         (format!("Sales tax ({} on taxable)", inv.tax_rate_label()), inv.totals.total_tax.to_string()),
     ];
+    if inv.ship_amt.0 != 0 {
+        rows.push(("Shipping".into(), inv.ship_amt.to_string()));
+    }
+    // Total comes after these (subtotal, tax, shipping).
+    let before_total = rows.len();
     let retainer = inv.retainer();
     let paid = inv.paid();
     if retainer.0 != 0 {
@@ -388,8 +401,7 @@ fn totals(w: &mut Writer, inv: &Invoice) {
     };
     for (i, (label, value)) in rows.iter().enumerate() {
         put(w, &mut y, label, value, false, BODY, CONTENT);
-        if i == 1 {
-            // Total, after subtotal and tax.
+        if i + 1 == before_total {
             w.hline(left, right, y - 1.0);
             y += 5.0;
             put(w, &mut y, "Total", &inv.total_before_retainer().to_string(), true, BODY, CONTENT);
@@ -435,6 +447,42 @@ mod tests {
         Invoice::load(&crate::db::open_demo(None).unwrap(), doc).unwrap()
     }
 
+    fn with(mut inv: Invoice, change: impl FnOnce(&mut Invoice)) -> Invoice {
+        change(&mut inv);
+        inv.recompute().unwrap();
+        inv
+    }
+
+    #[test]
+    fn a_description_only_line_prints_no_quantity_or_rate() {
+        let inv = with(invoice("INV-1048"), |i| {
+            i.lines.truncate(1);
+            i.lines.push(crate::invoice::Line {
+                description: "Notes for the client".into(),
+                item: String::new(),
+                qty: None,
+                rate: karbon_money::Cents::ZERO,
+                amount: karbon_money::Cents::ZERO,
+                taxable: false,
+                retainer: false,
+            });
+        });
+        let pages = layout(&inv);
+        let t = texts(&pages[0]);
+        let at = t.iter().position(|s| *s == "Notes for the client").unwrap();
+        assert_eq!(t[at + 1], "", "the empty item column");
+        assert_eq!(t[at + 2], "$0.00", "then the amount: no Qty, no Rate");
+    }
+
+    #[test]
+    fn the_ship_to_prints_when_stored() {
+        let inv = with(invoice("INV-1048"), |i| i.ship_to = vec!["1 Dock Rd".into(), "Portland, ME 04101".into()]);
+        let pages = layout(&inv);
+        let t = texts(&pages[0]);
+        assert!(t.contains(&"Ship to") && t.contains(&"1 Dock Rd") && t.contains(&"Portland, ME 04101"));
+        assert!(!texts(&layout(&invoice("INV-1048"))[0]).contains(&"Ship to"));
+    }
+
     #[test]
     fn inv_1048_prints_the_money_crate_totals_on_one_page() {
         let pages = layout(&invoice("INV-1048"));
@@ -447,7 +495,7 @@ mod tests {
 
     #[test]
     fn long_invoice_breaks_between_rows() {
-        let inv = invoice(crate::invoice::LONG_FIXTURE);
+        let inv = crate::invoice::long_fixture(invoice("INV-1048"), 60);
         let pages = layout(&inv);
         assert_eq!(pages.len(), 4);
         for (i, page) in pages.iter().enumerate() {

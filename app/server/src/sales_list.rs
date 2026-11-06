@@ -67,11 +67,11 @@ impl Status {
     }
 }
 
-/// The SQL expression of [`Status`] over a `sales_transaction st`, as its key.
-const STATUS_SQL: &str = "CASE
+/// The SQL expression of [`Status`] over a `sales_transaction st`, as its key. `?1` is today (`YYYY-MM-DD`).
+pub const STATUS_SQL: &str = "CASE
   WHEN COALESCE(st.locked_ind, 0) = 0 THEN 'draft'
   WHEN COALESCE(st.balance, 0) = 0 THEN 'paid'
-  WHEN COALESCE(st.invoice_ind, 0) = 1 AND st.due_date < date('now', 'localtime') THEN 'overdue'
+  WHEN COALESCE(st.invoice_ind, 0) = 1 AND st.due_date < ?1 THEN 'overdue'
   WHEN COALESCE(st.balance, 0) < COALESCE(st.total_amt, 0) THEN 'partial'
   ELSE 'open' END";
 
@@ -116,6 +116,8 @@ pub struct SalesQuery {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SalesRow {
+    pub id: String,
+    pub locked: bool,
     pub doc_number: String,
     pub date: String,
     pub due_date: String,
@@ -150,16 +152,17 @@ impl<T> Page<T> {
     }
 }
 
-fn paging(matched: i64, page: i64, page_size: i64) -> (i64, i64, i64) {
+pub(crate) fn paging(matched: i64, page: i64, page_size: i64) -> (i64, i64, i64) {
     let size = if page_size <= 0 { PAGE_SIZE } else { page_size };
     let pages = ((matched + size - 1) / size).max(1);
     (page.clamp(1, pages), pages, size)
 }
 
 /// The sales transactions that match, newest first. Deleted rows are hidden.
-pub fn sales_list(conn: &Connection, q: &SalesQuery) -> Result<Page<SalesRow>, CommandError> {
-    let mut clauses = vec!["COALESCE(st.deleted, 0) = 0".to_owned()];
-    let mut values: Vec<String> = Vec::new();
+pub fn sales_list(conn: &Connection, q: &SalesQuery, today: &str) -> Result<Page<SalesRow>, CommandError> {
+    // `?1 IS NOT NULL` uses today in the count query too, which may not read the status.
+    let mut clauses = vec!["?1 IS NOT NULL".to_owned(), "COALESCE(st.deleted, 0) = 0".to_owned()];
+    let mut values: Vec<String> = vec![today.to_owned()];
     match q.kind {
         DocKind::All => {}
         DocKind::Invoice => clauses.push("COALESCE(st.invoice_ind, 0) = 1".into()),
@@ -196,7 +199,7 @@ pub fn sales_list(conn: &Connection, q: &SalesQuery) -> Result<Page<SalesRow>, C
     let sql = format!(
         "SELECT COALESCE(st.doc_number, ''), COALESCE(st.date, ''), COALESCE(st.due_date, ''),
                 COALESCE(st.invoice_ind, 0) = 1, COALESCE(st.total_amt, 0), COALESCE(st.balance, 0), {STATUS_SQL},
-                COALESCE(p.name_cached, ''), COALESCE(p.id, '')
+                COALESCE(p.name_cached, ''), COALESCE(p.id, ''), st.id, COALESCE(st.locked_ind, 0) <> 0
          {from} {filter} ORDER BY st.date DESC, st.doc_number DESC LIMIT {size} OFFSET {}",
         (page - 1) * size
     );
@@ -204,6 +207,8 @@ pub fn sales_list(conn: &Connection, q: &SalesQuery) -> Result<Page<SalesRow>, C
     let rows = stmt
         .query_map(params_from_iter(values.iter()), |r| {
             Ok(SalesRow {
+                id: r.get(9)?,
+                locked: r.get(10)?,
                 doc_number: r.get(0)?,
                 date: r.get(1)?,
                 due_date: r.get(2)?,
@@ -280,6 +285,8 @@ mod tests {
     use super::*;
     use crate::db::{open_in_memory, Seed};
 
+    const TODAY: &str = "2026-10-28";
+
     fn demo() -> Connection {
         open_in_memory(Seed::Demo).unwrap().0
     }
@@ -287,7 +294,7 @@ mod tests {
     #[test]
     fn every_sales_transaction_newest_first() {
         let conn = demo();
-        let page = sales_list(&conn, &SalesQuery::default()).unwrap();
+        let page = sales_list(&conn, &SalesQuery::default(), TODAY).unwrap();
         assert_eq!(page.matched, 16);
         assert_eq!(page.rows[0].doc_number, "INV-1051");
         assert!(page.rows.windows(2).all(|w| w[0].date >= w[1].date));
@@ -297,13 +304,14 @@ mod tests {
     #[test]
     fn status_kind_customer_and_text_filters() {
         let conn = demo();
-        let only =
-            |q: SalesQuery| sales_list(&conn, &q).unwrap().rows.into_iter().map(|r| r.doc_number).collect::<Vec<_>>();
+        let only = |q: SalesQuery| {
+            sales_list(&conn, &q, TODAY).unwrap().rows.into_iter().map(|r| r.doc_number).collect::<Vec<_>>()
+        };
         let hp = only(SalesQuery { customer_role_id: Some("r-hp".into()), ..Default::default() });
         assert_eq!(hp, ["INV-1048", "INV-1042", "SR-0311", "INV-1035", "RET-0042", "INV-1027"]);
         let receipts = only(SalesQuery { kind: DocKind::Receipt, ..Default::default() });
         assert_eq!(receipts.len(), 5);
-        let paid = sales_list(&conn, &SalesQuery { status: Status::Paid, ..Default::default() }).unwrap();
+        let paid = sales_list(&conn, &SalesQuery { status: Status::Paid, ..Default::default() }, TODAY).unwrap();
         assert!(paid.rows.iter().all(|r| r.balance == 0 && r.status == Status::Paid));
         assert_eq!(only(SalesQuery { query: "inv-1048".into(), ..Default::default() }), ["INV-1048"]);
         assert_eq!(only(SalesQuery { query: "bluefin".into(), ..Default::default() }), ["INV-1051"]);
@@ -315,13 +323,13 @@ mod tests {
         conn.execute("UPDATE sales_transaction SET due_date = '2000-01-01' WHERE doc_number = 'INV-1051'", []).unwrap();
         conn.execute("UPDATE sales_transaction SET locked_ind = 0 WHERE doc_number = 'INV-1050'", []).unwrap();
         conn.execute("UPDATE sales_transaction SET deleted = 1 WHERE doc_number = 'INV-1049'", []).unwrap();
-        let all = sales_list(&conn, &SalesQuery::default()).unwrap();
+        let all = sales_list(&conn, &SalesQuery::default(), TODAY).unwrap();
         let status = |doc: &str| all.rows.iter().find(|r| r.doc_number == doc).map(|r| r.status);
         assert_eq!(status("INV-1051"), Some(Status::Overdue));
         assert_eq!(status("INV-1050"), Some(Status::Draft));
         assert_eq!(status("INV-1049"), None, "deleted rows are hidden");
         assert_eq!(status("INV-1027"), Some(Status::Paid));
-        let drafts = sales_list(&conn, &SalesQuery { status: Status::Draft, ..Default::default() }).unwrap();
+        let drafts = sales_list(&conn, &SalesQuery { status: Status::Draft, ..Default::default() }, TODAY).unwrap();
         assert_eq!(drafts.matched, 1);
     }
 

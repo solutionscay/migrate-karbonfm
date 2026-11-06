@@ -695,11 +695,12 @@ async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
     let topbar = &topbar[..topbar.find("</header>").unwrap()];
     assert!(topbar.contains(r#"<details class="dropdown dropdown-end">"#) && topbar.contains("</svg>New<svg"));
     let menu = &topbar[topbar.find(r#"aria-label="New""#).unwrap()..topbar.find("</ul>").unwrap()];
-    assert_eq!(menu.matches("<li>").count(), 5, "Invoice, Sales receipt, Customer, Task, Note");
+    assert_eq!(menu.matches("<li>").count(), 7, "Invoice, Sales receipt, Opportunity, Item, Customer, Task, Note");
     assert_eq!(menu.matches("<a ").count(), 1, "one real link, no fake ones");
     assert!(menu.contains(r#"<a href="/parties/new?role=customer">"#));
-    for soon in ["New invoice", "New sales receipt"] {
-        assert!(menu.contains(&format!(r#"<button type="button" class="muted" data-soon="{soon}">"#)), "{soon}");
+    // I5: Invoice and Sales receipt open the customer dialog.
+    for path in ["/invoices/new", "/sales-receipts/new"] {
+        assert!(menu.contains(&format!(r##"hx-get="{path}" hx-target="#modal-body""##)), "{path}");
     }
     // I4: Task and Note open the activity dialog.
     for kind in ["task", "note"] {

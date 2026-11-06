@@ -349,7 +349,7 @@ pub async fn merge(
     if !exists {
         return Err(AppError::NotFound);
     }
-    match templates::template_merge(&conn, id, form.activity_id.trim()) {
+    match templates::template_merge_at(&conn, id, form.activity_id.trim(), &state.today()) {
         Ok(merged) => render(&MergedView { merged: Some(merged), error: None }).map(IntoResponse::into_response),
         // The template exists, so NotFound is the activity: a field error, not a 404 page.
         Err(CommandError::NotFound) => {

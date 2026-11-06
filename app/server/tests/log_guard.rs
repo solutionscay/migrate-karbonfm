@@ -67,7 +67,7 @@ async fn refusals_are_logged_right_and_guard_denials_not_at_all() {
     assert_eq!(send(get("/customers", HOST, Some("karbon_session_4321=bad"))).await.status(), StatusCode::UNAUTHORIZED);
     assert_eq!(send(get(&launch, HOST, None)).await.status(), StatusCode::FORBIDDEN, "spent token");
     assert_eq!(send(get("/", "evil.example", Some(&cookie))).await.status(), StatusCode::MISDIRECTED_REQUEST);
-    let post = Request::post("/print")
+    let post = Request::post("/sales/INV-1048/save-pdf")
         .header(header::HOST, HOST)
         .header(header::COOKIE, &cookie)
         .header(header::ORIGIN, "https://evil.example")

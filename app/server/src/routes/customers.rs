@@ -92,7 +92,7 @@ pub struct Table<'a> {
 
 /// One row per customer role, with its first current contact person (relation pairs, BR-PARTY-03, also hold the
 /// employer rows, which are not contacts), its open balance, overdue amount and retainer balance (posted transactions only,
-/// BR-SALES-06). Overdue is an open invoice past its due date, by the local date.
+/// BR-SALES-06). Overdue is an open invoice past its due date. `?1` is today.
 const CUSTOMERS_SQL: &str = "
 WITH c AS (
   SELECT p.id AS party_id, p.name_cached AS name, p.organization_ind AS org,
@@ -105,11 +105,11 @@ WITH c AS (
               AND COALESCE(st.deleted, 0) = 0 AND st.invoice_ind = 1), 0) AS balance,
     COALESCE((SELECT SUM(st.balance) FROM sales_transaction st WHERE st.id_customer = pr.id AND st.locked_ind = 1
               AND COALESCE(st.deleted, 0) = 0 AND st.invoice_ind = 1 AND st.balance > 0
-              AND st.due_date < date('now', 'localtime')), 0) AS overdue,
-    COALESCE((SELECT CAST(julianday(date('now', 'localtime')) - julianday(MIN(st.due_date)) AS INTEGER)
+              AND st.due_date < ?1), 0) AS overdue,
+    COALESCE((SELECT CAST(julianday(?1) - julianday(MIN(st.due_date)) AS INTEGER)
               FROM sales_transaction st WHERE st.id_customer = pr.id AND st.locked_ind = 1
               AND COALESCE(st.deleted, 0) = 0 AND st.invoice_ind = 1 AND st.balance > 0
-              AND st.due_date < date('now', 'localtime')), 0) AS overdue_days,
+              AND st.due_date < ?1), 0) AS overdue_days,
     COALESCE(cu.retainer_balance_cached, 0) AS retainer
   FROM party_role pr JOIN party p ON p.id = pr.party_id LEFT JOIN customer cu ON cu.id = pr.id
   WHERE pr.customer_ind = 1 AND COALESCE(p.deleted_ind, 0) = 0
@@ -124,12 +124,12 @@ fn filter_sql(query: &ListQuery) -> String {
         _ => "",
     };
     format!(
-        "WHERE (?1 = '' OR lower(name) LIKE '%' || lower(?1) || '%' OR lower(contact) LIKE '%' || lower(?1) || '%' \
-         OR lower(email) LIKE '%' || lower(?1) || '%') {status}"
+        "WHERE (?2 = '' OR lower(name) LIKE '%' || lower(?2) || '%' OR lower(contact) LIKE '%' || lower(?2) || '%' \
+         OR lower(email) LIKE '%' || lower(?2) || '%') {status}"
     )
 }
 
-pub fn load_table<'a>(conn: &rusqlite::Connection, query: &'a ListQuery) -> Result<Table<'a>, AppError> {
+pub fn load_table<'a>(conn: &rusqlite::Connection, query: &'a ListQuery, today: &str) -> Result<Table<'a>, AppError> {
     let filter = filter_sql(query);
     let order = match query.sort() {
         "name" => "ORDER BY name COLLATE NOCASE",
@@ -138,14 +138,14 @@ pub fn load_table<'a>(conn: &rusqlite::Connection, query: &'a ListQuery) -> Resu
     let q = query.q.trim();
     let matched: i64 = conn.query_row(
         &format!("{CUSTOMERS_SQL} {filter}").replacen("SELECT * FROM c", "SELECT COUNT(*) FROM c", 1),
-        [q],
+        [today, q],
         |r| r.get(0),
     )?;
     let pages = ((matched + PAGE_SIZE - 1) / PAGE_SIZE).max(1);
     let page = query.page.clamp(1, pages);
-    let mut stmt = conn.prepare(&format!("{CUSTOMERS_SQL} {filter} {order} LIMIT ?2 OFFSET ?3"))?;
+    let mut stmt = conn.prepare(&format!("{CUSTOMERS_SQL} {filter} {order} LIMIT ?3 OFFSET ?4"))?;
     let rows = stmt
-        .query_map(rusqlite::params![q, PAGE_SIZE, (page - 1) * PAGE_SIZE], |r| {
+        .query_map(rusqlite::params![today, q, PAGE_SIZE, (page - 1) * PAGE_SIZE], |r| {
             let name: String = r.get("name")?;
             let balance: i64 = r.get("balance")?;
             let retainer: i64 = r.get("retainer")?;
@@ -172,7 +172,7 @@ pub fn load_table<'a>(conn: &rusqlite::Connection, query: &'a ListQuery) -> Resu
     Ok(Table { query, first, last: first + rows.len() as i64 - i64::from(matched > 0), rows, page, pages, matched })
 }
 
-fn load_totals(conn: &rusqlite::Connection) -> Result<Totals, AppError> {
+pub(super) fn load_totals(conn: &rusqlite::Connection, today: &str) -> Result<Totals, AppError> {
     let sql = format!(
         "{} ",
         CUSTOMERS_SQL.replacen(
@@ -184,7 +184,7 @@ fn load_totals(conn: &rusqlite::Connection) -> Result<Totals, AppError> {
             1
         )
     );
-    Ok(conn.query_row(&sql, [], |r| {
+    Ok(conn.query_row(&sql, [today], |r| {
         Ok(Totals {
             customers: r.get(0)?,
             current: r.get(1)?,
@@ -205,10 +205,11 @@ pub async fn list(
     Query(query): Query<ListQuery>,
 ) -> Result<Html<String>, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
-    let table = load_table(&conn, &query)?;
+    let today = state.today();
+    let table = load_table(&conn, &query, &today)?;
     if is_htmx(&headers) {
         return render(&table);
     }
-    let totals = load_totals(&conn)?;
+    let totals = load_totals(&conn, &today)?;
     render(&ListPage { nav: Nav::Customers, demo: crate::db::has_demo_data(&conn)?, totals, table })
 }

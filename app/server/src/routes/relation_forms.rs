@@ -304,7 +304,8 @@ pub struct PickerQuery {
     other_id: String,
 }
 
-/// `GET /pickers/{kind}`: `contact` (`?q=&exclude=&selected=`), `email` or `phone` (`?party_id=`).
+/// `GET /pickers/{kind}`: `contact` (`?q=&exclude=&selected=`), `email` or `phone` (`?party_id=`), `item` (`?q=&selected=`,
+/// active items only, BR-SALES-16).
 pub async fn picker(
     State(state): State<AppState>,
     Path(kind): Path<String>,
@@ -313,6 +314,8 @@ pub async fn picker(
     let conn = lock(&state)?;
     match kind.as_str() {
         "contact" => Ok(Html(contact_picker(&conn, &q.q, &q.exclude, &q.selected)?).into_response()),
+        "item" => Ok(Html(super::items::item_picker(&conn, &q.q, &q.selected)?).into_response()),
+        "customer" => Ok(Html(super::sales_forms::customer_picker(&conn, &q.q, &q.selected)?).into_response()),
         "email" | "phone" => {
             let party = if q.party_id.is_empty() { &q.other_id } else { &q.party_id };
             if party.is_empty() {

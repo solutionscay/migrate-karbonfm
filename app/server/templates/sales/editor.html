@@ -1,0 +1,105 @@
+{# UI-12 editor of an unlocked invoice or sales receipt (layouts 69, 94; design/invoice.html). A change saves the whole
+   form; the answer is this fragment, with the totals from the server. Inputs keep their ids, so htmx restores the focus. #}
+<form id="txn-editor" hx-put="{{ self.save_path() }}" hx-target="#txn-editor" hx-swap="outerHTML" hx-trigger="change">
+  <div class="flex flex-wrap items-center gap-3 mb-5">
+    <h1 class="page-title mono inv-title">{{ t.input.doc_number }}</h1>
+    <span class="chip"><span class="dot"></span>{{ status_label }}</span>
+    <span class="muted text-[12.5px]">{{ t.kind.label() }}</span>
+    <div class="ml-auto flex gap-2">
+      <button type="button" class="btn btn-sm btn-quiet" hx-get="/email-messages/new?party_id={{ t.party_id|urlencode }}&amp;entity_type_id=12&amp;entity_id={{ t.id|urlencode }}" hx-target="#modal-body" hx-swap="innerHTML" hx-params="none" hx-trigger="click"><svg class="i i-sm" aria-hidden="true"><use href="#i-send"/></svg>Email</button>
+      <button type="button" class="btn btn-sm btn-quiet" hx-get="/discussions/new?entity_type_id=12&amp;entity_id={{ t.id|urlencode }}" hx-target="#modal-body" hx-swap="innerHTML" hx-params="none" hx-trigger="click"><svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Discuss</button>
+      <button type="button" class="btn btn-sm btn-quiet" hx-delete="/sales-transactions/{{ t.id|urlencode }}" hx-target="#modal-body" hx-swap="innerHTML" hx-params="none" hx-trigger="click"><svg class="i i-sm" aria-hidden="true"><use href="#i-x"/></svg>Delete</button>
+      <button type="button" class="btn btn-sm btn-primary" hx-put="{{ self.save_path() }}" hx-vals='{"then_lock": "true"}' hx-trigger="click" hx-swap="none"><svg class="i i-sm" aria-hidden="true"><use href="#i-lock"/></svg>Lock</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5 items-start">
+    <article class="paper p-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pb-5 border-b hairline text-[12.5px]">
+        <label class="block"><span class="muted">Document number</span><input id="f-doc" name="doc_number" value="{{ t.input.doc_number }}" maxlength="21" class="input input-sm w-full mt-1 mono">
+          {% if let Some(e) = self.error("doc_number") %}<span class="text-error text-[12px]" role="alert">{{ e }}</span>{% endif %}</label>
+        <div><div class="muted">Customer</div><a class="link link-hover font-medium block mt-2" href="/parties/{{ t.party_id|urlencode }}">{{ t.customer }}</a></div>
+        <label class="block"><span class="muted">{% if self.is_invoice() %}Invoice date{% else %}Receipt date{% endif %}</span><input id="f-date" type="date" name="date" value="{{ t.input.date }}" class="input input-sm w-full mt-1 num">
+          {% if let Some(e) = self.error("date") %}<span class="text-error text-[12px]" role="alert">{{ e }}</span>{% endif %}</label>
+        <label class="block"><span class="muted">Tax rate (%)</span><input id="f-tax" name="tax_rate" value="{{ t.input.tax_rate }}" class="input input-sm w-full mt-1 num">
+          {% if let Some(e) = self.error("tax_rate") %}<span class="text-error text-[12px]" role="alert">{{ e }}</span>{% endif %}</label>
+        {% if self.is_invoice() %}
+        <label class="block"><span class="muted">Terms</span>
+          <select id="f-term" name="term" class="select select-sm w-full mt-1"><option value="">None</option>{% for term in terms %}<option value="{{ term }}" {% if *term == t.input.term %}selected{% endif %}>{{ term }}</option>{% endfor %}</select></label>
+        <label class="block"><span class="muted">Due date</span><input id="f-due" type="date" name="due_date" value="{{ t.input.due_date }}" class="input input-sm w-full mt-1 num">
+          {% if let Some(e) = self.error("due_date") %}<span class="text-error text-[12px]" role="alert">{{ e }}</span>{% endif %}</label>
+        {% else %}
+        <label class="block"><span class="muted">Deposit to</span><input id="f-deposit" name="id_account_deposit" value="{{ t.input.id_account_deposit }}" class="input input-sm w-full mt-1"></label>
+        <label class="block"><span class="muted">Payment reference</span><input id="f-ref" name="payment_ref_num" value="{{ t.input.payment_ref_num }}" class="input input-sm w-full mt-1"></label>
+        {% endif %}
+        <label class="block"><span class="muted">Ship date</span><input id="f-shipdate" type="date" name="ship_date" value="{{ t.input.ship_date }}" class="input input-sm w-full mt-1 num">
+          {% if let Some(e) = self.error("ship_date") %}<span class="text-error text-[12px]" role="alert">{{ e }}</span>{% endif %}</label>
+        <label class="block"><span class="muted">Bill email</span><input id="f-email" name="bill_email_address" value="{{ t.input.bill_email_address }}" class="input input-sm w-full mt-1"></label>
+      </div>
+
+      {% for e in self.line_errors() %}<p class="text-error text-[12px] mt-3" role="alert">{{ e }}</p>{% endfor %}
+      <table class="w-full mt-4 text-[13px] table-fixed">
+        <thead><tr class="text-[11.5px] muted text-left"><th class="font-medium py-2 w-36">Item</th><th class="font-medium py-2">Description</th><th class="font-medium py-2 text-right w-14">Qty</th><th class="font-medium py-2 text-right w-20">Rate</th><th class="font-medium py-2 text-center w-10">Tax</th><th class="font-medium py-2 text-right w-24">Amount</th><th class="w-8"></th></tr></thead>
+        <tbody>
+          {% for r in rows %}
+          <tr class="border-t hairline align-top">
+            <td class="py-1.5 pr-2"><input type="hidden" name="line_id" value="{{ r.line.id }}">
+              <select id="l-item-{{ r.line.id }}" name="line_item" class="select select-sm w-full text-[12px]" aria-label="Item"><option value="">No item</option>{% for c in r.choices %}<option value="{{ c.id }}" {% if c.id == r.line.item_id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select></td>
+            <td class="py-1.5 pr-2"><input id="l-desc-{{ r.line.id }}" name="line_description" value="{{ r.line.description }}" class="line-input" placeholder="Description" aria-label="Description"></td>
+            <td class="py-1.5"><input id="l-qty-{{ r.line.id }}" name="line_qty" value="{{ r.line.qty }}" class="line-input text-right num" placeholder="1" aria-label="Quantity"></td>
+            <td class="py-1.5"><input id="l-price-{{ r.line.id }}" name="line_price" value="{{ r.line.unit_price }}" class="line-input text-right num" aria-label="Rate"></td>
+            <td class="py-1.5 text-center"><input id="l-tax-{{ r.line.id }}" type="checkbox" name="line_taxable" value="{{ r.line.id }}" class="checkbox checkbox-xs checkbox-primary mt-2" aria-label="Taxable" {% if r.line.taxable %}checked{% endif %}></td>
+            <td class="py-1.5 text-right num font-medium pt-3">{{ r.amount }}</td>
+            <td class="py-1.5 text-right"><button type="button" class="icon-btn mt-0.5" hx-delete="/sales-transactions/{{ t.id|urlencode }}/lines?line_id={{ r.line.id|urlencode }}" hx-target="#modal-body" hx-swap="innerHTML" hx-params="none" hx-trigger="click" aria-label="Remove line"><svg class="i i-sm"><use href="#i-x"/></svg></button></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="py-6 text-center muted">No lines yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button type="button" class="btn btn-sm btn-ghost mt-2 text-primary" hx-put="{{ self.save_path() }}" hx-vals='{"add_line": "true"}' hx-trigger="click"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add line</button>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_17rem] gap-6 mt-6">
+        <div class="min-w-0 space-y-3 text-[12.5px]">
+          <label class="block"><span class="muted">Message displayed on {% if self.is_invoice() %}invoice{% else %}receipt{% endif %}</span><textarea id="f-memo" name="customer_memo" rows="2" class="textarea textarea-sm w-full mt-1">{{ t.input.customer_memo }}</textarea></label>
+          <label class="block"><span class="muted">On statement</span><textarea id="f-note" name="private_note" rows="2" class="textarea textarea-sm w-full mt-1">{{ t.input.private_note }}</textarea></label>
+        </div>
+        <dl class="text-[13px] grid grid-cols-[1fr_auto] gap-y-2 items-center self-start">
+          <dt class="muted">Subtotal</dt><dd class="num text-right">{{ self.subtotal_before_retainer() }}</dd>
+          <dt class="muted">Sales tax ({{ self.tax_label() }}% on taxable)</dt><dd class="num text-right">{{ t.totals.total_tax }}</dd>
+          <dt class="muted"><label for="f-ship">Shipping</label></dt><dd class="text-right"><input id="f-ship" name="ship_amt" value="{{ t.input.ship_amt }}" class="line-input text-right num w-24" aria-label="Shipping">
+            {% if let Some(e) = self.error("ship_amt") %}<div class="text-error text-[12px]" role="alert">{{ e }}</div>{% endif %}</dd>
+          <dt class="font-semibold pt-2 border-t hairline">Total</dt><dd class="num text-right font-semibold pt-2 border-t hairline">{{ self.total_before_retainer() }}</dd>
+          {% if self.has_retainer() %}<dt class="muted">Retainer applied</dt><dd class="num text-right">−{{ self.retainer_credit() }}</dd>{% endif %}
+          {% if self.has_paid() %}<dt class="muted">Payments</dt><dd class="num text-right">−{{ t.paid }}</dd>{% endif %}
+          <dt class="font-semibold pt-2 border-t hairline text-[15px]">Balance due</dt><dd class="num text-right font-semibold pt-2 border-t hairline text-[15px] text-primary">{{ t.totals.balance }}</dd>
+        </dl>
+      </div>
+    </article>
+
+    <aside class="space-y-4">
+      {% if self.is_invoice() %}
+      <section class="panel p-4 text-[12.5px]" aria-labelledby="retainer-title">
+        <h2 class="panel-title" id="retainer-title">Retainer</h2>
+        <dl class="grid grid-cols-[1fr_auto] gap-y-1 mt-2">
+          <dt class="muted">Retainer available</dt><dd class="num text-right">{{ retainer_available }}</dd>
+          <dt class="muted">Accounts receivable</dt><dd class="num text-right">{{ receivable }}</dd>
+        </dl>
+        <button type="button" class="btn btn-sm btn-quiet w-full mt-3" hx-post="/invoices/{{ t.id|urlencode }}/apply-retainer" hx-trigger="click">Apply retainer</button>
+      </section>
+      {% endif %}
+      <section class="panel p-4 text-[12.5px] space-y-2">
+        <div class="panel-title">Billing address</div>
+        {% for (name, label, value) in self.bill_fields() %}
+        <input id="f-{{ name }}" name="{{ name }}" value="{{ value }}" class="input input-sm w-full" placeholder="{{ label }}" aria-label="Billing {{ label }}">
+        {% endfor %}
+      </section>
+      <section class="panel p-4 text-[12.5px] space-y-2">
+        <div class="panel-title">Shipping/Service address</div>
+        {% for (name, label, value) in self.ship_fields() %}
+        <input id="f-{{ name }}" name="{{ name }}" value="{{ value }}" class="input input-sm w-full" placeholder="{{ label }}" aria-label="Shipping {{ label }}">
+        {% endfor %}
+      </section>
+    </aside>
+  </div>
+</form>

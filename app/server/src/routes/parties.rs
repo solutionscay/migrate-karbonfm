@@ -161,6 +161,8 @@ pub fn page_error(op: &str, e: CommandError) -> AppError {
 
 /// One sales transaction row of the Sales tab and the sales list (UI-13).
 pub struct SalesView {
+    pub id: String,
+    pub locked: bool,
     pub doc_number: String,
     pub href: String,
     pub date: String,
@@ -178,6 +180,8 @@ pub struct SalesView {
 impl From<SalesRow> for SalesView {
     fn from(r: SalesRow) -> Self {
         SalesView {
+            id: r.id.clone(),
+            locked: r.locked,
             href: format!("/sales/{}", urlencode(&r.doc_number)),
             date: display_date(&r.date),
             due: display_date(&r.due_date),
@@ -338,27 +342,31 @@ struct DetailPage<'a> {
     activity_count: i64,
     /// The Files panel (UI-19, `routes::files::FilesPanel`).
     files: String,
+    /// The Opportunities tab (O12).
+    opportunities: Vec<super::opportunities::OpportunityView>,
 }
 
 /// `GET /parties/{id}` (UI-04). An archived party opens too, marked archived and without edit actions (D3).
 pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Result<Html<String>, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
     let d = parties::party_get(&conn, &id).map_err(|e| page_error("party_get", e))?;
+    let today = state.today();
     let (sales, sales_matched) = match &d.customer {
         Some(c) => {
             let q = SalesQuery { customer_role_id: Some(c.role_id.clone()), page_size: 100, ..Default::default() };
-            let page = sales_list::sales_list(&conn, &q).map_err(|e| page_error("sales_list", e))?;
+            let page = sales_list::sales_list(&conn, &q, &today).map_err(|e| page_error("sales_list", e))?;
             (page.rows.into_iter().map(SalesView::from).collect(), page.matched)
         }
         None => (Vec::new(), 0),
     };
     let header = Header::new(&d).render()?;
     let relations = Relations { d: &d, oob: false }.render()?;
-    let q = crate::activities::ListQuery { party_id: Some(d.id.clone()), ..Default::default() };
+    let q =
+        crate::activities::ListQuery { party_id: Some(d.id.clone()), today: Some(today.clone()), ..Default::default() };
     let found = crate::activities::activity_list(&conn, &q).map_err(|e| page_error("activity_list", e))?;
     let activity_count = found.matched;
     let activity = super::timeline::Rows {
-        rows: super::timeline::rows(&found, true),
+        rows: super::timeline::rows(&found, true, &today),
         matched: found.matched,
         page: found.page,
         page_size: found.page_size,
@@ -367,6 +375,8 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
     }
     .render()?;
     let files = super::files::FilesPanel::load(&state, &conn, &d.id)?.render()?;
+    let opportunities =
+        crate::opportunities::opportunities_of_party(&conn, &d.id)?.into_iter().map(Into::into).collect();
     render(&DetailPage {
         nav: Nav::Parties,
         demo: crate::db::has_demo_data(&conn)?,
@@ -379,6 +389,7 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
         activity,
         activity_count,
         files,
+        opportunities,
     })
 }
 

@@ -16,20 +16,21 @@ use tower::ServiceExt;
 
 const HOST: &str = "127.0.0.1:4321";
 const ORIGIN: &str = "http://127.0.0.1:4321";
+const SAVE: &str = "/sales/INV-1048/save-pdf";
 
-/// A guarded router, its launch path and a counter of /print calls (to show that a refused request changes nothing).
+/// A guarded router, its launch path and a counter of save-hook calls (to show that a refused request changes nothing).
 fn guarded() -> (axum::Router, String, Arc<AtomicUsize>) {
     let session = Arc::new(Session::new(4321));
     let launch = session.launch_path().unwrap();
-    let prints = Arc::new(AtomicUsize::new(0));
-    let counter = prints.clone();
-    let state = AppState::new(db::open_demo(None).unwrap()).with_origin(ORIGIN).with_session(session).with_print(
-        Arc::new(move || {
+    let saves = Arc::new(AtomicUsize::new(0));
+    let counter = saves.clone();
+    let state = AppState::new(db::open_demo(None).unwrap()).with_origin(ORIGIN).with_session(session).with_save(
+        Arc::new(move |_, _| {
             counter.fetch_add(1, Ordering::SeqCst);
-            Ok(())
+            Ok(None)
         }),
     );
-    (router(state), launch, prints)
+    (router(state), launch, saves)
 }
 
 async fn send(app: &axum::Router, req: Request<Body>) -> (StatusCode, HeaderMap, String) {
@@ -87,6 +88,16 @@ fn sample(path: &str) -> String {
         "f-001"
     } else if path.starts_with("/attachments/") {
         "fa-001"
+    } else if path.starts_with("/invoices/") || path.starts_with("/sales-transactions/") {
+        "t-inv-1048"
+    } else if path.starts_with("/sales-receipts/") {
+        "t-sr-0311"
+    } else if path.starts_with("/payments/") {
+        "pay-004"
+    } else if path.starts_with("/items/") {
+        "i-svc-hourly"
+    } else if path.starts_with("/opportunities/") {
+        "o-hp-fitout2"
     } else {
         "p-hp"
     };
@@ -101,12 +112,10 @@ fn sample(path: &str) -> String {
 /// T-08-14: without the session cookie, with a foreign Host, or a POST with a foreign Origin: refused, nothing changes.
 #[tokio::test]
 async fn t_08_14_only_the_app_window_gets_in() {
-    let (app, launch_path, prints) = guarded();
+    let (app, launch_path, saves) = guarded();
 
     // Another local process or a page in a browser, before or after the window opened: no cookie, 401.
-    for (method, uri) in
-        [("GET", "/"), ("GET", "/customers"), ("GET", "/sales/INV-1048/invoice.pdf"), ("POST", "/print")]
-    {
+    for (method, uri) in [("GET", "/"), ("GET", "/customers"), ("GET", "/sales/INV-1048/invoice.pdf"), ("POST", SAVE)] {
         let (status, _, body) = send(&app, req(method, uri, None, Some(ORIGIN))).await;
         assert_eq!(status, StatusCode::UNAUTHORIZED, "{method} {uri}");
         assert!(!body.contains("Halden"), "no data in the refusal");
@@ -145,16 +154,16 @@ async fn t_08_14_only_the_app_window_gets_in() {
     assert_eq!(status, StatusCode::MISDIRECTED_REQUEST);
 
     // A POST with the cookie but a foreign Origin, or none: 403.
-    let (status, _, _) = send(&app, req("POST", "/print", Some(cookie), Some("https://evil.example"))).await;
+    let (status, _, _) = send(&app, req("POST", SAVE, Some(cookie), Some("https://evil.example"))).await;
     assert_eq!(status, StatusCode::FORBIDDEN);
-    let (status, _, _) = send(&app, req("POST", "/print", Some(cookie), None)).await;
+    let (status, _, _) = send(&app, req("POST", SAVE, Some(cookie), None)).await;
     assert_eq!(status, StatusCode::FORBIDDEN);
-    assert_eq!(prints.load(Ordering::SeqCst), 0, "no refused request reached the handler");
+    assert_eq!(saves.load(Ordering::SeqCst), 0, "no refused request reached the handler");
 
     // The window's own POST works.
-    let (status, _, _) = send(&app, req("POST", "/print", Some(cookie), Some(ORIGIN))).await;
-    assert_eq!(status, StatusCode::NO_CONTENT);
-    assert_eq!(prints.load(Ordering::SeqCst), 1);
+    let (status, _, _) = send(&app, req("POST", SAVE, Some(cookie), Some(ORIGIN))).await;
+    assert_eq!(status, StatusCode::NO_CONTENT, "the hook answered: cancelled");
+    assert_eq!(saves.load(Ordering::SeqCst), 1);
 
     // Static files need no cookie (05 Guards); they hold no data.
     let (status, _, _) = send(&app, req("GET", "/assets/app.css", None, None)).await;

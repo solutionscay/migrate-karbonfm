@@ -1,0 +1,19 @@
+{# The payments of an invoice (layouts 69, 143). A row opens the payment's card (kontacts 216). #}
+<section class="panel" aria-labelledby="payments-title">
+  <div class="panel-head">
+    <h2 class="panel-title" id="payments-title">Payments</h2><span class="chip">{{ rows.len() }}</span>
+    {% if can_receive %}<button class="btn btn-sm btn-primary ml-auto" hx-get="/payments/new?invoice_id={{ invoice_id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-card"/></svg>Record payment</button>{% endif %}
+  </div>
+  {% if rows.is_empty() %}
+  <p class="p-4 text-[12.5px] muted">No payments.</p>
+  {% else %}
+  <ul class="p-2 text-[12.5px]">
+    {% for p in rows %}
+    <li><button type="button" class="w-full flex items-center gap-3 px-2 py-2 rounded-field hover:bg-base-200 text-left" hx-get="/payments/{{ p.payment_id|urlencode }}/edit" hx-target="#modal-body">
+      <span class="min-w-0 flex-1"><span class="block truncate">{{ p.reference }}</span><span class="block text-[11.5px] muted num">{{ p.date }}</span></span>
+      <span class="num font-medium">{{ p.amount }}</span>
+    </button></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>

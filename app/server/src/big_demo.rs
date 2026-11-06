@@ -72,8 +72,14 @@ fn io<'a>(what: &'a str, path: &'a Path) -> impl Fn(std::io::Error) -> BigDemoEr
     move |e| BigDemoError::Io(format!("{what} {}: {e}", path.display()))
 }
 
-/// Creates the big demo database in `data_dir` when it has none. Call before `db::open`.
+/// Creates the big demo database in `data_dir` when it has none, its dates moved to the local date. Call before
+/// `db::open`.
 pub fn create(data_dir: &Path) -> Result<Outcome, BigDemoError> {
+    create_as_of(data_dir, crate::demo_dates::local_today())
+}
+
+/// [`create`], with the export's last day (2026-10-31) moved to `today` (B11, `demo_dates`).
+pub fn create_as_of(data_dir: &Path, today: chrono::NaiveDate) -> Result<Outcome, BigDemoError> {
     let db_path = db::database_path(data_dir);
     if db_path.exists() {
         return Ok(Outcome::Existing);
@@ -96,7 +102,11 @@ pub fn create(data_dir: &Path) -> Result<Outcome, BigDemoError> {
 
     // Mark it as demo data (DEMO badge), and leave one self-contained file: no -wal or -shm beside it.
     {
-        let conn = rusqlite::Connection::open(db::database_path(&built))?;
+        let mut conn = rusqlite::Connection::open(db::database_path(&built))?;
+        let tx = conn.transaction()?;
+        let anchor = crate::demo_dates::parse_date(crate::demo_dates::BIG_DEMO_ANCHOR).expect("the anchor is a date");
+        crate::demo_dates::shift(&tx, anchor, today)?;
+        tx.commit()?;
         conn.execute("INSERT OR REPLACE INTO app_meta (key, value) VALUES (?1, ?2)", [DEMO_KEY, DEMO_VALUE])?;
         conn.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()))?;
     }

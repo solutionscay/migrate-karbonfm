@@ -10,10 +10,15 @@ mod dashboard;
 mod discussions;
 mod email;
 mod files;
+mod items;
+mod opportunities;
 mod parties;
 mod party_forms;
+mod payments;
 mod relation_forms;
+mod reports;
 mod sales;
+mod sales_forms;
 mod sales_lists;
 mod secrets_store;
 mod settings;
@@ -92,12 +97,39 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/discussions/{id}/comments"),
     ("GET", "/notifications"),
     ("POST", "/notifications/read"),
+    ("GET", "/invoices/new"),
+    ("POST", "/invoices"),
+    ("PUT", "/invoices/{id}"),
+    ("POST", "/invoices/{id}/apply-retainer"),
+    ("GET", "/sales-receipts/new"),
+    ("POST", "/sales-receipts"),
+    ("PUT", "/sales-receipts/{id}"),
+    ("POST", "/sales-transactions/{id}/lock"),
+    ("DELETE", "/sales-transactions/{id}"),
+    ("DELETE", "/sales-transactions/{id}/lines"),
     ("GET", "/sales"),
     ("GET", "/payments"),
+    ("POST", "/payments"),
+    ("GET", "/payments/new"),
+    ("GET", "/payments/{id}/edit"),
+    ("PUT", "/payments/{id}"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/sales/{doc_number}/save-pdf"),
-    ("POST", "/print"),
+    ("GET", "/items"),
+    ("POST", "/items"),
+    ("GET", "/items/new"),
+    ("GET", "/items/{id}/edit"),
+    ("PUT", "/items/{id}"),
+    ("GET", "/opportunities"),
+    ("POST", "/opportunities"),
+    ("GET", "/opportunities/status-totals"),
+    ("GET", "/opportunities/new"),
+    ("GET", "/opportunities/{id}"),
+    ("PUT", "/opportunities/{id}"),
+    ("GET", "/opportunities/{id}/edit"),
+    ("POST", "/opportunities/{id}/status"),
+    ("GET", "/reports/sales-by-month"),
     ("GET", "/setup"),
     ("POST", "/setup"),
     ("GET", "/settings"),
@@ -177,12 +209,35 @@ pub fn router() -> Router<AppState> {
         .route("/discussions/{id}/comments", post(discussions::comment))
         .route("/notifications", get(discussions::notifications))
         .route("/notifications/read", post(discussions::mark_read))
+        .route("/invoices/new", get(sales_forms::new_invoice))
+        .route("/invoices", post(sales_forms::create_invoice))
+        .route("/invoices/{id}", put(sales_forms::save_invoice).fallback(not_found))
+        .route("/invoices/{id}/apply-retainer", post(sales_forms::apply_retainer))
+        .route("/sales-receipts/new", get(sales_forms::new_receipt))
+        .route("/sales-receipts", post(sales_forms::create_receipt))
+        .route("/sales-receipts/{id}", put(sales_forms::save_receipt))
+        .route("/sales-transactions/{id}/lock", post(sales_forms::lock))
+        .route("/sales-transactions/{id}", delete(sales_forms::delete))
+        .route("/sales-transactions/{id}/lines", delete(sales_forms::remove_lines))
         .route("/sales", get(sales_lists::sales))
-        .route("/payments", get(sales_lists::payments))
+        .route("/payments", get(sales_lists::payments).post(payments::create))
+        .route("/payments/new", get(payments::new_card))
+        .route("/payments/{id}/edit", get(payments::edit_card))
+        .route("/payments/{id}", put(payments::update))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))
-        .route("/print", post(print))
+        .route("/items", get(items::list).post(items::create))
+        .route("/items/new", get(items::new_dialog))
+        .route("/items/{id}/edit", get(items::edit_dialog))
+        .route("/items/{id}", put(items::update))
+        .route("/opportunities", get(opportunities::list).post(opportunities::create))
+        .route("/opportunities/status-totals", get(opportunities::status_totals))
+        .route("/opportunities/new", get(opportunities::new_dialog))
+        .route("/opportunities/{id}", get(opportunities::detail).put(opportunities::update))
+        .route("/opportunities/{id}/edit", get(opportunities::edit_dialog))
+        .route("/opportunities/{id}/status", post(opportunities::set_status))
+        .route("/reports/sales-by-month", get(reports::sales_by_month))
         .route("/setup", get(setup::page).post(setup::submit))
         .route("/settings", get(settings::page).put(settings::update))
         .route("/settings/backup", post(backup::create))
@@ -202,15 +257,6 @@ pub fn router() -> Router<AppState> {
         .route("/files/{id}/open", post(files::open))
         .route("/attachments", post(files::attach))
         .route("/attachments/{id}", delete(files::detach))
-}
-
-/// Opens the native print dialog for the current page (204). Without a desktop window (the dev server in a
-/// browser) it answers 501 and the page falls back to window.print().
-async fn print(State(state): State<AppState>) -> Result<StatusCode, AppError> {
-    match &state.print {
-        Some(print) => print().map(|()| StatusCode::NO_CONTENT).map_err(AppError::Internal),
-        None => Ok(StatusCode::NOT_IMPLEMENTED),
-    }
 }
 
 /// A 404 for the other methods of a path (T-08-07: a party has no delete route, it is only archived).
@@ -253,8 +299,11 @@ pub enum Nav {
     Messages,
     Customers,
     Parties,
+    Opportunities,
     Invoices,
     Payments,
+    Items,
+    Reports,
     Templates,
     Files,
     Settings,

@@ -3,18 +3,20 @@
 {% block head %}<link href="/assets/invoice.css" rel="stylesheet">{% endblock %}
 {% block content %}
 <div class="no-print">
-  <div class="inv-crumbs muted"><svg class="i i-sm"><use href="#i-arrow-left"/></svg>{{ inv.customer }} <span>/</span> Invoices</div>
+  <div class="inv-crumbs muted"><svg class="i i-sm"><use href="#i-arrow-left"/></svg><a class="hover:text-base-content" href="/parties/{{ inv.party_id|urlencode }}">{{ inv.customer }}</a> <span>/</span> <a class="hover:text-base-content" href="/sales">Invoices &amp; receipts</a></div>
   <div class="flex flex-wrap items-center gap-3 mb-5">
     <h1 class="page-title mono inv-title">{{ inv.doc_number }}</h1>
     {% if !inv.status.is_empty() %}<span class="chip {{ status_class }}"><span class="dot"></span>{{ inv.status }}</span>{% endif %}
     {% if !due_text.is_empty() %}<span class="inv-due muted">Due {{ due_text }}</span>{% endif %}
     <div class="ml-auto flex gap-2">
-      {# S-02 compares the two PDF paths: the webview's print dialog and the PDF generated in Rust. #}
-      <button class="btn btn-sm btn-quiet" data-print><svg class="i i-sm"><use href="#i-printer"/></svg>Print (webview)</button>
-      {# Not a link: a PDF that replaces the app page strands the desktop window (no sidebar, no back button). #}
-      <button class="btn btn-sm btn-primary" data-pdf-open="pdf-preview" aria-haspopup="dialog"><svg class="i i-sm"><use href="#i-download"/></svg>PDF</button>
+      {% if inv.locked %}<button class="btn btn-sm btn-quiet" hx-post="/sales-transactions/{{ inv.id|urlencode }}/lock" hx-vals='{"lock": "false"}'><svg class="i i-sm" aria-hidden="true"><use href="#i-lock"/></svg>Unlock</button>{% endif %}
+      <button class="btn btn-sm btn-quiet" hx-get="/email-messages/new?party_id={{ inv.party_id|urlencode }}&amp;entity_type_id=12&amp;entity_id={{ inv.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-send"/></svg>Email</button>
+      <button class="btn btn-sm btn-quiet" hx-get="/discussions/new?entity_type_id=12&amp;entity_id={{ inv.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Discuss</button>
+      {# Not a link: a PDF that replaces the app page strands the desktop window (no sidebar, no back button). A sales receipt has no PDF (D-38). #}
+      {% if inv.is_invoice %}<button class="btn btn-sm btn-primary" data-pdf-open="pdf-preview" aria-haspopup="dialog"><svg class="i i-sm"><use href="#i-download"/></svg>PDF</button>{% endif %}
     </div>
   </div>
+  {% if inv.is_invoice %}
   {# PDF preview: the file in a frame inside the app. app.js opens it, or saves at once where the webview has no PDF
      viewer (WebKitGTK). Save goes server -> desktop shell -> native save dialog; in a browser it is a download link. #}
   <dialog id="pdf-preview" class="modal" aria-labelledby="pdf-preview-title" data-src="/sales/{{ inv.doc_number }}/invoice.pdf">
@@ -34,6 +36,10 @@
     </div>
     <form method="dialog" class="modal-backdrop"><button aria-label="Close">close</button></form>
   </dialog>
+  {% endif %}
 </div>
-{% include "sales/document.html" %}
+<div class="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5 items-start">
+  {% include "sales/document.html" %}
+  <aside class="space-y-4 no-print">{{ payments|safe }}{{ files|safe }}</aside>
+</div>
 {% endblock %}

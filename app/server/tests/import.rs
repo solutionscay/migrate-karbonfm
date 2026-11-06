@@ -101,6 +101,8 @@ fn golden_counts_of_the_full_export_and_the_import_time() {
         .query_row("SELECT MIN(date), MAX(date) FROM sales_transaction", [], |r| Ok((r.get(0)?, r.get(1)?)))
         .unwrap();
     assert!(first.as_str() < "2023-02-01" && last.as_str() > "2026-10-01", "{first} .. {last}");
+    // B11: only the big demo moves its dates; an import keeps the export's dates, whatever today is.
+    assert!(last.as_str() <= "2026-10-31", "b11_import_never_shifts: {last}");
     // Every file: read = loaded + rejected + skipped.
     for f in &report.files {
         assert_eq!(f.rows_read, f.rows_loaded + f.rows_rejected + f.rows_skipped, "{f:?}");

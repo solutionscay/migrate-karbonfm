@@ -19,7 +19,7 @@
       <button type="button" class="ktab" :class="tab === 'contacts' && 'on'" @click="tab = 'contacts'" role="tab" id="tab-contacts" aria-controls="panel-contacts" :aria-selected="tab === 'contacts'">Contacts <span class="n">{{ d.relations.len() }}</span></button>
       <button type="button" class="ktab" :class="tab === 'sales' && 'on'" @click="tab = 'sales'" role="tab" id="tab-sales" aria-controls="panel-sales" :aria-selected="tab === 'sales'">Sales transactions <span class="n">{{ sales_matched }}</span></button>
       <button type="button" class="ktab" :class="tab === 'activity' && 'on'" @click="tab = 'activity'" role="tab" id="tab-activity" aria-controls="panel-activity" :aria-selected="tab === 'activity'">Activity <span class="n">{{ activity_count }}</span></button>
-      <button type="button" class="ktab" :class="tab === 'opps' && 'on'" @click="tab = 'opps'" role="tab" id="tab-opps" aria-controls="panel-opps" :aria-selected="tab === 'opps'">Opportunities</button>
+      <button type="button" class="ktab" :class="tab === 'opps' && 'on'" @click="tab = 'opps'" role="tab" id="tab-opps" aria-controls="panel-opps" :aria-selected="tab === 'opps'">Opportunities <span class="n">{{ opportunities.len() }}</span></button>
     </nav>
 
     <section x-show="tab === 'contacts'" role="tabpanel" id="panel-contacts" aria-labelledby="tab-contacts">
@@ -27,6 +27,12 @@
     </section>
 
     <section x-show="tab === 'sales'" x-cloak role="tabpanel" id="panel-sales" aria-labelledby="tab-sales" class="panel overflow-hidden">
+      {% if !d.archived %}{% if let Some(c) = &d.customer %}
+      <div class="flex justify-end gap-2 px-4 py-2.5 border-b hairline">
+        <button class="btn btn-sm btn-quiet" hx-get="/sales-receipts/new?customer_id={{ c.role_id|urlencode }}" hx-target="#modal-body">New sales receipt</button>
+        <button class="btn btn-sm btn-quiet" hx-get="/invoices/new?customer_id={{ c.role_id|urlencode }}" hx-target="#modal-body">New invoice</button>
+      </div>
+      {% endif %}{% endif %}
       {% if sales.is_empty() %}
       <div class="p-8 text-center muted">{% if d.customer.is_some() %}No sales transactions yet.{% else %}Not a customer: no sales transactions.{% endif %}</div>
       {% else %}
@@ -56,7 +62,34 @@
       {{ activity|safe }}
       {% if activity_count > 0 %}<a class="inline-block mt-2 text-[12.5px] link link-hover muted" href="/activities?party_id={{ d.id|urlencode }}">Open full timeline</a>{% endif %}
     </section>
-    <section x-show="tab === 'opps'" x-cloak role="tabpanel" id="panel-opps" aria-labelledby="tab-opps" class="panel p-8 text-center muted">Opportunities come in a later release.</section>
+    <section x-show="tab === 'opps'" x-cloak role="tabpanel" id="panel-opps" aria-labelledby="tab-opps">
+      {% if !d.archived %}
+      <div class="flex justify-end mb-3">
+        <button class="btn btn-sm btn-primary" hx-get="/opportunities/new?party_id={{ d.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>New opportunity</button>
+      </div>
+      {% endif %}
+      <div class="panel overflow-hidden">
+        {% if opportunities.is_empty() %}
+        <div class="p-8 text-center muted">No opportunities yet.</div>
+        {% else %}
+        <table class="tbl">
+          <thead><tr><th>Name</th><th>Status</th><th class="r">Value</th><th>Probability</th><th>Active</th><th>Next Task</th></tr></thead>
+          <tbody>
+            {% for o in opportunities %}
+            <tr>
+              <td class="font-medium"><a class="link link-hover" href="{{ o.href }}">{{ o.name }}</a></td>
+              <td>{{ o.status }}</td>
+              <td class="r num">{{ o.value }}</td>
+              <td>{{ o.probability }}</td>
+              <td>{% if o.active %}<span class="chip ok"><span class="dot"></span>Active</span>{% else %}<span class="chip"><span class="dot"></span>Inactive</span>{% endif %}</td>
+              <td>{% if let Some(t) = o.next_task %}<a class="link link-hover" href="{{ t.href }}">{{ t.subject }}</a> <span class="text-[12px] muted num">{{ t.date }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+    </section>
   </div>
 
   <aside class="space-y-4" aria-label="Details">

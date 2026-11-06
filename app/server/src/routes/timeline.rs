@@ -116,8 +116,8 @@ impl RowView {
 }
 
 /// The rows of a page, with a day header on the first row of each day.
-pub fn rows(page: &ListPage, with_days: bool) -> Vec<RowView> {
-    let today = crate::audit::local_now()[..10].to_owned();
+pub fn rows(page: &ListPage, with_days: bool, today: &str) -> Vec<RowView> {
+    let today = today.to_owned();
     let yesterday = chrono::NaiveDate::parse_from_str(&today, "%Y-%m-%d")
         .ok()
         .and_then(|d| d.pred_opt())
@@ -173,6 +173,8 @@ impl Rows {
 #[serde(default)]
 pub struct TimelineQuery {
     party_id: String,
+    entity_type_id: String,
+    entity_id: String,
     role_id: String,
     status: String,
     kind: String,
@@ -183,6 +185,12 @@ impl TimelineQuery {
     fn list(&self) -> ListQuery {
         ListQuery {
             party_id: (!self.party_id.is_empty()).then(|| self.party_id.clone()),
+            entity: self
+                .entity_type_id
+                .parse()
+                .ok()
+                .filter(|_| !self.entity_id.is_empty())
+                .map(|t| (t, self.entity_id.clone())),
             role_id: self.role_id.parse().ok(),
             status: Status::parse(&self.status),
             kind: KindFilter::parse(&self.kind),
@@ -200,6 +208,13 @@ impl TimelineQuery {
         }
         if !self.role_id.is_empty() {
             q.push_str(&format!("&role_id={}", urlencode(&self.role_id)));
+        }
+        if !self.entity_id.is_empty() {
+            q.push_str(&format!(
+                "&entity_type_id={}&entity_id={}",
+                urlencode(&self.entity_type_id),
+                urlencode(&self.entity_id)
+            ));
         }
         q
     }
@@ -227,13 +242,14 @@ pub async fn page(
     Query(q): Query<TimelineQuery>,
 ) -> Result<Response, AppError> {
     let conn = lock(&state)?;
-    let list = q.list();
+    let today = state.today();
+    let list = ListQuery { today: Some(today.clone()), ..q.list() };
     let found = match activities::activity_list(&conn, &list) {
         Ok(p) => p,
         Err(e) => return command_error("activity_list", e),
     };
     let rows = Rows {
-        rows: rows(&found, true),
+        rows: rows(&found, true, &today),
         matched: found.matched,
         page: found.page,
         page_size: found.page_size,

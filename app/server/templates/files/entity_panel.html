@@ -1,0 +1,35 @@
+{# Attachments of a sales transaction (layouts 69, 94, 143, UI-19). Add file links the upload to it and to its party (F7);
+   Remove detaches the link only. A posted transaction lists its files read only (layout 143). #}
+<section class="panel" id="entity-files" aria-labelledby="attachments-title">
+  <div class="panel-head">
+    <h2 class="panel-title" id="attachments-title">Attachments</h2><span class="chip">{{ rows.len() }}</span>
+    {% if can_add && can_edit %}
+    <form class="ml-auto" hx-post="/files" hx-encoding="multipart/form-data" hx-target="#entity-files" hx-swap="outerHTML" hx-trigger="change">
+      <input type="hidden" name="entity_type_id" value="{{ entity_type_id }}">
+      <input type="hidden" name="entity_id" value="{{ entity_id }}">
+      <label class="icon-btn cursor-pointer" title="Add file">
+        <svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>
+        <input type="file" name="file" class="sr-only" aria-label="Add file">
+      </label>
+    </form>
+    {% endif %}
+  </div>
+  {% if let Some(e) = error %}<div role="alert" class="alert alert-error alert-soft text-[12.5px] py-2 mx-3 mt-2">{{ e }}</div>{% endif %}
+  {% if rows.is_empty() %}
+  <p class="p-4 text-[12.5px] muted">No attachments.</p>
+  {% else %}
+  <ul class="p-2 text-[12.5px]">
+    {% for f in rows %}
+    <li class="flex items-center gap-2.5 px-2 py-1.5 rounded-field hover:bg-base-200" data-file="{{ f.id }}">
+      <span class="w-7 h-7 rounded-field grid place-items-center flex-none text-[10px] font-semibold {{ f.badge_color }}">{{ f.badge }}</span>
+      <div class="min-w-0 flex-1">
+        {% if f.present %}<button type="button" class="truncate block max-w-full text-left link link-hover" data-open-file="{{ f.id }}">{{ f.name }}</button>{% else %}<div class="truncate">{{ f.name }}</div>{% endif %}
+        <div class="text-[11px] {% if f.present %}muted{% else %}text-error{% endif %}">{% if f.present %}{{ f.size }}{% else %}File missing from the file store{% endif %}</div>
+      </div>
+      {% if can_edit %}<button type="button" class="icon-btn" aria-label="Remove {{ f.name }} from this record" title="Remove from this record"
+              hx-delete="/attachments/{{ f.attachment_id }}" hx-target="#entity-files" hx-swap="outerHTML"><svg class="i i-sm" aria-hidden="true"><use href="#i-x"/></svg></button>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>

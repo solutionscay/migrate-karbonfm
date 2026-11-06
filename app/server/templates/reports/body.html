@@ -1,0 +1,39 @@
+{# UI-20, the screen: the range, the chart and the table. htmx replaces #report-body with it. #}
+{% macro month(name, label, value) %}
+<label class="block">
+  <span class="text-[12px] muted">{{ label }}</span>
+  <input name="{{ name }}" value="{{ value }}" inputmode="numeric" placeholder="YYYYMM" class="input input-sm w-28 mt-1 num {% if self.error(name).is_some() %}input-error{% endif %}" autocomplete="off"
+         {% if let Some(e) = self.error(name) %}aria-invalid="true" aria-describedby="err-{{ name }}"{% endif %}>
+  {% if let Some(e) = self.error(name) %}<span class="block text-[12px] text-error" id="err-{{ name }}">{{ e }}</span>{% endif %}
+</label>
+{% endmacro %}
+<form class="flex flex-wrap items-start gap-3 mb-4" action="/reports/sales-by-month" method="get"
+      hx-get="/reports/sales-by-month" hx-target="#report-body" hx-push-url="true">
+  {% call month("from", "From", from) %}
+  {% call month("to", "To", to) %}
+  <button class="btn btn-sm btn-quiet mt-[22px]">Show</button>
+</form>
+{% if !errors.is_empty() %}
+<div role="alert" class="sr-only">Check the highlighted fields.</div>
+{% else %}
+<section class="panel mb-5">
+  <div class="panel-head">
+    <h2 class="panel-title">Revenue by month</h2>
+    <span class="ml-auto text-[12px] muted">from posted sales transactions, without retainers, tax or shipping</span>
+  </div>
+  <div class="p-4 h-72"><canvas data-revenue-chart="{{ chart_json }}" aria-label="Monthly revenue chart" role="img"></canvas></div>
+</section>
+<section class="panel overflow-hidden">
+  <table class="tbl">
+    <thead><tr><th>Period</th><th class="r">Revenue</th><th class="r">Transactions</th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr><td class="num">{{ r.period }}</td><td class="r num">{{ r.revenue }}</td><td class="r num">{{ r.transactions }}</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="font-medium"><td>Total</td><td class="r num">{{ total_revenue }}</td><td class="r num">{{ total_transactions }}</td></tr>
+    </tfoot>
+  </table>
+</section>
+{% endif %}

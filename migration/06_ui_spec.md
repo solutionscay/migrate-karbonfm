@@ -95,7 +95,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 | Log a task and complete it | /parties/:id -> task card (UI-07) | new -> assign -> complete/incomplete | activity_create, task_set_complete | ROLE-OWNER | `objects/karbon_kontroller.fmp12/scripts/690-Mark_Task_Complete_data.txt` | BR-ACTIVITY-04 |
 | Send an email | email card (UI-08) | compose -> template -> send -> read only | activity_create, template_merge, email_send | AP-08 | `objects/karbon_kontroller.fmp12/scripts/521-Send_Email_Message_Activity_json.txt` | BR-INTEG-01 |
 | Invoice and payment | /sales/:id (UI-12) -> payment (UI-14) | draft -> lines -> lock -> payment | invoice_save, retainer_apply, sales_transaction_lock, payment_save | AP-05, AP-06 | `objects/karbon_kontacts.fmp12/scripts/270-SalesLine_Amount_OnObjectExit_Trigger.txt` | BR-SALES-01..09 |
-| Opportunity pipeline | /opportunities (UI-10) | list -> chart -> status change | opportunity_status_totals, opportunity_set_status | ROLE-OWNER | `objects/karbon_kontroller.fmp12/scripts/608-wip_Update_Opportunity_Status_json.txt` | BR-SALES-12, 14 |
+| Opportunity pipeline | /opportunities (UI-10) | list and chart -> detail (UI-11) -> status change | opportunity_status_totals, opportunity_set_status | ROLE-OWNER | `objects/karbon_kontroller.fmp12/scripts/608-wip_Update_Opportunity_Status_json.txt` | BR-SALES-12, 14 |
 
 ## Target page specifications
 
@@ -210,13 +210,16 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
 - Destructive action confirmation: none
 
+**Where a create action lives (user rule, 2026-11-06; it wins over the FileMaker source and the mockups).** The header's New menu is the one place for a page's create action, and no action appears twice on a page. On the I5 screens the menu offers Invoice, Sales receipt, Opportunity and Item; /sales, /opportunities and /items have no create button of their own. Kept on the page, because the header cannot do them: New invoice, New sales receipt and New opportunity on a party's tabs (they preset that party), Record payment on a posted invoice (a payment starts from its invoice, kontacts 221), Add line and Apply retainer in the editor, and the row-level Unpost on the lock marker of /sales.
+
 ### UI-10 Opportunities
 
 - Readiness: behavior-ready
 - Use case and users: Opportunity list, find and status chart; the single local user (ROLE-OWNER).
-- Source layouts: `objects/karbon_kontacts.fmp12/layouts/153-Opportunities.txt`, `objects/karbon_kontacts.fmp12/layouts/165-Opportunity_Find.txt`
-- Page: `GET /opportunities` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `GET /opportunities/status-totals?active=` (OP-SALES-03 `opportunity_status_totals`), `POST /opportunities/{id}/status` (OP-SALES-02 `opportunity_set_status`)
+- Source layouts: `objects/karbon_kontacts.fmp12/layouts/153-Opportunities.txt`, `objects/karbon_kontacts.fmp12/layouts/165-Opportunity_Find.txt`, `objects/karbon_charts.fmp12/layouts/25-SalesOpp_Chart.txt`
+- Page: `GET /opportunities` (`?q=&active=&page=`; full page; the same route returns the fragment to htmx)
+- Fragments and actions: `GET /opportunities/status-totals?active=` (OP-SALES-03 `opportunity_status_totals`), `GET /opportunities/new` (the new dialog)
+- Built (I5 S6, 2026-11-06, branch `i5/opportunities`): the chart of active opportunities with the same totals as text; the list shows active ones by default (Show Active, Show All), by status then name, with a subtotal per status and the columns Name, Party, Status, Value, Probability, Active, Next Task (layout 153). Search covers name, party and notes. New opens a dialog with the UI-06 picker and a link to the wizard. Layout 153 has no status button, so a status changes on the detail page. No Find mode (03).
 - Rules shown or enforced: BR-SALES-12, BR-SALES-14
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
@@ -227,8 +230,9 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: behavior-ready
 - Use case and users: Opportunity detail page and card; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/162-Opportunity_Detail_-_Card.txt`
-- Page: `GET /opportunities/{id}` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /opportunities; PUT /opportunities/{id}` (OP-SALES-01 `opportunity_save`), `POST /opportunities/{id}/status` (OP-SALES-02 `opportunity_set_status`), `POST /activities` (OP-ACTIVITY-01 `activity_create`)
+- Page: `GET /opportunities/{id}` (full page)
+- Fragments and actions: `POST /opportunities; PUT /opportunities/{id}` (OP-SALES-01 `opportunity_save`), `GET /opportunities/{id}/edit` (the card), `POST /opportunities/{id}/status` (OP-SALES-02 `opportunity_set_status`), `POST /activities` (OP-ACTIVITY-01 `activity_create`)
+- Built (I5 S6, 2026-11-06, branch `i5/opportunities`): the summary (fields of layouts 156, 162, customer and retainer balance, Created by) with the status menu and Edit; the activity timeline with Note, Task, Meeting, Call, Email and Start discussion on entity 13; the party's relations with their Add button; a Files panel (attaching also links the party). A party page's Opportunities tab lists that party's opportunities with a New button. The Opportunity Referral Report (charts layout 22) is not built: no script opens it, and D-38 keeps the invoice as the only print output.
 - Rules shown or enforced: BR-ACTIVITY-01, BR-ACTIVITY-02, BR-SALES-12, BR-SALES-13
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
@@ -239,7 +243,8 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: implementation-ready (design/invoice.html)
 - Use case and users: Invoice and sales receipt editors and view-only views; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/69-Invoice.txt`, `objects/karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt`, `objects/karbon_kontacts.fmp12/layouts/143-Invoice_-_View_Only.txt`, `objects/karbon_kontacts.fmp12/layouts/145-SalesReceipt_-_View_Only.txt`; target design: `design/invoice.html`
-- Page: `GET /sales/{id}` (full page; the same route returns the fragment to htmx)
+- Built (I5 S3): `GET /sales/{doc_number}` opens the editor when unlocked and the read-only view when locked (kontacts 224 s31-41). A field change saves the whole form; the answer is the editor with the server's totals. Lock saves first, then posts (kontacts 377). New: `GET /invoices/new`, `GET /sales-receipts/new`, a customer dialog with `GET /pickers/customer`. The design's History panel is not built (D-30).
+- Page: `GET /sales/{doc_number}` (full page)
 - Fragments and actions: `POST /invoices; PUT /invoices/{id}` (OP-SALES-04 `invoice_save`), `POST /sales-receipts; PUT /sales-receipts/{id}` (OP-SALES-05 `sales_receipt_save`), `POST /sales-transactions/{id}/lock` (OP-SALES-06 `sales_transaction_lock`), `DELETE /sales-transactions/{id}` (OP-SALES-07 `sales_transaction_delete`), `DELETE /sales-transactions/{id}/lines` (OP-SALES-08 `sales_lines_remove`), `POST /invoices/{id}/apply-retainer` (OP-SALES-12 `retainer_apply`)
 - Rules shown or enforced: BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-05, BR-SALES-06, BR-SALES-07, BR-SALES-08, BR-SALES-11, BR-SALES-15, BR-SALES-18
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment) / locked (AP-05) / confirmation (AP-07)
@@ -263,10 +268,11 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: implementation-ready (design/invoice.html ("Record payment" dialog))
 - Use case and users: Payment card with allocations; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/85-Card_-_New_Payment.txt`; target design: `design/invoice.html`
-- Page: `GET /payments/new` (full page; the same route returns the fragment to htmx)
+- Built (I5 S4): `GET /payments/new?invoice_id=` and `GET /payments/{id}/edit` return the card for the shared dialog. Each of the customer's unpaid invoices and the payment's own is a row; an amount allocates, and the balance is a button that fills it (kontacts 280). Record payment shows on a posted invoice only (layout 143). A payment on a posted invoice changes only its balance and paid_ind.
+- Page: `GET /payments/new` (fragment)
 - Fragments and actions: `POST /payments; PUT /payments/{id}` (OP-SALES-09 `payment_save`)
 - Rules shown or enforced: BR-SALES-02, BR-SALES-09, BR-SALES-10
-- States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment) / locked (AP-05)
+- States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
 - Destructive action confirmation: none
 
@@ -275,8 +281,9 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: inventory-only
 - Use case and users: Item list and item card; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/86-Items.txt`, `objects/karbon_kontacts.fmp12/layouts/135-Card_-_Items.txt`, `objects/karbon_kontacts.fmp12/layouts/136-Card_-_UtilityItem.txt`
-- Page: `GET /items` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /items; PUT /items/{id}` (OP-SALES-10 `item_save`)
+- Page: `GET /items` (`?q=&page=`; full page; the same route returns the fragment to htmx)
+- Fragments and actions: `POST /items; PUT /items/{id}` (OP-SALES-10 `item_save`), `GET /items/new`, `GET /items/{id}/edit` (the card), `GET /pickers/item` (`?q=&selected=`, active items only)
+- Built (I5 S2, 2026-11-06, branch `i5/items`): the list shows Name, SKU, Description, Sales Price/Rate and Active by name, inactive items included (layout 86; kontacts 345). The card has name, SKU, description, unit price, taxable, type, purchase cost and description, qty on hand, track qty, inventory start date, level and Active; the QBO account fields are gone (D-02). Active is checked on a new item. No delete. An item named Retainer keeps its name (BR-SALES-07).
 - Rules shown or enforced: BR-SALES-16
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
@@ -338,9 +345,11 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: inventory-only
 - Use case and users: The invoice PDF (the only print output; no sales receipt PDF) and the monthly sales summary screen with its chart (owner, 2026-10-28; D-38); the single local user (ROLE-OWNER).
-- Source layouts: `objects/karbon_kontacts.fmp12/layouts/103-SalesLine_pdf.txt`, `objects/karbon_charts.fmp12/layouts/25-SalesOpp_Chart.txt`, `objects/karbon_charts.fmp12/layouts/22-Opportunity_Referral_Report.txt`
-- Page: `GET /sales/{id}/print; GET /reports/sales-by-month` (full page; the same route returns the fragment to htmx)
+- Source layouts: `objects/karbon_kontacts.fmp12/layouts/103-SalesLine_pdf.txt`. Charts layout 25 is UI-10's chart; charts layout 22 is opened by no script and is not built.
+- Page: `GET /sales/{doc_number}/invoice.pdf` (the PDF, invoices only; a sales receipt answers 404), `POST /sales/{doc_number}/save-pdf` (through the desktop shell), `GET /reports/sales-by-month` (full page; the same route returns the fragment to htmx)
+- Built, PDF (I5 S5, 2026-11-06, branch `i5/pdf`): one model (`invoice.rs`) renders the page and the PDF, with krilla. It reads shipping (a Shipping row when not 0) and the address stored on the transaction, falling back to the party's on an older row. A sales receipt's page says "Sales receipt", shows a balance of 0 and has no PDF. The webview print button, `POST /print`, the print hook and the printpdf comparison are gone.
 - Fragments and actions: `POST /invoices; PUT /invoices/{id}` (OP-SALES-04 `invoice_save`), `GET /opportunities/status-totals?active=` (OP-SALES-03 `opportunity_status_totals`), `GET /reports/sales-by-month?from=&to=` (OP-SALES-11 `sales_summary_by_month`)
+- Built, the screen (I5 S7, 2026-11-06, branch `i5/reports`): a Chart.js chart and a table (period, revenue, transactions, a total row) of the months in the range, 0 for a month with no posted sale. The default is the last 12 months. Linked under Sales in the sidebar, as Monthly summary (the design's sidebar has no reports link), and from the dashboard's chart panel.
 - Rules shown or enforced: BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-05, BR-SALES-08, BR-SALES-14, BR-SALES-17
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
@@ -383,7 +392,7 @@ Per-layout hide rules and conditional formats are listed in the layout explorer 
 | Breakpoints/input devices | desktop window, min 1024 x 700; mouse and keyboard; macOS, Windows and Linux (keyboard shortcuts use Cmd on macOS and Ctrl on Windows and Linux) | owner, 2026-10-28; D-37 | resizes without horizontal scroll |
 | Data-density/table behavior | dense DaisyUI tables, sorted, filtered and paged on the server (50-100 rows); htmx swaps the table body | Karbon list layouts | a page of a 10,000-row list renders in under 200 ms |
 | Modal/tab/navigation behavior | FileMaker cards become DaisyUI modals on `<dialog>` (fragments loaded by htmx) or side drawers; one main window; tabs and dropdowns use Alpine.js | Card - * layouts | focus moves into the dialog and returns on close |
-| Print/PDF behavior | invoice print page only (askama template with print CSS) turned into a PDF locally (S-02); no other print output | SalesLine_pdf layout (owner, 2026-10-28; D-38) | PDF matches totals |
+| Print/PDF behavior | the invoice PDF only, drawn in Rust with krilla from the same model as the page (S-02, 03); no other print output | SalesLine_pdf layout (owner, 2026-10-28; D-38) | PDF matches totals |
 | Charts | Chart.js on a `<canvas>`; the fragment carries the data as JSON in a data attribute | karbon_charts layouts | chart totals equal the query |
 | Accessibility target | full keyboard use and good contrast (WCAG AA contrast ratios); semantic HTML (labels, buttons, landmarks) | owner, 2026-10-28; D-38 | route tests check labels and roles in the HTML; axe check by hand per screen |
 

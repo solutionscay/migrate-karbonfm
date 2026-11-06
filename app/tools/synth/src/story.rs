@@ -1336,10 +1336,17 @@ impl G<'_> {
                     l.id = self.r.uuid();
                 }
                 let ship = if !invoice || !self.r.chance(0.06) { 0 } else { *self.r.pick(&[1500, 2500, 4500]) };
-                let locked = date < end() - Duration::days(6) && !(is_hp && date > end() - Duration::days(120));
+                // In the last 6 days one transaction in four is still a draft (by its number: no PRNG draw, so the rows stay the
+                // same). The rest are posted, so the demo's newest revenue reaches its last day (B11).
+                let number: i64 = doc.rsplit('-').next().and_then(|n| n.parse().ok()).unwrap_or(0);
+                let draft = date >= end() - Duration::days(6) && number % 4 == 0;
+                let held = is_hp && date > end() - Duration::days(120);
+                let locked = !draft && !held;
+                // Payments keep their old cut-off, so the PRNG stream and the export's row counts do not change.
+                let payable = date < end() - Duration::days(6) && !held;
                 let txn = Txn { id: id.clone(), doc, date, invoice, lines, ship, memo: String::new(), locked };
                 let total = Self::txn_total(&c, &txn);
-                let paid = if invoice { self.pay(&c, &txn, total, is_hp, &mut pay_no) } else { 0 };
+                let paid = if invoice && payable { self.pay(&c, &txn, total, is_hp, &mut pay_no) } else { 0 };
                 self.write_txn(&c, &txn, paid);
                 self.customers[ci] = c;
             }
@@ -1427,7 +1434,7 @@ impl G<'_> {
         } else {
             0.25
         };
-        if !t.locked || !self.r.chance(p_paid) {
+        if !self.r.chance(p_paid) {
             return 0;
         }
         let mut paid = 0;
@@ -1485,44 +1492,69 @@ impl G<'_> {
                 let c = self.r.pick(&self.customers).clone();
                 (c.party, None, c.name)
             };
-            let start_d = self.since().max(start());
-            let age = (end() - start_d).num_days();
-            let status = if age > 200 {
+            let drawn_start = self.since().max(start());
+            let age = (end() - drawn_start).num_days();
+            let drawn_status = if age > 200 {
                 *self.r.pick(&[4, 4, 4, 5, 5, 6, 7])
             } else if age > 60 {
                 *self.r.pick(&[2, 3, 3, 4, 5, 8])
             } else {
                 *self.r.pick(&[1, 1, 2, 3])
             };
+            // One in eight (about 40 of 320) started in the last 180 days, so the desktop has a live pipeline. These
+            // come from the index, not new draws, so every other row of the export stays as it was. The status still
+            // follows the age rule above.
+            let recent = i % 8 == 0;
+            let start_d = if recent { end() - Duration::days((i as i64 * 7) % 180) } else { drawn_start };
+            let status = if recent {
+                let age = (end() - start_d).num_days();
+                if age > 60 {
+                    [2, 3, 3, 4, 5, 8][i / 8 % 6]
+                } else {
+                    [1, 1, 2, 3][i / 8 % 4]
+                }
+            } else {
+                drawn_status
+            };
             let active = matches!(status, 1 | 2 | 3 | 8);
             let (emp_party, emp_role, _) = self.r.pick(&self.employees[..3]).clone();
             let _ = emp_party;
-            let prob = match status {
+            let drawn_prob = match drawn_status {
                 4 => "definite",
                 1 | 5 | 6 | 7 => "unlikely",
                 _ => *self.r.pick(&["unlikely", "likely", "likely"]),
+            };
+            let prob = if !recent {
+                drawn_prob
+            } else {
+                match status {
+                    4 => "definite",
+                    1 | 5 | 6 | 7 => "unlikely",
+                    _ => ["unlikely", "likely", "likely"][i / 8 % 3],
+                }
             };
             let status_name =
                 ["New", "In process", "Proposal sent", "Won", "Lost", "Unqualified", "Closed (other)", "On Hold"]
                     [status - 1];
             let id = self.r.uuid();
             let at = self.at(start_d);
+            let opp_name = format!("{} {}", self.r.pick(&names), if i % 7 == 0 { "(phase 2)" } else { "" });
+            let opp_value = fm_money(self.r.range(4, 400) * 10000);
+            let closed = start_d + Duration::days(self.r.range(20, 150));
             let r = row(&[
                 ("Id", id),
-                (
-                    "Name",
-                    format!("{} {}", self.r.pick(&names), if i % 7 == 0 { "(phase 2)" } else { "" }).trim().to_string(),
-                ),
+                ("Name", opp_name.trim().to_string()),
                 ("PartyId", party),
                 ("PartyNameCached", pname),
                 ("LeadId", lead_id.unwrap_or_default()),
                 ("OpportunityStatusId", status.to_string()),
                 ("StatusCached", status_name.into()),
                 ("Probability", prob.into()),
-                ("Value", fm_money(self.r.range(4, 400) * 10000)),
+                ("Value", opp_value),
                 ("SalespersonId", emp_role),
                 ("StartDate", fm_date(start_d)),
-                ("EndDate", fm_date(start_d + Duration::days(self.r.range(20, 150)))),
+                // 608 s108: an active opportunity has no date closed. The draw stays, and a closed one is never future.
+                ("EndDate", if active { String::new() } else { fm_date(closed.min(end())) }),
                 ("ActiveInd", fm_bool(active)),
             ]);
             self.push("Opportunity", r, at);

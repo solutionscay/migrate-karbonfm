@@ -1193,10 +1193,12 @@ INSERT INTO value_list_item (list, value, sort_order) VALUES
 -- ---------------------------------------------------------------------------
 -- Monthly posted revenue, replacing the SumaryByMonth table of the unexported karbon_reports file (D-13) and the
 -- post/unpost bookkeeping of objects/karbon_kontroller.fmp12/scripts/576-Post_Unpost_Internal_Id_Post.txt (BR-SALES-06).
+-- Retainer lines are not revenue (BR-SALES-17; V3).
 CREATE VIEW sales_summary_by_month AS
   SELECT st.period AS period, SUM(sl.amount) AS revenue, COUNT(DISTINCT st.id) AS transactions
   FROM sales_transaction st JOIN sales_line sl ON sl.sales_transaction_id = st.id
-  WHERE st.locked_ind = 1 AND COALESCE(st.deleted, 0) = 0
+  LEFT JOIN item it ON it.id = sl.item_id
+  WHERE st.locked_ind = 1 AND COALESCE(st.deleted, 0) = 0 AND COALESCE(it.name, '') <> 'Retainer'
   GROUP BY st.period;
 
 -- ---------------------------------------------------------------------------

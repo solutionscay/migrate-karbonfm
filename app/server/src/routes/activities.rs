@@ -33,6 +33,7 @@ pub fn command_error(op: &str, e: CommandError) -> Result<Response, AppError> {
     match e {
         CommandError::NotFound => Err(AppError::NotFound),
         CommandError::AlreadySent => Ok((StatusCode::CONFLICT, crate::admin::ALREADY_SENT).into_response()),
+        CommandError::Locked => Ok((StatusCode::CONFLICT, crate::admin::LOCKED).into_response()),
         CommandError::Refused(message) => Ok((StatusCode::CONFLICT, message).into_response()),
         e => Err(AppError::Internal(format!("{op}: {e}"))),
     }
@@ -262,6 +263,9 @@ impl FormDialog {
 pub struct NewQuery {
     kind: String,
     party_id: String,
+    /// The record it is about, when that is not the party (an opportunity's buttons, layout 156).
+    entity_type_id: String,
+    entity_id: String,
 }
 
 /// `GET /activities/new?kind=note|task|event|meeting|call&party_id=`: the New dialog; opened from a party, the
@@ -288,6 +292,11 @@ pub async fn new_dialog(
         } else {
             form.regarding_id = q.party_id.clone();
         }
+    }
+    if !q.entity_id.is_empty() {
+        form.entity_type_id = q.entity_type_id.clone();
+        form.entity_id = q.entity_id.clone();
+        form.regarding_id = q.party_id.clone();
     }
     if kind == Kind::Task {
         form.assigned_to = "me".into();

@@ -17,6 +17,9 @@ struct Dashboard {
     balance_due: String,
     open_invoices: i64,
     revenue_this_month: String,
+    /// The Overdue tile (B5): the same figures as /customers.
+    overdue: String,
+    overdue_customers: i64,
     pipeline: String,
     open_opportunities: i64,
     /// JSON for the chart: {"labels": [...], "revenue": [...dollars]}; read by app.js from a data attribute.
@@ -59,15 +62,18 @@ pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppErro
         |r| Ok((r.get(0)?, r.get(1)?)),
     )?;
 
+    let today = state.today();
+    let totals = super::customers::load_totals(&conn, &today)?;
     // The last 12 months, oldest first, with 0 for a month without posted sales.
     let mut stmt = conn.prepare(
-        "WITH RECURSIVE m(n, d) AS (SELECT 0, date('now', 'localtime', 'start of month')
+        "WITH RECURSIVE m(n, d) AS (SELECT 0, date(?1, 'start of month')
                                      UNION ALL SELECT n + 1, date(d, '-1 month') FROM m WHERE n < 11)
          SELECT strftime('%m', d), COALESCE(s.revenue, 0)
          FROM m LEFT JOIN sales_summary_by_month s ON s.period = CAST(strftime('%Y%m', d) AS INTEGER)
          ORDER BY d",
     )?;
-    let months: Vec<(String, i64)> = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<Result<_, _>>()?;
+    let months: Vec<(String, i64)> =
+        stmt.query_map([&today], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<Result<_, _>>()?;
     const NAMES: [&str; 12] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     let labels: Vec<&str> =
         months.iter().map(|(m, _)| NAMES[m.parse::<usize>().unwrap_or(1).clamp(1, 12) - 1]).collect();
@@ -75,7 +81,6 @@ pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppErro
     let this_month = months.last().map(|(_, c)| *c).unwrap_or(0);
 
     let actor = crate::admin::current_user(&conn)?;
-    let today = crate::audit::local_now()[..10].to_owned();
     let (tasks, tasks_open) = match &actor {
         Some(a) => {
             let due = crate::activities::tasks_due(&conn, a, 8).map_err(|e| AppError::Internal(e.to_string()))?;
@@ -99,11 +104,13 @@ pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppErro
         }
         None => (Vec::new(), 0),
     };
-    let recent_page =
-        crate::activities::activity_list(&conn, &crate::activities::ListQuery { page_size: 6, ..Default::default() })
-            .map_err(|e| AppError::Internal(e.to_string()))?;
+    let recent_page = crate::activities::activity_list(
+        &conn,
+        &crate::activities::ListQuery { page_size: 6, today: Some(today.clone()), ..Default::default() },
+    )
+    .map_err(|e| AppError::Internal(e.to_string()))?;
     let recent = super::timeline::Rows {
-        rows: super::timeline::rows(&recent_page, false),
+        rows: super::timeline::rows(&recent_page, false, &today),
         matched: recent_page.rows.len() as i64,
         page: 1,
         page_size: 6,
@@ -122,6 +129,8 @@ pub async fn page(State(state): State<AppState>) -> Result<Html<String>, AppErro
         balance_due: usd(balance),
         open_invoices,
         revenue_this_month: usd(this_month),
+        overdue: totals.overdue,
+        overdue_customers: totals.overdue_customers,
         pipeline: usd(pipeline),
         open_opportunities,
         chart_json: serde_json::json!({ "labels": labels, "revenue": revenue }).to_string(),

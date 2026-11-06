@@ -71,17 +71,6 @@ if (window.htmx) {
     window.karbonToast("KarbonFM did not answer, so this was not saved. Restart KarbonFM and try again.", { error: true }),
   );
 
-  // Print buttons: the native print dialog (it also saves as PDF). In the desktop app the server opens it, because
-  // window.print() does nothing in WKWebView on macOS; in a plain browser the server answers 501 and we print here.
-  document.addEventListener("click", async (e) => {
-    if (!e.target.closest("[data-print]")) return;
-    try {
-      const res = await fetch("/print", { method: "POST" });
-      if (res.status === 204) return;
-    } catch (_) {}
-    window.print();
-  });
-
   // Open a stored file (UI-19): the desktop shell opens it with the system app, so the window stays on the app. In a
   // plain browser the server answers 501 and the file opens in a new tab; a missing copy says so.
   document.addEventListener("click", async (e) => {
@@ -190,6 +179,47 @@ window.karbonColor = function (name) {
     });
   }
   window.addEventListener("DOMContentLoaded", draw);
+  window.addEventListener("karbon-theme", draw);
+  // The monthly summary's range form swaps the canvas.
+  document.addEventListener("htmx:afterSettle", (e) => { if (e.detail.target && e.detail.target.id === "report-body") draw(); });
+})();
+
+// Opportunity chart (O8): <canvas data-status-chart='{"labels": [...], "values": [...]}'>, dollars per status. htmx
+// loads the fragment, so it draws after a swap too.
+(function () {
+  let chart;
+  const money = (v) => "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  function draw() {
+    const canvas = document.querySelector("[data-status-chart]");
+    if (!canvas || !window.Chart) return;
+    const data = JSON.parse(canvas.dataset.statusChart);
+    const c = window.karbonColor;
+    if (chart) chart.destroy();
+    Chart.defaults.font.family = "Geist, system-ui, sans-serif";
+    Chart.defaults.font.size = 11.5;
+    Chart.defaults.color = c("--k-muted");
+    chart = new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels: data.labels,
+        datasets: [{ label: "Value", data: data.values, backgroundColor: c("--color-primary"), borderRadius: 4, barPercentage: 0.62, categoryPercentage: 0.8 }],
+      },
+      options: {
+        indexAxis: "y",
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: c("--color-neutral"), titleColor: c("--color-neutral-content"), bodyColor: c("--color-neutral-content"),
+            padding: 10, cornerRadius: 4, callbacks: { label: (ctx) => ` ${money(ctx.parsed.x)}` } },
+        },
+        scales: {
+          x: { beginAtZero: true, border: { display: false }, grid: { color: c("--k-chart-grid") }, ticks: { maxTicksLimit: 5, callback: (v) => "$" + v / 1000 + "k" } },
+          y: { grid: { display: false }, border: { display: false } },
+        },
+      },
+    });
+  }
+  document.addEventListener("htmx:afterSettle", draw);
   window.addEventListener("karbon-theme", draw);
 })();
 
