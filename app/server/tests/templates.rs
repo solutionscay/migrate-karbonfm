@@ -570,6 +570,16 @@ async fn invoice_total_follows_the_page_when_the_invoice_has_shipping() {
     assert_eq!(merged_value(&check, "a-mail-1048", "InvoiceTotal"), Some(page));
 }
 
+/// The same case with the figures, now that the Total includes shipping (I5 decision F1): the credit and the shipping
+/// together on one invoice.
+#[tokio::test]
+async fn invoice_total_of_inv_1048_with_shipping_is_3_582_65() {
+    let (_dir, app, check) = file_demo();
+    check.execute("UPDATE sales_transaction SET ship_amt = 2550 WHERE id = 't-inv-1048'", []).unwrap();
+    assert_eq!(merged_value(&check, "a-mail-1048", "InvoiceTotal").as_deref(), Some("$3,582.65"));
+    assert_eq!(page_total(&app, "INV-1048").await, "$3,582.65");
+}
+
 #[test]
 fn invoice_total_of_a_deleted_invoice_has_no_value() {
     let (conn, _) = demo();
