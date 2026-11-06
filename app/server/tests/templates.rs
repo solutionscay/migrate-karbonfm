@@ -260,7 +260,7 @@ async fn the_list_page_is_linked_from_the_sidebar_and_has_an_empty_state() {
     let (status, _, html) = send(&app, get("/templates")).await;
     assert_eq!(status, StatusCode::OK);
     assert!(html.contains(r#"href="/templates" aria-current="page""#), "the sidebar marks the page");
-    assert!(html.contains("No templates yet."));
+    assert!(html.contains("No templates yet. Choose New, then Template, to make one."));
     let (_, _, html) = send(&app, get("/")).await;
     assert!(html.contains(r#"href="/templates""#) && !html.contains(r#"data-soon="Templates""#));
 }
