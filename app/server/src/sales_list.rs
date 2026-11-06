@@ -75,6 +75,12 @@ pub const STATUS_SQL: &str = "CASE
   WHEN COALESCE(st.balance, 0) < COALESCE(st.total_amt, 0) THEN 'partial'
   ELSE 'open' END";
 
+/// The retainer credit of a `sales_transaction st`, negative: its negative retainer lines. A positive retainer line is
+/// a deposit, the sale itself (RET-0042), not a credit.
+pub const RETAINER_CREDIT_SQL: &str =
+    "COALESCE((SELECT SUM(sl.amount) FROM sales_line sl JOIN item it ON it.id = sl.item_id
+   WHERE sl.sales_transaction_id = st.id AND it.name = 'Retainer' AND sl.amount < 0), 0)";
+
 /// Invoices, sales receipts or both.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum DocKind {
@@ -122,6 +128,8 @@ pub struct SalesRow {
     pub date: String,
     pub due_date: String,
     pub invoice: bool,
+    /// The figure the document page labels "Total": before any retainer credit, so $3,557.15 on INV-1048, whose
+    /// stored `total_amt` is $3,057.15 after its $500.00 credit.
     pub total: i64,
     pub balance: i64,
     pub status: Status,
@@ -189,7 +197,7 @@ pub fn sales_list(conn: &Connection, q: &SalesQuery, today: &str) -> Result<Page
     let filter = format!("WHERE {}", clauses.join(" AND "));
     let (matched, total, balance): (i64, i64, i64) = conn.query_row(
         &format!(
-            "SELECT COUNT(*), COALESCE(SUM(st.total_amt), 0),
+            "SELECT COUNT(*), COALESCE(SUM(COALESCE(st.total_amt, 0) - {RETAINER_CREDIT_SQL}), 0),
                     COALESCE(SUM(CASE WHEN COALESCE(st.locked_ind, 0) = 1 THEN st.balance END), 0) {from} {filter}"
         ),
         params_from_iter(values.iter()),
@@ -198,7 +206,8 @@ pub fn sales_list(conn: &Connection, q: &SalesQuery, today: &str) -> Result<Page
     let (page, pages, size) = paging(matched, q.page, q.page_size);
     let sql = format!(
         "SELECT COALESCE(st.doc_number, ''), COALESCE(st.date, ''), COALESCE(st.due_date, ''),
-                COALESCE(st.invoice_ind, 0) = 1, COALESCE(st.total_amt, 0), COALESCE(st.balance, 0), {STATUS_SQL},
+                COALESCE(st.invoice_ind, 0) = 1, COALESCE(st.total_amt, 0) - {RETAINER_CREDIT_SQL},
+                COALESCE(st.balance, 0), {STATUS_SQL},
                 COALESCE(p.name_cached, ''), COALESCE(p.id, ''), st.id, COALESCE(st.locked_ind, 0) <> 0
          {from} {filter} ORDER BY st.date DESC, st.doc_number DESC LIMIT {size} OFFSET {}",
         (page - 1) * size

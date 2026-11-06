@@ -146,7 +146,7 @@ impl Editor {
         format!("{}/{}", self.t.kind.path(), urlencode(&self.t.id))
     }
     pub fn subtotal_before_retainer(&self) -> Cents {
-        self.t.totals.subtotal - self.t.totals.retainer
+        self.t.totals.subtotal - self.t.retainer_credit
     }
     pub fn total_before_retainer(&self) -> Cents {
         self.subtotal_before_retainer() + self.t.totals.total_tax + self.ship()
@@ -155,13 +155,13 @@ impl Editor {
         self.t.totals.total_amt - self.t.totals.subtotal - self.t.totals.total_tax
     }
     pub fn has_retainer(&self) -> bool {
-        self.t.totals.retainer.0 != 0
+        self.t.retainer_credit.0 != 0
     }
     pub fn has_paid(&self) -> bool {
         self.t.paid.0 != 0
     }
     pub fn retainer_credit(&self) -> Cents {
-        -self.t.totals.retainer
+        -self.t.retainer_credit
     }
     pub fn bill_fields(&self) -> Vec<(&'static str, &'static str, &str)> {
         address_fields("bill", &self.t.input.bill)

@@ -429,6 +429,15 @@ async fn pdf_matches_totals_big_demo() {
     assert!(matches!(big_demo::create(&dir).unwrap(), Outcome::Created { .. }));
     let conn = db::open(&db::database_path(&dir), Seed::Reference).unwrap().0;
 
+    // The list's Total is the page's Total on every document.
+    let q = karbon_server::sales_list::SalesQuery { page_size: 100_000, ..Default::default() };
+    let list = karbon_server::sales_list::sales_list(&conn, &q, "2026-11-06").unwrap();
+    assert!(list.rows.len() > 3000);
+    for row in &list.rows {
+        let page = Invoice::load(&conn, &row.doc_number).unwrap().total_before_retainer();
+        assert_eq!(row.total, page.0, "{}", row.doc_number);
+    }
+
     type Row = (String, i64, i64, i64, i64, i64);
     let rows: Vec<Row> = conn
         .prepare(

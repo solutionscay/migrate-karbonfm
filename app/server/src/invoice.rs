@@ -3,7 +3,8 @@
 //!
 //! The stored totals are not read: the model recomputes them from the lines with `karbon_money::sales`. The
 //! document shows the amount before the retainer credit and the credit below the total, as design/invoice.html
-//! does; the balance due is the same as the stored one (04_demo_seed.sql header).
+//! does; the balance due is the same as the stored one (04_demo_seed.sql header). Only a negative retainer line is a
+//! credit: on a retainer receipt (RET-0042) the positive line is the sale itself, an ordinary line of the document.
 
 use karbon_money::sales::{self, Totals, RETAINER_ITEM_NAME};
 use karbon_money::{Cents, Qty};
@@ -223,12 +224,12 @@ impl Invoice {
 
     /// The lines shown in the line table: every line except the retainer credits, which show below the total.
     pub fn item_lines(&self) -> impl Iterator<Item = &Line> {
-        self.lines.iter().filter(|l| !l.retainer)
+        self.lines.iter().filter(|l| !(l.retainer && l.amount < Cents::ZERO))
     }
 
     /// Subtotal before the retainer credit ($3,550.00 on INV-1048).
     pub fn subtotal_before_retainer(&self) -> Cents {
-        self.totals.subtotal - self.totals.retainer
+        self.totals.subtotal - self.retainer()
     }
 
     /// Total before the retainer credit ($3,557.15 on INV-1048): the "Total" of the design, shipping included.
@@ -245,9 +246,9 @@ impl Invoice {
         }
     }
 
-    /// The retainer credit, negative (-$500.00 on INV-1048).
+    /// The retainer credit, negative (-$500.00 on INV-1048): the negative retainer lines.
     pub fn retainer(&self) -> Cents {
-        self.totals.retainer
+        self.lines.iter().filter(|l| l.retainer && l.amount < Cents::ZERO).map(|l| l.amount).sum()
     }
 
     pub fn paid(&self) -> Cents {

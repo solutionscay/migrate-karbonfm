@@ -689,3 +689,27 @@ async fn unpost_asks_first_and_a_stray_click_changes_nothing() {
     assert!(h.get("HX-Redirect").is_some());
     assert_eq!(locked().unwrap(), 1);
 }
+
+/// The list's Total is the figure the document page labels Total, on every document of the seed. INV-1048 stores
+/// $3,057.15 after its $500.00 credit, and used to read so here, under Amount, against $3,557.15 on its page.
+#[tokio::test]
+async fn the_sales_list_total_is_the_page_total() {
+    use karbon_server::invoice::Invoice;
+    use karbon_server::sales_list::{sales_list, SalesQuery};
+    let c = demo();
+    let page = sales_list(&c, &SalesQuery { page_size: 1000, ..Default::default() }, TODAY).unwrap();
+    assert!(page.rows.len() >= 5);
+    let (mut sum, mut seen) = (0, Vec::new());
+    for row in &page.rows {
+        let model = Invoice::load(&c, &row.doc_number).unwrap().total_before_retainer();
+        assert_eq!(row.total, model.0, "{}", row.doc_number);
+        sum += row.total;
+        seen.push((row.doc_number.as_str(), row.total));
+    }
+    assert_eq!(page.total, sum, "the footer sums the column");
+    assert!(seen.contains(&("INV-1048", 355_715)) && seen.contains(&("RET-0042", 300_000)), "{seen:?}");
+
+    let (_, _, html) = send(&app(c), get("/sales")).await;
+    assert!(html.contains(r#"<th class="r">Total</th>"#) && !html.contains(">Amount</th>"));
+    assert!(html.contains("$3,557.15") && !html.contains("$3,057.15"));
+}

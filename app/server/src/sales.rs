@@ -102,6 +102,8 @@ pub struct TxnEdit {
     pub amounts: Vec<Cents>,
     pub totals: Totals,
     pub paid: Cents,
+    /// The negative retainer lines, negative: the credit shown below the total (RET-0042's positive line is the sale).
+    pub retainer_credit: Cents,
     pub tax_rate_bp: i64,
 }
 
@@ -837,7 +839,7 @@ pub fn retainer_apply(conn: &mut Connection, id: &str, actor: &Actor) -> Result<
 /// A transaction for the editor, by id.
 pub fn transaction_get(conn: &Connection, id: &str) -> Result<TxnEdit, CommandError> {
     let current = head(conn, id)?;
-    let mut e = conn.query_row(
+    let sql = format!(
         "SELECT COALESCE(st.doc_number, ''), COALESCE(st.date, ''), COALESCE(st.due_date, ''), COALESCE(st.tax_rate_bp, 0),
                 st.ship_amt, COALESCE(st.ship_date, ''), COALESCE(st.customer_memo, ''), COALESCE(st.private_note, ''),
                 COALESCE(st.bill_email_address, ''),
@@ -848,67 +850,68 @@ pub fn transaction_get(conn: &Connection, id: &str) -> Result<TxnEdit, CommandEr
                 COALESCE(st.id_customer, ''), COALESCE(p.name_cached, ''), COALESCE(p.id, ''),
                 COALESCE(i.id_term, ''), COALESCE(sr.id_account_deposit, ''), COALESCE(sr.payment_ref_num, ''),
                 COALESCE(st.subtotal, 0), COALESCE(st.taxable_subtotal, 0), COALESCE(st.total_tax, 0), COALESCE(st.total_amt, 0),
-                COALESCE(st.balance, 0), COALESCE(st.retainer, 0)
+                COALESCE(st.balance, 0), COALESCE(st.retainer, 0), {credit}
          FROM sales_transaction st
          LEFT JOIN party_role r ON r.id = st.id_customer LEFT JOIN party p ON p.id = r.party_id
          LEFT JOIN invoice i ON i.id = st.id LEFT JOIN sales_receipt sr ON sr.id = st.id
          WHERE st.id = ?1",
-        [id],
-        |r| {
-            let bp: i64 = r.get(3)?;
-            let ship: Option<i64> = r.get(4)?;
-            Ok(TxnEdit {
-                id: id.to_owned(),
-                kind: current.kind,
-                locked: current.locked,
-                customer_role_id: r.get(21)?,
-                customer: r.get(22)?,
-                party_id: r.get(23)?,
-                tax_rate_bp: bp,
-                amounts: Vec::new(),
-                paid: Cents::ZERO,
-                totals: Totals {
-                    subtotal: Cents(r.get(27)?),
-                    taxable_subtotal: Cents(r.get(28)?),
-                    total_tax: Cents(r.get(29)?),
-                    total_amt: Cents(r.get(30)?),
-                    balance: Cents(r.get(31)?),
-                    retainer: Cents(r.get(32)?),
+        credit = crate::sales_list::RETAINER_CREDIT_SQL
+    );
+    let mut e = conn.query_row(&sql, [id], |r| {
+        let bp: i64 = r.get(3)?;
+        let ship: Option<i64> = r.get(4)?;
+        Ok(TxnEdit {
+            id: id.to_owned(),
+            kind: current.kind,
+            locked: current.locked,
+            customer_role_id: r.get(21)?,
+            customer: r.get(22)?,
+            party_id: r.get(23)?,
+            tax_rate_bp: bp,
+            amounts: Vec::new(),
+            paid: Cents::ZERO,
+            retainer_credit: Cents(r.get(33)?),
+            totals: Totals {
+                subtotal: Cents(r.get(27)?),
+                taxable_subtotal: Cents(r.get(28)?),
+                total_tax: Cents(r.get(29)?),
+                total_amt: Cents(r.get(30)?),
+                balance: Cents(r.get(31)?),
+                retainer: Cents(r.get(32)?),
+            },
+            input: TxnInput {
+                doc_number: r.get(0)?,
+                date: r.get(1)?,
+                due_date: r.get(2)?,
+                term: r.get(24)?,
+                tax_rate: crate::admin::format_percent(bp),
+                ship_amt: ship.map(|c| Cents(c).to_input_value()).unwrap_or_default(),
+                ship_date: r.get(5)?,
+                customer_memo: r.get(6)?,
+                private_note: r.get(7)?,
+                bill_email_address: r.get(8)?,
+                bill: Address {
+                    line_1: r.get(9)?,
+                    line_2: r.get(10)?,
+                    city: r.get(11)?,
+                    state: r.get(12)?,
+                    postal_code: r.get(13)?,
+                    country: r.get(14)?,
                 },
-                input: TxnInput {
-                    doc_number: r.get(0)?,
-                    date: r.get(1)?,
-                    due_date: r.get(2)?,
-                    term: r.get(24)?,
-                    tax_rate: crate::admin::format_percent(bp),
-                    ship_amt: ship.map(|c| Cents(c).to_input_value()).unwrap_or_default(),
-                    ship_date: r.get(5)?,
-                    customer_memo: r.get(6)?,
-                    private_note: r.get(7)?,
-                    bill_email_address: r.get(8)?,
-                    bill: Address {
-                        line_1: r.get(9)?,
-                        line_2: r.get(10)?,
-                        city: r.get(11)?,
-                        state: r.get(12)?,
-                        postal_code: r.get(13)?,
-                        country: r.get(14)?,
-                    },
-                    ship: Address {
-                        line_1: r.get(15)?,
-                        line_2: r.get(16)?,
-                        city: r.get(17)?,
-                        state: r.get(18)?,
-                        postal_code: r.get(19)?,
-                        country: r.get(20)?,
-                    },
-                    id_account_deposit: r.get(25)?,
-                    payment_ref_num: r.get(26)?,
-                    lines: Vec::new(),
+                ship: Address {
+                    line_1: r.get(15)?,
+                    line_2: r.get(16)?,
+                    city: r.get(17)?,
+                    state: r.get(18)?,
+                    postal_code: r.get(19)?,
+                    country: r.get(20)?,
                 },
-            })
-        },
-    )?;
+                id_account_deposit: r.get(25)?,
+                payment_ref_num: r.get(26)?,
+                lines: Vec::new(),
+            },
+        })
+    })?;
     let mut stmt = conn.prepare(
         "SELECT sl.id, COALESCE(sl.item_id, ''), COALESCE(sl.description, ''), CAST(sl.qty AS TEXT), sl.unit_price,
                 COALESCE(sl.taxable, 0) <> 0, COALESCE(sl.amount, 0)

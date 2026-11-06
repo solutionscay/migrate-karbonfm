@@ -459,3 +459,32 @@ async fn save_pdf_goes_through_the_shell_for_same_origin_posts_only() {
     let res = browser.oneshot(req("POST", uri, HOST, Some(ORIGIN))).await.unwrap();
     assert_eq!(res.status(), StatusCode::NOT_IMPLEMENTED);
 }
+
+/// A retainer receipt: its positive retainer line is the sale, not a credit. Before this, RET-0042 showed Total $0.00
+/// and "Retainer applied −-$3,000.00", though it stores $3,000.00.
+#[tokio::test]
+async fn a_retainer_receipt_shows_its_sale() {
+    let conn = db::open_demo(None).unwrap();
+    let inv = Invoice::load(&conn, "RET-0042").unwrap();
+    assert_eq!(inv.total_before_retainer(), Cents(300_000));
+    assert_eq!(inv.retainer(), Cents::ZERO);
+    assert_eq!(inv.item_lines().count(), 1, "the deposit is a line of the document");
+    let app = router(AppState::new(conn));
+    let req = Request::get("/sales/RET-0042").body(Body::empty()).unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+    let html = String::from_utf8(res.into_body().collect().await.unwrap().to_bytes().to_vec()).unwrap();
+    assert!(!html.contains("Retainer applied") && !html.contains("−-"), "no credit, no double sign");
+    let (_, total) = html.split_once(r#">Total</dt><dd class="num inv-rule inv-bold">"#).expect("the Total row");
+    assert!(total.starts_with("$3,000.00</dd>"), "{}", &total[..30]);
+    assert!(html.contains(">$3,000.00</td>"), "the deposit's line");
+}
+
+/// A retainer credit stays below the total, out of the line table.
+#[test]
+fn a_credit_still_shows_below_the_total() {
+    let conn = db::open_demo(None).unwrap();
+    let inv = Invoice::load(&conn, "INV-1048").unwrap();
+    assert_eq!((inv.total_before_retainer(), inv.retainer()), (Cents(355_715), Cents(-50_000)));
+    assert_eq!(inv.item_lines().filter(|l| l.retainer).count(), 0, "the credit is not in the line table");
+}
