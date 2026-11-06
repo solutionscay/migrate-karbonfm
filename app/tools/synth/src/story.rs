@@ -800,7 +800,7 @@ impl G<'_> {
             let n = self.phone_number();
             self.phone(&id, "Office", &n, false, at);
             let email = format!("accounts@{domain}.example");
-            self.network(&id, "Billing", &email, false, &[1], at);
+            self.network(&id, "Accounts", &email, false, &[1], at);
             if self.r.chance(0.5) {
                 self.network(&id, "Website", &format!("https://{domain}.example"), true, &[], at);
             }
@@ -1716,8 +1716,16 @@ impl G<'_> {
                 2 => self.x.push("Note", row(&[("Id", id.clone())])),
                 3 => {
                     let due = date + Duration::days(self.r.range(1, 21));
-                    let done = due < end() - Duration::days(3) && self.r.chance(0.85);
-                    let completed = done.then(|| self.at(due.min(end())));
+                    let drawn = due < end() - Duration::days(3) && self.r.chance(0.85);
+                    // An old task is done, or the dashboard's "Tasks due" opens on years-old work. No PRNG draw here, so
+                    // the other rows stay the same.
+                    let stale = due < end() - Duration::days(30);
+                    let done = drawn || stale;
+                    let completed = if drawn {
+                        Some(self.at(due.min(end())))
+                    } else {
+                        stale.then(|| due.and_hms_opt(17, 0, 0).unwrap())
+                    };
                     self.activity_party(&id, &emp_party, &emp_name, 53, at);
                     let r = row(&[
                         ("Id", id.clone()),

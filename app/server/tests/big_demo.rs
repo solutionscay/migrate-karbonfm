@@ -344,6 +344,11 @@ async fn overdue_is_a_tenth_to_a_fifth_of_balance_due() {
         // A paid invoice is paid in full: none left overdue by the rounding of its fixed-fee line.
         let pennies = "SELECT COUNT(*) FROM sales_transaction WHERE balance BETWEEN 1 AND 99";
         assert_eq!(conn.query_row(pennies, [], |r| r.get::<_, i64>(0)).unwrap(), 0);
+        // "Tasks due" does not open on work years old.
+        let stale = format!(
+            "SELECT COUNT(*) FROM task WHERE COALESCE(completed_at, '') = '' AND due_date < date('{day}', '-60 days')"
+        );
+        assert_eq!(conn.query_row(&stale, [], |r| r.get::<_, i64>(0)).unwrap(), 0);
         let state = AppState::new(conn).with_data_dir(&dir).with_today(day);
         let (_, html) = get(&state, "/").await;
         let (revenue, balance, overdue) =
