@@ -1336,10 +1336,17 @@ impl G<'_> {
                     l.id = self.r.uuid();
                 }
                 let ship = if !invoice || !self.r.chance(0.06) { 0 } else { *self.r.pick(&[1500, 2500, 4500]) };
-                let locked = date < end() - Duration::days(6) && !(is_hp && date > end() - Duration::days(120));
+                // In the last 6 days one transaction in four is still a draft (by its number: no PRNG draw, so the rows stay the
+                // same). The rest are posted, so the demo's newest revenue reaches its last day (B11).
+                let number: i64 = doc.rsplit('-').next().and_then(|n| n.parse().ok()).unwrap_or(0);
+                let draft = date >= end() - Duration::days(6) && number % 4 == 0;
+                let held = is_hp && date > end() - Duration::days(120);
+                let locked = !draft && !held;
+                // Payments keep their old cut-off, so the PRNG stream and the export's row counts do not change.
+                let payable = date < end() - Duration::days(6) && !held;
                 let txn = Txn { id: id.clone(), doc, date, invoice, lines, ship, memo: String::new(), locked };
                 let total = Self::txn_total(&c, &txn);
-                let paid = if invoice { self.pay(&c, &txn, total, is_hp, &mut pay_no) } else { 0 };
+                let paid = if invoice && payable { self.pay(&c, &txn, total, is_hp, &mut pay_no) } else { 0 };
                 self.write_txn(&c, &txn, paid);
                 self.customers[ci] = c;
             }
@@ -1427,7 +1434,7 @@ impl G<'_> {
         } else {
             0.25
         };
-        if !t.locked || !self.r.chance(p_paid) {
+        if !self.r.chance(p_paid) {
             return 0;
         }
         let mut paid = 0;
