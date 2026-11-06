@@ -422,6 +422,7 @@ INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, p
 INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-012', 'a-mail-1048', 'p-hp', 63, 'Halden & Pryce Architects', 'H');
 INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id, party_name_cached, party_initials) VALUES ('ap-013', 'a-mail-1048', 'p-hp-jw', 55, 'Joanna Whitfield', 'JW');
 INSERT INTO email_message (id, sent_ind, smtp_timestamp, use_system_settings_ind) VALUES ('a-mail-1048', 1, '2026-10-14 16:40:00', 1);
+INSERT INTO activity_entity (id, activity_id, entity_type_id, entity_id) VALUES ('ae-mail-1048', 'a-mail-1048', 12, 't-inv-1048');
 
 -- Files: the stored copies are small placeholders in migration/demo_files, written to the data folder's file store
 -- when the seed loads (db::DEMO_FILES; D-17). file_size is the copy's KB (617 s104); content_type and category as 617

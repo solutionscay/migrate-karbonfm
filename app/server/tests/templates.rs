@@ -64,6 +64,17 @@ fn fixture_email(conn: &Connection) -> &'static str {
 // The parser and the save rules (BR-TEMPLATE-01, 478)
 // ---------------------------------------------------------------------------------------------------------------
 
+/// An email with a To person (Joanna Wells of H&P) and nothing else: no From and no invoice link.
+fn unlinked_email(conn: &Connection) -> &'static str {
+    conn.execute_batch(
+        "INSERT INTO activity (id, activity_type_id, email_message_ind, subject) VALUES ('a-nolink', 1, 1, 'No link');
+         INSERT INTO activity_party (id, activity_id, party_id, activity_party_role_id)
+         VALUES ('ap-nolink', 'a-nolink', 'p-hp-jw', 55);",
+    )
+    .unwrap();
+    "a-nolink"
+}
+
 #[test]
 fn a_token_mismatch_is_refused_and_nothing_is_saved() {
     let (mut conn, actor) = demo();
@@ -197,14 +208,15 @@ fn every_field_merges_on_a_fixture_email() {
 #[test]
 fn a_missing_value_is_empty_never_the_previous_fields() {
     let (mut conn, actor) = demo();
-    // The demo's sent email: a To person, no From, no invoice link.
+    // A To person, no From, no invoice link.
+    let email = unlinked_email(&conn);
     let id = templates::template_create(
         &mut conn,
         &input("", "[{{FirstName}}][{{SenderName}}][{{InvoiceNumber}}][{{DueDate}}]"),
         &actor,
     )
     .unwrap();
-    let merged = templates::template_merge(&conn, id, "a-mail-1048").unwrap();
+    let merged = templates::template_merge(&conn, id, email).unwrap();
     assert_eq!(merged.message, "[Joanna][][][]");
 }
 
@@ -391,4 +403,28 @@ fn the_big_demo_templates_use_known_braces_and_merge() {
     assert_eq!(d.subject, "Invoice {{InvoiceNumber}} from Ellison Studio");
     let required: Vec<&str> = d.merge_fields.iter().filter(|m| m.required).map(|m| m.name.as_str()).collect();
     assert_eq!(required, ["{{InvoiceNumber}}"]);
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// The preview never leaves a blank box (user report: Body {{InvoiceTotal}}, email INV-1048, labels and nothing else)
+// ---------------------------------------------------------------------------------------------------------------
+
+const TOTAL: &str = "%7B%7BInvoiceTotal%7D%7D";
+
+/// A new template that has nothing saved but its name.
+async fn blank_template(app: &axum::Router) {
+    let (status, _, _) = send(app, form("POST", "/templates", "name=Preview")).await;
+    assert_eq!(status, StatusCode::CREATED);
+}
+
+#[tokio::test]
+async fn a_saved_invoice_total_fills_in_for_the_seed_invoice_email() {
+    let (_dir, app, _check) = file_demo();
+    blank_template(&app).await;
+    let body = format!("name=Preview&subject=&message={TOTAL}&activity_type=1");
+    let (status, _, html) = send(&app, form("PUT", "/templates/1", &body)).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    let (status, _, html) = send(&app, form("POST", "/templates/1/merge", "activity_id=a-mail-1048")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("$3,057.15"), "INV-1048's total_amt: {html}");
 }
