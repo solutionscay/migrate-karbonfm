@@ -8,7 +8,7 @@ use rusqlite::{params_from_iter, Connection};
 pub const PAGE_SIZE: i64 = 50;
 
 /// The status a list shows, derived from the stored totals (BR-SALES-06: only posted, locked, transactions count):
-/// Draft (not locked), Paid (no balance), Overdue (an open invoice past its due date, by the local date), Partially
+/// Draft (not locked), Paid (nothing owed, an overpayment included), Overdue (an open invoice past its due date, by the local date), Partially
 /// paid, Open.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Status {
@@ -70,7 +70,7 @@ impl Status {
 /// The SQL expression of [`Status`] over a `sales_transaction st`, as its key. `?1` is today (`YYYY-MM-DD`).
 pub const STATUS_SQL: &str = "CASE
   WHEN COALESCE(st.locked_ind, 0) = 0 THEN 'draft'
-  WHEN COALESCE(st.balance, 0) = 0 THEN 'paid'
+  WHEN COALESCE(st.balance, 0) <= 0 THEN 'paid'
   WHEN COALESCE(st.invoice_ind, 0) = 1 AND st.due_date < ?1 THEN 'overdue'
   WHEN COALESCE(st.balance, 0) < COALESCE(st.total_amt, 0) THEN 'partial'
   ELSE 'open' END";

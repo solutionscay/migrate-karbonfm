@@ -713,3 +713,41 @@ async fn the_sales_list_total_is_the_page_total() {
     assert!(html.contains(r#"<th class="r">Total</th>"#) && !html.contains(">Amount</th>"));
     assert!(html.contains("$3,557.15") && !html.contains("$3,057.15"));
 }
+
+/// A line with no item is description only (field 6), so its quantity and rate cannot be typed and then lost. Choosing
+/// an item opens them.
+#[tokio::test]
+async fn a_line_with_no_item_has_no_quantity_or_rate_to_type() {
+    let (mut c, a) = {
+        let c = demo();
+        let a = admin::current_user(&c).unwrap().unwrap();
+        (c, a)
+    };
+    let id = id_of(&c, "INV-1048");
+    sales::transaction_lock(&mut c, &id, false, &a).unwrap();
+    let mut input = sales::transaction_get(&c, &id).unwrap().input;
+    input.lines[0].item_id = String::new();
+    sales::transaction_save(&mut c, Kind::Invoice, &id, &input, false, &a).unwrap();
+    let (_, _, html) = send(&app(c), get("/sales/INV-1048")).await;
+    let tags = |name: &str| -> Vec<String> {
+        html.split("<input")
+            .filter(|t| t.contains(&format!(r#"name="{name}""#)))
+            .map(|t| t[..t.find('>').unwrap()].to_owned())
+            .collect()
+    };
+    for name in ["line_qty", "line_price"] {
+        let found = tags(name);
+        assert!(found[0].contains("readonly"), "{}", found[0]);
+        assert!(!found[1].contains("readonly"), "{}", found[1]);
+    }
+}
+
+/// An overpayment leaves a negative balance (fx_overpayment_gives_negative_balance): nothing is owed, so it reads Paid.
+#[tokio::test]
+async fn an_overpaid_invoice_reads_paid() {
+    use karbon_server::sales_list::{sales_list, SalesQuery, Status};
+    let c = demo();
+    c.execute("UPDATE sales_transaction SET balance = -10000 WHERE doc_number = 'INV-1048'", []).unwrap();
+    let q = SalesQuery { query: "INV-1048".into(), ..Default::default() };
+    assert_eq!(sales_list(&c, &q, TODAY).unwrap().rows[0].status, Status::Paid);
+}
