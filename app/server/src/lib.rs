@@ -48,9 +48,6 @@ use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
 
-/// Opens the native print dialog of the window that shows the app (set by the desktop shell).
-pub type PrintHook = Arc<dyn Fn() -> Result<(), String> + Send + Sync>;
-
 /// Saves a file through the desktop shell: native save dialog with the suggested name, write, open in the system
 /// viewer. Returns the saved path, or `None` when the user cancels. It blocks until the dialog closes.
 pub type SaveHook = Arc<dyn Fn(String, Vec<u8>) -> Result<Option<PathBuf>, String> + Send + Sync>;
@@ -66,7 +63,7 @@ pub enum FolderPick {
 
 /// Shows the native folder dialog through the desktop shell and returns the chosen folder, or `None` when the user
 /// cancels. It blocks until the dialog closes. The page has no IPC and no file-system access (AP-01, AP-02): it asks
-/// the server, the server asks the shell, the same pattern as the print hook.
+/// the server, the server asks the shell, the same pattern as the save hook.
 pub type FolderHook = Arc<dyn Fn(FolderPick) -> Result<Option<PathBuf>, String> + Send + Sync>;
 
 /// Opens a stored file in the system's default app through the desktop shell (UI-19 "Open"). The server resolves the
@@ -77,7 +74,6 @@ pub type OpenHook = Arc<dyn Fn(PathBuf) -> Result<(), String> + Send + Sync>;
 #[derive(Clone)]
 pub struct AppState {
     db: Arc<Mutex<Connection>>,
-    print: Option<PrintHook>,
     save: Option<SaveHook>,
     /// Opens a stored file with the system app; none in the dev server and the tests (`POST /files/{id}/open` 501).
     open: Option<OpenHook>,
@@ -109,7 +105,6 @@ impl AppState {
     pub fn new(db: Connection) -> Self {
         Self {
             db: Arc::new(Mutex::new(db)),
-            print: None,
             save: None,
             open: None,
             mailer: Arc::new(email::LettreMailer::default()),
@@ -157,13 +152,6 @@ impl AppState {
     /// The secrets as the routes use them: `secrets.toml` in the data folder while it exists, else the keychain.
     pub fn secret_store(&self) -> secrets::Secrets {
         secrets::Secrets::new(self.secrets.clone(), self.data_dir.as_deref().map(secrets::secrets_path))
-    }
-
-    /// The desktop shell passes the window's print function. `window.print()` does nothing in WKWebView on macOS
-    /// (S-01), so the page asks the server, and the server asks the window; the page itself has no IPC access.
-    pub fn with_print(mut self, print: PrintHook) -> Self {
-        self.print = Some(print);
-        self
     }
 
     /// The desktop shell passes its save function. The window never navigates to a file (it would replace the app

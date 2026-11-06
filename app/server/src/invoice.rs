@@ -9,7 +9,8 @@ use karbon_money::sales::{self, Totals, RETAINER_ITEM_NAME};
 use karbon_money::{Cents, Qty};
 use rusqlite::{Connection, OptionalExtension};
 
-/// The document number of the long-invoice fixture (S-02): INV-1048 with 60 lines, for page-break tests.
+/// The document number of the long-invoice fixture (S-02): INV-1048 with 60 lines, for page-break tests. Tests build
+/// it with [`long_fixture`]; it is not a page of the app.
 pub const LONG_FIXTURE: &str = "FIXTURE-60";
 
 #[derive(Clone, Debug)]
@@ -56,6 +57,10 @@ pub struct Invoice {
     pub seller: Seller,
     pub customer: String,
     pub bill_to: Vec<String>,
+    /// The stored ship-to address; empty when the transaction has none.
+    pub ship_to: Vec<String>,
+    /// Shipping (field 41): in the total, not taxed.
+    pub ship_amt: Cents,
     pub memo: String,
     /// Every line, retainer credit lines included, in entry order.
     pub lines: Vec<Line>,
@@ -65,16 +70,12 @@ pub struct Invoice {
 
 impl Invoice {
     /// Loads an invoice by document number and recomputes its totals, with the status as of the local date.
-    /// `LONG_FIXTURE` gives the 60-line fixture.
     pub fn load(conn: &Connection, doc_number: &str) -> rusqlite::Result<Invoice> {
         Invoice::load_at(conn, doc_number, &crate::audit::local_now()[..10])
     }
 
     /// [`Invoice::load`], with the status as of `today` (`AppState::today`).
     pub fn load_at(conn: &Connection, doc_number: &str, today: &str) -> rusqlite::Result<Invoice> {
-        if doc_number == LONG_FIXTURE {
-            return Ok(long_fixture(Invoice::load_at(conn, "INV-1048", today)?, 60));
-        }
         let sql = format!(
             "SELECT st.id, ({}), COALESCE(st.date, ''), COALESCE(st.due_date, ''), COALESCE(i.id_term, ''),
                     COALESCE(st.tax_rate_bp, 0), p.name_cached, p.id, COALESCE(st.customer_memo, ''),
@@ -127,16 +128,27 @@ impl Invoice {
             .query_map([&id], |r| Ok(Payment { date: r.get(0)?, method: r.get(1)?, amount: Cents(r.get(2)?) }))?
             .collect::<rusqlite::Result<Vec<_>>>()?;
 
-        let bill_to = conn
-            .query_row(
-                "SELECT a.address_line_1, a.address_line_2, a.city, a.state_province, a.postal_code
-                 FROM contact_method cm JOIN address a ON a.id = cm.id
-                 WHERE cm.party_id = ?1 AND cm.address_ind = 1 ORDER BY cm.billing_ind_cached DESC LIMIT 1",
-                [&party_id],
-                address_lines,
-            )
-            .optional()?
-            .unwrap_or_default();
+        // F3: the address stored on the transaction (layout 143, field 81). An older row with none (the seed) falls
+        // back to the party's address.
+        let (billing, shipping, ship_amt): (String, String, i64) = conn.query_row(
+            "SELECT COALESCE(billing_address_display, ''), COALESCE(shipping_address_display, ''), COALESCE(ship_amt, 0)
+             FROM sales_transaction WHERE id = ?1",
+            [&id],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+        )?;
+        let mut bill_to = stored_lines(&billing);
+        if bill_to.is_empty() {
+            bill_to = conn
+                .query_row(
+                    "SELECT a.address_line_1, a.address_line_2, a.city, a.state_province, a.postal_code
+                     FROM contact_method cm JOIN address a ON a.id = cm.id
+                     WHERE cm.party_id = ?1 AND cm.address_ind = 1 ORDER BY cm.billing_ind_cached DESC LIMIT 1",
+                    [&party_id],
+                    address_lines,
+                )
+                .optional()?
+                .unwrap_or_default();
+        }
 
         let seller = conn
             .query_row(
@@ -183,6 +195,8 @@ impl Invoice {
             seller,
             customer,
             bill_to,
+            ship_to: stored_lines(&shipping),
+            ship_amt: Cents(ship_amt),
             memo,
             lines,
             payments,
@@ -192,14 +206,18 @@ impl Invoice {
         Ok(inv)
     }
 
-    /// Recomputes the totals from the lines, the tax rate and the payments (BR-SALES-02).
+    /// Recomputes the totals from the lines, the tax rate, shipping and the payments (BR-SALES-02). A sales receipt
+    /// is paid when sold, so its balance is 0 (X12, field 57).
     pub fn recompute(&mut self) -> Result<(), sales::Overflow> {
         let lines: Vec<sales::Line> = self
             .lines
             .iter()
             .map(|l| sales::Line { qty: l.qty, unit_price: l.rate, taxable: l.taxable, retainer: l.retainer })
             .collect();
-        self.totals = sales::totals(&lines, self.tax_rate_bp, Cents::ZERO, self.paid())?;
+        self.totals = sales::totals(&lines, self.tax_rate_bp, self.ship_amt, self.paid())?;
+        if !self.is_invoice {
+            self.totals.balance = Cents::ZERO;
+        }
         Ok(())
     }
 
@@ -213,9 +231,18 @@ impl Invoice {
         self.totals.subtotal - self.totals.retainer
     }
 
-    /// Total before the retainer credit ($3,557.15 on INV-1048): the "Total" of the design.
+    /// Total before the retainer credit ($3,557.15 on INV-1048): the "Total" of the design, shipping included.
     pub fn total_before_retainer(&self) -> Cents {
-        self.subtotal_before_retainer() + self.totals.total_tax
+        self.subtotal_before_retainer() + self.totals.total_tax + self.ship_amt
+    }
+
+    /// The document's name: "Invoice", or "Sales receipt" (06 UI-20).
+    pub fn kind_label(&self) -> &'static str {
+        if self.is_invoice {
+            "Invoice"
+        } else {
+            "Sales receipt"
+        }
     }
 
     /// The retainer credit, negative (-$500.00 on INV-1048).
@@ -279,6 +306,11 @@ pub fn display_stamp(ts: &str) -> String {
 fn line(description: String, item: String, qty: Option<Qty>, rate: Cents, taxable: bool, item_name: String) -> Line {
     let amount = sales::line_amount(qty, rate).unwrap_or(Cents::ZERO);
     Line { description, item, qty, rate, amount, taxable, retainer: item_name == RETAINER_ITEM_NAME }
+}
+
+/// The lines of a stored address display.
+fn stored_lines(display: &str) -> Vec<String> {
+    display.lines().map(str::trim).filter(|l| !l.is_empty()).map(str::to_owned).collect()
 }
 
 fn address_lines(r: &rusqlite::Row<'_>) -> rusqlite::Result<Vec<String>> {

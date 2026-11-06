@@ -1,13 +1,12 @@
-//! The sales transaction page (UI-12: the editor or the read-only view) and the invoice PDF (UI-20). Spike S-02 compares the two ways to get a PDF:
-//! the page printed by the webview ("Print (webview)") and the file generated in Rust (`GET .../invoice.pdf`).
+//! The sales transaction page (UI-12: the editor or the read-only view) and the invoice PDF (UI-20), generated in Rust
+//! (`GET .../invoice.pdf`, S-02). A sales receipt has no PDF (D-38).
 
 use super::Nav;
 use crate::invoice::{display_date, Invoice};
-use crate::pdf::Engine;
 use crate::web::{render, AppError};
 use crate::AppState;
 use askama::Template;
-use axum::extract::{Path, Query, State};
+use axum::extract::{Path, State};
 use axum::http::{header, StatusCode};
 use axum::response::{Html, IntoResponse, Response};
 
@@ -88,7 +87,7 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
         demo: super::demo(&state)?,
         initial: inv.seller.name.chars().next().map(|c| c.to_uppercase().collect()).unwrap_or_default(),
         date_text: display_date(&inv.date),
-        due_text: display_date(&inv.due_date),
+        due_text: if inv.is_invoice { display_date(&inv.due_date) } else { String::new() },
         status_class,
         can_save: state.save.is_some(),
         files,
@@ -97,24 +96,20 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
     })
 }
 
-#[derive(serde::Deserialize)]
-pub struct PdfQuery {
-    engine: Option<String>,
+/// An invoice; a sales receipt has no PDF (F2, D-38).
+fn load_invoice(state: &AppState, doc_number: &str) -> Result<Invoice, AppError> {
+    let inv = load(state, doc_number)?;
+    if inv.is_invoice {
+        Ok(inv)
+    } else {
+        Err(AppError::NotFound)
+    }
 }
 
-/// The invoice PDF drawn in Rust, shown inline; the file name is the document number. `?engine=printpdf` writes
-/// it with printpdf instead of krilla (S-02 compares the two).
-pub async fn pdf(
-    State(state): State<AppState>,
-    Path(doc_number): Path<String>,
-    Query(q): Query<PdfQuery>,
-) -> Result<Response, AppError> {
-    let inv = load(&state, &doc_number)?;
-    let engine = match q.engine.as_deref() {
-        Some("printpdf") => Engine::Printpdf,
-        _ => Engine::Krilla,
-    };
-    let bytes = crate::pdf::invoice_pdf(&inv, engine);
+/// The invoice PDF drawn in Rust, shown inline; the file name is the document number.
+pub async fn pdf(State(state): State<AppState>, Path(doc_number): Path<String>) -> Result<Response, AppError> {
+    let inv = load_invoice(&state, &doc_number)?;
+    let bytes = crate::pdf::invoice_pdf(&inv);
     let disposition = format!("inline; filename=\"{}\"", file_name(&inv));
     Ok((
         [
@@ -136,9 +131,9 @@ pub async fn save_pdf(State(state): State<AppState>, Path(doc_number): Path<Stri
     let Some(save) = state.save.clone() else {
         return Ok(StatusCode::NOT_IMPLEMENTED.into_response());
     };
-    let inv = load(&state, &doc_number)?;
+    let inv = load_invoice(&state, &doc_number)?;
     let name = file_name(&inv);
-    let bytes = crate::pdf::invoice_pdf(&inv, Engine::Krilla);
+    let bytes = crate::pdf::invoice_pdf(&inv);
     // The dialog blocks until the user answers; keep it off the async workers.
     let saved = tokio::task::spawn_blocking(move || save(name, bytes))
         .await

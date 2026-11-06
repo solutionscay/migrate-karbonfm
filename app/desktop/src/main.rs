@@ -58,13 +58,7 @@ fn main() {
             );
             applog::log_write(&applog::Entry::info("start", &started));
 
-            // The local server: 127.0.0.1 on a free port, inside this process. Its print route opens the
-            // window's native print dialog (window.print() does nothing in WKWebView on macOS).
-            let handle = app.handle().clone();
-            let print: karbon_server::PrintHook = Arc::new(move || {
-                let window = handle.get_webview_window("main").ok_or("no main window")?;
-                window.print().map_err(|e| e.to_string())
-            });
+            // The local server: 127.0.0.1 on a free port, inside this process.
             let (listener, addr) = tauri::async_runtime::block_on(karbon_server::bind())?;
             // AP-13: the window opens the one-time launch URL, which gives it the session cookie; any other
             // client of the port gets 401.
@@ -85,7 +79,6 @@ fn main() {
             // to the system app. The page only names a file id (AP-01).
             let open: karbon_server::OpenHook = Arc::new(|path| open_in_viewer(&path));
             let state = karbon_server::AppState::new(db)
-                .with_print(print)
                 .with_save(save)
                 .with_open(open)
                 .with_session(session)
