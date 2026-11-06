@@ -356,7 +356,8 @@ pub async fn merge(
     let saved = templates::template_get(&conn, id).map_err(|e| command_error("template_get", e))?;
     let subject = form.subject.unwrap_or(saved.subject);
     let message = form.message.unwrap_or(saved.message);
-    match templates::merge_preview(&conn, form.activity_id.trim(), &subject, &message) {
+    match templates::merge_preview(&conn, form.activity_id.trim(), &subject, &message, &crate::audit::local_now()[..10])
+    {
         Ok(preview) => render(&MergedView { preview: Some(preview), error: None }).map(IntoResponse::into_response),
         // The template exists, so NotFound is the activity: a field error, not a 404 page.
         Err(CommandError::NotFound) => merge_refused("Choose an email to merge with.".into()),

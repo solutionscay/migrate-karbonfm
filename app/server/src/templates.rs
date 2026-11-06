@@ -439,7 +439,11 @@ pub struct Merged {
 }
 
 /// The value of each field of [`FIELDS`] for an activity. A field with nothing to show is absent.
-pub fn merge_values(conn: &Connection, activity_id: &str) -> rusqlite::Result<HashMap<&'static str, String>> {
+pub fn merge_values(
+    conn: &Connection,
+    activity_id: &str,
+    today: &str,
+) -> rusqlite::Result<HashMap<&'static str, String>> {
     let mut v: HashMap<&'static str, String> = HashMap::new();
     let put = |v: &mut HashMap<&'static str, String>, k: &'static str, s: Option<String>| {
         if let Some(s) = s.filter(|s| !s.trim().is_empty()) {
@@ -495,7 +499,7 @@ pub fn merge_values(conn: &Connection, activity_id: &str) -> rusqlite::Result<Ha
         put(&mut v, "BalanceDue", balance.map(usd));
         put(&mut v, "DueDate", due.map(|d| display_date(&d)));
     }
-    put(&mut v, "Date", Some(display_date(&audit::local_now()[..10])));
+    put(&mut v, "Date", Some(display_date(today)));
     Ok(v)
 }
 
@@ -503,6 +507,16 @@ pub fn merge_values(conn: &Connection, activity_id: &str) -> rusqlite::Result<Ha
 /// (490 s164). A template with no merge field rows merges too (490 s88-90 refused it only because the config lookup
 /// needed them). Nothing is written: the caller writes the result (T4, the email composer) only when this succeeds.
 pub fn template_merge(conn: &Connection, template_id: i64, activity_id: &str) -> Result<Merged, CommandError> {
+    template_merge_at(conn, template_id, activity_id, &audit::local_now()[..10])
+}
+
+/// [`template_merge`] with `{{Date}}` read from `today` (`AppState::today`).
+pub fn template_merge_at(
+    conn: &Connection,
+    template_id: i64,
+    activity_id: &str,
+    today: &str,
+) -> Result<Merged, CommandError> {
     let (subject, message): (String, String) = conn
         .query_row(
             "SELECT COALESCE(subject, ''), COALESCE(message, '') FROM template WHERE id = ?1",
@@ -516,7 +530,7 @@ pub fn template_merge(conn: &Connection, template_id: i64, activity_id: &str) ->
     if !exists {
         return Err(CommandError::NotFound);
     }
-    let values = merge_values(conn, activity_id)?;
+    let values = merge_values(conn, activity_id, today)?;
     Ok(Merged { subject: substitute(&subject, &values), message: substitute(&message, &values) })
 }
 
@@ -544,6 +558,7 @@ pub fn merge_preview(
     activity_id: &str,
     subject: &str,
     message: &str,
+    today: &str,
 ) -> Result<MergePreview, CommandError> {
     let exists: bool =
         conn.query_row("SELECT EXISTS (SELECT 1 FROM activity WHERE id = ?1)", [activity_id], |r| r.get(0))?;
@@ -553,7 +568,7 @@ pub fn merge_preview(
     let subject = subject.trim();
     let input = TemplateInput { subject: subject.into(), message: message.into(), ..Default::default() };
     let names = validate(&input)?;
-    let values = merge_values(conn, activity_id)?;
+    let values = merge_values(conn, activity_id, today)?;
     let missing = names
         .iter()
         .filter(|n| !values.contains_key(n.as_str()))
@@ -621,7 +636,7 @@ mod tests {
         // B2: the seed email INV-1048 goes To Joanna Whitfield of Halden & Pryce. A person's OrganizationName is
         // Person::EmployerName (156 f131), which a person made with their organization takes (kontroller 229 s229).
         let (conn, _) = crate::db::open_in_memory(crate::db::Seed::Demo).unwrap();
-        let v = merge_values(&conn, "a-mail-1048").unwrap();
+        let v = merge_values(&conn, "a-mail-1048", &audit::local_now()[..10]).unwrap();
         assert_eq!(v.get("FirstName").map(String::as_str), Some("Joanna"));
         assert_eq!(v.get("OrganizationName").map(String::as_str), Some("Halden & Pryce Architects"));
     }
