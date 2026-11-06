@@ -272,7 +272,8 @@ fn the_stored_address_wins_and_an_older_row_falls_back_to_the_party() {
     assert_eq!(inv.bill_to, ["9 Stored St", "Boston, MA 02101"]);
     assert_eq!(inv.ship_to, ["1 Dock Rd"]);
     let t = printed(&inv);
-    assert!(t.iter().any(|s| s == "9 Stored St") && t.iter().any(|s| s == "1 Dock Rd"));
+    assert!(t.iter().any(|s| s == "9 Stored St"));
+    assert!(!t.iter().any(|s| s == "1 Dock Rd" || s == "Ship to"), "the PDF has no ship-to (layout 103): {t:?}");
 }
 
 #[tokio::test]

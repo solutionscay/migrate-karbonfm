@@ -300,13 +300,7 @@ fn meta(w: &mut Writer, inv: &Invoice) {
     pair(2, top, "Due date", &display_date(&inv.due_date));
     pair(3, top, "Tax", &inv.tax_rate_label());
     bottom = bottom.max(second + lh);
-    if !inv.ship_to.is_empty() {
-        w.text(label, Align::Left, x(2), second, "Ship to");
-        for (i, l) in inv.ship_to.iter().enumerate() {
-            bottom = bottom.max(second + lh * (i as f32 + 1.0));
-            w.text(value, Align::Left, x(2), second + lh * (i as f32 + 1.0), l);
-        }
-    }
+    // No ship-to: the source's PDF (layout 103) has none, and the page keeps it (user call, 2026-11-06).
 
     w.y = bottom + 4.0 + 18.0;
     w.hline(MARGIN, PAGE_W - MARGIN, w.y);
@@ -475,12 +469,11 @@ mod tests {
     }
 
     #[test]
-    fn the_ship_to_prints_when_stored() {
-        let inv = with(invoice("INV-1048"), |i| i.ship_to = vec!["1 Dock Rd".into(), "Portland, ME 04101".into()]);
+    fn a_stored_ship_to_does_not_print() {
+        let inv = with(invoice("INV-1048"), |i| i.ship_to = vec!["1 Dock Rd".into(), "Bath, ME 04530".into()]);
         let pages = layout(&inv);
         let t = texts(&pages[0]);
-        assert!(t.contains(&"Ship to") && t.contains(&"1 Dock Rd") && t.contains(&"Portland, ME 04101"));
-        assert!(!texts(&layout(&invoice("INV-1048"))[0]).contains(&"Ship to"));
+        assert!(!t.iter().any(|s| ["Ship to", "1 Dock Rd", "Bath, ME 04530"].contains(s)), "{t:?}");
     }
 
     #[test]
