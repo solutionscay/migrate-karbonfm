@@ -21,13 +21,16 @@ if (window.htmx) {
     const dialog = document.getElementById("modal");
     if (e.detail.target.innerHTML.trim() === "") { dialog.close(); return; }
     if (!dialog.open) dialog.showModal();
-    const focusFirst = () => {
-      const first = dialog.querySelector("[autofocus], input, button");
-      if (first) first.focus();
-    };
-    focusFirst();
-    // WebKit, the desktop app's view, ignores a focus() in the same task as showModal.
-    requestAnimationFrame(() => { if (!dialog.contains(document.activeElement)) focusFirst(); });
+    // The modal's visibility transition can leave its controls unfocusable for a moment, and WebKit then drops the
+    // focus to the page: so keep it in the dialog while it opens. A later Tab or click inside the dialog is left alone.
+    const first = dialog.querySelector("[autofocus], input, button");
+    if (first) first.focus();
+    for (let wait = 25; wait <= 500; wait += 25) {
+      setTimeout(() => {
+        const active = document.activeElement;
+        if (first && first.isConnected && dialog.open && (active === dialog || !dialog.contains(active))) first.focus();
+      }, wait);
+    }
   });
   // Server events sent with the HX-Trigger header.
   document.addEventListener("karbon-close-dialog", () => document.getElementById("modal").close());
