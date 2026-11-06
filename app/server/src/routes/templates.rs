@@ -205,7 +205,10 @@ struct DetailPage {
 fn email_choices(conn: &Connection) -> rusqlite::Result<Vec<EmailChoice>> {
     let mut stmt = conn.prepare(
         "SELECT id, COALESCE(NULLIF(subject, ''), '(no subject)'), COALESCE(date_display, ''), \
-         COALESCE(parties_cached, '') FROM activity WHERE email_message_ind = 1 \
+         COALESCE(parties_cached, ''), \
+         (SELECT st.doc_number FROM activity_entity ae JOIN sales_transaction st ON st.id = ae.entity_id \
+          WHERE ae.activity_id = activity.id AND ae.entity_type_id = 12 ORDER BY ae.rowid LIMIT 1) \
+         FROM activity WHERE email_message_ind = 1 \
          ORDER BY date_display DESC, time_display DESC, id LIMIT 50",
     )?;
     let rows = stmt.query_map([], |r| {
@@ -216,6 +219,10 @@ fn email_choices(conn: &Connection) -> rusqlite::Result<Vec<EmailChoice>> {
         }
         if !date.is_empty() {
             label.push_str(&format!(" · {}", crate::invoice::display_date(&date)));
+        }
+        // Which one can fill in the invoice fields.
+        if let Some(doc) = r.get::<_, Option<String>>(4)? {
+            label.push_str(&format!(" · {doc}"));
         }
         Ok(EmailChoice { id: r.get(0)?, label })
     })?;

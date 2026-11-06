@@ -580,6 +580,17 @@ async fn invoice_total_of_inv_1048_with_shipping_is_3_582_65() {
     assert_eq!(page_total(&app, "INV-1048").await, "$3,582.65");
 }
 
+#[tokio::test]
+async fn the_preview_names_the_invoice_an_email_is_about() {
+    let (_dir, app, _check) = file_demo();
+    let (status, _, _) = send(&app, form("POST", "/templates", "name=x")).await;
+    assert_eq!(status, StatusCode::CREATED);
+    let (_, _, html) = send(&app, get("/templates/1")).await;
+    let at = html.find(r#"<option value="a-mail-1048">"#).expect("the seed's email");
+    let label = &html[at..at + html[at..].find("</option>").unwrap()];
+    assert!(label.ends_with(" · INV-1048"), "{label}");
+}
+
 #[test]
 fn invoice_total_of_a_deleted_invoice_has_no_value() {
     let (conn, _) = demo();
