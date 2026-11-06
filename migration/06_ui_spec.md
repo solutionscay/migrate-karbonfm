@@ -343,6 +343,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/103-SalesLine_pdf.txt`, `objects/karbon_charts.fmp12/layouts/25-SalesOpp_Chart.txt`, `objects/karbon_charts.fmp12/layouts/22-Opportunity_Referral_Report.txt`
 - Page: `GET /sales/{id}/print; GET /reports/sales-by-month` (full page; the same route returns the fragment to htmx)
 - Fragments and actions: `POST /invoices; PUT /invoices/{id}` (OP-SALES-04 `invoice_save`), `GET /opportunities/status-totals?active=` (OP-SALES-03 `opportunity_status_totals`), `GET /reports/sales-by-month?from=&to=` (OP-SALES-11 `sales_summary_by_month`)
+- Built, the screen (I5 S7, 2026-11-06, branch `i5/reports`): a Chart.js chart and a table (period, revenue, transactions, a total row) of the months in the range, 0 for a month with no posted sale. The default is the last 12 months. Linked under Sales in the sidebar, as Monthly summary (the design's sidebar has no reports link), and from the dashboard's chart panel.
 - Rules shown or enforced: BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-05, BR-SALES-08, BR-SALES-14, BR-SALES-17
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
