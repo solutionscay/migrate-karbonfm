@@ -455,9 +455,23 @@ pub async fn apply_retainer(
 #[serde(deny_unknown_fields)]
 pub struct LockForm {
     lock: String,
+    /// Unpost only: "true" once the dialog has been answered.
+    #[serde(default)]
+    confirm: String,
+}
+
+/// The question before an unpost (AP-07 pattern): a stray click on the lock icon or Unlock changes nothing.
+#[derive(Template)]
+#[template(path = "sales/unpost_confirm.html")]
+struct UnpostConfirm {
+    id: String,
+    doc_number: String,
+    summary: String,
 }
 
 /// `POST /sales-transactions/{id}/lock`: the page opens again as the editor or the read-only view (kontacts 335, 377).
+/// Unpost asks first (user call over the source, 2026-11-06): without `confirm=true` the answer is the dialog and
+/// nothing changes.
 pub async fn lock(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -471,6 +485,19 @@ pub async fn lock(
         _ => return Ok((StatusCode::UNPROCESSABLE_ENTITY, "lock must be true or false").into_response()),
     };
     let mut conn = lock_db(&state)?;
+    if !posting && form.confirm != "true" {
+        return match sales::unpost_summary(&conn, &id) {
+            Ok(Some((doc_number, summary))) => {
+                Ok(Html(UnpostConfirm { id, doc_number, summary }.render()?).into_response())
+            }
+            // Already a draft: nothing to ask, the page opens as it is.
+            Ok(None) => {
+                let doc = sales::transaction_get(&conn, &id).map_err(|e| AppError::Internal(e.to_string()))?;
+                go(&headers, &doc_href(&doc.input.doc_number))
+            }
+            Err(e) => command_error("transaction_lock", e),
+        };
+    }
     match sales::transaction_lock(&mut conn, &id, posting, &actor) {
         Ok(doc) => {
             let mut res = go(&headers, &doc_href(&doc))?;

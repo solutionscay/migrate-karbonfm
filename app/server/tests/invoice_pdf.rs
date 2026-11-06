@@ -136,7 +136,10 @@ fn enc(v: &str) -> String {
 async fn edit_inv_1048(app: &axum::Router, check: &rusqlite::Connection, ship_amt: &str) -> String {
     let id: String =
         check.query_row("SELECT id FROM sales_transaction WHERE doc_number = 'INV-1048'", [], |r| r.get(0)).unwrap();
-    assert_eq!(send_form(app, "POST", &format!("/sales-transactions/{id}/lock"), "lock=false").await, StatusCode::OK);
+    assert_eq!(
+        send_form(app, "POST", &format!("/sales-transactions/{id}/lock"), "lock=false&confirm=true").await,
+        StatusCode::OK
+    );
     let i = karbon_server::sales::transaction_get(check, &id).unwrap().input;
     let mut body = format!(
         "doc_number={}&date={}&due_date={}&term={}&tax_rate={}&ship_amt={}",

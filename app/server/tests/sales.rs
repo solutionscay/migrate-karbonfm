@@ -90,7 +90,8 @@ async fn t_08_05_locked_transaction_refuses_edit_and_delete() {
         assert_eq!(s, StatusCode::CONFLICT, "{doc} remove lines");
 
         // Unpost, edit, post works.
-        let (s, h, _) = send(&a, form("POST", &format!("/sales-transactions/{id}/lock"), "lock=false")).await;
+        let (s, h, _) =
+            send(&a, form("POST", &format!("/sales-transactions/{id}/lock"), "lock=false&confirm=true")).await;
         assert_eq!(s, StatusCode::OK);
         assert!(h.get("HX-Redirect").is_some());
     }
@@ -644,4 +645,47 @@ async fn apply_retainer_through_the_route() {
     assert_eq!(s, StatusCode::NOT_FOUND);
     let (s, _, _) = send(&a, form("POST", &uri, "payment_amount=1")).await;
     assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+/// A stray click cannot unpost (user call over the source, 2026-11-06): the lock icon on /sales and Unlock on the
+/// document send the same request, which only asks; the dialog's button sends it with confirm=true.
+#[tokio::test]
+async fn unpost_asks_first_and_a_stray_click_changes_nothing() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = db::database_path(dir.path());
+    let a = app(db::open(&path, Seed::Demo).unwrap().0);
+    let c = Connection::open(&path).unwrap();
+    let id = id_of(&c, "INV-1048");
+    let locked =
+        || c.query_row("SELECT locked_ind FROM sales_transaction WHERE id = ?1", [&id], |r| r.get::<_, i64>(0));
+    assert_eq!(locked().unwrap(), 1);
+
+    // Both ways in open the dialog, not the request itself.
+    let (_, _, list) = send(&a, Request::get("/sales").body(Body::empty()).unwrap()).await;
+    let (_, _, doc) = send(&a, Request::get("/sales/INV-1048").body(Body::empty()).unwrap()).await;
+    for html in [&list, &doc] {
+        let at = html.find(&format!(r#"hx-post="/sales-transactions/{id}/lock""#)).expect("the unpost button");
+        let tag = &html[at..at + html[at..].find('>').unwrap()];
+        assert!(tag.contains(r##"hx-target="#modal-body""##), "{tag}");
+        assert!(!tag.contains("confirm"), "{tag}");
+    }
+
+    let (s, h, dialog) = send(&a, form("POST", &format!("/sales-transactions/{id}/lock"), "lock=false")).await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(h.get("HX-Redirect").is_none(), "no navigation");
+    assert!(dialog.contains(r#"role="alertdialog""#) && dialog.contains("Unpost INV-1048?"), "{dialog}");
+    assert!(dialog.contains("Cancel") && dialog.contains(r#"autofocus"#), "{dialog}");
+    assert!(dialog.contains("confirm"), "{dialog}");
+    assert_eq!(locked().unwrap(), 1, "only asked");
+
+    let (s, h, _) = send(&a, form("POST", &format!("/sales-transactions/{id}/lock"), "lock=false&confirm=true")).await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(h.get("HX-Redirect").unwrap(), "/sales/INV-1048");
+    assert_eq!(locked().unwrap(), 0, "unposted");
+
+    // Posting asks nothing.
+    let (s, h, _) = send(&a, form("POST", &format!("/sales-transactions/{id}/lock"), "lock=true")).await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(h.get("HX-Redirect").is_some());
+    assert_eq!(locked().unwrap(), 1);
 }

@@ -9,7 +9,7 @@
     {% if !inv.status.is_empty() %}<span class="chip {{ status_class }}"><span class="dot"></span>{{ inv.status }}</span>{% endif %}
     {% if !due_text.is_empty() %}<span class="inv-due muted">Due {{ due_text }}</span>{% endif %}
     <div class="ml-auto flex gap-2">
-      {% if inv.locked %}<button class="btn btn-sm btn-quiet" hx-post="/sales-transactions/{{ inv.id|urlencode }}/lock" hx-vals='{"lock": "false"}'><svg class="i i-sm" aria-hidden="true"><use href="#i-lock"/></svg>Unlock</button>{% endif %}
+      {% if inv.locked %}<button class="btn btn-sm btn-quiet" hx-post="/sales-transactions/{{ inv.id|urlencode }}/lock" hx-vals='{"lock": "false"}' hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-lock"/></svg>Unlock</button>{% endif %}
       <button class="btn btn-sm btn-quiet" hx-get="/email-messages/new?party_id={{ inv.party_id|urlencode }}&amp;entity_type_id=12&amp;entity_id={{ inv.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-send"/></svg>Email</button>
       <button class="btn btn-sm btn-quiet" hx-get="/discussions/new?entity_type_id=12&amp;entity_id={{ inv.id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Discuss</button>
       {# Not a link: a PDF that replaces the app page strands the desktop window (no sidebar, no back button). A sales receipt has no PDF (D-38). #}

@@ -668,6 +668,21 @@ pub fn transaction_lock(conn: &mut Connection, id: &str, lock: bool, actor: &Act
     Ok(doc)
 }
 
+/// What an unpost does, for its confirmation dialog: (document number, summary). `None` when it is not posted.
+pub fn unpost_summary(conn: &Connection, id: &str) -> Result<Option<(String, String)>, CommandError> {
+    let current = head(conn, id)?;
+    if !current.locked {
+        return Ok(None);
+    }
+    let doc: String =
+        conn.query_row("SELECT COALESCE(doc_number, '') FROM sales_transaction WHERE id = ?1", [id], |r| r.get(0))?;
+    let summary = format!(
+        "This {} goes back to draft, so it can be edited. It stops counting in revenue and balances until you post it again. Its payments stay.",
+        current.kind.label().to_lowercase()
+    );
+    Ok(Some((doc, summary)))
+}
+
 /// OP-SALES-07 `sales_transaction_delete` (AP-05, AP-07, BR-SALES-11): removes the lines, the invoice or receipt row and
 /// the file links (rels 59, 76, 77, 82); the files stay. A transaction with payment lines is refused: the source leaves
 /// them orphaned (rel 78 has no cascade), foreign keys forbid that (OD-04-01) and only `payment_save` writes them (AP-06).

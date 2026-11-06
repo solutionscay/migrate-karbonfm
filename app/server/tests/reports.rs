@@ -107,7 +107,7 @@ async fn post_and_unpost_move_the_number() {
         Request::post(format!("/sales-transactions/{id}/lock"))
             .header(header::CONTENT_TYPE, "application/x-www-form-urlencoded")
             .header("HX-Request", "true")
-            .body(Body::from(format!("lock={value}")))
+            .body(Body::from(format!("lock={value}&confirm=true")))
             .unwrap()
     };
     assert_eq!(send(&app, lock("false")).await.0, StatusCode::OK);

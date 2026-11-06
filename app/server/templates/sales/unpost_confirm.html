@@ -1,0 +1,12 @@
+{# Unpost asks first (AP-07 pattern; user call over the source, 2026-11-06): the summary, then the same request with confirm=true. #}
+<div role="alertdialog" aria-labelledby="modal-title" aria-describedby="confirm-summary">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">Unpost {{ doc_number }}?</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <p class="p-5 text-[13px]" id="confirm-summary">{{ summary }}</p>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" autofocus @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-error" hx-post="/sales-transactions/{{ id|urlencode }}/lock" hx-vals='{"lock": "false", "confirm": "true"}' hx-target="#modal-body">Unpost</button>
+  </div>
+</div>
