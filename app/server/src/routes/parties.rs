@@ -344,21 +344,23 @@ struct DetailPage<'a> {
 pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Result<Html<String>, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
     let d = parties::party_get(&conn, &id).map_err(|e| page_error("party_get", e))?;
+    let today = state.today();
     let (sales, sales_matched) = match &d.customer {
         Some(c) => {
             let q = SalesQuery { customer_role_id: Some(c.role_id.clone()), page_size: 100, ..Default::default() };
-            let page = sales_list::sales_list(&conn, &q).map_err(|e| page_error("sales_list", e))?;
+            let page = sales_list::sales_list(&conn, &q, &today).map_err(|e| page_error("sales_list", e))?;
             (page.rows.into_iter().map(SalesView::from).collect(), page.matched)
         }
         None => (Vec::new(), 0),
     };
     let header = Header::new(&d).render()?;
     let relations = Relations { d: &d, oob: false }.render()?;
-    let q = crate::activities::ListQuery { party_id: Some(d.id.clone()), ..Default::default() };
+    let q =
+        crate::activities::ListQuery { party_id: Some(d.id.clone()), today: Some(today.clone()), ..Default::default() };
     let found = crate::activities::activity_list(&conn, &q).map_err(|e| page_error("activity_list", e))?;
     let activity_count = found.matched;
     let activity = super::timeline::Rows {
-        rows: super::timeline::rows(&found, true),
+        rows: super::timeline::rows(&found, true, &today),
         matched: found.matched,
         page: found.page,
         page_size: found.page_size,

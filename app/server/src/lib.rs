@@ -13,6 +13,7 @@ pub mod backup;
 pub mod big_demo;
 pub mod contacts;
 pub mod db;
+pub mod demo_dates;
 pub mod discussions;
 pub mod email;
 pub mod files;
@@ -96,6 +97,8 @@ pub struct AppState {
     /// A backup folder that passed the restore checks, waiting for the user to confirm: (id, folder). The page only
     /// ever sees the id, never a path (AP-01).
     pending_restore: Arc<Mutex<Option<(String, PathBuf)>>>,
+    /// A fixed "today" for the pages that read the date (tests, `karbon-dev-server --as-of`); none means the local date.
+    today: Option<String>,
 }
 
 impl AppState {
@@ -113,7 +116,20 @@ impl AppState {
             folder: None,
             data_dir: None,
             pending_restore: Arc::new(Mutex::new(None)),
+            today: None,
         }
+    }
+
+    /// Pins "today" (`YYYY-MM-DD`) for the pages that read the date: overdue, revenue this month, the day headers.
+    /// Stamps keep the real clock (`Stamp::at` serves tests).
+    pub fn with_today(mut self, today: impl Into<String>) -> Self {
+        self.today = Some(today.into());
+        self
+    }
+
+    /// Today as the pages read it: the pinned date, or the local date.
+    pub fn today(&self) -> String {
+        self.today.clone().unwrap_or_else(|| audit::local_now()[..10].to_owned())
     }
 
     /// The desktop shell passes its native folder dialog (backup and restore).

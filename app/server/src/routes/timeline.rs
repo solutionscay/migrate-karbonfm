@@ -116,8 +116,8 @@ impl RowView {
 }
 
 /// The rows of a page, with a day header on the first row of each day.
-pub fn rows(page: &ListPage, with_days: bool) -> Vec<RowView> {
-    let today = crate::audit::local_now()[..10].to_owned();
+pub fn rows(page: &ListPage, with_days: bool, today: &str) -> Vec<RowView> {
+    let today = today.to_owned();
     let yesterday = chrono::NaiveDate::parse_from_str(&today, "%Y-%m-%d")
         .ok()
         .and_then(|d| d.pred_opt())
@@ -227,13 +227,14 @@ pub async fn page(
     Query(q): Query<TimelineQuery>,
 ) -> Result<Response, AppError> {
     let conn = lock(&state)?;
-    let list = q.list();
+    let today = state.today();
+    let list = ListQuery { today: Some(today.clone()), ..q.list() };
     let found = match activities::activity_list(&conn, &list) {
         Ok(p) => p,
         Err(e) => return command_error("activity_list", e),
     };
     let rows = Rows {
-        rows: rows(&found, true),
+        rows: rows(&found, true, &today),
         matched: found.matched,
         page: found.page,
         page_size: found.page_size,

@@ -40,7 +40,11 @@ fn main() {
                 })?;
                 applog::log_write(&applog::Entry::info("start", &format!("big demo: {outcome:?}")));
             }
-            let seed = if cfg!(feature = "demo") && !cfg!(feature = "big-demo") { Seed::Demo } else { Seed::Reference };
+            let seed = if cfg!(feature = "demo") && !cfg!(feature = "big-demo") {
+                Seed::DemoAsOf(karbon_server::demo_dates::local_today())
+            } else {
+                Seed::Reference
+            };
             let (db, report) = karbon_server::db::open(&db_path, seed).inspect_err(|e| {
                 applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
             })?;

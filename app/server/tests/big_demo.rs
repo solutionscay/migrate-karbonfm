@@ -160,3 +160,94 @@ fn a_half_built_staging_folder_is_rebuilt() {
     let (conn, _) = db::open(&db::database_path(dir), Seed::Reference).unwrap();
     assert!(db::has_demo_data(&conn).unwrap());
 }
+
+/// (table, column) of every text column holding a date or a timestamp.
+fn columns_with_dates(conn: &rusqlite::Connection) -> Vec<(String, String)> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT m.name, p.name FROM sqlite_master m JOIN pragma_table_info(m.name) p
+             WHERE m.type = 'table' AND m.name NOT LIKE 'sqlite_%'",
+        )
+        .unwrap();
+    let all: Vec<(String, String)> =
+        stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?))).unwrap().collect::<Result<_, _>>().unwrap();
+    all.into_iter()
+        .filter(|(t, c)| {
+            let sql = format!(
+                r#"SELECT EXISTS (SELECT 1 FROM "{t}" WHERE "{c}" GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]*')"#
+            );
+            conn.query_row(&sql, [], |r| r.get::<_, bool>(0)).unwrap()
+        })
+        .collect()
+}
+
+fn usd_after<'a>(html: &'a str, label: &str) -> &'a str {
+    let at = html.find(label).unwrap_or_else(|| panic!("no {label}"));
+    let rest = &html[at..];
+    let start = rest.find('$').unwrap();
+    let end = rest[start..].find('<').unwrap();
+    &rest[start..start + end]
+}
+
+/// B11 on the big demo: created in the first week of a month, when the shift alone would leave no posted sale.
+#[tokio::test]
+async fn b11_big_demo_is_current_on_any_day() {
+    let today = karbon_server::demo_dates::parse_date("2026-11-06").unwrap();
+    let tmp = tempfile::tempdir().unwrap();
+    let dir = tmp.path().join("data");
+    std::fs::create_dir_all(&dir).unwrap();
+    assert!(matches!(big_demo::create_as_of(&dir, today).unwrap(), Outcome::Created { .. }));
+    let (conn, _) = db::open(&db::database_path(&dir), Seed::Reference).unwrap();
+    let int = |sql: &str| conn.query_row(sql, [], |r| r.get::<_, i64>(0)).unwrap();
+
+    // The export's last day is now today, and a sale was posted on it.
+    let newest: String = conn.query_row("SELECT MAX(date) FROM sales_transaction", [], |r| r.get(0)).unwrap();
+    assert_eq!(newest, "2026-11-06");
+    assert!(int("SELECT COUNT(*) FROM sales_transaction WHERE date = '2026-11-06' AND locked_ind = 1") > 0);
+    assert_eq!(
+        int("SELECT COUNT(*) FROM sales_transaction WHERE date IS NOT NULL
+             AND period <> CAST(strftime('%Y%m', date) AS INTEGER)"),
+        0,
+        "period follows date"
+    );
+    assert!(db::foreign_key_check(&conn).unwrap().is_empty());
+
+    // Every date column is one the shift knows, or one it keeps on purpose.
+    let shifted = karbon_server::demo_dates::shifted_columns(&conn).unwrap();
+    for (t, c) in columns_with_dates(&conn) {
+        let kept = karbon_server::demo_dates::KEPT_TABLES.contains(&t.as_str())
+            || karbon_server::demo_dates::KEPT_COLUMNS.iter().any(|(kt, kc)| *kt == t && *kc == c);
+        assert!(kept || shifted.contains(&(t.clone(), c.clone())), "{t}.{c} holds dates and is in neither list");
+    }
+
+    let revenue = int(
+        "SELECT COALESCE(SUM(sl.amount), 0) FROM sales_line sl JOIN sales_transaction st ON st.id = sl.sales_transaction_id
+         LEFT JOIN item i ON i.id = sl.item_id
+         WHERE st.locked_ind = 1 AND COALESCE(i.name, '') <> 'Retainer' AND st.date >= '2026-11-01'",
+    );
+    let balance =
+        int("SELECT SUM(balance) FROM sales_transaction WHERE invoice_ind = 1 AND locked_ind = 1 AND balance > 0
+         AND COALESCE(deleted, 0) = 0");
+    assert!(revenue > 0, "b11: revenue this month is above $0.00");
+    let state = AppState::new(conn).with_data_dir(&dir).with_today("2026-11-06");
+    let (_, html) = get(&state, "/").await;
+    assert_eq!(usd_after(&html, "Revenue this month"), karbon_server::money::usd(revenue));
+    assert_eq!(usd_after(&html, "Balance due"), karbon_server::money::usd(balance));
+    // b11_dashboard_overdue_matches_customers, on the big demo.
+    let overdue = usd_after(&html, ">Overdue<").to_owned();
+    let (_, customers) = get(&state, "/customers").await;
+    assert!(customers.contains(&overdue), "/customers shows {overdue}");
+    assert_ne!(overdue, "$0.00");
+}
+
+/// B11 by the wall clock: `create` uses the local date, with nothing pinned.
+#[tokio::test]
+async fn b11_big_demo_by_the_wall_clock_has_revenue() {
+    let tmp = tempfile::tempdir().unwrap();
+    let dir = tmp.path().join("data");
+    std::fs::create_dir_all(&dir).unwrap();
+    big_demo::create(&dir).unwrap();
+    let state = AppState::new(db::open(&db::database_path(&dir), Seed::Reference).unwrap().0).with_data_dir(&dir);
+    let (_, html) = get(&state, "/").await;
+    assert_ne!(usd_after(&html, "Revenue this month"), "$0.00");
+}

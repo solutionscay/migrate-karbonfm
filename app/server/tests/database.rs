@@ -15,7 +15,7 @@ fn count(conn: &Connection, sql: &str) -> i64 {
 #[test]
 fn fresh_database_gets_schema_04_and_the_reference_seed_only() {
     let (conn, report) = db::open_in_memory(Seed::Reference).unwrap();
-    assert_eq!(report.migrations_applied, ["V1__schema_04", "V2__ddr_audit"]);
+    assert_eq!(report.migrations_applied, ["V1__schema_04", "V2__ddr_audit", "V3__sales_summary_view"]);
     assert_eq!(report.reference_rows_inserted, 44);
     assert!(!report.demo_seed_loaded);
     // The 57 tables of V1 and the 2 import lineage tables of V2, plus refinery's history.
@@ -23,7 +23,7 @@ fn fresh_database_gets_schema_04_and_the_reference_seed_only() {
         count(&conn, "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name <> 'refinery_schema_history'"),
         59
     );
-    assert_eq!(count(&conn, "SELECT COUNT(*) FROM refinery_schema_history"), 2);
+    assert_eq!(count(&conn, "SELECT COUNT(*) FROM refinery_schema_history"), 3);
     assert_eq!(count(&conn, "SELECT COUNT(*) FROM value_list_item"), 24);
     assert_eq!(
         count(&conn, "SELECT COUNT(*) FROM sqlite_master WHERE type = 'view' AND name = 'sales_summary_by_month'"),
@@ -123,7 +123,7 @@ fn file_database_uses_wal_and_seeds_the_demo_once() {
     let path = db::database_path(&dir.path().join("app-data"));
     let (conn, report) = db::open(&path, Seed::Demo).unwrap();
     assert!(path.exists());
-    assert_eq!(report.migrations_applied, ["V1__schema_04", "V2__ddr_audit"]);
+    assert_eq!(report.migrations_applied, ["V1__schema_04", "V2__ddr_audit", "V3__sales_summary_view"]);
     assert_eq!(report.reference_rows_inserted, 44);
     assert!(report.demo_seed_loaded);
     let mode: String = conn.query_row("PRAGMA journal_mode", [], |r| r.get(0)).unwrap();

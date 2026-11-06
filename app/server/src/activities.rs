@@ -1223,6 +1223,8 @@ pub struct ListQuery {
     pub page_size: i64,
     /// Oldest first (the home task list, layout 101 sorts by date ascending); newest first otherwise (05).
     pub oldest_first: bool,
+    /// "Today" of the Overdue filter (`AppState::today`); none means the local date.
+    pub today: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -1293,7 +1295,7 @@ pub fn activity_list(conn: &Connection, q: &ListQuery) -> Result<ListPage, Comma
         Status::Incomplete => wh.push(format!("NOT {done}")),
         Status::Complete => wh.push(done.to_owned()),
         Status::Overdue => {
-            let today = arg(crate::audit::local_now()[..10].to_owned().into());
+            let today = arg(q.today.clone().unwrap_or_else(|| crate::audit::local_now()[..10].to_owned()).into());
             wh.push(format!("a.date_display <= {today} AND NOT {done}"));
         }
     }

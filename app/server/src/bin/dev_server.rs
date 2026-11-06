@@ -15,6 +15,10 @@
 //!   none (`karbon_server::big_demo`, the same data the desktop app opens on), then serves it. Without `--data-dir` it
 //!   uses `<temp>/karbonfm-big-demo/data`.
 //!
+//! The demo data's dates (B11): the in-memory seed moves to today at each start, so the dashboard reads as current.
+//! `--as-of YYYY-MM-DD` pins both the seed's dates and the pages' "today", for a recording that must show the fixed
+//! design dates (`--as-of 2026-10-28`). A database already in `--data-dir` keeps its dates.
+//!
 //! The server has the same guard as the app (AP-13): open the one-time URL it prints once per run. The browser then
 //! keeps the session cookie until the server stops; reloads and other tabs of the same browser work.
 
@@ -27,6 +31,7 @@ use std::sync::Arc;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (mut port, mut fresh, mut data_dir, mut backup_folder) = (3000u16, false, None::<PathBuf>, None);
     let (mut import, mut big_demo) = (None::<PathBuf>, false);
+    let mut as_of = None::<String>;
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -37,12 +42,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--import" => import = Some(PathBuf::from(args.next().ok_or("--import needs an export folder")?)),
             "--big-demo" => big_demo = true,
+            "--as-of" => as_of = Some(args.next().ok_or("--as-of needs a date (YYYY-MM-DD)")?),
             p => port = p.parse()?,
         }
     }
+    let today = match &as_of {
+        Some(d) => karbon_server::demo_dates::parse_date(d).ok_or("--as-of needs a date (YYYY-MM-DD)")?,
+        None => karbon_server::demo_dates::local_today(),
+    };
     if big_demo {
         let dir = data_dir.get_or_insert_with(|| std::env::temp_dir().join("karbonfm-big-demo").join("data")).clone();
-        create_big_demo(&dir)?;
+        create_big_demo(&dir, today)?;
         fresh = true; // the big demo is demo data already; never add the small seed
     }
     if let Some(export) = &import {
@@ -62,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         fresh = true; // an imported database never takes the demo seed
     }
-    let seed = if fresh { Seed::Reference } else { Seed::Demo };
+    let seed = if fresh { Seed::Reference } else { Seed::DemoAsOf(today) };
     let db = match &data_dir {
         Some(dir) => db::open(&db::database_path(dir), seed)?.0,
         None => db::open_in_memory(seed)?.0,
@@ -72,6 +82,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let session = Arc::new(karbon_server::session::Session::new(addr.port()));
     let launch = session.launch_path().ok_or("session already used")?;
     let mut state = karbon_server::AppState::new(db).with_session(session);
+    if let Some(d) = as_of {
+        state = state.with_today(d);
+    }
     if let Some(dir) = data_dir {
         state = state.with_data_dir(dir);
     }
@@ -86,8 +99,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[cfg(feature = "big-demo")]
-fn create_big_demo(dir: &std::path::Path) -> Result<(), Box<dyn std::error::Error>> {
-    match karbon_server::big_demo::create(dir)? {
+fn create_big_demo(dir: &std::path::Path, today: chrono::NaiveDate) -> Result<(), Box<dyn std::error::Error>> {
+    match karbon_server::big_demo::create_as_of(dir, today)? {
         karbon_server::big_demo::Outcome::Created { rows, total_ms, .. } => {
             eprintln!("created the big demo database: {rows} rows in {total_ms} ms in {}", dir.display())
         }
@@ -97,7 +110,7 @@ fn create_big_demo(dir: &std::path::Path) -> Result<(), Box<dyn std::error::Erro
 }
 
 #[cfg(not(feature = "big-demo"))]
-fn create_big_demo(_: &std::path::Path) -> Result<(), Box<dyn std::error::Error>> {
+fn create_big_demo(_: &std::path::Path, _: chrono::NaiveDate) -> Result<(), Box<dyn std::error::Error>> {
     Err("--big-demo needs a build with --features big-demo".into())
 }
 

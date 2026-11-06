@@ -23,6 +23,8 @@
 --   * customers.html says the balance is "across 9 customers", but its rows show 8 customers with a balance; the seed
 --     follows the rows (8 customers, 9 open invoices; Halden & Pryce has two, INV-1042 is due Oct 30).
 --   * subtotal includes the retainer credit line (INV-1048 subtotal $3,050.00, as BR-SALES-02 sums every line).
+--   * INV-1051 is dated the seed's own day, so the newest posted sale always falls in the current month once the
+--     dates are moved to today (B11, app/server/src/demo_dates.rs; the seed loads at these dates in tests only).
 --   * Ids are readable text keys (p-hp, t-inv-1048) instead of UUIDs, so the demo is easy to read.
 --   * The chat screen (UI-21) is a static template; it needs no rows.
 
@@ -343,7 +345,7 @@ INSERT INTO sales_line (id, sales_transaction_id, item_id, description, qty, uni
 INSERT INTO sales_line (id, sales_transaction_id, item_id, description, qty, unit_price, amount, taxable, amount_taxable) VALUES ('l-011', 't-inv-1048', 'i-retainer', 'Retainer applied (RET-0042)', 1, -50000, -50000, 0, 0);
 INSERT INTO payment (id, id_customer, date, amount, payment_ref_num, id_payment_method) VALUES ('pay-004', 'r-hp', '2026-10-20', 100000, 'Check #2214', 'Check');
 INSERT INTO payment_line (id, id_payment, id_invoice, id_customer, amount) VALUES ('pl-004', 'pay-004', 't-inv-1048', 'r-hp', 100000);
-INSERT INTO sales_transaction (id, doc_number, date, due_date, id_customer, subtotal, taxable_subtotal, tax_rate_bp, total_tax, ship_amt, total_amt, balance, paid_ind, period, invoice_ind, sales_receipt_ind, locked_ind, customer_memo, status, retainer) VALUES ('t-inv-1051', 'INV-1051', '2026-10-27', '2026-11-26', 'r-bm', 1298000, 0, 0, 0, 0, 1298000, 1298000, 0, '202610', 1, 0, 1, NULL, 'Open', 0);
+INSERT INTO sales_transaction (id, doc_number, date, due_date, id_customer, subtotal, taxable_subtotal, tax_rate_bp, total_tax, ship_amt, total_amt, balance, paid_ind, period, invoice_ind, sales_receipt_ind, locked_ind, customer_memo, status, retainer) VALUES ('t-inv-1051', 'INV-1051', '2026-10-28', '2026-11-27', 'r-bm', 1298000, 0, 0, 0, 0, 1298000, 1298000, 0, '202610', 1, 0, 1, NULL, 'Open', 0);
 INSERT INTO invoice (id, id_term) VALUES ('t-inv-1051', 'Net 30');
 INSERT INTO sales_line (id, sales_transaction_id, item_id, description, qty, unit_price, amount, taxable, amount_taxable) VALUES ('l-012', 't-inv-1051', 'i-svc-design', 'Warehouse wayfinding: sign family', 1, 1298000, 1298000, 0, 0);
 INSERT INTO sales_transaction (id, doc_number, date, due_date, id_customer, subtotal, taxable_subtotal, tax_rate_bp, total_tax, ship_amt, total_amt, balance, paid_ind, period, invoice_ind, sales_receipt_ind, locked_ind, customer_memo, status, retainer) VALUES ('t-inv-1039', 'INV-1039', '2026-09-24', '2026-10-09', 'r-wt', 340000, 0, 0, 0, 0, 340000, 340000, 0, '202609', 1, 0, 1, NULL, 'Open', 0);
