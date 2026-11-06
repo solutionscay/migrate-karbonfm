@@ -1,0 +1,67 @@
+{# The opportunity card (layouts 156, 162). Status changes on the page's menu only (O6). Field errors come back with 422 and this body again. #}
+{% macro field(name, label, value, kind) %}
+<label class="block">
+  <span class="text-[12px] muted">{{ label }}</span>
+  <input name="{{ name }}" value="{{ value }}" type="{{ kind }}" class="input input-sm w-full mt-1 {% if self.error(name).is_some() %}input-error{% endif %}" autocomplete="off"
+         {% if let Some(e) = self.error(name) %}aria-invalid="true" aria-describedby="err-{{ name }}"{% endif %}>
+  {% if let Some(e) = self.error(name) %}<span class="text-[12px] text-error" id="err-{{ name }}">{{ e }}</span>{% endif %}
+</label>
+{% endmacro %}
+<form hx-put="{{ action }}" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">Edit opportunity</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3 max-h-[70vh] overflow-y-auto">
+    {% if !errors.is_empty() %}<div role="alert" class="sr-only">Check the highlighted fields.</div>{% endif %}
+    {% call field("name", "Name", form.name, "text") %}
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("value", "Value", form.value, "text") %}
+      <label class="block">
+        <span class="text-[12px] muted">Probability</span>
+        <select name="probability" class="select select-sm w-full mt-1 {% if self.error("probability").is_some() %}select-error{% endif %}" {% if self.error("probability").is_some() %}aria-invalid="true" aria-describedby="err-probability"{% endif %}>
+          {% for p in probabilities %}<option value="{{ p }}" {% if form.probability == *p %}selected{% endif %}>{{ p }}</option>{% endfor %}
+        </select>
+        {% if let Some(e) = self.error("probability") %}<span class="text-[12px] text-error" id="err-probability">{{ e }}</span>{% endif %}
+      </label>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("start_date", "Date opened", form.start_date, "date") %}
+      {% call field("end_date", "Date closed", form.end_date, "date") %}
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <label class="block">
+        <span class="text-[12px] muted">Salesperson</span>
+        <select name="salesperson_id" class="select select-sm w-full mt-1 {% if self.error("salesperson_id").is_some() %}select-error{% endif %}" {% if self.error("salesperson_id").is_some() %}aria-invalid="true" aria-describedby="err-salesperson_id"{% endif %}>
+          <option value="">None</option>
+          {% for (id, name) in salespeople %}<option value="{{ id }}" {% if form.salesperson_id == *id %}selected{% endif %}>{{ name }}</option>{% endfor %}
+        </select>
+        {% if let Some(e) = self.error("salesperson_id") %}<span class="text-[12px] text-error" id="err-salesperson_id">{{ e }}</span>{% endif %}
+      </label>
+      <label class="block">
+        <span class="text-[12px] muted">Primary contact</span>
+        <select name="primary_contact_party_id" class="select select-sm w-full mt-1 {% if self.error("primary_contact_party_id").is_some() %}select-error{% endif %}" {% if self.error("primary_contact_party_id").is_some() %}aria-invalid="true" aria-describedby="err-primary_contact_party_id"{% endif %}>
+          <option value="">None</option>
+          {% for (id, name) in contacts %}<option value="{{ id }}" {% if form.primary_contact_party_id == *id %}selected{% endif %}>{{ name }}</option>{% endfor %}
+        </select>
+        {% if let Some(e) = self.error("primary_contact_party_id") %}<span class="text-[12px] text-error" id="err-primary_contact_party_id">{{ e }}</span>{% endif %}
+      </label>
+    </div>
+    <label class="block">
+      <span class="text-[12px] muted">Notes</span>
+      <textarea name="notes" rows="3" class="textarea textarea-sm w-full mt-1">{{ form.notes }}</textarea>
+    </label>
+    <details {% if self.error("referring_party_id").is_some() %}open{% endif %}>
+      <summary class="text-[12.5px] cursor-pointer">Referring party: {% if referring.is_empty() %}<span class="muted">none</span>{% else %}{{ referring }}{% endif %}</summary>
+      <div class="mt-2 space-y-2">
+        {% if let Some(e) = self.error("referring_party_id") %}<span class="text-[12px] text-error" id="err-referring_party_id">{{ e }}</span>{% endif %}
+        {{ picker|safe }}
+        {% if !referring.is_empty() %}<label class="flex items-center gap-1.5 text-[12.5px]"><input type="checkbox" name="clear_referring" class="checkbox checkbox-xs">No referring party</label>{% endif %}
+      </div>
+    </details>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">Save</button>
+  </div>
+</form>

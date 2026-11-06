@@ -87,7 +87,9 @@ impl From<FileRow> for FileView {
 #[derive(Template)]
 #[template(path = "files/panel.html")]
 pub struct FilesPanel {
-    pub party_id: String,
+    /// The record the panel is on: a party (10) or an opportunity (13).
+    pub entity_type_id: i64,
+    pub entity_id: String,
     pub rows: Vec<FileView>,
     pub error: Option<String>,
     /// The upload needs the file store of a data folder (none in an in-memory dev server).
@@ -131,9 +133,19 @@ impl EntityFiles {
 
 impl FilesPanel {
     pub fn load(state: &AppState, conn: &Connection, party_id: &str) -> Result<Self, AppError> {
-        let rows = files::party_files(conn, state.data_dir.as_deref(), party_id)?;
+        Self::load_for(state, conn, 10, party_id)
+    }
+
+    pub fn load_for(
+        state: &AppState,
+        conn: &Connection,
+        entity_type_id: i64,
+        entity_id: &str,
+    ) -> Result<Self, AppError> {
+        let rows = files::entity_files(conn, state.data_dir.as_deref(), entity_type_id, entity_id)?;
         Ok(Self {
-            party_id: party_id.to_string(),
+            entity_type_id,
+            entity_id: entity_id.to_string(),
             rows: rows.into_iter().map(FileView::from).collect(),
             error: None,
             can_add: state.data_dir.is_some(),
@@ -278,7 +290,8 @@ pub async fn upload(
             Err(_) => return Ok(bad_request("entity_type_id")),
         },
     };
-    let party = link.as_ref().filter(|l| l.entity_type_id == 10).map(|l| l.entity_id.clone());
+    let panel_of =
+        link.as_ref().filter(|l| matches!(l.entity_type_id, 10 | 13)).map(|l| (l.entity_type_id, l.entity_id.clone()));
     let transaction = link.as_ref().filter(|l| l.entity_type_id == 12).map(|l| l.entity_id.clone());
     u.input.link = link;
     let Some(data_dir) = state.data_dir.clone() else {
@@ -312,9 +325,9 @@ pub async fn upload(
             Ok((status, [("HX-Trigger", toast("File added", false))], Html(html)).into_response())
         };
     }
-    match party {
-        Some(party_id) => {
-            let mut panel = FilesPanel::load(&state, &conn, &party_id)?;
+    match panel_of {
+        Some((entity_type_id, entity_id)) => {
+            let mut panel = FilesPanel::load_for(&state, &conn, entity_type_id, &entity_id)?;
             panel.error = error.clone();
             let html = panel.render()?;
             if error.is_some() {
@@ -482,7 +495,7 @@ pub async fn attach(
 }
 
 /// `DELETE /attachments/{id}` (`file_detach`): removes only the link, with no confirmation (UI-19); the file stays.
-/// A party's link answers with that party's panel.
+/// A party's or an opportunity's link answers with that record's panel.
 pub async fn detach(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -492,8 +505,8 @@ pub async fn detach(
     let d = files::file_detach(&mut conn, &id, &actor).map_err(|e| command_error("file_detach", e))?;
     let trigger = [("HX-Trigger", toast("File removed from this record", false))];
     match (d.entity_type_id, d.entity_id) {
-        (Some(10), Some(party)) => {
-            let html = FilesPanel::load(&state, &conn, &party)?.render()?;
+        (Some(t @ (10 | 13)), Some(entity_id)) => {
+            let html = FilesPanel::load_for(&state, &conn, t, &entity_id)?.render()?;
             Ok((trigger, Html(html)).into_response())
         }
         (Some(12), Some(id)) => {

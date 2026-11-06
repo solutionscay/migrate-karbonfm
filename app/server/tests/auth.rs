@@ -95,6 +95,8 @@ fn sample(path: &str) -> String {
         "pay-004"
     } else if path.starts_with("/items/") {
         "i-svc-hourly"
+    } else if path.starts_with("/opportunities/") {
+        "o-hp-fitout2"
     } else {
         "p-hp"
     };

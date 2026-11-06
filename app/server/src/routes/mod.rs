@@ -11,6 +11,7 @@ mod discussions;
 mod email;
 mod files;
 mod items;
+mod opportunities;
 mod parties;
 mod party_forms;
 mod payments;
@@ -120,6 +121,14 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/items/new"),
     ("GET", "/items/{id}/edit"),
     ("PUT", "/items/{id}"),
+    ("GET", "/opportunities"),
+    ("POST", "/opportunities"),
+    ("GET", "/opportunities/status-totals"),
+    ("GET", "/opportunities/new"),
+    ("GET", "/opportunities/{id}"),
+    ("PUT", "/opportunities/{id}"),
+    ("GET", "/opportunities/{id}/edit"),
+    ("POST", "/opportunities/{id}/status"),
     ("GET", "/setup"),
     ("POST", "/setup"),
     ("GET", "/settings"),
@@ -222,6 +231,12 @@ pub fn router() -> Router<AppState> {
         .route("/items/new", get(items::new_dialog))
         .route("/items/{id}/edit", get(items::edit_dialog))
         .route("/items/{id}", put(items::update))
+        .route("/opportunities", get(opportunities::list).post(opportunities::create))
+        .route("/opportunities/status-totals", get(opportunities::status_totals))
+        .route("/opportunities/new", get(opportunities::new_dialog))
+        .route("/opportunities/{id}", get(opportunities::detail).put(opportunities::update))
+        .route("/opportunities/{id}/edit", get(opportunities::edit_dialog))
+        .route("/opportunities/{id}/status", post(opportunities::set_status))
         .route("/setup", get(setup::page).post(setup::submit))
         .route("/settings", get(settings::page).put(settings::update))
         .route("/settings/backup", post(backup::create))
@@ -292,6 +307,7 @@ pub enum Nav {
     Messages,
     Customers,
     Parties,
+    Opportunities,
     Invoices,
     Payments,
     Items,

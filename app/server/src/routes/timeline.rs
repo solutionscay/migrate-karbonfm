@@ -173,6 +173,8 @@ impl Rows {
 #[serde(default)]
 pub struct TimelineQuery {
     party_id: String,
+    entity_type_id: String,
+    entity_id: String,
     role_id: String,
     status: String,
     kind: String,
@@ -183,6 +185,12 @@ impl TimelineQuery {
     fn list(&self) -> ListQuery {
         ListQuery {
             party_id: (!self.party_id.is_empty()).then(|| self.party_id.clone()),
+            entity: self
+                .entity_type_id
+                .parse()
+                .ok()
+                .filter(|_| !self.entity_id.is_empty())
+                .map(|t| (t, self.entity_id.clone())),
             role_id: self.role_id.parse().ok(),
             status: Status::parse(&self.status),
             kind: KindFilter::parse(&self.kind),
@@ -200,6 +208,13 @@ impl TimelineQuery {
         }
         if !self.role_id.is_empty() {
             q.push_str(&format!("&role_id={}", urlencode(&self.role_id)));
+        }
+        if !self.entity_id.is_empty() {
+            q.push_str(&format!(
+                "&entity_type_id={}&entity_id={}",
+                urlencode(&self.entity_type_id),
+                urlencode(&self.entity_id)
+            ));
         }
         q
     }

@@ -967,6 +967,7 @@ pub fn entities_of(conn: &Connection, activity_id: &str) -> rusqlite::Result<Vec
                 10 => format!("/parties/{}", crate::web::urlencode(&id)),
                 11 => format!("/activities/{}", crate::web::urlencode(&id)),
                 12 => label.as_deref().map(|d| format!("/sales/{}", crate::web::urlencode(d))).unwrap_or_default(),
+                13 if label.is_some() => format!("/opportunities/{}", crate::web::urlencode(&id)),
                 _ => String::new(),
             };
             Ok(EntityLink { type_id, id, label: label.unwrap_or_else(|| "(removed)".into()), href })
@@ -1215,6 +1216,8 @@ impl KindFilter {
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ListQuery {
     pub party_id: Option<String>,
+    /// Only activities about this record (activity_entity): entity type id and entity id.
+    pub entity: Option<(i64, String)>,
     pub role_id: Option<i64>,
     pub status: Status,
     pub kind: KindFilter,
@@ -1287,6 +1290,14 @@ pub fn activity_list(conn: &Connection, q: &ListQuery) -> Result<ListPage, Comma
         wh.push(format!(
             "EXISTS (SELECT 1 FROM activity_party ap WHERE ap.activity_id = a.id
                                                       AND CAST(ap.activity_party_role_id AS INTEGER) = {r})"
+        ));
+    }
+    if let Some((type_id, entity_id)) = &q.entity {
+        let t = arg((*type_id).into());
+        let e = arg(entity_id.clone().into());
+        wh.push(format!(
+            "EXISTS (SELECT 1 FROM activity_entity ae WHERE ae.activity_id = a.id
+                                AND CAST(ae.entity_type_id AS INTEGER) = {t} AND ae.entity_id = {e})"
         ));
     }
     let done = "EXISTS (SELECT 1 FROM task t WHERE t.id = a.id AND t.completed_at IS NOT NULL)";

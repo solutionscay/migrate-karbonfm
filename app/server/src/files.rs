@@ -442,10 +442,10 @@ fn row_from(r: &rusqlite::Row, data_dir: Option<&Path>) -> rusqlite::Result<File
 
 /// The files attached to a party, newest first (the party Files panel, customer.html).
 pub fn party_files(conn: &Connection, data_dir: Option<&Path>, party_id: &str) -> rusqlite::Result<Vec<FileRow>> {
-    entity_files(conn, data_dir, 10, party_id)
+    entity_files(conn, data_dir, EntityType::Party.id(), party_id)
 }
 
-/// The files linked to one record of an entity type (10 party, 12 sales transaction, 13 opportunity).
+/// The files linked to one record, newest first (a party, a sales transaction, or an opportunity's panel on layout 156).
 pub fn entity_files(
     conn: &Connection,
     data_dir: Option<&Path>,

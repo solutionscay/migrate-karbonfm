@@ -95,7 +95,7 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 | Log a task and complete it | /parties/:id -> task card (UI-07) | new -> assign -> complete/incomplete | activity_create, task_set_complete | ROLE-OWNER | `objects/karbon_kontroller.fmp12/scripts/690-Mark_Task_Complete_data.txt` | BR-ACTIVITY-04 |
 | Send an email | email card (UI-08) | compose -> template -> send -> read only | activity_create, template_merge, email_send | AP-08 | `objects/karbon_kontroller.fmp12/scripts/521-Send_Email_Message_Activity_json.txt` | BR-INTEG-01 |
 | Invoice and payment | /sales/:id (UI-12) -> payment (UI-14) | draft -> lines -> lock -> payment | invoice_save, retainer_apply, sales_transaction_lock, payment_save | AP-05, AP-06 | `objects/karbon_kontacts.fmp12/scripts/270-SalesLine_Amount_OnObjectExit_Trigger.txt` | BR-SALES-01..09 |
-| Opportunity pipeline | /opportunities (UI-10) | list -> chart -> status change | opportunity_status_totals, opportunity_set_status | ROLE-OWNER | `objects/karbon_kontroller.fmp12/scripts/608-wip_Update_Opportunity_Status_json.txt` | BR-SALES-12, 14 |
+| Opportunity pipeline | /opportunities (UI-10) | list and chart -> detail (UI-11) -> status change | opportunity_status_totals, opportunity_set_status | ROLE-OWNER | `objects/karbon_kontroller.fmp12/scripts/608-wip_Update_Opportunity_Status_json.txt` | BR-SALES-12, 14 |
 
 ## Target page specifications
 
@@ -214,9 +214,10 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 
 - Readiness: behavior-ready
 - Use case and users: Opportunity list, find and status chart; the single local user (ROLE-OWNER).
-- Source layouts: `objects/karbon_kontacts.fmp12/layouts/153-Opportunities.txt`, `objects/karbon_kontacts.fmp12/layouts/165-Opportunity_Find.txt`
-- Page: `GET /opportunities` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `GET /opportunities/status-totals?active=` (OP-SALES-03 `opportunity_status_totals`), `POST /opportunities/{id}/status` (OP-SALES-02 `opportunity_set_status`)
+- Source layouts: `objects/karbon_kontacts.fmp12/layouts/153-Opportunities.txt`, `objects/karbon_kontacts.fmp12/layouts/165-Opportunity_Find.txt`, `objects/karbon_charts.fmp12/layouts/25-SalesOpp_Chart.txt`
+- Page: `GET /opportunities` (`?q=&active=&page=`; full page; the same route returns the fragment to htmx)
+- Fragments and actions: `GET /opportunities/status-totals?active=` (OP-SALES-03 `opportunity_status_totals`), `GET /opportunities/new` (the new dialog)
+- Built (I5 S6, 2026-11-06, branch `i5/opportunities`): the chart of active opportunities with the same totals as text; the list shows active ones by default (Show Active, Show All), by status then name, with a subtotal per status and the columns Name, Party, Status, Value, Probability, Active, Next Task (layout 153). Search covers name, party and notes. New opens a dialog with the UI-06 picker and a link to the wizard. Layout 153 has no status button, so a status changes on the detail page. No Find mode (03).
 - Rules shown or enforced: BR-SALES-12, BR-SALES-14
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
@@ -227,8 +228,9 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: behavior-ready
 - Use case and users: Opportunity detail page and card; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/156-Opportunity_Detail.txt`, `objects/karbon_kontacts.fmp12/layouts/162-Opportunity_Detail_-_Card.txt`
-- Page: `GET /opportunities/{id}` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /opportunities; PUT /opportunities/{id}` (OP-SALES-01 `opportunity_save`), `POST /opportunities/{id}/status` (OP-SALES-02 `opportunity_set_status`), `POST /activities` (OP-ACTIVITY-01 `activity_create`)
+- Page: `GET /opportunities/{id}` (full page)
+- Fragments and actions: `POST /opportunities; PUT /opportunities/{id}` (OP-SALES-01 `opportunity_save`), `GET /opportunities/{id}/edit` (the card), `POST /opportunities/{id}/status` (OP-SALES-02 `opportunity_set_status`), `POST /activities` (OP-ACTIVITY-01 `activity_create`)
+- Built (I5 S6, 2026-11-06, branch `i5/opportunities`): the summary (fields of layouts 156, 162, customer and retainer balance, Created by) with the status menu and Edit; the activity timeline with Note, Task, Meeting, Call, Email and Start discussion on entity 13; the party's relations with their Add button; a Files panel (attaching also links the party). A party page's Opportunities tab lists that party's opportunities with a New button. The Opportunity Referral Report (charts layout 22) is not built: no script opens it, and D-38 keeps the invoice as the only print output.
 - Rules shown or enforced: BR-ACTIVITY-01, BR-ACTIVITY-02, BR-SALES-12, BR-SALES-13
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).

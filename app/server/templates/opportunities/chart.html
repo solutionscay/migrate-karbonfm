@@ -1,0 +1,12 @@
+{# OP-SALES-03: the total per status, as a chart and as text. #}
+{% if rows.is_empty() %}
+<p class="p-4 text-[12.5px] muted">No opportunities here.</p>
+{% else %}
+<div class="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 p-4">
+  <div class="h-48"><canvas data-status-chart="{{ chart_json }}" aria-label="Opportunity value by status" role="img"></canvas></div>
+  <dl class="grid grid-cols-[1fr_auto] gap-y-1.5 text-[12.5px] content-start">
+    {% for (status, value) in rows %}<dt class="muted">{{ status }}</dt><dd class="num text-right">{{ value }}</dd>{% endfor %}
+    <dt class="font-medium border-t hairline pt-1.5">Total</dt><dd class="num text-right font-medium border-t hairline pt-1.5">{{ total }}</dd>
+  </dl>
+</div>
+{% endif %}

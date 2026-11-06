@@ -24,6 +24,7 @@ pub mod items;
 pub mod money;
 pub mod net;
 pub mod notifications;
+pub mod opportunities;
 pub mod parties;
 pub mod payments;
 pub mod pdf;
