@@ -760,8 +760,6 @@ async fn every_create_entry_point_lands_on_the_wizard() {
     }
     let (_, html) = get(&app, "/parties").await;
     assert!(html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new">"#), "New contact");
-    let (_, html) = get(&app, "/customers").await;
-    assert!(html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new?role=customer">"#), "New customer");
     for dialog in ["/parties/people/new", "/parties/organizations/new?role=customer"] {
         let (status, html) = htmx_get(&app, dialog).await;
         assert_eq!(status, StatusCode::OK, "{dialog} is kept");

@@ -41,12 +41,11 @@ async fn customers_page_shows_the_seed_totals() {
 }
 
 #[tokio::test]
-async fn customers_page_new_customer_opens_the_wizard() {
+async fn customers_page_leaves_new_customer_to_the_header() {
     let (status, html) = get("/customers").await;
     assert_eq!(status, StatusCode::OK);
-    // The page's New customer and the top bar's New ▾ Customer: both the wizard, never the dialog.
-    assert_eq!(html.matches(r#"href="/parties/new?role=customer""#).count(), 2);
-    assert!(html.contains(r##"href="/parties/new?role=customer"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>New customer</a>"##));
+    // Only the top bar's New ▾ Customer: the wizard, never the dialog.
+    assert_eq!(html.matches(r#"href="/parties/new?role=customer""#).count(), 1);
     assert!(!html.contains("/parties/organizations/new"), "no top-level button opens the dialog");
 }
 
