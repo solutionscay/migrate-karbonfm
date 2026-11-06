@@ -695,9 +695,10 @@ async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
     let topbar = &topbar[..topbar.find("</header>").unwrap()];
     assert!(topbar.contains(r#"<details class="dropdown dropdown-end">"#) && topbar.contains("</svg>New<svg"));
     let menu = &topbar[topbar.find(r#"aria-label="New""#).unwrap()..topbar.find("</ul>").unwrap()];
-    assert_eq!(menu.matches("<li>").count(), 6, "Invoice, Sales receipt, Customer, Task, Note, Template");
-    assert_eq!(menu.matches("<a ").count(), 1, "one real link, no fake ones");
+    assert_eq!(menu.matches("<li>").count(), 7, "Invoice, Sales receipt, Customer, Contact, Task, Note, Template");
+    assert_eq!(menu.matches("<a ").count(), 2, "two real links, no fake ones");
     assert!(menu.contains(r#"<a href="/parties/new?role=customer">"#));
+    assert!(menu.contains(r#"<a href="/parties/new">"#));
     for soon in ["New invoice", "New sales receipt"] {
         assert!(menu.contains(&format!(r#"<button type="button" class="muted" data-soon="{soon}">"#)), "{soon}");
     }
@@ -759,7 +760,7 @@ async fn every_create_entry_point_lands_on_the_wizard() {
         assert!(html.contains(r#"href="/parties/new?role=customer""#), "{page}: the top bar's Customer");
     }
     let (_, html) = get(&app, "/parties").await;
-    assert!(html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new">"#), "New contact");
+    assert!(!html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new">"#), "New contact is in the header");
     for dialog in ["/parties/people/new", "/parties/organizations/new?role=customer"] {
         let (status, html) = htmx_get(&app, dialog).await;
         assert_eq!(status, StatusCode::OK, "{dialog} is kept");
