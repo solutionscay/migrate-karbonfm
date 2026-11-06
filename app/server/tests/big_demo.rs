@@ -20,6 +20,11 @@ async fn get(state: &AppState, uri: &str) -> (StatusCode, String) {
     (status, String::from_utf8_lossy(&body).into_owned())
 }
 
+/// A second connection, for reads a test needs next to the state's.
+fn state_db(dir: &Path) -> rusqlite::Connection {
+    rusqlite::Connection::open(db::database_path(dir)).unwrap()
+}
+
 /// Every file under `dir` with its bytes, for "nothing changed" checks.
 fn snapshot(dir: &Path) -> Vec<(String, Vec<u8>)> {
     let mut out = Vec::new();
@@ -124,6 +129,30 @@ async fn new_data_folder_gets_the_big_demo_and_opens_without_setup() {
 
     // 06 "Data-density": a page of a long list renders fast. Some 3,000 activities here; the debug build gets a
     // generous margin over the 200 ms of 06 (a release build is several times faster).
+    for uri in ["/sales?page=5", "/sales?status=overdue", "/sales/INV-12000"] {
+        let start = std::time::Instant::now();
+        let (status, html) = get(&state, uri).await;
+        let took = start.elapsed();
+        assert_eq!(status, StatusCode::OK, "{uri}");
+        assert!(html.contains("INV-"), "{uri}");
+        assert!(took.as_millis() < 600, "{uri} took {took:?}");
+    }
+    // The editor of a draft, one of the last week's (B11 leaves them unposted).
+    let draft: String = {
+        let conn = state_db(&dir);
+        conn.query_row(
+            "SELECT doc_number FROM sales_transaction WHERE COALESCE(locked_ind, 0) = 0 AND invoice_ind = 1 LIMIT 1",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap()
+    };
+    let start = std::time::Instant::now();
+    let (status, html) = get(&state, &format!("/sales/{draft}")).await;
+    let took = start.elapsed();
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("txn-editor"), "{draft} opens in the editor");
+    assert!(took.as_millis() < 600, "the editor took {took:?}");
     for uri in ["/activities?page=2", "/activities?kind=task&status=incomplete"] {
         let start = std::time::Instant::now();
         let (status, html) = get(&state, uri).await;
@@ -261,4 +290,79 @@ async fn b11_big_demo_by_the_wall_clock_has_revenue() {
     let state = AppState::new(db::open(&db::database_path(&dir), Seed::Reference).unwrap().0).with_data_dir(&dir);
     let (_, html) = get(&state, "/").await;
     assert_ne!(usd_after(&html, "Revenue this month"), "$0.00");
+}
+
+/// S3: the commands' customer caches agree with the importer's recompute, for every customer; one save is fast on the
+/// big demo; the model and the stored totals agree on what posting did.
+#[test]
+fn sales_commands_agree_with_import_recompute() {
+    let tmp = tempfile::tempdir().unwrap();
+    let dir = tmp.path().join("data");
+    std::fs::create_dir_all(&dir).unwrap();
+    big_demo::create_as_of(&dir, karbon_server::demo_dates::parse_date("2026-11-06").unwrap()).unwrap();
+    let (mut conn, _) = db::open(&db::database_path(&dir), Seed::Reference).unwrap();
+    let actor = admin::current_user(&conn).unwrap().unwrap();
+    let customers: Vec<String> = {
+        let mut stmt = conn.prepare("SELECT id FROM customer").unwrap();
+        let rows = stmt.query_map([], |r| r.get(0)).unwrap();
+        rows.map(Result::unwrap).collect()
+    };
+    assert!(customers.len() > 100);
+    let dump = |c: &rusqlite::Connection| -> Vec<(String, i64, i64)> {
+        let mut stmt = c
+            .prepare("SELECT id, COALESCE(retainer_balance_cached, 0), COALESCE(balance, 0) FROM customer ORDER BY id")
+            .unwrap();
+        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))).unwrap();
+        rows.map(Result::unwrap).collect()
+    };
+    let imported = dump(&conn);
+    for role in &customers {
+        karbon_server::sales::recompute_customer(&conn, role).unwrap();
+    }
+    assert_eq!(dump(&conn), imported, "the same two formulas");
+
+    // A stored transaction recomputes to what the import stored, with shipping, tax and retainer lines among them.
+    let ids: Vec<String> = {
+        let mut stmt = conn
+            .prepare("SELECT id FROM sales_transaction WHERE COALESCE(ship_amt, 0) > 0 OR retainer <> 0 LIMIT 300")
+            .unwrap();
+        let rows = stmt.query_map([], |r| r.get(0)).unwrap();
+        rows.map(Result::unwrap).collect()
+    };
+    let totals = |c: &rusqlite::Connection, id: &str| -> (i64, i64, i64, i64, i64, i64) {
+        c.query_row(
+            "SELECT subtotal, taxable_subtotal, total_tax, total_amt, balance, retainer FROM sales_transaction WHERE id = ?1",
+            [id],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)),
+        )
+        .unwrap()
+    };
+    assert!(ids.len() >= 100);
+    for id in &ids {
+        let before = totals(&conn, id);
+        karbon_server::sales::recompute_totals(&conn, id).unwrap();
+        assert_eq!(totals(&conn, id), before, "{id}");
+    }
+
+    // One save on the big demo.
+    let draft: String = conn
+        .query_row(
+            "SELECT id FROM sales_transaction WHERE COALESCE(locked_ind, 0) = 0 AND invoice_ind = 1 LIMIT 1",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap();
+    let input = karbon_server::sales::transaction_get(&conn, &draft).unwrap().input;
+    let start = std::time::Instant::now();
+    karbon_server::sales::transaction_save(
+        &mut conn,
+        karbon_server::sales::Kind::Invoice,
+        &draft,
+        &input,
+        false,
+        &actor,
+    )
+    .unwrap();
+    let took = start.elapsed();
+    assert!(took.as_millis() < 600, "a save took {took:?}");
 }

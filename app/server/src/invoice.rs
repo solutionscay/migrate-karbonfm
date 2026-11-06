@@ -40,6 +40,13 @@ pub struct Payment {
 
 #[derive(Clone, Debug)]
 pub struct Invoice {
+    pub id: String,
+    pub party_id: String,
+    pub locked: bool,
+    /// False for a sales receipt.
+    pub is_invoice: bool,
+    /// The derived status (`sales_list::STATUS_SQL`; X13: the `status` column is not read).
+    pub state: crate::sales_list::Status,
     pub doc_number: String,
     pub status: String,
     pub date: String,
@@ -57,22 +64,31 @@ pub struct Invoice {
 }
 
 impl Invoice {
-    /// Loads an invoice by document number and recomputes its totals. `LONG_FIXTURE` gives the 60-line fixture.
+    /// Loads an invoice by document number and recomputes its totals, with the status as of the local date.
+    /// `LONG_FIXTURE` gives the 60-line fixture.
     pub fn load(conn: &Connection, doc_number: &str) -> rusqlite::Result<Invoice> {
+        Invoice::load_at(conn, doc_number, &crate::audit::local_now()[..10])
+    }
+
+    /// [`Invoice::load`], with the status as of `today` (`AppState::today`).
+    pub fn load_at(conn: &Connection, doc_number: &str, today: &str) -> rusqlite::Result<Invoice> {
         if doc_number == LONG_FIXTURE {
-            return Ok(long_fixture(Invoice::load(conn, "INV-1048")?, 60));
+            return Ok(long_fixture(Invoice::load_at(conn, "INV-1048", today)?, 60));
         }
-        let (id, status, date, due_date, terms, tax_rate_bp, customer, party_id, memo) = conn.query_row(
-            "SELECT st.id, COALESCE(st.status, ''), st.date, COALESCE(st.due_date, ''), COALESCE(i.id_term, ''),
-                    COALESCE(st.tax_rate_bp, 0), p.name_cached, p.id, COALESCE(st.customer_memo, '')
+        let sql = format!(
+            "SELECT st.id, ({}), COALESCE(st.date, ''), COALESCE(st.due_date, ''), COALESCE(i.id_term, ''),
+                    COALESCE(st.tax_rate_bp, 0), p.name_cached, p.id, COALESCE(st.customer_memo, ''),
+                    COALESCE(st.locked_ind, 0) <> 0, COALESCE(st.invoice_ind, 0) = 1
              FROM sales_transaction st JOIN party_role pr ON pr.id = st.id_customer JOIN party p ON p.id = pr.party_id
              LEFT JOIN invoice i ON i.id = st.id
-             WHERE st.doc_number = ?1 AND COALESCE(st.deleted, 0) = 0",
-            [doc_number],
-            |r| {
+             WHERE st.doc_number = ?2 AND COALESCE(st.deleted, 0) = 0",
+            crate::sales_list::STATUS_SQL
+        );
+        let (id, state, date, due_date, terms, tax_rate_bp, customer, party_id, memo, locked, is_invoice) = conn
+            .query_row(&sql, [today, doc_number], |r| {
                 Ok((
                     r.get::<_, String>(0)?,
-                    r.get(1)?,
+                    crate::sales_list::Status::parse(&r.get::<_, String>(1)?),
                     r.get(2)?,
                     r.get(3)?,
                     r.get(4)?,
@@ -80,16 +96,17 @@ impl Invoice {
                     r.get(6)?,
                     r.get::<_, String>(7)?,
                     r.get(8)?,
+                    r.get(9)?,
+                    r.get(10)?,
                 ))
-            },
-        )?;
+            })?;
 
         // Quantity is read as text and parsed as fixed-point, never multiplied as f64 (S-03 finding 1).
         let mut stmt = conn.prepare(
             "SELECT COALESCE(sl.description, ''), COALESCE(it.sku, ''), COALESCE(it.name, ''), CAST(sl.qty AS TEXT),
                     COALESCE(sl.unit_price, 0), COALESCE(sl.taxable, 0)
              FROM sales_line sl LEFT JOIN item it ON it.id = sl.item_id
-             WHERE sl.sales_transaction_id = ?1 ORDER BY sl.id",
+             WHERE sl.sales_transaction_id = ?1 ORDER BY sl.rowid",
         )?;
         let lines = stmt
             .query_map([&id], |r| {
@@ -152,8 +169,13 @@ impl Invoice {
         };
 
         let mut inv = Invoice {
+            id,
+            party_id,
+            locked,
+            is_invoice,
+            state,
             doc_number: doc_number.to_string(),
-            status,
+            status: state.label().to_owned(),
             date,
             due_date,
             terms,
@@ -224,6 +246,11 @@ impl Invoice {
 }
 
 impl Line {
+    /// A line with no item carries text only (SalesLine field 6): no quantity, rate or amount to show.
+    pub fn description_only(&self) -> bool {
+        self.item.is_empty() && self.rate.0 == 0 && self.amount.0 == 0
+    }
+
     /// The quantity as the document shows it: "2", "1.5"; empty quantity counts as 1 (BR-SALES-01).
     pub fn qty_text(&self) -> String {
         self.qty.unwrap_or(Qty::ONE).to_string()

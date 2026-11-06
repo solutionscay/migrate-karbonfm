@@ -116,6 +116,8 @@ pub struct SalesQuery {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SalesRow {
+    pub id: String,
+    pub locked: bool,
     pub doc_number: String,
     pub date: String,
     pub due_date: String,
@@ -197,7 +199,7 @@ pub fn sales_list(conn: &Connection, q: &SalesQuery, today: &str) -> Result<Page
     let sql = format!(
         "SELECT COALESCE(st.doc_number, ''), COALESCE(st.date, ''), COALESCE(st.due_date, ''),
                 COALESCE(st.invoice_ind, 0) = 1, COALESCE(st.total_amt, 0), COALESCE(st.balance, 0), {STATUS_SQL},
-                COALESCE(p.name_cached, ''), COALESCE(p.id, '')
+                COALESCE(p.name_cached, ''), COALESCE(p.id, ''), st.id, COALESCE(st.locked_ind, 0) <> 0
          {from} {filter} ORDER BY st.date DESC, st.doc_number DESC LIMIT {size} OFFSET {}",
         (page - 1) * size
     );
@@ -205,6 +207,8 @@ pub fn sales_list(conn: &Connection, q: &SalesQuery, today: &str) -> Result<Page
     let rows = stmt
         .query_map(params_from_iter(values.iter()), |r| {
             Ok(SalesRow {
+                id: r.get(9)?,
+                locked: r.get(10)?,
                 doc_number: r.get(0)?,
                 date: r.get(1)?,
                 due_date: r.get(2)?,

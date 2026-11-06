@@ -105,7 +105,7 @@ async fn invoice_lives_at_sales() {
     let (status, html) = get("/").await;
     assert_eq!(status, StatusCode::OK);
     assert!(html.contains(r#"href="/sales""#), "the nav links to the sales list (UI-13)");
-    assert!(!html.contains("/invoices/"));
+    assert!(!html.contains("/invoices/INV"), "the document page is under /sales; /invoices/new is the new-invoice dialog");
 }
 
 #[tokio::test]

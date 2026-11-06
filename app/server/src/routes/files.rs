@@ -94,6 +94,41 @@ pub struct FilesPanel {
     pub can_add: bool,
 }
 
+/// The attachments of a sales transaction (layouts 69, 94, 143).
+#[derive(Template)]
+#[template(path = "files/entity_panel.html")]
+pub struct EntityFiles {
+    pub entity_type_id: i64,
+    pub entity_id: String,
+    pub rows: Vec<FileView>,
+    pub error: Option<String>,
+    pub can_add: bool,
+    /// Off on a posted transaction: layout 143 lists its files without Add or Remove.
+    pub can_edit: bool,
+}
+
+impl EntityFiles {
+    pub fn load(state: &AppState, conn: &Connection, entity_type_id: i64, entity_id: &str) -> Result<Self, AppError> {
+        let rows = files::entity_files(conn, state.data_dir.as_deref(), entity_type_id, entity_id)?;
+        let locked: bool = entity_type_id == 12
+            && conn
+                .query_row(
+                    "SELECT COALESCE(locked_ind, 0) <> 0 FROM sales_transaction WHERE id = ?1",
+                    [entity_id],
+                    |r| r.get(0),
+                )
+                .unwrap_or(false);
+        Ok(Self {
+            entity_type_id,
+            entity_id: entity_id.to_string(),
+            rows: rows.into_iter().map(FileView::from).collect(),
+            error: None,
+            can_add: state.data_dir.is_some(),
+            can_edit: !locked,
+        })
+    }
+}
+
 impl FilesPanel {
     pub fn load(state: &AppState, conn: &Connection, party_id: &str) -> Result<Self, AppError> {
         let rows = files::party_files(conn, state.data_dir.as_deref(), party_id)?;
@@ -244,6 +279,7 @@ pub async fn upload(
         },
     };
     let party = link.as_ref().filter(|l| l.entity_type_id == 10).map(|l| l.entity_id.clone());
+    let transaction = link.as_ref().filter(|l| l.entity_type_id == 12).map(|l| l.entity_id.clone());
     u.input.link = link;
     let Some(data_dir) = state.data_dir.clone() else {
         return Ok(bad_request("This install has no file store (no data folder)."));
@@ -266,6 +302,16 @@ pub async fn upload(
     };
     let status = if error.is_some() { StatusCode::UNPROCESSABLE_ENTITY } else { StatusCode::OK };
     let conn = lock(&state)?;
+    if let Some(id) = transaction {
+        let mut panel = EntityFiles::load(&state, &conn, 12, &id)?;
+        panel.error = error.clone();
+        let html = panel.render()?;
+        return if error.is_some() {
+            Ok((status, Html(html)).into_response())
+        } else {
+            Ok((status, [("HX-Trigger", toast("File added", false))], Html(html)).into_response())
+        };
+    }
     match party {
         Some(party_id) => {
             let mut panel = FilesPanel::load(&state, &conn, &party_id)?;
@@ -448,6 +494,10 @@ pub async fn detach(
     match (d.entity_type_id, d.entity_id) {
         (Some(10), Some(party)) => {
             let html = FilesPanel::load(&state, &conn, &party)?.render()?;
+            Ok((trigger, Html(html)).into_response())
+        }
+        (Some(12), Some(id)) => {
+            let html = EntityFiles::load(&state, &conn, 12, &id)?.render()?;
             Ok((trigger, Html(html)).into_response())
         }
         _ => Ok((trigger, StatusCode::OK).into_response()),

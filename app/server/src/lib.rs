@@ -28,6 +28,7 @@ pub mod parties;
 pub mod pdf;
 pub mod reference;
 mod routes;
+pub mod sales;
 pub mod sales_list;
 pub mod secrets;
 pub mod session;

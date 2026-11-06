@@ -239,7 +239,8 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: implementation-ready (design/invoice.html)
 - Use case and users: Invoice and sales receipt editors and view-only views; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/69-Invoice.txt`, `objects/karbon_kontacts.fmp12/layouts/94-SalesReceipt.txt`, `objects/karbon_kontacts.fmp12/layouts/143-Invoice_-_View_Only.txt`, `objects/karbon_kontacts.fmp12/layouts/145-SalesReceipt_-_View_Only.txt`; target design: `design/invoice.html`
-- Page: `GET /sales/{id}` (full page; the same route returns the fragment to htmx)
+- Built (I5 S3): `GET /sales/{doc_number}` opens the editor when unlocked and the read-only view when locked (kontacts 224 s31-41). A field change saves the whole form; the answer is the editor with the server's totals. Lock saves first, then posts (kontacts 377). New: `GET /invoices/new`, `GET /sales-receipts/new`, a customer dialog with `GET /pickers/customer`. The design's History panel is not built (D-30).
+- Page: `GET /sales/{doc_number}` (full page)
 - Fragments and actions: `POST /invoices; PUT /invoices/{id}` (OP-SALES-04 `invoice_save`), `POST /sales-receipts; PUT /sales-receipts/{id}` (OP-SALES-05 `sales_receipt_save`), `POST /sales-transactions/{id}/lock` (OP-SALES-06 `sales_transaction_lock`), `DELETE /sales-transactions/{id}` (OP-SALES-07 `sales_transaction_delete`), `DELETE /sales-transactions/{id}/lines` (OP-SALES-08 `sales_lines_remove`), `POST /invoices/{id}/apply-retainer` (OP-SALES-12 `retainer_apply`)
 - Rules shown or enforced: BR-SALES-01, BR-SALES-02, BR-SALES-03, BR-SALES-05, BR-SALES-06, BR-SALES-07, BR-SALES-08, BR-SALES-11, BR-SALES-15, BR-SALES-18
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment) / locked (AP-05) / confirmation (AP-07)

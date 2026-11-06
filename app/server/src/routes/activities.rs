@@ -33,6 +33,7 @@ pub fn command_error(op: &str, e: CommandError) -> Result<Response, AppError> {
     match e {
         CommandError::NotFound => Err(AppError::NotFound),
         CommandError::AlreadySent => Ok((StatusCode::CONFLICT, crate::admin::ALREADY_SENT).into_response()),
+        CommandError::Locked => Ok((StatusCode::CONFLICT, crate::admin::LOCKED).into_response()),
         CommandError::Refused(message) => Ok((StatusCode::CONFLICT, message).into_response()),
         e => Err(AppError::Internal(format!("{op}: {e}"))),
     }

@@ -15,6 +15,7 @@ mod parties;
 mod party_forms;
 mod relation_forms;
 mod sales;
+mod sales_forms;
 mod sales_lists;
 mod secrets_store;
 mod settings;
@@ -93,6 +94,15 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("POST", "/discussions/{id}/comments"),
     ("GET", "/notifications"),
     ("POST", "/notifications/read"),
+    ("GET", "/invoices/new"),
+    ("POST", "/invoices"),
+    ("PUT", "/invoices/{id}"),
+    ("GET", "/sales-receipts/new"),
+    ("POST", "/sales-receipts"),
+    ("PUT", "/sales-receipts/{id}"),
+    ("POST", "/sales-transactions/{id}/lock"),
+    ("DELETE", "/sales-transactions/{id}"),
+    ("DELETE", "/sales-transactions/{id}/lines"),
     ("GET", "/sales"),
     ("GET", "/payments"),
     ("GET", "/sales/{doc_number}"),
@@ -183,6 +193,15 @@ pub fn router() -> Router<AppState> {
         .route("/discussions/{id}/comments", post(discussions::comment))
         .route("/notifications", get(discussions::notifications))
         .route("/notifications/read", post(discussions::mark_read))
+        .route("/invoices/new", get(sales_forms::new_invoice))
+        .route("/invoices", post(sales_forms::create_invoice))
+        .route("/invoices/{id}", put(sales_forms::save_invoice).fallback(not_found))
+        .route("/sales-receipts/new", get(sales_forms::new_receipt))
+        .route("/sales-receipts", post(sales_forms::create_receipt))
+        .route("/sales-receipts/{id}", put(sales_forms::save_receipt))
+        .route("/sales-transactions/{id}/lock", post(sales_forms::lock))
+        .route("/sales-transactions/{id}", delete(sales_forms::delete))
+        .route("/sales-transactions/{id}/lines", delete(sales_forms::remove_lines))
         .route("/sales", get(sales_lists::sales))
         .route("/payments", get(sales_lists::payments))
         .route("/sales/{doc_number}", get(sales::page))

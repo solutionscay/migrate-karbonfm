@@ -27,6 +27,12 @@
     </section>
 
     <section x-show="tab === 'sales'" x-cloak role="tabpanel" id="panel-sales" aria-labelledby="tab-sales" class="panel overflow-hidden">
+      {% if !d.archived %}{% if let Some(c) = &d.customer %}
+      <div class="flex justify-end gap-2 px-4 py-2.5 border-b hairline">
+        <button class="btn btn-sm btn-quiet" hx-get="/sales-receipts/new?customer_id={{ c.role_id|urlencode }}" hx-target="#modal-body">New sales receipt</button>
+        <button class="btn btn-sm btn-quiet" hx-get="/invoices/new?customer_id={{ c.role_id|urlencode }}" hx-target="#modal-body">New invoice</button>
+      </div>
+      {% endif %}{% endif %}
       {% if sales.is_empty() %}
       <div class="p-8 text-center muted">{% if d.customer.is_some() %}No sales transactions yet.{% else %}Not a customer: no sales transactions.{% endif %}</div>
       {% else %}

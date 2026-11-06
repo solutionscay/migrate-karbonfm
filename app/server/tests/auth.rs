@@ -87,6 +87,10 @@ fn sample(path: &str) -> String {
         "f-001"
     } else if path.starts_with("/attachments/") {
         "fa-001"
+    } else if path.starts_with("/invoices/") || path.starts_with("/sales-transactions/") {
+        "t-inv-1048"
+    } else if path.starts_with("/sales-receipts/") {
+        "t-sr-0311"
     } else if path.starts_with("/items/") {
         "i-svc-hourly"
     } else {

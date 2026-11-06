@@ -274,7 +274,7 @@ fn text(x: &Option<String>) -> Option<&str> {
 }
 
 /// The source's address display: List(line 1; line 2; "city state postal"; country), one value per line.
-fn display(a: &[Option<String>; 6]) -> Option<String> {
+pub(crate) fn display(a: &[Option<String>; 6]) -> Option<String> {
     let mut parts: Vec<&str> = a[..2].iter().filter_map(text).collect();
     let csp: Vec<&str> = a[2..5].iter().filter_map(text).collect();
     let csp = csp.join(" ");
@@ -321,7 +321,6 @@ fn cache(
 }
 
 fn customers(tx: &Transaction, report: &mut Report, name_of: &NameOf) -> rusqlite::Result<()> {
-    let posted = "st.id_customer = t.id AND st.locked_ind = 1 AND COALESCE(st.deleted, 0) = 0";
     cache(
         tx,
         report,
@@ -329,7 +328,7 @@ fn customers(tx: &Transaction, report: &mut Report, name_of: &NameOf) -> rusqlit
         "customer",
         "id",
         "retainer_balance_cached",
-        &format!("COALESCE(t.retainer_adjustment, 0) + COALESCE((SELECT SUM(st.retainer) FROM sales_transaction st WHERE {posted}), 0)"),
+        &crate::sales::retainer_balance_sql(),
         "retainer balance recomputed from the posted transactions (BR-SALES-06)",
     )?;
     cache(
@@ -339,9 +338,7 @@ fn customers(tx: &Transaction, report: &mut Report, name_of: &NameOf) -> rusqlit
         "customer",
         "id",
         "balance",
-        &format!(
-            "COALESCE((SELECT SUM(st.balance) FROM sales_transaction st WHERE {posted} AND st.invoice_ind = 1), 0)"
-        ),
+        &crate::sales::customer_balance_sql(),
         "customer balance recomputed from the posted invoices (D-39)",
     )
 }

@@ -1,4 +1,4 @@
-//! Invoice view (UI-12, read only) and the invoice PDF (UI-20). Spike S-02 compares the two ways to get a PDF:
+//! The sales transaction page (UI-12: the editor or the read-only view) and the invoice PDF (UI-20). Spike S-02 compares the two ways to get a PDF:
 //! the page printed by the webview ("Print (webview)") and the file generated in Rust (`GET .../invoice.pdf`).
 
 use super::Nav;
@@ -12,8 +12,8 @@ use axum::http::{header, StatusCode};
 use axum::response::{Html, IntoResponse, Response};
 
 #[derive(Template)]
-#[template(path = "sales/invoice.html")]
-struct InvoicePage {
+#[template(path = "sales/read_only.html")]
+struct ReadOnlyPage {
     nav: Nav,
     demo: bool,
     inv: Invoice,
@@ -23,22 +23,53 @@ struct InvoicePage {
     status_class: &'static str,
     /// The desktop shell can save files (native save dialog); in a browser the page links the PDF for download.
     can_save: bool,
+    /// The attachments panel (UI-19).
+    files: String,
+}
+
+/// The editor of an unlocked transaction, in the app's layout (layouts 69, 94).
+#[derive(Template)]
+#[template(path = "sales/editor_page.html")]
+struct EditorPage {
+    nav: Nav,
+    demo: bool,
+    title: String,
+    customer: String,
+    party_id: String,
+    editor: String,
+    /// The attachments panel (UI-19).
+    files: String,
 }
 
 fn load(state: &AppState, doc_number: &str) -> Result<Invoice, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
-    Ok(Invoice::load(&conn, doc_number)?)
+    Ok(Invoice::load_at(&conn, doc_number, &state.today())?)
 }
 
+/// `GET /sales/{doc_number}` (UI-12): an unlocked transaction opens in the editor, a locked one read only (kontacts 224
+/// s31-41).
 pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>) -> Result<Html<String>, AppError> {
     let inv = load(&state, &doc_number)?;
-    let status_class = match inv.status.as_str() {
-        "Paid" => "ok",
-        "Partially paid" => "warn",
-        "Overdue" => "bad",
-        _ => "info",
+    if !inv.locked {
+        let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
+        let editor = super::sales_forms::editor(&conn, &inv.id, None, Vec::new())?.render()?;
+        let files = super::files::EntityFiles::load(&state, &conn, 12, &inv.id)?.render()?;
+        return render(&EditorPage {
+            nav: Nav::Invoices,
+            demo: crate::db::has_demo_data(&conn)?,
+            title: doc_number,
+            customer: inv.customer,
+            party_id: inv.party_id,
+            editor,
+            files,
+        });
+    }
+    let status_class = inv.state.chip();
+    let files = {
+        let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
+        super::files::EntityFiles::load(&state, &conn, 12, &inv.id)?.render()?
     };
-    render(&InvoicePage {
+    render(&ReadOnlyPage {
         nav: Nav::Invoices,
         demo: super::demo(&state)?,
         initial: inv.seller.name.chars().next().map(|c| c.to_uppercase().collect()).unwrap_or_default(),
@@ -46,6 +77,7 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
         due_text: display_date(&inv.due_date),
         status_class,
         can_save: state.save.is_some(),
+        files,
         inv,
     })
 }

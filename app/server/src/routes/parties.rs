@@ -161,6 +161,8 @@ pub fn page_error(op: &str, e: CommandError) -> AppError {
 
 /// One sales transaction row of the Sales tab and the sales list (UI-13).
 pub struct SalesView {
+    pub id: String,
+    pub locked: bool,
     pub doc_number: String,
     pub href: String,
     pub date: String,
@@ -178,6 +180,8 @@ pub struct SalesView {
 impl From<SalesRow> for SalesView {
     fn from(r: SalesRow) -> Self {
         SalesView {
+            id: r.id.clone(),
+            locked: r.locked,
             href: format!("/sales/{}", urlencode(&r.doc_number)),
             date: display_date(&r.date),
             due: display_date(&r.due_date),
