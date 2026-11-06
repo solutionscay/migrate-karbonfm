@@ -23,7 +23,7 @@ if (window.htmx) {
     if (!dialog.open) dialog.showModal();
     // The modal's visibility transition can leave its controls unfocusable for a moment, and WebKit then drops the
     // focus to the page: so keep it in the dialog while it opens. A later Tab or click inside the dialog is left alone.
-    const first = dialog.querySelector("[autofocus], input, button");
+    const first = dialog.querySelector("[autofocus]") || dialog.querySelector("input:not([type=hidden]), select, textarea") || dialog.querySelector("button");
     if (first) first.focus();
     for (let wait = 25; wait <= 500; wait += 25) {
       setTimeout(() => {
