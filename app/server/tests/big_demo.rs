@@ -341,6 +341,9 @@ async fn overdue_is_a_tenth_to_a_fifth_of_balance_due() {
         let today = karbon_server::demo_dates::parse_date(day).unwrap();
         assert!(matches!(big_demo::create_as_of(&dir, today).unwrap(), Outcome::Created { .. }));
         let conn = db::open(&db::database_path(&dir), Seed::Reference).unwrap().0;
+        // A paid invoice is paid in full: none left overdue by the rounding of its fixed-fee line.
+        let pennies = "SELECT COUNT(*) FROM sales_transaction WHERE balance BETWEEN 1 AND 99";
+        assert_eq!(conn.query_row(pennies, [], |r| r.get::<_, i64>(0)).unwrap(), 0);
         let state = AppState::new(conn).with_data_dir(&dir).with_today(day);
         let (_, html) = get(&state, "/").await;
         let (revenue, balance, overdue) =

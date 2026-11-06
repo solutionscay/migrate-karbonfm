@@ -1412,7 +1412,7 @@ impl G<'_> {
         if fee && self.r.chance(0.02) {
             let fee = self.r.range(3, 40) * 10000;
             l.qty = 30000;
-            l.price = fee / 3;
+            l.price = div_round(fee as i128, 3) as i64;
             l.amount_text = Some(fm_money(fee));
             l.price_7dp = Some(seven_dp(fee, 3));
             l.desc = format!("{} (fixed fee, 3 visits)", it.name);
