@@ -695,18 +695,25 @@ async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
     let topbar = &topbar[..topbar.find("</header>").unwrap()];
     assert!(topbar.contains(r#"<details class="dropdown dropdown-end">"#) && topbar.contains("</svg>New<svg"));
     let menu = &topbar[topbar.find(r#"aria-label="New""#).unwrap()..topbar.find("</ul>").unwrap()];
-    assert_eq!(menu.matches("<li>").count(), 7, "Invoice, Sales receipt, Opportunity, Item, Customer, Task, Note");
-    assert_eq!(menu.matches("<a ").count(), 1, "one real link, no fake ones");
+    assert_eq!(
+        menu.matches("<li>").count(),
+        13,
+        "Invoice, Sales receipt, Opportunity, Item, Customer, Contact, 5 activities, Template, File"
+    );
+    assert_eq!(menu.matches("<a ").count(), 2, "two real links, no fake ones");
     assert!(menu.contains(r#"<a href="/parties/new?role=customer">"#));
+    assert!(menu.contains(r#"<a href="/parties/new">"#));
+    assert!(!menu.contains("data-soon") && !menu.contains("Later"), "every entry is live");
     // I5: Invoice and Sales receipt open the customer dialog.
     for path in ["/invoices/new", "/sales-receipts/new"] {
         assert!(menu.contains(&format!(r##"hx-get="{path}" hx-target="#modal-body""##)), "{path}");
     }
-    // I4: Task and Note open the activity dialog.
-    for kind in ["task", "note"] {
+    // I4: Task, Note, Meeting and Call open the activity dialog.
+    for kind in ["task", "note", "meeting", "call"] {
         assert!(menu.contains(&format!(r##"hx-get="/activities/new?kind={kind}" hx-target="#modal-body""##)), "{kind}");
     }
-    assert_eq!(topbar.matches(r#"hx-get="/activities/new"#).count(), 2, "only Task and Note open a dialog");
+    assert_eq!(topbar.matches(r#"hx-get="/activities/new"#).count(), 4, "Task, Note, Meeting and Call");
+    assert!(menu.contains(r##"hx-get="/email-messages/new" hx-target="#modal-body""##), "Email");
 }
 
 #[tokio::test]
@@ -760,9 +767,10 @@ async fn every_create_entry_point_lands_on_the_wizard() {
         assert!(html.contains(r#"href="/parties/new?role=customer""#), "{page}: the top bar's Customer");
     }
     let (_, html) = get(&app, "/parties").await;
-    assert!(html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new">"#), "New contact");
-    let (_, html) = get(&app, "/customers").await;
-    assert!(html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new?role=customer">"#), "New customer");
+    assert!(
+        !html.contains(r#"<a class="btn btn-sm btn-primary" href="/parties/new">"#),
+        "New contact is in the header"
+    );
     for dialog in ["/parties/people/new", "/parties/organizations/new?role=customer"] {
         let (status, html) = htmx_get(&app, dialog).await;
         assert_eq!(status, StatusCode::OK, "{dialog} is kept");

@@ -178,7 +178,7 @@ pub struct NewQuery {
 }
 
 /// `GET /parties/new?role=` (UI-05): the names step. Every create entry point opens it (the top bar's New ▾ Customer
-/// and /customers' New customer with `role=customer`, /parties' New contact), so every create has the duplicate check
+/// with `role=customer`, its Contact without a role), so every create has the duplicate check
 /// of BR-PARTY-02. An unknown role keeps the default (customer).
 pub async fn page(
     State(state): State<AppState>,

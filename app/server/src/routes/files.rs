@@ -190,8 +190,6 @@ struct ListPage {
     nav: Nav,
     demo: bool,
     table: FileTable,
-    can_add: bool,
-    error: Option<String>,
 }
 
 /// `GET /files` (layouts 142/185): every file, newest first, with a thumbnail for images and what it is attached to.
@@ -213,7 +211,7 @@ pub async fn list(
     if is_htmx(&headers) {
         return render(&table);
     }
-    render(&ListPage { nav: Nav::Files, demo, table, can_add: state.data_dir.is_some(), error: None })
+    render(&ListPage { nav: Nav::Files, demo, table })
 }
 
 // ---------------------------------------------------------------------------------------------------------------

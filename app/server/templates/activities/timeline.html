@@ -6,14 +6,17 @@
     <div class="eyebrow mb-1.5">Workspace</div>
     <h1 class="page-title">Activity{% if !party_name.is_empty() %} · {{ party_name }}{% endif %}</h1>
   </div>
+  {# Only a party's timeline: these preset the party, which the header's New menu cannot do. The plain timeline uses the menu. #}
+  {% if !party_id.is_empty() %}
   <div class="flex gap-2">
-    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=task{% if !party_id.is_empty() %}&party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-task"/></svg>Task</button>
-    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=note{% if !party_id.is_empty() %}&party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-note"/></svg>Note</button>
-    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=meeting{% if !party_id.is_empty() %}&party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-video"/></svg>Meeting</button>
-    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=call{% if !party_id.is_empty() %}&party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-phone"/></svg>Call</button>
-    <button class="btn btn-sm btn-quiet" hx-get="/email-messages/new{% if !party_id.is_empty() %}?party_id={{ party_id|urlencode }}{% endif %}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-mail"/></svg>Email</button>
-    {% if !party_id.is_empty() %}<button class="btn btn-sm btn-primary" hx-get="/discussions/new?entity_type_id=10&amp;entity_id={{ party_id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Start discussion</button>{% endif %}
+    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=task&party_id={{ party_id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-task"/></svg>Task</button>
+    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=note&party_id={{ party_id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-note"/></svg>Note</button>
+    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=meeting&party_id={{ party_id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-video"/></svg>Meeting</button>
+    <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind=call&party_id={{ party_id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-phone"/></svg>Call</button>
+    <button class="btn btn-sm btn-quiet" hx-get="/email-messages/new?party_id={{ party_id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-mail"/></svg>Email</button>
+    <button class="btn btn-sm btn-primary" hx-get="/discussions/new?entity_type_id=10&amp;entity_id={{ party_id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Start discussion</button>
   </div>
+  {% endif %}
 </div>
 <nav class="flex flex-wrap gap-2 mb-3" aria-label="Kind of activity">
   {% for (href, label, on) in kinds %}<a class="filter-chip {% if *on %}on{% endif %}" href="{{ href }}" {% if *on %}aria-current="true"{% endif %}>{{ label }}</a>{% endfor %}

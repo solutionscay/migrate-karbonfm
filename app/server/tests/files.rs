@@ -478,6 +478,22 @@ async fn open_never_hands_a_program_to_the_system() {
     assert!(headers[header::CONTENT_DISPOSITION].to_str().unwrap().starts_with("attachment;"), "it only downloads");
 }
 
+/// AGENTS.md: the file list leaves Add file to the header's New menu; a party's panel keeps its own, which links the file.
+#[tokio::test]
+async fn add_file_is_in_the_header_and_on_a_party_panel_only() {
+    let (dir, conn, _) = demo();
+    drop(conn);
+    let app = app(dir.path(), None);
+    let (_, _, html) = send(&app, Request::get("/files").body(Body::empty()).unwrap()).await;
+    let html = text(&html);
+    assert_eq!(html.matches(r#"hx-post="/files""#).count(), 1, "only the header's File");
+    assert!(html.contains(r##"hx-target="#file-upload-result""##) && !html.contains("Add file"));
+    let (_, _, html) = send(&app, Request::get("/parties/p-hp").body(Body::empty()).unwrap()).await;
+    let html = text(&html);
+    assert_eq!(html.matches(r#"hx-post="/files""#).count(), 2, "the header's File and the panel's Add file");
+    assert!(html.contains(r#"title="Add file""#) && html.contains(r#"name="entity_id" value="p-hp""#));
+}
+
 #[tokio::test]
 async fn the_file_list_fits_1024_px() {
     // B7: every .tbl cell is nowrap; at 1024 px the Category column made the table wider than its panel.
