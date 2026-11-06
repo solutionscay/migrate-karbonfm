@@ -124,7 +124,9 @@ pub fn email_update(
 
 /// Apply a template to an email (kontacts 343 s6, 346 s5-11; 333 s72): the merged message (OP-TEMPLATE-01) replaces
 /// the message and `activity.template_id` is set; the subject does not change (343 copies the message only). A sent
-/// message is refused (AP-08). 346 writes the result even when the merge failed: not built.
+/// message is refused (AP-08). 346 writes the result even when the merge failed: not built. A field with no value yet
+/// stays as `{{Name}}` in the draft, where the source leaves a gap (490 s164): New > Email has no recipient until the
+/// next step, and the send fills it in or says what is missing (`templates::merge_for_send`).
 pub fn email_apply_template(
     conn: &mut Connection,
     id: &str,
@@ -142,13 +144,15 @@ pub fn email_apply_template(
     if target.sent {
         return Err(CommandError::AlreadySent);
     }
-    let merged = crate::templates::template_merge(&tx, template_id, id).map_err(|e| match e {
+    let saved = crate::templates::template_get(&tx, template_id).map_err(|e| match e {
         CommandError::NotFound => field_error("template_id", "Choose a template."),
         e => e,
     })?;
+    let values = crate::templates::merge_values(&tx, id, &audit::local_now()[..10])?;
+    let message = crate::templates::fill_known(&saved.message, &values);
     tx.execute(
         "UPDATE activity SET message = ?2, template_id = ?3, last_updated = ?4 WHERE id = ?1",
-        params![id, opt(&merged.message), template_id, stamp.at],
+        params![id, opt(&message), template_id, stamp.at],
     )?;
     audit::stamp_modified(&tx, "activity", &id, &stamp)?;
     tx.commit()?;
@@ -369,6 +373,18 @@ pub fn prepare_send(
     need(!a.subject.trim().is_empty(), "subject", "Enter a subject.");
     need(!a.message.trim().is_empty(), "message", "Write the message.");
     need(!to.is_empty(), "to", "Add at least one recipient with an email address in To.");
+    // What goes out holds values, never a literal {{Name}} (BR-TEMPLATE-01).
+    let merged = crate::templates::merge_for_send(conn, id, a.subject.trim(), &a.message, &audit::local_now()[..10]);
+    let (subject, body) = match merged {
+        Ok(merged) => merged,
+        Err(CommandError::Validation(found)) => {
+            for e in found {
+                need(false, e.field, &e.message);
+            }
+            Default::default()
+        }
+        Err(e) => return Err(e),
+    };
     let where_ = if account == Account::User { "your email account" } else { "the system email account" };
     need(!text(&row.address).is_empty(), "sender", &format!("Set the email address of {where_} in Settings."));
     need(!text(&row.server).is_empty(), "smtp_server", &format!("Set the SMTP server of {where_} in Settings."));
@@ -403,8 +419,8 @@ pub fn prepare_send(
         to,
         cc,
         bcc,
-        subject: a.subject.trim().to_owned(),
-        body: a.message,
+        subject,
+        body,
     })
 }
 
@@ -422,8 +438,15 @@ pub fn smtp_policy(conn: &Connection, actor: &Actor) -> rusqlite::Result<Outboun
 
 /// Marks the message sent (521 s92, s125): sent_ind = 1, smtp_timestamp now, and smtp_result = the server's final
 /// reply (07 BR-INTEG-01 "records the send result"; no source script writes SmtpResult, table 168 #8). The activity
-/// date is not changed.
-pub fn mark_sent(conn: &mut Connection, id: &str, reply: &str, actor: &Actor) -> Result<(), CommandError> {
+/// date is not changed. The subject and message become the merged text that went out, so the sent record says what the
+/// recipient read.
+pub fn mark_sent(
+    conn: &mut Connection,
+    id: &str,
+    sent: &Outgoing,
+    reply: &str,
+    actor: &Actor,
+) -> Result<(), CommandError> {
     let stamp = Stamp::now(actor);
     let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let n = tx.execute(
@@ -434,7 +457,10 @@ pub fn mark_sent(conn: &mut Connection, id: &str, reply: &str, actor: &Actor) ->
     if n == 0 {
         return Err(CommandError::AlreadySent);
     }
-    tx.execute("UPDATE activity SET last_updated = ?2 WHERE id = ?1", params![id, stamp.at])?;
+    tx.execute(
+        "UPDATE activity SET subject = ?2, message = ?3, last_updated = ?4 WHERE id = ?1",
+        params![id, sent.subject, sent.body, stamp.at],
+    )?;
     audit::stamp_modified(&tx, "activity", &id, &stamp)?;
     tx.commit()?;
     Ok(())
@@ -478,7 +504,7 @@ pub fn email_send(
     }
     match mailer.send(&outgoing) {
         Ok(reply) => {
-            mark_sent(&mut *lock()?, id, &reply, actor)?;
+            mark_sent(&mut *lock()?, id, &outgoing, &reply, actor)?;
             if let (Some(p), Account::User) = (password, outgoing.account) {
                 // Kept only after it worked; a keychain failure here does not undo the send.
                 let _ = secrets.set(SecretKey::UserSmtpPassword, p);

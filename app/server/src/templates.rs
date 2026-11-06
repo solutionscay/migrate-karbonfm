@@ -530,6 +530,56 @@ pub fn template_merge_at(
     Ok(Merged { subject: substitute(&subject, &values), message: substitute(&message, &values) })
 }
 
+/// [`substitute`], except that a placeholder with no value stays as it is written: a draft may still gain its recipient
+/// or be sent later ([`merge_for_send`]).
+pub fn fill_known(text: &str, values: &HashMap<&str, String>) -> String {
+    segments(text)
+        .into_iter()
+        .map(|s| match s.token.and_then(|(_, name)| values.get(name.as_str()).cloned()) {
+            Some(value) => value,
+            None => s.text.to_string(),
+        })
+        .collect()
+}
+
+/// The merged text of an email at send time: what goes out holds values, never a literal `{{Name}}`. A placeholder
+/// with no value, a name that is not a field or an unclosed `{{` is an error that names it, so the draft can be put
+/// right; a recipient never gets a silent gap. The source has no hand-typed placeholders, as its merge ran on a
+/// template only (kontacts 343, 346); this covers a token typed into a draft and one a template left waiting.
+pub fn merge_for_send(
+    conn: &Connection,
+    activity_id: &str,
+    subject: &str,
+    message: &str,
+    today: &str,
+) -> Result<(String, String), CommandError> {
+    let values = merge_values(conn, activity_id, today)?;
+    let mut errors = Vec::new();
+    for (field, label, text) in [("subject", "The subject", subject), ("message", "The message", message)] {
+        match parse_tokens(text) {
+            Err(TokenError::Mismatch) => errors.push(FieldError {
+                field,
+                message: format!(
+                    "{label} has an unclosed merge field: every {TOKEN_PREFIX} needs a closing {TOKEN_SUFFIX}."
+                ),
+            }),
+            Ok(names) => {
+                for name in names.iter().filter(|n| !values.contains_key(n.as_str())) {
+                    let message = match FIELDS.iter().find(|f| f.name == name) {
+                        Some(f) => format!("{} has no value on this email ({}).", token(name), f.help),
+                        None => format!("{} is not a merge field.", token(name)),
+                    };
+                    errors.push(FieldError { field, message });
+                }
+            }
+        }
+    }
+    if !errors.is_empty() {
+        return Err(CommandError::Validation(errors));
+    }
+    Ok((substitute(subject, &values), substitute(message, &values)))
+}
+
 /// A placeholder of a preview that has no value on the chosen email.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MissingField {

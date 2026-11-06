@@ -473,6 +473,120 @@ async fn t_08_08_a_sent_message_is_not_sent_again() {
     assert_eq!(status, StatusCode::CONFLICT);
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// Merge fields reach the mail (BR-TEMPLATE-01): a recipient never gets a literal {{Name}}
+// ---------------------------------------------------------------------------------------------------------------
+
+impl App {
+    /// A template with this text; returns its id.
+    async fn template(&self, message: &str) -> i64 {
+        let (status, h, _) = self.send("POST", "/templates", "name=Merge+check").await;
+        assert_eq!(status, StatusCode::CREATED);
+        let id = h["HX-Redirect"].to_str().unwrap().trim_start_matches("/templates/").to_owned();
+        let body = format!("name=Merge+check&subject=&message={}", urlencode(message));
+        let (status, _, html) = self.send("PUT", &format!("/templates/{id}"), &body).await;
+        assert_eq!(status, StatusCode::OK, "{html}");
+        id.parse().unwrap()
+    }
+
+    async fn patch(&self, id: &str, subject: &str, message: &str) {
+        let body = format!("subject={}&message={}&account=system", urlencode(subject), urlencode(message));
+        let (status, _, html) = self.send("PATCH", &format!("/email-messages/{id}"), &body).await;
+        assert_eq!(status, StatusCode::OK, "{html}");
+    }
+
+    fn message_of(&self, id: &str) -> String {
+        self.read().query_row("SELECT message FROM activity WHERE id = ?1", [id], |r| r.get(0)).unwrap()
+    }
+}
+
+/// Form encoding of what these bodies hold.
+fn urlencode(s: &str) -> String {
+    s.chars()
+        .flat_map(|c| {
+            if c.is_ascii_alphanumeric() {
+                vec![c.to_string()]
+            } else {
+                let mut b = [0; 4];
+                c.encode_utf8(&mut b).bytes().map(|x| format!("%{x:02X}")).collect()
+            }
+        })
+        .collect()
+}
+
+#[tokio::test]
+async fn a_token_typed_by_hand_is_merged_in_the_mail_and_in_the_sent_record() {
+    let server = Capture::start(Mode::Ok);
+    let app = App::new(server.port);
+    let id = app.draft("system").await;
+    app.patch(&id, "For {{FirstName}}", "Hi {{FirstName}},\nfrom {{SenderName}}.").await;
+    let (status, _, html) = app.send("POST", &format!("/email-messages/{id}/send"), "").await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    let data = server.captured().data;
+    assert!(data.contains("Subject: For Elena"), "{data}");
+    assert!(data.contains("Hi Elena,") && data.contains("from Mara Ellison."), "{data}");
+    assert!(!data.contains("{{"), "no literal placeholder: {data}");
+    assert!(app.message_of(&id).starts_with("Hi Elena,"), "the record says what went out");
+    let page = app.page(&format!("/email-messages/{id}")).await;
+    assert!(page.contains("For Elena") && !page.contains("{{FirstName}}"), "{page}");
+}
+
+#[tokio::test]
+async fn a_template_applied_to_a_draft_reaches_the_mail_with_its_values() {
+    let server = Capture::start(Mode::Ok);
+    let app = App::new(server.port);
+    let id = app.draft("system").await;
+    let template = app.template("Dear {{FirstName}} of {{OrganizationName}}").await;
+    let (status, _, _) =
+        app.send("POST", &format!("/email-messages/{id}/template"), &format!("template_id={template}")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(app.message_of(&id), "Dear Elena of Halden & Pryce Architects", "filled in on selection");
+    let (status, _, html) = app.send("POST", &format!("/email-messages/{id}/send"), "").await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    let data = server.captured().data;
+    assert!(data.contains("Dear Elena of Halden & Pryce Architects"), "{data}");
+    assert!(!data.contains("{{"), "{data}");
+}
+
+/// New > Email has no recipient yet, so the template goes on first: its field waits for the recipient, not lost.
+#[tokio::test]
+async fn a_template_applied_before_the_recipient_fills_in_when_it_is_sent() {
+    let server = Capture::start(Mode::Ok);
+    let app = App::new(server.port);
+    let (status, h, _) = app.send("POST", "/email-messages", "subject=Hello&message=x").await;
+    assert_eq!(status, StatusCode::OK);
+    let id = h["HX-Redirect"].to_str().unwrap().trim_start_matches("/email-messages/").to_owned();
+    let template = app.template("Dear {{FirstName}}").await;
+    app.send("POST", &format!("/email-messages/{id}/template"), &format!("template_id={template}")).await;
+    assert_eq!(app.message_of(&id), "Dear {{FirstName}}", "kept, for the recipient still to come");
+
+    let (cm, _) = app.email_of("p-hp-eh");
+    let body = format!("role=55&other_id=p-hp-eh&q=&email_id={cm}");
+    let (status, _, html) = app.send("PUT", &format!("/activities/{id}/parties"), &body).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    let (status, _, html) = app.send("POST", &format!("/email-messages/{id}/send"), "").await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(server.captured().data.contains("Dear Elena"), "{:?}", server.captured().data);
+}
+
+/// A field with no value, or a name that is not a field, stops the send and says which: never a literal in the mail
+/// and never a silent gap.
+#[tokio::test]
+async fn a_token_with_no_value_stops_the_send_and_nothing_connects() {
+    let server = Capture::start(Mode::Ok);
+    let app = App::new(server.port);
+    let id = app.draft("system").await;
+    for (text, says) in [("Total {{InvoiceTotal}}", "{{InvoiceTotal}}"), ("Hi {{Nope}}", "{{Nope}}")] {
+        app.patch(&id, "Subject", text).await;
+        let (status, _, html) = app.send("POST", &format!("/email-messages/{id}/send"), "").await;
+        assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{html}");
+        assert!(html.contains(says), "{html}");
+        assert_eq!(server.connections.load(Ordering::SeqCst), 0, "nothing connects");
+        assert_eq!(app.sent_row(&id), (0, None, None));
+        assert_eq!(app.message_of(&id), text, "the draft stays as written");
+    }
+}
+
 /// A small base64 decoder for the AUTH PLAIN check (no extra crate).
 fn base64_decode(s: &str) -> String {
     const A: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
