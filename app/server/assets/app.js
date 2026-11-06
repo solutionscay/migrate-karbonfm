@@ -191,6 +191,8 @@ window.karbonColor = function (name) {
   }
   window.addEventListener("DOMContentLoaded", draw);
   window.addEventListener("karbon-theme", draw);
+  // The monthly summary's range form swaps the canvas.
+  document.addEventListener("htmx:afterSettle", (e) => { if (e.detail.target && e.detail.target.id === "report-body") draw(); });
 })();
 
 document.addEventListener("alpine:init", () => {

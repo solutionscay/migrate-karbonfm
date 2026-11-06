@@ -27,6 +27,7 @@ pub mod notifications;
 pub mod parties;
 pub mod pdf;
 pub mod reference;
+pub mod reports;
 mod routes;
 pub mod sales;
 pub mod sales_list;
