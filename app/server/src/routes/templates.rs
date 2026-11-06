@@ -5,7 +5,7 @@ use super::current_user::CurrentUser;
 use super::party_forms::toast;
 use super::Nav;
 use crate::admin::{CommandError, FieldError};
-use crate::templates::{self, MergeFieldRow, Merged, TemplateDetail, TemplateInput, TemplateRow, FIELDS};
+use crate::templates::{self, MergeFieldRow, MergePreview, TemplateDetail, TemplateInput, TemplateRow, FIELDS};
 use crate::web::{render, AppError};
 use crate::AppState;
 use askama::Template;
@@ -329,13 +329,21 @@ pub async fn save_merge_fields(
 #[serde(default, deny_unknown_fields)]
 pub struct MergeForm {
     pub activity_id: String,
+    /// The editor's text, saved or not. Absent: the saved template.
+    pub subject: Option<String>,
+    pub message: Option<String>,
 }
 
 #[derive(Template)]
 #[template(path = "templates/merged.html")]
 struct MergedView {
-    merged: Option<Merged>,
+    preview: Option<MergePreview>,
     error: Option<String>,
+}
+
+fn merge_refused(error: String) -> Result<Response, AppError> {
+    let html = MergedView { preview: None, error: Some(error) }.render()?;
+    Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(html)).into_response())
 }
 
 /// `POST /templates/{id}/merge`: the merged subject and message for an activity, as a fragment. Nothing is written.
@@ -345,17 +353,18 @@ pub async fn merge(
     Form(form): Form<MergeForm>,
 ) -> Result<Response, AppError> {
     let conn = lock(&state)?;
-    let exists: bool = conn.query_row("SELECT EXISTS (SELECT 1 FROM template WHERE id = ?1)", [id], |r| r.get(0))?;
-    if !exists {
-        return Err(AppError::NotFound);
-    }
-    match templates::template_merge(&conn, id, form.activity_id.trim()) {
-        Ok(merged) => render(&MergedView { merged: Some(merged), error: None }).map(IntoResponse::into_response),
+    let saved = templates::template_get(&conn, id).map_err(|e| command_error("template_get", e))?;
+    let subject = form.subject.unwrap_or(saved.subject);
+    let message = form.message.unwrap_or(saved.message);
+    match templates::merge_preview(&conn, form.activity_id.trim(), &subject, &message) {
+        Ok(preview) => render(&MergedView { preview: Some(preview), error: None }).map(IntoResponse::into_response),
         // The template exists, so NotFound is the activity: a field error, not a 404 page.
-        Err(CommandError::NotFound) => {
-            let html = MergedView { merged: None, error: Some("Choose an email to merge with.".into()) }.render()?;
-            Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(html)).into_response())
+        Err(CommandError::NotFound) => merge_refused("Choose an email to merge with.".into()),
+        Err(CommandError::Validation(errors)) => {
+            let label = |field: &str| if field == "subject" { "Subject" } else { "Body" };
+            let text: Vec<String> = errors.iter().map(|e| format!("{}: {}", label(e.field), e.message)).collect();
+            merge_refused(text.join(" "))
         }
-        Err(e) => Err(command_error("template_merge", e)),
+        Err(e) => Err(command_error("merge_preview", e)),
     }
 }

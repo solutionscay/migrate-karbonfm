@@ -1,10 +1,20 @@
-{# OP-TEMPLATE-01 template_merge: the merged subject and body. Nothing is written. #}
+{# OP-TEMPLATE-01 template_merge: the merged subject and body of the text in the editor. Nothing is written. Never a
+   blank box: an empty template and a field with no value on this email say so. #}
 {% if let Some(e) = error %}<div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ e }}</div>{% endif %}
-{% if let Some(m) = merged %}
+{% if let Some(p) = preview %}
+{% if p.nothing_to_merge %}
+<div role="status" class="alert alert-soft text-[13px] py-2" data-merge-nothing>Nothing to merge: the template has no subject or body yet. Write one above, then preview again.</div>
+{% else %}
+{% if !p.missing.is_empty() %}
+<div role="status" class="alert alert-warning alert-soft text-[13px] py-2 mb-2 block" data-merge-missing>
+  This email has no value for {% for f in p.missing %}<code class="mono">{{ f.token }}</code> ({{ f.help }}){% if !loop.last %}, {% endif %}{% endfor %}. {% if p.missing.len() == 1 %}It stays{% else %}They stay{% endif %} empty in the merge.
+</div>
+{% endif %}
 <div class="rounded-box border hairline p-3 space-y-2" data-merged>
   <div class="text-[12px] muted">Subject</div>
-  <div class="font-medium" data-merged-subject>{{ m.subject }}</div>
+  <div class="font-medium" data-merged-subject>{% if p.merged.subject.is_empty() %}<span class="muted font-normal">(no subject)</span>{% else %}{{ p.merged.subject }}{% endif %}</div>
   <div class="text-[12px] muted">Body</div>
-  <pre class="whitespace-pre-wrap text-[13px] font-sans" data-merged-message>{{ m.message }}</pre>
+  <pre class="whitespace-pre-wrap text-[13px] font-sans" data-merged-message>{% if p.merged.message.is_empty() %}<span class="muted">(empty)</span>{% else %}{{ p.merged.message }}{% endif %}</pre>
 </div>
+{% endif %}
 {% endif %}

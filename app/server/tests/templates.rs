@@ -428,3 +428,57 @@ async fn a_saved_invoice_total_fills_in_for_the_seed_invoice_email() {
     assert_eq!(status, StatusCode::OK);
     assert!(html.contains("$3,057.15"), "INV-1048's total_amt: {html}");
 }
+
+#[tokio::test]
+async fn the_preview_merges_the_text_on_screen_and_saves_nothing() {
+    let (_dir, app, check) = file_demo();
+    blank_template(&app).await;
+    let body = "activity_id=a-mail-1048&subject=Hi+%7B%7BFirstName%7D%7D&message=Hi+%7B%7BFirstName%7D%7D";
+    let (status, _, html) = send(&app, form("POST", "/templates/1/merge", body)).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert_eq!(html.matches("Hi Joanna").count(), 2, "{html}");
+    let saved: Option<String> = check.query_row("SELECT message FROM template WHERE id = 1", [], |r| r.get(0)).unwrap();
+    assert_eq!(saved, None, "a preview writes nothing");
+    // The page sends the editor's text with the preview.
+    let (_, _, page) = send(&app, get("/templates/1")).await;
+    assert!(page.contains("hx-include=\"#template-editor [name=subject], #template-editor [name=message]\""), "{page}");
+    assert!(!page.contains("Merges the saved template"), "the page no longer says it merges the saved text");
+}
+
+#[tokio::test]
+async fn unsaved_text_with_a_bad_token_says_so_in_the_preview() {
+    let (_dir, app, _check) = file_demo();
+    blank_template(&app).await;
+    let (status, _, html) =
+        send(&app, form("POST", "/templates/1/merge", "activity_id=a-mail-1048&subject=&message=%7B%7BNope%7D%7D"))
+            .await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Body:") && html.contains("Unknown merge field"), "{html}");
+    let (status, _, html) =
+        send(&app, form("POST", "/templates/1/merge", "activity_id=a-mail-1048&subject=%7B%7BOops&message=")).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Subject:") && html.contains("token symbol mismatch"), "{html}");
+}
+
+#[tokio::test]
+async fn an_empty_template_says_there_is_nothing_to_merge() {
+    let (_dir, app, _check) = file_demo();
+    blank_template(&app).await;
+    let (status, _, html) = send(&app, form("POST", "/templates/1/merge", "activity_id=a-mail-1048")).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("Nothing to merge"), "{html}");
+    assert!(!html.contains("data-merged-message"), "no box of empty labels: {html}");
+}
+
+#[tokio::test]
+async fn a_field_with_no_value_is_named_in_the_preview() {
+    let (_dir, app, check) = file_demo();
+    let email = unlinked_email(&check);
+    blank_template(&app).await;
+    let body = format!("activity_id={email}&subject=&message={TOTAL}");
+    let (status, _, html) = send(&app, form("POST", "/templates/1/merge", &body)).await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(html.contains("data-merge-missing"), "{html}");
+    assert!(html.contains("{{InvoiceTotal}}") && html.contains("linked invoice"), "{html}");
+    assert!(html.contains("(no subject)") && html.contains("(empty)"), "an empty value is not a blank line: {html}");
+}

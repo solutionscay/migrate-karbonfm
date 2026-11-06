@@ -520,6 +520,53 @@ pub fn template_merge(conn: &Connection, template_id: i64, activity_id: &str) ->
     Ok(Merged { subject: substitute(&subject, &values), message: substitute(&message, &values) })
 }
 
+/// A placeholder of a preview that has no value on the chosen email.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MissingField {
+    pub token: String,
+    pub help: &'static str,
+}
+
+/// What the preview shows: the merge, and why a part of it may be empty.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MergePreview {
+    pub merged: Merged,
+    /// The subject and the message are both empty: there was nothing to merge.
+    pub nothing_to_merge: bool,
+    pub missing: Vec<MissingField>,
+}
+
+/// The preview of layout 112: merges this text, which may be unsaved, for an activity. It refuses what
+/// `template_save` refuses (Validation) and writes nothing. A field with no value merges as empty (490 s164), as
+/// [`template_merge`] does, and is named in `missing`.
+pub fn merge_preview(
+    conn: &Connection,
+    activity_id: &str,
+    subject: &str,
+    message: &str,
+) -> Result<MergePreview, CommandError> {
+    let exists: bool =
+        conn.query_row("SELECT EXISTS (SELECT 1 FROM activity WHERE id = ?1)", [activity_id], |r| r.get(0))?;
+    if !exists {
+        return Err(CommandError::NotFound);
+    }
+    let subject = subject.trim();
+    let input = TemplateInput { subject: subject.into(), message: message.into(), ..Default::default() };
+    let names = validate(&input)?;
+    let values = merge_values(conn, activity_id)?;
+    let missing = names
+        .iter()
+        .filter(|n| !values.contains_key(n.as_str()))
+        .filter_map(|n| FIELDS.iter().find(|f| f.name == n))
+        .map(|f| MissingField { token: token(f.name), help: f.help })
+        .collect();
+    Ok(MergePreview {
+        merged: Merged { subject: substitute(subject, &values), message: substitute(message, &values) },
+        nothing_to_merge: subject.is_empty() && message.trim().is_empty(),
+        missing,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
