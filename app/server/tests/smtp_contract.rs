@@ -171,6 +171,23 @@ impl App {
         let tmp = tempfile::tempdir().unwrap();
         let path = db::database_path(tmp.path());
         let conn = db::open_demo(Some(&path)).unwrap();
+        let dir = tmp.path().to_path_buf();
+        Self::around(port, tmp, dir, path, conn)
+    }
+
+    /// The big demo: the same synthetic export and import the desktop app opens on.
+    fn big_demo(port: u16) -> Self {
+        log_dir();
+        let tmp = tempfile::tempdir().unwrap();
+        let (export, data) = (tmp.path().join("export"), tmp.path().join("data"));
+        karbon_synth::generate(karbon_synth::Config::default(), &export).unwrap();
+        karbon_server::import::import_export(&export, &data, &Default::default()).unwrap();
+        let path = db::database_path(&data);
+        let conn = db::open(&path, db::Seed::Reference).unwrap().0;
+        Self::around(port, tmp, data, path, conn)
+    }
+
+    fn around(port: u16, tmp: tempfile::TempDir, dir: PathBuf, path: PathBuf, conn: Connection) -> Self {
         conn.execute(
             "UPDATE system_setting SET system_email_address = 'billing@ellisonstudio.example',
                     system_email_full_name = 'Ellison Studio', system_email_user_name = 'billing',
@@ -188,7 +205,7 @@ impl App {
         let secrets = Arc::new(MemoryStore::default());
         secrets.set(SecretKey::SystemSmtpPassword, &Secret::new(PASSWORD)).unwrap();
         secrets.set(SecretKey::UserSmtpPassword, &Secret::new(PASSWORD)).unwrap();
-        let state = AppState::new(conn).with_secrets(secrets.clone()).with_data_dir(tmp.path());
+        let state = AppState::new(conn).with_secrets(secrets.clone()).with_data_dir(&dir);
         App { router: router(state), secrets, path, _tmp: tmp }
     }
 
@@ -567,6 +584,92 @@ async fn a_template_applied_before_the_recipient_fills_in_when_it_is_sent() {
     let (status, _, html) = app.send("POST", &format!("/email-messages/{id}/send"), "").await;
     assert_eq!(status, StatusCode::OK, "{html}");
     assert!(server.captured().data.contains("Dear Elena"), "{:?}", server.captured().data);
+}
+
+impl App {
+    /// What an invoice's Email button does: its dialog, with the customer's primary address, saved as a draft.
+    async fn email_from_invoice(&self, doc: &str) -> String {
+        let page = self.page(&format!("/sales/{doc}")).await;
+        let button = r#"hx-get=""#;
+        let start = page.find(r#"hx-get="/email-messages/new?party_id="#).expect("the Email button") + button.len();
+        let uri = page[start..start + page[start..].find('"').unwrap()].replace("&amp;", "&");
+        let (status, _, dialog) = self.send("GET", &uri, "").await;
+        assert_eq!(status, StatusCode::OK);
+        let radio = r#"name="email_id" value=""#;
+        let at = dialog.find(radio).expect("the customer has an email address") + radio.len();
+        let email_id = &dialog[at..at + dialog[at..].find('"').unwrap()];
+        let body = format!("{}&email_id={email_id}&subject=About+{doc}&message=Draft", uri.split_once('?').unwrap().1);
+        let (status, h, html) = self.send("POST", "/email-messages", &body).await;
+        assert_eq!(status, StatusCode::OK, "{html}");
+        h["HX-Redirect"].to_str().unwrap().trim_start_matches("/email-messages/").to_owned()
+    }
+
+    /// Applies each template to a new draft from the invoice's Email button, sends it, and checks what arrives.
+    async fn every_template_sends(&self, server: &Capture, doc: &str, recipient: &str, templates: &[(i64, String)]) {
+        for (template, name) in templates {
+            let id = self.email_from_invoice(doc).await;
+            let (status, _, html) =
+                self.send("POST", &format!("/email-messages/{id}/template"), &format!("template_id={template}")).await;
+            assert_eq!(status, StatusCode::OK, "{name}: {html}");
+            let (status, _, html) = self.send("POST", &format!("/email-messages/{id}/send"), "").await;
+            assert_eq!(status, StatusCode::OK, "{name} on {doc} did not send: {html}");
+            let data = server.captured().data;
+            assert!(!data.contains("{{") && !data.contains("}}"), "{name} on {doc}: {data}");
+            if name == "Invoice email" || name == "Payment reminder" {
+                assert!(data.contains(&format!("Hi {recipient},")), "{name} on {doc}: {data}");
+            }
+            if name == "Invoice email" {
+                assert!(data.contains(&format!("invoice {doc} attached")), "{name} on {doc}: {data}");
+            }
+        }
+    }
+}
+
+/// The demo's most obvious email flow: an invoice's Email button addresses an organization, which has no first name, so
+/// a seeded template must use only fields that have a value there. The small seed has no templates of its own, so it
+/// runs the big demo's text, as a template a user made there would.
+#[tokio::test]
+async fn every_seeded_template_sends_from_an_invoice_to_an_organization() {
+    let server = Capture::start(Mode::Ok);
+    let big = App::big_demo(server.port);
+    let seeded: Vec<(i64, String, String)> = {
+        let c = big.read();
+        let mut stmt = c.prepare("SELECT id, name, COALESCE(message, '') FROM template ORDER BY id").unwrap();
+        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))).unwrap();
+        rows.collect::<rusqlite::Result<_>>().unwrap()
+    };
+    assert_eq!(seeded.len(), 6);
+    assert!(seeded.iter().any(|(_, name, _)| name == "Invoice email"));
+    let templates: Vec<(i64, String)> = seeded.iter().map(|(id, name, _)| (*id, name.clone())).collect();
+    let docs: Vec<(String, String)> = {
+        let c = big.read();
+        let mut stmt = c
+            .prepare(
+                "SELECT st.doc_number, p.name_cached FROM sales_transaction st
+                 JOIN party_role r ON r.id = st.id_customer JOIN party p ON p.id = r.party_id
+                 WHERE st.invoice_ind = 1 AND st.locked_ind = 1 AND p.organization_ind = 1 AND st.due_date IS NOT NULL
+                   AND p.name_cached NOT LIKE '%&%'
+                   AND EXISTS (SELECT 1 FROM contact_method cm JOIN network_address n ON n.id = cm.id
+                               WHERE cm.party_id = p.id AND n.email_address_ind = 1)
+                 GROUP BY p.id ORDER BY MAX(st.date) DESC LIMIT 3",
+            )
+            .unwrap();
+        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?))).unwrap();
+        rows.collect::<rusqlite::Result<_>>().unwrap()
+    };
+    assert_eq!(docs.len(), 3);
+    for (doc, name) in &docs {
+        big.every_template_sends(&server, doc, name, &templates).await;
+    }
+
+    let small = App::new(server.port);
+    let own: i64 = small.read().query_row("SELECT COUNT(*) FROM template", [], |r| r.get(0)).unwrap();
+    assert_eq!(own, 0, "the small seed has templates now: run them here too");
+    let mut copies = Vec::new();
+    for (_, name, message) in &seeded {
+        copies.push((small.template(message).await, name.clone()));
+    }
+    small.every_template_sends(&server, "INV-1048", "Halden & Pryce Architects", &copies).await;
 }
 
 /// A field with no value, or a name that is not a field, stops the send and says which: never a literal in the mail

@@ -1815,19 +1815,21 @@ impl G<'_> {
     }
 
     /// Six templates with merge placeholders in the source's form, `<<Name>>` (kontroller 478 s3, MergeFieldConfig
-    /// field 31), named from the app's fixed list (BR-TEMPLATE-01). The import stores them as `{{Name}}` (OD-07-03).
+    /// field 31), named from the app's fixed list (BR-TEMPLATE-01). The import stores them as `{{Name}}` (OD-07-03). A
+    /// greeting uses RecipientName: an invoice's Email button addresses the customer, usually an organization, which has
+    /// no first name, and the send stops on a field with no value.
     fn templates(&mut self) {
         let list = [
             (
                 "Invoice email",
                 "Invoice <<InvoiceNumber>> from Ellison Studio",
-                "Hi <<FirstName>>,\n\nPlease find invoice <<InvoiceNumber>> attached.\n\nThank you,\n<<SenderName>>",
+                "Hi <<RecipientName>>,\n\nPlease find invoice <<InvoiceNumber>> attached.\n\nThank you,\n<<SenderName>>",
                 1,
             ),
             (
                 "Payment reminder",
                 "Reminder: invoice <<InvoiceNumber>>",
-                "Hi <<FirstName>>,\n\nA friendly reminder that invoice <<InvoiceNumber>> is due on <<DueDate>>.",
+                "Hi <<RecipientName>>,\n\nA friendly reminder that invoice <<InvoiceNumber>> is due on <<DueDate>>.",
                 1,
             ),
             ("Thank you", "Thank you", "Thank you for choosing Ellison Studio.", 1),
@@ -1853,7 +1855,7 @@ impl G<'_> {
             ]);
             self.push("Template", r, t0 + Duration::days(i as i64 * 30));
             for field in [
-                "<<FirstName>>",
+                "<<RecipientName>>",
                 "<<InvoiceNumber>>",
                 "<<DueDate>>",
                 "<<SenderName>>",
