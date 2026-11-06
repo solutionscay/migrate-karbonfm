@@ -10,7 +10,7 @@
 
 use crate::admin::{CommandError, FieldError};
 use crate::audit::{self, Actor, Stamp};
-use crate::invoice::display_date;
+use crate::invoice::{display_date, Invoice};
 use crate::money::usd;
 use crate::reference::ActivityType;
 use regex::Regex;
@@ -37,7 +37,8 @@ pub struct Field {
 /// The fixed list. The recipient is the email's first To (55) party and the sender its first From (54) party: 490
 /// s113-137 resolves each field with "the first activity party with that role". The invoice is the activity's
 /// sales-transaction link (activity_entity, entity type 12). The source names only `<<FirstName>>` and
-/// `<<RecipientName>>` (478 s3, 189 f31); the other names are ours (Q2).
+/// `<<RecipientName>>` (478 s3, 189 f31); the other names are ours (Q2). `InvoiceTotal` is the figure the invoice page
+/// labels "Total", before any retainer credit; `BalanceDue` is what is still owed (owner, 2026-11-06).
 pub const FIELDS: &[Field] = &[
     Field { name: "RecipientName", help: "the recipient's name" },
     Field { name: "FirstName", help: "the recipient's first name" },
@@ -479,23 +480,18 @@ pub fn merge_values(
     }
     let invoice = conn
         .query_row(
-            "SELECT st.doc_number, st.total_amt, st.balance, st.due_date FROM activity_entity ae \
+            "SELECT st.doc_number, st.balance, st.due_date FROM activity_entity ae \
              JOIN sales_transaction st ON st.id = ae.entity_id \
              WHERE ae.activity_id = ?1 AND ae.entity_type_id = 12 ORDER BY ae.rowid LIMIT 1",
             [activity_id],
-            |r| {
-                Ok((
-                    r.get::<_, Option<String>>(0)?,
-                    r.get::<_, Option<i64>>(1)?,
-                    r.get::<_, Option<i64>>(2)?,
-                    r.get::<_, Option<String>>(3)?,
-                ))
-            },
+            |r| Ok((r.get::<_, Option<String>>(0)?, r.get::<_, Option<i64>>(1)?, r.get::<_, Option<String>>(2)?)),
         )
         .optional()?;
-    if let Some((number, total, balance, due)) = invoice {
+    if let Some((number, balance, due)) = invoice {
+        // The page's own model, so the two cannot differ. A document the page cannot show has no Total: no value.
+        let total = number.as_deref().and_then(|n| Invoice::load(conn, n).ok());
+        put(&mut v, "InvoiceTotal", total.map(|i| i.total_before_retainer().to_string()));
         put(&mut v, "InvoiceNumber", number);
-        put(&mut v, "InvoiceTotal", total.map(usd));
         put(&mut v, "BalanceDue", balance.map(usd));
         put(&mut v, "DueDate", due.map(|d| display_date(&d)));
     }
