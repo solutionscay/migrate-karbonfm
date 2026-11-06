@@ -8,7 +8,7 @@
     <h1 class="page-title">{{ title }}</h1>
   </div>
 </div>
-<div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+<div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]" x-data="mergeFieldPicker" @focusin="remember($event)">
   <div class="space-y-5 min-w-0">
     {{ editor|safe }}
     <section class="panel" aria-labelledby="t-preview">
@@ -30,9 +30,10 @@
     {{ editor.fields|safe }}
     <section class="panel" aria-labelledby="t-available">
       <div class="panel-head"><h2 id="t-available" class="panel-title">Available merge fields</h2></div>
-      <ul class="p-4 space-y-1.5 text-[12.5px]">
+      <p class="px-4 pt-3 text-[12px] muted">Select a field to insert it at the cursor in the Subject or Body. Until you click in one of them, it goes at the end of the Body.</p>
+      <ul class="p-2 text-[12.5px]">
         {% for f in fields %}
-        <li><code class="mono">&#123;&#123;{{ f.name }}&#125;&#125;</code> <span class="muted">{{ f.help }}</span></li>
+        <li><button type="button" class="merge-token" data-merge-token="&#123;&#123;{{ f.name }}&#125;&#125;" @click="insert($el.dataset.mergeToken)"><span class="sr-only">Insert </span><code class="mono">&#123;&#123;{{ f.name }}&#125;&#125;</code> <span class="muted">{{ f.help }}</span></button></li>
         {% endfor %}
       </ul>
     </section>

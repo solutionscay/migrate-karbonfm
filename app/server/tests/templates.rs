@@ -482,3 +482,14 @@ async fn a_field_with_no_value_is_named_in_the_preview() {
     assert!(html.contains("{{InvoiceTotal}}") && html.contains("linked invoice"), "{html}");
     assert!(html.contains("(no subject)") && html.contains("(empty)"), "an empty value is not a blank line: {html}");
 }
+
+#[tokio::test]
+async fn the_available_fields_are_buttons_for_the_subject_and_body() {
+    let (_dir, app, _check) = file_demo();
+    blank_template(&app).await;
+    let (_, _, page) = send(&app, get("/templates/1")).await;
+    assert!(page.contains(r#"x-data="mergeFieldPicker""#), "{page}");
+    assert_eq!(page.matches("data-merge-token=").count(), FIELDS.len());
+    assert_eq!(page.matches(r#"<button type="button" class="merge-token""#).count(), FIELDS.len());
+    assert_eq!(page.matches("data-merge-target").count(), 2, "the Subject and the Body");
+}
