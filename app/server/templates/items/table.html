@@ -1,0 +1,36 @@
+{# UI-15 list (layout 86): toolbar, rows and pager. htmx replaces #item-table with it. #}
+<form class="flex flex-wrap items-center gap-2 px-4 py-3 border-b hairline" role="search"
+      hx-get="/items" hx-target="#item-table" hx-push-url="true" hx-trigger="input changed delay:250ms from:input[name=q]">
+  <label class="flex items-center gap-2 h-8 px-2.5 w-72 rounded-field border hairline bg-base-200/50 focus-within:border-primary">
+    <svg class="i muted" aria-hidden="true"><use href="#i-search"/></svg>
+    <input name="q" value="{{ query.q }}" class="bg-transparent outline-none w-full text-[13px]" placeholder="Name, SKU or description" aria-label="Search items" autocomplete="off">
+  </label>
+</form>
+<div class="overflow-x-auto">
+  <table class="tbl">
+    <thead><tr><th>Name</th><th>SKU</th><th>Description</th><th class="r">Sales Price/Rate</th><th>Active</th></tr></thead>
+    <tbody>
+      {% for i in rows %}
+      {% include "items/row_cells.html" %}
+      {% else %}
+      <tr><td colspan="5" class="text-center muted py-10">{% if query.q.is_empty() %}No items yet.{% else %}No items match.{% endif %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<nav class="flex items-center gap-3 px-4 py-2.5 border-t hairline text-[12px] muted" aria-label="Pages">
+  <span class="num">{% if matched > 0 %}{{ first }}–{{ last }} of {{ matched }}{% else %}0 items{% endif %}</span>
+  <div class="ml-auto join">
+    {% if page > 1 %}
+    <a class="join-item btn btn-sm btn-quiet" href="{{ query.href(page - 1) }}" hx-get="{{ query.href(page - 1) }}" hx-target="#item-table" hx-push-url="true" aria-label="Previous page"><svg class="i i-sm"><use href="#i-chevron-left"/></svg></a>
+    {% else %}
+    <button class="join-item btn btn-sm btn-quiet" disabled aria-label="Previous page"><svg class="i i-sm"><use href="#i-chevron-left"/></svg></button>
+    {% endif %}
+    <span class="join-item btn btn-sm btn-quiet pointer-events-none num">Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}
+    <a class="join-item btn btn-sm btn-quiet" href="{{ query.href(page + 1) }}" hx-get="{{ query.href(page + 1) }}" hx-target="#item-table" hx-push-url="true" aria-label="Next page"><svg class="i i-sm"><use href="#i-chevron-right"/></svg></a>
+    {% else %}
+    <button class="join-item btn btn-sm btn-quiet" disabled aria-label="Next page"><svg class="i i-sm"><use href="#i-chevron-right"/></svg></button>
+    {% endif %}
+  </div>
+</nav>

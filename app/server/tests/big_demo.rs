@@ -104,12 +104,23 @@ async fn new_data_folder_gets_the_big_demo_and_opens_without_setup() {
         "/activities",
         "/activities?kind=task&status=overdue",
         "/activities?page=3",
+        "/items",
     ] {
         let (status, html) = get(&state, uri).await;
         assert_eq!(status, StatusCode::OK, "{uri}");
         assert!(html.contains(BADGE), "{uri} shows DEMO");
     }
     assert_eq!(get(&state, "/setup").await.0, StatusCode::SEE_OTHER, "setup is done");
+
+    // S2: the item list and the picker, under the same limit as the other long lists.
+    for (uri, expect) in [("/items", "of "), ("/items?q=a", "of "), ("/pickers/item", "item-picker")] {
+        let start = std::time::Instant::now();
+        let (status, html) = get(&state, uri).await;
+        let took = start.elapsed();
+        assert_eq!(status, StatusCode::OK, "{uri}");
+        assert!(html.contains(expect), "{uri}");
+        assert!(took.as_millis() < 600, "{uri} took {took:?}");
+    }
 
     // 06 "Data-density": a page of a long list renders fast. Some 3,000 activities here; the debug build gets a
     // generous margin over the 200 ms of 06 (a release build is several times faster).

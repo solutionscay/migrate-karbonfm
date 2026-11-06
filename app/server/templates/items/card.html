@@ -1,0 +1,55 @@
+{# The item card (layouts 135, 136), the body of the shared <dialog>. The account fields went with QBO (D-02). Field errors come back with 422 and this body again. #}
+{% macro field(name, label, value, kind) %}
+<label class="block">
+  <span class="text-[12px] muted">{{ label }}</span>
+  <input name="{{ name }}" value="{{ value }}" type="{{ kind }}" class="input input-sm w-full mt-1 {% if self.error(name).is_some() %}input-error{% endif %}" autocomplete="off"
+         {% if let Some(e) = self.error(name) %}aria-invalid="true" aria-describedby="err-{{ name }}"{% endif %}>
+  {% if let Some(e) = self.error(name) %}<span class="text-[12px] text-error" id="err-{{ name }}">{{ e }}</span>{% endif %}
+</label>
+{% endmacro %}
+<form {% if id.is_some() %}hx-put{% else %}hx-post{% endif %}="{{ self.action() }}" hx-target="#modal-body">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">{% if id.is_some() %}Edit item{% else %}New item{% endif %}</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3 max-h-[70vh] overflow-y-auto">
+    {% if !errors.is_empty() %}<div role="alert" class="sr-only">Check the highlighted fields.</div>{% endif %}
+    {% call field("name", "Name", form.name, "text") %}
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("sku", "SKU (optional)", form.sku, "text") %}
+      {% call field("unit_price", "Sales price/rate", form.unit_price, "text") %}
+    </div>
+    <label class="block">
+      <span class="text-[12px] muted">Description (optional)</span>
+      <textarea name="description" rows="2" class="textarea textarea-sm w-full mt-1">{{ form.description }}</textarea>
+    </label>
+    <div class="grid grid-cols-2 gap-3 items-end">
+      <label class="block">
+        <span class="text-[12px] muted">Type</span>
+        <select name="item_type" class="select select-sm w-full mt-1 {% if self.error("item_type").is_some() %}select-error{% endif %}" {% if let Some(e) = self.error("item_type") %}aria-invalid="true" aria-describedby="err-item_type"{% endif %}>
+          <option value="" {% if form.item_type.is_empty() %}selected{% endif %}>None</option>
+          {% for t in types %}<option value="{{ t }}" {% if form.item_type == *t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+        {% if let Some(e) = self.error("item_type") %}<span class="text-[12px] text-error" id="err-item_type">{{ e }}</span>{% endif %}
+      </label>
+      <label class="flex items-center gap-1.5 text-[12.5px] h-8"><input type="checkbox" name="taxable" class="checkbox checkbox-xs" {% if form.taxable %}checked{% endif %}>Taxable</label>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      {% call field("purchase_cost", "Purchase cost (optional)", form.purchase_cost, "text") %}
+      {% call field("purchase_desc", "Purchase description (optional)", form.purchase_desc, "text") %}
+    </div>
+    <div class="grid grid-cols-3 gap-3 items-start">
+      {% call field("qty_on_hand", "Qty on hand", form.qty_on_hand, "text") %}
+      {% call field("inv_start_date", "Inventory start date", form.inv_start_date, "date") %}
+      {% call field("level", "Level", form.level, "text") %}
+    </div>
+    <div class="flex items-center gap-4">
+      <label class="flex items-center gap-1.5 text-[12.5px]"><input type="checkbox" name="track_qty_on_hand" class="checkbox checkbox-xs" {% if form.track_qty_on_hand %}checked{% endif %}>Track qty on hand</label>
+      <label class="flex items-center gap-1.5 text-[12.5px]"><input type="checkbox" name="active" class="checkbox checkbox-xs" {% if form.active %}checked{% endif %}>Active</label>
+    </div>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">{% if id.is_some() %}Save{% else %}Create{% endif %}</button>
+  </div>
+</form>

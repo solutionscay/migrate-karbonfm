@@ -1,0 +1,19 @@
+{# The item picker for a new line (UI-06's pattern): active items only (BR-SALES-16). The data attributes are what a line copies from the item (X4). #}
+<div id="item-picker">
+  <label class="flex items-center gap-2 h-8 px-2.5 rounded-field border hairline bg-base-200/50 focus-within:border-primary">
+    <svg class="i muted" aria-hidden="true"><use href="#i-search"/></svg>
+    <input name="q" value="{{ q }}" class="bg-transparent outline-none w-full text-[13px]" placeholder="Search items" aria-label="Search items" autocomplete="off"
+           hx-get="/pickers/item" hx-target="#item-picker" hx-swap="outerHTML" hx-trigger="input changed delay:250ms">
+  </label>
+  <ul class="mt-2 max-h-56 overflow-y-auto" role="radiogroup" aria-label="Items">
+    {% for row in rows %}
+    <li><label class="flex items-center gap-2.5 px-2 py-1.5 rounded-field hover:bg-base-200 cursor-pointer">
+      <input type="radio" name="item_id" value="{{ row.id }}" class="radio radio-xs" data-unit-price="{{ row.input_price }}" data-description="{{ row.description }}" data-taxable="{% if row.taxable %}1{% else %}0{% endif %}" {% if *selected == row.id %}checked{% endif %}>
+      <span class="min-w-0 grow"><span class="block truncate text-[13px]">{{ row.name }}</span>{% if !row.sku.is_empty() %}<span class="block text-[11.5px] muted truncate mono">{{ row.sku }}</span>{% endif %}</span>
+      <span class="num text-[12.5px]">{{ row.price }}</span>
+    </label></li>
+    {% else %}
+    <li class="text-[12.5px] muted px-2 py-3">{% if q.is_empty() %}No active items.{% else %}No active item matches “{{ q }}”.{% endif %}</li>
+    {% endfor %}
+  </ul>
+</div>
