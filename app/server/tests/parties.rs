@@ -695,18 +695,19 @@ async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
     let topbar = &topbar[..topbar.find("</header>").unwrap()];
     assert!(topbar.contains(r#"<details class="dropdown dropdown-end">"#) && topbar.contains("</svg>New<svg"));
     let menu = &topbar[topbar.find(r#"aria-label="New""#).unwrap()..topbar.find("</ul>").unwrap()];
-    assert_eq!(menu.matches("<li>").count(), 7, "Invoice, Sales receipt, Customer, Contact, Task, Note, Template");
+    assert_eq!(menu.matches("<li>").count(), 10, "Invoice, Sales receipt, Customer, Contact, 5 activities, Template");
     assert_eq!(menu.matches("<a ").count(), 2, "two real links, no fake ones");
     assert!(menu.contains(r#"<a href="/parties/new?role=customer">"#));
     assert!(menu.contains(r#"<a href="/parties/new">"#));
     for soon in ["New invoice", "New sales receipt"] {
         assert!(menu.contains(&format!(r#"<button type="button" class="muted" data-soon="{soon}">"#)), "{soon}");
     }
-    // I4: Task and Note open the activity dialog.
-    for kind in ["task", "note"] {
+    // I4: Task, Note, Meeting and Call open the activity dialog.
+    for kind in ["task", "note", "meeting", "call"] {
         assert!(menu.contains(&format!(r##"hx-get="/activities/new?kind={kind}" hx-target="#modal-body""##)), "{kind}");
     }
-    assert_eq!(topbar.matches(r#"hx-get="/activities/new"#).count(), 2, "only Task and Note open a dialog");
+    assert_eq!(topbar.matches(r#"hx-get="/activities/new"#).count(), 4, "Task, Note, Meeting and Call");
+    assert!(menu.contains(r##"hx-get="/email-messages/new" hx-target="#modal-body""##), "Email");
 }
 
 #[tokio::test]
