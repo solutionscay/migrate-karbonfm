@@ -470,3 +470,178 @@ async fn the_list_offers_new_and_edit() {
     assert!(html.contains(r#"aria-label="Unpost INV-1051""#));
     assert!(html.contains(r#"aria-label="Posted""#));
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// S4: T-08-06, AP-06, the payment card, Apply Retainer
+// ---------------------------------------------------------------------------------------------------------------
+
+#[tokio::test]
+async fn t_08_06_invoice_save_cannot_write_payments() {
+    let mut c = demo();
+    let actor = admin::current_user(&c).unwrap().unwrap();
+    let (id, _) = sales::transaction_create(&mut c, Kind::Invoice, "r-hp", TODAY, &actor).unwrap();
+    let count = |c: &Connection| -> (i64, i64) {
+        c.query_row("SELECT (SELECT COUNT(*) FROM payment), (SELECT COUNT(*) FROM payment_line)", [], |r| {
+            Ok((r.get(0)?, r.get(1)?))
+        })
+        .unwrap()
+    };
+    let before = count(&c);
+    let state = AppState::new(c).with_today(TODAY);
+    let a = router(state.clone());
+    let pre = before;
+    for field in ["payment_amount", "payment_line", "id_payment", "amount_paid", "line_invoice"] {
+        let body = format!("doc_number=INV-1052&date={TODAY}&tax_rate=5.5&{field}=100");
+        let (s, _, text) = send(&a, form("PUT", &format!("/invoices/{id}"), &body)).await;
+        assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY, "PUT {field}");
+        assert!(text.contains("unknown field"), "{text}");
+        let (s, _, _) = send(&a, form("POST", "/invoices", &format!("customer_id=r-hp&{field}=100"))).await;
+        assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY, "POST {field}");
+    }
+    // The list still counts the seed's four payments: nothing was written.
+    let (s, _, html) = send(&a, get("/payments")).await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(pre.0, 4);
+    assert!(html.contains("of 4"), "{html}");
+}
+
+/// AP-06: no other command writes the payment tables. The importer and the seed load exports; they are not commands.
+#[test]
+fn ap_06_only_payments_rs_writes_payment_tables() {
+    fn walk(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).unwrap().flatten() {
+            let p = e.path();
+            if p.is_dir() {
+                walk(&p, out);
+            } else if p.extension().is_some_and(|x| x == "rs") {
+                out.push(p);
+            }
+        }
+    }
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    let mut files = Vec::new();
+    walk(&root, &mut files);
+    assert!(files.len() > 20);
+    for f in files {
+        let name = f.strip_prefix(&root).unwrap().to_string_lossy().into_owned();
+        if name == "payments.rs" || name.starts_with("import") {
+            continue;
+        }
+        let text = std::fs::read_to_string(&f).unwrap().to_lowercase();
+        for table in ["payment", "payment_line"] {
+            for verb in ["insert into", "update", "delete from", "insert or replace into"] {
+                assert!(!text.contains(&format!("{verb} {table} ")), "{name} writes {table}");
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn the_payment_card_from_an_invoice() {
+    let c = demo();
+    let inv = id_of(&c, "INV-1048");
+    let a = app(c);
+    // Y3: Record payment shows on the posted invoice.
+    let (_, _, html) = send(&a, Request::get("/sales/INV-1048").body(Body::empty()).unwrap()).await;
+    assert!(html.contains(&format!("/payments/new?invoice_id={inv}")), "{html}");
+    assert!(html.contains("Check #2214"), "its payment is listed");
+    // Y1: amount = balance, date today, one line at the balance.
+    let (s, _, html) = send(&a, get(&format!("/payments/new?invoice_id={inv}"))).await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(html.contains("Payment from Halden &#38; Pryce Architects"), "{html}");
+    assert!(html.contains(r#"name="amount" value="2057.15""#), "{html}");
+    assert!(html.contains(&format!(r#"name="date" value="{TODAY}""#)));
+    assert!(html.contains(r#"name="line_amount" value="2057.15""#));
+    // Y2: the customer's other unpaid invoice is offered, a paid one is not, and neither is another customer's.
+    assert!(html.contains("INV-1042") && !html.contains("INV-1027") && !html.contains("INV-1051"));
+
+    let body = format!("customer_id=r-hp&date={TODAY}&amount=100&method=Cash&line_invoice={inv}&line_amount=100");
+    let (s, h, _) = send(&a, form("POST", "/payments", &body)).await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(h.get("HX-Refresh").unwrap(), "true");
+    let (_, _, html) = send(&a, Request::get("/sales/INV-1048").body(Body::empty()).unwrap()).await;
+    assert!(html.contains("$1,957.15"), "{html}");
+
+    // Field errors come back in the card; another customer's invoice and an unknown field are refused.
+    let over = format!("customer_id=r-hp&date={TODAY}&amount=1&line_invoice={inv}&line_amount=2");
+    let (s, _, html) = send(&a, form("POST", "/payments", &over)).await;
+    assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("The total allocated cannot exceed the Payment amount."));
+    let wrong = format!("customer_id=r-bm&date={TODAY}&amount=1&line_invoice={inv}&line_amount=1");
+    let (s, _, html) = send(&a, form("POST", "/payments", &wrong)).await;
+    assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Only this customer"), "{html}");
+    let (s, _, _) = send(&a, form("POST", "/payments", "customer_id=r-hp&amount=1&total=9")).await;
+    assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY);
+    let (s, _, _) = send(&a, form("POST", "/payments", "customer_id=&amount=1")).await;
+    assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY, "BR-SALES-09: a customer");
+    let (s, _, _) = send(&a, get("/payments/new?invoice_id=nope")).await;
+    assert_eq!(s, StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn an_invoice_with_no_customer_takes_no_payment() {
+    let c = demo();
+    let inv = id_of(&c, "INV-1048");
+    c.execute("PRAGMA foreign_keys = OFF", []).unwrap();
+    c.execute("UPDATE sales_transaction SET id_customer = NULL WHERE id = ?1", [&inv]).unwrap();
+    let a = app(c);
+    let (s, _, text) = send(&a, get(&format!("/payments/new?invoice_id={inv}"))).await;
+    assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(text.contains("doesn't have a customer"), "{text}");
+}
+
+#[tokio::test]
+async fn a_payment_opens_again_and_a_sales_receipt_is_not_a_line() {
+    let c = demo();
+    let sr = id_of(&c, "SR-0311");
+    let a = app(c);
+    let (s, _, html) = send(&a, get("/payments/pay-004/edit")).await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(html.contains(r#"hx-put="/payments/pay-004""#) && html.contains(r#"value="1000.00""#), "{html}");
+    assert!(html.contains("Check"), "a stored method off the list stays");
+    let (s, _, _) = send(&a, get("/payments/nope/edit")).await;
+    assert_eq!(s, StatusCode::NOT_FOUND);
+    let body = format!("customer_id=r-hp&amount=1&line_invoice={sr}&line_amount=1");
+    let (s, _, html) = send(&a, form("POST", "/payments", &body)).await;
+    assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(html.contains("Only this customer"));
+    let (s, _, _) = send(&a, form("PUT", "/payments/nope", "customer_id=r-hp&amount=1")).await;
+    assert_eq!(s, StatusCode::NOT_FOUND);
+    // A draft has no Record payment (Y3); a receipt has no payments panel.
+    let (_, _, html) = send(&a, Request::get("/sales/SR-0311").body(Body::empty()).unwrap()).await;
+    assert!(!html.contains("Record payment"));
+}
+
+#[tokio::test]
+async fn apply_retainer_through_the_route() {
+    let mut c = demo();
+    let actor = admin::current_user(&c).unwrap().unwrap();
+    let (id, _) = sales::transaction_create(&mut c, Kind::Invoice, "r-cs", TODAY, &actor).unwrap();
+    let input = sales::transaction_get(&c, &id).unwrap().input;
+    sales::transaction_save(&mut c, Kind::Invoice, &id, &input, true, &actor).unwrap();
+    let mut input = sales::transaction_get(&c, &id).unwrap().input;
+    input.lines[0].item_id = "i-svc-design".into();
+    input.lines[0].qty = "1".into();
+    input.lines[0].unit_price = "300.00".into();
+    sales::transaction_save(&mut c, Kind::Invoice, &id, &input, false, &actor).unwrap();
+    let inv = id_of(&c, "INV-1048");
+    let a = app(c);
+    let uri = format!("/invoices/{id}/apply-retainer");
+    let (_, _, html) = send(&a, Request::get("/sales/INV-1052").body(Body::empty()).unwrap()).await;
+    assert!(html.contains("Retainer available") && html.contains("$2,000.00"), "{html}");
+    assert!(!html.contains("Record payment"), "Y3: a draft takes no payment from its page");
+    let (s, h, html) = send(&a, form("POST", &uri, "")).await;
+    assert_eq!(s, StatusCode::OK, "{html}");
+    assert!(h.get("HX-Trigger").is_some());
+    assert!(html.contains("Retainer applied") && html.contains("−$300.00"), "{html}");
+    let (s, _, text) = send(&a, form("POST", &uri, "")).await;
+    assert_eq!(s, StatusCode::CONFLICT);
+    assert!(text.contains("Nothing is due"), "{text}");
+    let (s, _, _) = send(&a, form("POST", &format!("/invoices/{inv}/apply-retainer"), "")).await;
+    assert_eq!(s, StatusCode::CONFLICT, "AP-05");
+    let (s, _, _) = send(&a, form("POST", "/invoices/nope/apply-retainer", "")).await;
+    assert_eq!(s, StatusCode::NOT_FOUND);
+    let (s, _, _) = send(&a, form("POST", &uri, "payment_amount=1")).await;
+    assert_eq!(s, StatusCode::UNPROCESSABLE_ENTITY);
+}

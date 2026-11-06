@@ -127,6 +127,9 @@ pub struct Editor {
     pub terms: Vec<String>,
     pub errors: Vec<FieldError>,
     pub status_label: &'static str,
+    /// The retainer the invoice could use, and the customer's accounts receivable (layout 69's popover).
+    pub retainer_available: Cents,
+    pub receivable: Cents,
 }
 
 impl Editor {
@@ -214,7 +217,23 @@ pub fn editor(
             choices,
         });
     }
-    Ok(Editor { rows, terms: sales::term_choices(conn)?, errors, status_label: "Draft", t })
+    let retainer_available = sales::retainer_available(conn, &t.customer_role_id)
+        .map_err(|e| AppError::Internal(format!("retainer_available: {e}")))?;
+    let receivable: i64 = rusqlite::OptionalExtension::optional(conn.query_row(
+        "SELECT COALESCE(balance, 0) FROM customer WHERE id = ?1",
+        [&t.customer_role_id],
+        |r| r.get(0),
+    ))?
+    .unwrap_or(0);
+    Ok(Editor {
+        rows,
+        terms: sales::term_choices(conn)?,
+        errors,
+        status_label: "Draft",
+        retainer_available,
+        receivable: Cents(receivable),
+        t,
+    })
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -391,6 +410,41 @@ pub async fn save_receipt(
     form: FormPairs,
 ) -> Result<Response, AppError> {
     save(state, headers, actor, Kind::Receipt, id, form).await
+}
+
+/// `POST /invoices/{id}/apply-retainer` (OP-SALES-12). The form is saved first (kontacts 223 s5 commits, then s7 applies);
+/// a request with no form applies at once. The answer is the editor with the new line and totals.
+pub async fn apply_retainer(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+    CurrentUser(actor): CurrentUser,
+    form: FormPairs,
+) -> Result<Response, AppError> {
+    if let Err(refused) = form.only(FORM_FIELDS) {
+        return Ok(*refused);
+    }
+    let mut conn = lock_db(&state)?;
+    if !form.0.is_empty() {
+        let input = match input_of(&form) {
+            Ok(i) => i,
+            Err(message) => return Ok((StatusCode::UNPROCESSABLE_ENTITY, message).into_response()),
+        };
+        match sales::transaction_save(&mut conn, Kind::Invoice, &id, &input, false, &actor) {
+            Ok(()) => {}
+            Err(CommandError::Validation(errors)) => {
+                let view = editor(&conn, &id, Some(input), errors)?;
+                return Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(view.render()?)).into_response());
+            }
+            Err(e) => return command_error("transaction_save", e),
+        }
+    }
+    match sales::retainer_apply(&mut conn, &id, &actor) {
+        Ok(_) => {
+            let view = editor(&conn, &id, None, Vec::new())?;
+            Ok(([("HX-Trigger", toast("Retainer applied", false))], Html(view.render()?)).into_response())
+        }
+        Err(e) => command_error("retainer_apply", e),
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------

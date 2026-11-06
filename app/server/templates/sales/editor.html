@@ -78,6 +78,16 @@
     </article>
 
     <aside class="space-y-4">
+      {% if self.is_invoice() %}
+      <section class="panel p-4 text-[12.5px]" aria-labelledby="retainer-title">
+        <h2 class="panel-title" id="retainer-title">Retainer</h2>
+        <dl class="grid grid-cols-[1fr_auto] gap-y-1 mt-2">
+          <dt class="muted">Retainer available</dt><dd class="num text-right">{{ retainer_available }}</dd>
+          <dt class="muted">Accounts receivable</dt><dd class="num text-right">{{ receivable }}</dd>
+        </dl>
+        <button type="button" class="btn btn-sm btn-quiet w-full mt-3" hx-post="/invoices/{{ t.id|urlencode }}/apply-retainer" hx-trigger="click">Apply retainer</button>
+      </section>
+      {% endif %}
       <section class="panel p-4 text-[12.5px] space-y-2">
         <div class="panel-title">Billing address</div>
         {% for (name, label, value) in self.bill_fields() %}

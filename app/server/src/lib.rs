@@ -25,6 +25,7 @@ pub mod money;
 pub mod net;
 pub mod notifications;
 pub mod parties;
+pub mod payments;
 pub mod pdf;
 pub mod reference;
 mod routes;

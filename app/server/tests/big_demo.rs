@@ -129,6 +129,25 @@ async fn new_data_folder_gets_the_big_demo_and_opens_without_setup() {
 
     // 06 "Data-density": a page of a long list renders fast. Some 3,000 activities here; the debug build gets a
     // generous margin over the 200 ms of 06 (a release build is several times faster).
+    // The payment card, for the customer with the most open invoices.
+    let invoice: String = state_db(&dir)
+        .query_row(
+            "SELECT id FROM sales_transaction WHERE invoice_ind = 1 AND COALESCE(paid_ind, 0) <> 1 AND id_customer =
+               (SELECT id_customer FROM sales_transaction WHERE invoice_ind = 1 AND COALESCE(paid_ind, 0) <> 1
+                GROUP BY id_customer ORDER BY COUNT(*) DESC LIMIT 1) LIMIT 1",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap();
+    let card = format!("/payments/new?invoice_id={invoice}");
+    for uri in ["/payments?page=3", card.as_str()] {
+        let start = std::time::Instant::now();
+        let (status, html) = get(&state, uri).await;
+        let took = start.elapsed();
+        assert_eq!(status, StatusCode::OK, "{uri}");
+        assert!(html.contains("INV-"), "{uri}");
+        assert!(took.as_millis() < 600, "{uri} took {took:?}");
+    }
     for uri in ["/sales?page=5", "/sales?status=overdue", "/sales/INV-12000"] {
         let start = std::time::Instant::now();
         let (status, html) = get(&state, uri).await;

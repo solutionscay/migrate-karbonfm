@@ -7,7 +7,7 @@
 use crate::admin::{parse_percent_bp, CommandError, FieldError};
 use crate::audit::{self, Actor, Stamp};
 use crate::ids::new_id;
-use karbon_money::sales::{self, Line, Totals, RETAINER_ITEM_NAME};
+use karbon_money::sales::{self, ApplyRetainerRefused, Line, Totals, RETAINER_ITEM_NAME};
 use karbon_money::{Cents, Qty};
 use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 
@@ -749,6 +749,74 @@ pub fn lines_remove(
     }
     tx.commit()?;
     Ok(())
+}
+
+/// The customer's retainer available to apply (BR-SALES-18): the balance less the credit lines on the customer's unposted
+/// transactions, so one deposit cannot be applied twice. A deposit that is not posted yet is not available.
+pub fn retainer_available(conn: &Connection, customer_role_id: &str) -> Result<Cents, CommandError> {
+    let balance: i64 = conn
+        .query_row(
+            &format!("SELECT {} FROM customer AS t WHERE t.id = ?1", retainer_balance_sql()),
+            [customer_role_id],
+            |r| r.get(0),
+        )
+        .optional()?
+        .unwrap_or(0);
+    let credits: Vec<Cents> = {
+        let mut stmt = conn.prepare(
+            "SELECT sl.amount FROM sales_line sl JOIN item it ON it.id = sl.item_id
+             JOIN sales_transaction st ON st.id = sl.sales_transaction_id
+             WHERE st.id_customer = ?1 AND COALESCE(st.locked_ind, 0) = 0 AND COALESCE(st.deleted, 0) = 0
+               AND it.name = ?2 AND sl.amount < 0",
+        )?;
+        let rows = stmt.query_map(params![customer_role_id, RETAINER_ITEM_NAME], |r| Ok(Cents(r.get(0)?)))?;
+        rows.collect::<rusqlite::Result<_>>()?
+    };
+    sales::available_retainer(Cents(balance), credits)
+        .map_err(|_| CommandError::Validation(vec![field("lines", "An amount is too large.")]))
+}
+
+/// OP-SALES-12 `retainer_apply` (BR-SALES-18, OD-07-04): one line on an unlocked invoice: item "Retainer", description
+/// "Retainer applied", not taxable, -min(balance due, available). Returns the amount.
+pub fn retainer_apply(conn: &mut Connection, id: &str, actor: &Actor) -> Result<Cents, CommandError> {
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let current = head(&tx, id)?;
+    if current.kind != Kind::Invoice {
+        return Err(CommandError::NotFound);
+    }
+    if current.locked {
+        return Err(CommandError::Locked);
+    }
+    let Some(customer) = current.customer else {
+        return Err(CommandError::Refused("This invoice has no customer.".into()));
+    };
+    let due: i64 =
+        tx.query_row("SELECT COALESCE(balance, 0) FROM sales_transaction WHERE id = ?1", [id], |r| r.get(0))?;
+    let available = retainer_available(&tx, &customer)?;
+    let amount = sales::apply_retainer_amount(Cents(due), available).map_err(|e| {
+        CommandError::Refused(
+            match e {
+                ApplyRetainerRefused::NothingDue => "Nothing is due on this invoice.",
+                ApplyRetainerRefused::NoRetainerAvailable => "This customer has no retainer available.",
+            }
+            .into(),
+        )
+    })?;
+    // Q5: the name is what counts (BR-SALES-07), active or not.
+    let item: Option<String> =
+        tx.query_row("SELECT id FROM item WHERE name = ?1 LIMIT 1", [RETAINER_ITEM_NAME], |r| r.get(0)).optional()?;
+    let Some(item) = item else {
+        return Err(CommandError::Refused("Add an item named Retainer first.".into()));
+    };
+    tx.execute(
+        "INSERT INTO sales_line (id, sales_transaction_id, item_id, description, qty, unit_price, taxable)
+         VALUES (?1, ?2, ?3, 'Retainer applied', 1, ?4, 0)",
+        params![new_id(), id, item, amount.0],
+    )?;
+    recompute_totals(&tx, id)?;
+    audit::stamp_modified(&tx, "invoice", &id.to_owned(), &Stamp::now(actor))?;
+    tx.commit()?;
+    Ok(amount)
 }
 
 /// A transaction for the editor, by id.

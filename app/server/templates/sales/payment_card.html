@@ -1,0 +1,44 @@
+{# UI-14 the payment card (layout 85; design/invoice.html "Record payment"). An amount on a row allocates to that invoice;
+   Choose fills its balance (kontacts 280). Allocated above the amount is refused (kontacts 283). #}
+<form hx-{% if id.is_some() %}put{% else %}post{% endif %}="{{ self.action() }}" hx-target="#modal-body" x-data>
+  <input type="hidden" name="customer_id" value="{{ input.customer_id }}">
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">Payment from {{ customer }}</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3 max-h-[70vh] overflow-y-auto text-[13px]">
+    <div class="grid grid-cols-2 gap-3">
+      <label class="block"><span class="text-[12px] muted">Amount</span><input name="amount" value="{{ input.amount }}" class="input input-sm w-full mt-1 num" autofocus>
+        {% if let Some(e) = self.error("amount") %}<span class="text-[12px] text-error" role="alert">{{ e }}</span>{% endif %}</label>
+      <label class="block"><span class="text-[12px] muted">Date</span><input type="date" name="date" value="{{ input.date }}" class="input input-sm w-full mt-1 num">
+        {% if let Some(e) = self.error("date") %}<span class="text-[12px] text-error" role="alert">{{ e }}</span>{% endif %}</label>
+      <label class="block"><span class="text-[12px] muted">Payment method</span>
+        <select name="method" class="select select-sm w-full mt-1"><option value="">None</option>{% for m in methods %}<option value="{{ m }}" {% if *m == input.method %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></label>
+      <label class="block"><span class="text-[12px] muted">Reference number</span><input name="reference" value="{{ input.reference }}" class="input input-sm w-full mt-1"></label>
+      <label class="block"><span class="text-[12px] muted">Deposit account</span>
+        <select name="deposit" class="select select-sm w-full mt-1"><option value="">None</option>{% for m in deposits %}<option value="{{ m }}" {% if *m == input.deposit %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></label>
+    </div>
+    <div class="panel-title pt-2">Allocate payment</div>
+    {% for e in self.line_errors() %}<p class="text-[12px] text-error" role="alert">{{ e }}</p>{% endfor %}
+    <table class="w-full text-[12.5px]">
+      <thead><tr class="muted text-left text-[11.5px]"><th class="font-medium py-1">Invoice</th><th class="font-medium py-1">Date</th><th class="font-medium py-1 text-right">Original</th><th class="font-medium py-1 text-right">Balance due</th><th class="font-medium py-1 text-right w-32">Amount to be credited</th></tr></thead>
+      <tbody>
+        {% for r in rows %}
+        <tr class="border-t hairline">
+          <td class="py-1.5 mono">{{ r.doc_number }}<input type="hidden" name="line_invoice" value="{{ r.invoice_id }}"></td>
+          <td class="py-1.5 num">{{ r.date }}</td>
+          <td class="py-1.5 num text-right">{{ r.original }}</td>
+          <td class="py-1.5 num text-right"><button type="button" class="link link-hover" title="Credit the balance" aria-label="Credit the balance of {{ r.doc_number }}" @click="$el.closest('tr').querySelector('[name=line_amount]').value = '{{ r.balance_input }}'">{{ r.balance }}</button></td>
+          <td class="py-1.5"><input name="line_amount" value="{{ r.amount }}" class="input input-sm w-full text-right num" aria-label="Amount to be credited to {{ r.doc_number }}"></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="py-4 text-center muted">No open invoices.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">Save payment</button>
+  </div>
+</form>

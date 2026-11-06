@@ -13,6 +13,7 @@ mod files;
 mod items;
 mod parties;
 mod party_forms;
+mod payments;
 mod relation_forms;
 mod sales;
 mod sales_forms;
@@ -97,6 +98,7 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/invoices/new"),
     ("POST", "/invoices"),
     ("PUT", "/invoices/{id}"),
+    ("POST", "/invoices/{id}/apply-retainer"),
     ("GET", "/sales-receipts/new"),
     ("POST", "/sales-receipts"),
     ("PUT", "/sales-receipts/{id}"),
@@ -105,6 +107,10 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("DELETE", "/sales-transactions/{id}/lines"),
     ("GET", "/sales"),
     ("GET", "/payments"),
+    ("POST", "/payments"),
+    ("GET", "/payments/new"),
+    ("GET", "/payments/{id}/edit"),
+    ("PUT", "/payments/{id}"),
     ("GET", "/sales/{doc_number}"),
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/sales/{doc_number}/save-pdf"),
@@ -196,6 +202,7 @@ pub fn router() -> Router<AppState> {
         .route("/invoices/new", get(sales_forms::new_invoice))
         .route("/invoices", post(sales_forms::create_invoice))
         .route("/invoices/{id}", put(sales_forms::save_invoice).fallback(not_found))
+        .route("/invoices/{id}/apply-retainer", post(sales_forms::apply_retainer))
         .route("/sales-receipts/new", get(sales_forms::new_receipt))
         .route("/sales-receipts", post(sales_forms::create_receipt))
         .route("/sales-receipts/{id}", put(sales_forms::save_receipt))
@@ -203,7 +210,10 @@ pub fn router() -> Router<AppState> {
         .route("/sales-transactions/{id}", delete(sales_forms::delete))
         .route("/sales-transactions/{id}/lines", delete(sales_forms::remove_lines))
         .route("/sales", get(sales_lists::sales))
-        .route("/payments", get(sales_lists::payments))
+        .route("/payments", get(sales_lists::payments).post(payments::create))
+        .route("/payments/new", get(payments::new_card))
+        .route("/payments/{id}/edit", get(payments::edit_card))
+        .route("/payments/{id}", put(payments::update))
         .route("/sales/{doc_number}", get(sales::page))
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))

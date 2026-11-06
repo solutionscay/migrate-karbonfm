@@ -25,6 +25,8 @@ struct ReadOnlyPage {
     can_save: bool,
     /// The attachments panel (UI-19).
     files: String,
+    /// The invoice's payments (layouts 69, 143); empty for a sales receipt.
+    payments: String,
 }
 
 /// The editor of an unlocked transaction, in the app's layout (layouts 69, 94).
@@ -39,11 +41,21 @@ struct EditorPage {
     editor: String,
     /// The attachments panel (UI-19).
     files: String,
+    /// The invoice's payments (layouts 69, 143); empty for a sales receipt.
+    payments: String,
 }
 
 fn load(state: &AppState, doc_number: &str) -> Result<Invoice, AppError> {
     let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
     Ok(Invoice::load_at(&conn, doc_number, &state.today())?)
+}
+
+/// The Payments panel: invoices only (layouts 69, 143); "Receive Payment" on a posted one (Y3).
+fn payments_panel(conn: &rusqlite::Connection, inv: &Invoice) -> Result<String, AppError> {
+    if !inv.is_invoice {
+        return Ok(String::new());
+    }
+    Ok(super::payments::PaymentsPanel::load(conn, &inv.id, inv.locked)?.render()?)
 }
 
 /// `GET /sales/{doc_number}` (UI-12): an unlocked transaction opens in the editor, a locked one read only (kontacts 224
@@ -54,6 +66,7 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
         let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
         let editor = super::sales_forms::editor(&conn, &inv.id, None, Vec::new())?.render()?;
         let files = super::files::EntityFiles::load(&state, &conn, 12, &inv.id)?.render()?;
+        let payments = payments_panel(&conn, &inv)?;
         return render(&EditorPage {
             nav: Nav::Invoices,
             demo: crate::db::has_demo_data(&conn)?,
@@ -62,12 +75,13 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
             party_id: inv.party_id,
             editor,
             files,
+            payments,
         });
     }
     let status_class = inv.state.chip();
-    let files = {
+    let (files, payments) = {
         let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
-        super::files::EntityFiles::load(&state, &conn, 12, &inv.id)?.render()?
+        (super::files::EntityFiles::load(&state, &conn, 12, &inv.id)?.render()?, payments_panel(&conn, &inv)?)
     };
     render(&ReadOnlyPage {
         nav: Nav::Invoices,
@@ -78,6 +92,7 @@ pub async fn page(State(state): State<AppState>, Path(doc_number): Path<String>)
         status_class,
         can_save: state.save.is_some(),
         files,
+        payments,
         inv,
     })
 }

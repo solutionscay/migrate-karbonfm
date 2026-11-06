@@ -91,6 +91,8 @@ fn sample(path: &str) -> String {
         "t-inv-1048"
     } else if path.starts_with("/sales-receipts/") {
         "t-sr-0311"
+    } else if path.starts_with("/payments/") {
+        "pay-004"
     } else if path.starts_with("/items/") {
         "i-svc-hourly"
     } else {
