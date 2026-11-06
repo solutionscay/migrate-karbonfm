@@ -330,6 +330,27 @@ async fn b11_big_demo_is_current_on_any_day() {
     assert_ne!(overdue, "$0.00");
 }
 
+/// The synth's payment odds: overdue is 10 to 20% of balance due, today and on the first of a month.
+#[tokio::test]
+async fn overdue_is_a_tenth_to_a_fifth_of_balance_due() {
+    let cents = |usd: &str| -> i64 { usd.trim_start_matches('$').replace([',', '.'], "").parse().unwrap() };
+    for day in ["2026-11-06", "2026-12-01"] {
+        let tmp = tempfile::tempdir().unwrap();
+        let dir = tmp.path().join("data");
+        std::fs::create_dir_all(&dir).unwrap();
+        let today = karbon_server::demo_dates::parse_date(day).unwrap();
+        assert!(matches!(big_demo::create_as_of(&dir, today).unwrap(), Outcome::Created { .. }));
+        let conn = db::open(&db::database_path(&dir), Seed::Reference).unwrap().0;
+        let state = AppState::new(conn).with_data_dir(&dir).with_today(day);
+        let (_, html) = get(&state, "/").await;
+        let (revenue, balance, overdue) =
+            (usd_after(&html, "Revenue this month"), usd_after(&html, "Balance due"), usd_after(&html, ">Overdue<"));
+        let share = cents(overdue) as f64 / cents(balance) as f64;
+        eprintln!("{day}: revenue {revenue}, balance due {balance}, overdue {overdue}, {:.1}%", share * 100.0);
+        assert!((0.10..=0.20).contains(&share), "{day}: overdue {overdue} of {balance}");
+    }
+}
+
 /// B11 by the wall clock: `create` uses the local date, with nothing pinned.
 #[tokio::test]
 async fn b11_big_demo_by_the_wall_clock_has_revenue() {

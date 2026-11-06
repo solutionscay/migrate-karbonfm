@@ -71,6 +71,8 @@ struct Item {
 struct G<'a> {
     x: &'a mut Export,
     r: Rng,
+    /// The draws of the invoices collected late (`pay`): a stream of its own, so the rest of the export stays the same.
+    late: Rng,
     scale: f64,
     employees: Vec<(String, String, String)>, // (party id, role id, name)
     customers: Vec<Customer>,
@@ -86,6 +88,7 @@ pub fn build(x: &mut Export, cfg: Config) {
     let mut g = G {
         x,
         r: Rng::new(cfg.seed),
+        late: Rng::new(cfg.seed ^ 0x6c61_7465),
         scale: cfg.scale,
         employees: Vec::new(),
         customers: Vec::new(),
@@ -1434,16 +1437,54 @@ impl G<'_> {
         } else {
             0.25
         };
-        if !self.r.chance(p_paid) {
+        if self.r.chance(p_paid) {
+            let paid = self.pay_parts(c, t, total, always, age, false, pay_no);
+            if paid > 0 {
+                return paid;
+            }
+        }
+        // Most of the rest come in late, or the demo reads as a business nobody pays: overdue was 57% of balance due
+        // (owner, 2026-11-06: 10 to 20%). The draws are `late`'s, so every other row of the export stays the same.
+        let p_late = if age > 60 {
+            0.97
+        } else if age > 30 {
+            0.9
+        } else if age > 15 {
+            0.8
+        } else {
+            0.0
+        };
+        if !self.late.chance(p_late) {
             return 0;
         }
+        std::mem::swap(&mut self.r, &mut self.late);
+        let paid = self.pay_parts(c, t, total, always, age, true, pay_no);
+        std::mem::swap(&mut self.r, &mut self.late);
+        paid
+    }
+
+    /// The payments of an invoice that gets paid; returns the amount. `late`: all of it, by the export's last day.
+    #[allow(clippy::too_many_arguments)]
+    fn pay_parts(
+        &mut self,
+        c: &Customer,
+        t: &Txn,
+        total: i64,
+        always: bool,
+        age: i64,
+        late: bool,
+        pay_no: &mut u32,
+    ) -> i64 {
         let mut paid = 0;
         let methods = [("Check", 0.45), ("ACH", 0.35), ("Credit Card", 0.2)];
         let mi = self.r.weighted(&methods.iter().map(|m| m.1).collect::<Vec<_>>());
         let method = methods[mi].0;
-        let split = !always && total > 200000 && self.r.chance(0.2);
+        let split = !late && !always && total > 200000 && self.r.chance(0.2);
         let parts = if split { vec![total / 2, total - total / 2] } else { vec![total] };
         let mut when = t.date + Duration::days(self.r.range(3, c.terms + 20));
+        if late {
+            when = when.min(end());
+        }
         for (k, amount) in parts.iter().enumerate() {
             if when > end() || (!always && k == 1 && age < 75) {
                 break;
