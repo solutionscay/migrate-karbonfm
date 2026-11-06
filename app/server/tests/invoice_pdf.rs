@@ -191,7 +191,7 @@ fn assert_pdf_equals_stored(check: &rusqlite::Connection, id: &str, doc: &str) {
     assert!(texts.iter().any(|s| *s == Cents(tax).to_string()), "{texts:?}");
 }
 
-/// S5 builds the edit step. Apply Retainer and a payment are S4's: pane A adds them at integration.
+/// Edit, Apply Retainer, post, pay: after each step the PDF prints the stored totals (03 I5 exit).
 #[tokio::test]
 async fn pdf_matches_totals_after_edit() {
     let (app, check, _tmp) = app_and_conn();
@@ -205,6 +205,29 @@ async fn pdf_matches_totals_after_edit() {
     let after = stored(&check, &id);
     assert_ne!(before, after, "the edit moved the totals");
     assert_pdf_equals_stored(&check, &id, "INV-1048");
+
+    // Apply Retainer (S4). Unposted, INV-1048's own -$500.00 line is already spoken for: $2,000.00 less it leaves $1,500.00.
+    let uri = format!("/invoices/{id}/apply-retainer");
+    assert_eq!(send_form(&app, "POST", &uri, "").await, StatusCode::OK);
+    let applied = stored(&check, &id);
+    assert_eq!(applied.3, after.3 - 150_000, "the credit line");
+    assert_eq!(applied.4, after.4 - 150_000, "the balance due");
+    assert_pdf_equals_stored(&check, &id, "INV-1048");
+    let inv = Invoice::load(&check, "INV-1048").unwrap();
+    assert!(row_shows(&printed(&inv), "Retainer applied", "−$2,000.00"), "{:?}", printed(&inv));
+
+    // Post it, then a payment (S4): only the balance moves.
+    let lock = format!("/sales-transactions/{id}/lock");
+    assert_eq!(send_form(&app, "POST", &lock, "lock=true").await, StatusCode::OK);
+    assert_pdf_equals_stored(&check, &id, "INV-1048");
+    let body = format!("customer_id=r-hp&date=2026-11-06&amount=50&line_invoice={id}&line_amount=50");
+    assert_eq!(send_form(&app, "POST", "/payments", &body).await, StatusCode::OK);
+    let paid = stored(&check, &id);
+    assert_eq!(paid.4, applied.4 - 5_000);
+    assert_eq!((paid.0, paid.1, paid.2, paid.3), (applied.0, applied.1, applied.2, applied.3), "the rest stays");
+    assert_pdf_equals_stored(&check, &id, "INV-1048");
+    let inv = Invoice::load(&check, "INV-1048").unwrap();
+    assert!(row_shows(&printed(&inv), "Payments", "−$1,050.00"), "{:?}", printed(&inv));
 }
 
 #[tokio::test]
