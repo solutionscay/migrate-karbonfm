@@ -695,7 +695,7 @@ async fn the_top_bar_new_menu_opens_the_wizard_for_a_customer() {
     let topbar = &topbar[..topbar.find("</header>").unwrap()];
     assert!(topbar.contains(r#"<details class="dropdown dropdown-end">"#) && topbar.contains("</svg>New<svg"));
     let menu = &topbar[topbar.find(r#"aria-label="New""#).unwrap()..topbar.find("</ul>").unwrap()];
-    assert_eq!(menu.matches("<li>").count(), 5, "Invoice, Sales receipt, Customer, Task, Note");
+    assert_eq!(menu.matches("<li>").count(), 7, "Invoice, Sales receipt, Opportunity, Item, Customer, Task, Note");
     assert_eq!(menu.matches("<a ").count(), 1, "one real link, no fake ones");
     assert!(menu.contains(r#"<a href="/parties/new?role=customer">"#));
     // I5: Invoice and Sales receipt open the customer dialog.

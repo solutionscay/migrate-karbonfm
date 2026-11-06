@@ -210,6 +210,8 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
 - Destructive action confirmation: none
 
+**Where a create action lives (user rule, 2026-11-06; it wins over the FileMaker source and the mockups).** The header's New menu is the one place for a page's create action, and no action appears twice on a page. On the I5 screens the menu offers Invoice, Sales receipt, Opportunity and Item; /sales, /opportunities and /items have no create button of their own. Kept on the page, because the header cannot do them: New invoice, New sales receipt and New opportunity on a party's tabs (they preset that party), Record payment on a posted invoice (a payment starts from its invoice, kontacts 221), Add line and Apply retainer in the editor, and row-level Edit.
+
 ### UI-10 Opportunities
 
 - Readiness: behavior-ready

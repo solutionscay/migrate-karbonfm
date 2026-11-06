@@ -463,10 +463,10 @@ async fn a_draft_page_shows_status_from_the_data_not_the_column() {
 }
 
 #[tokio::test]
-async fn the_list_offers_new_and_edit() {
+async fn the_list_offers_edit_and_the_header_offers_new() {
     let a = app(demo());
     let (_, _, html) = send(&a, Request::get("/sales").body(Body::empty()).unwrap()).await;
-    assert!(html.contains("New invoice") && html.contains("New sales receipt"));
+    assert!(!html.contains("New invoice") && !html.contains("New sales receipt"), "the page repeats no create button");
     assert!(html.contains(r#"aria-label="Unpost INV-1051""#));
     assert!(html.contains(r#"aria-label="Posted""#));
 }
