@@ -193,6 +193,45 @@ window.karbonColor = function (name) {
   window.addEventListener("karbon-theme", draw);
 })();
 
+// Opportunity chart (O8): <canvas data-status-chart='{"labels": [...], "values": [...]}'>, dollars per status. htmx
+// loads the fragment, so it draws after a swap too.
+(function () {
+  let chart;
+  const money = (v) => "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  function draw() {
+    const canvas = document.querySelector("[data-status-chart]");
+    if (!canvas || !window.Chart) return;
+    const data = JSON.parse(canvas.dataset.statusChart);
+    const c = window.karbonColor;
+    if (chart) chart.destroy();
+    Chart.defaults.font.family = "Geist, system-ui, sans-serif";
+    Chart.defaults.font.size = 11.5;
+    Chart.defaults.color = c("--k-muted");
+    chart = new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels: data.labels,
+        datasets: [{ label: "Value", data: data.values, backgroundColor: c("--color-primary"), borderRadius: 4, barPercentage: 0.62, categoryPercentage: 0.8 }],
+      },
+      options: {
+        indexAxis: "y",
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: c("--color-neutral"), titleColor: c("--color-neutral-content"), bodyColor: c("--color-neutral-content"),
+            padding: 10, cornerRadius: 4, callbacks: { label: (ctx) => ` ${money(ctx.parsed.x)}` } },
+        },
+        scales: {
+          x: { beginAtZero: true, border: { display: false }, grid: { color: c("--k-chart-grid") }, ticks: { maxTicksLimit: 5, callback: (v) => "$" + v / 1000 + "k" } },
+          y: { grid: { display: false }, border: { display: false } },
+        },
+      },
+    });
+  }
+  document.addEventListener("htmx:afterSettle", draw);
+  window.addEventListener("karbon-theme", draw);
+})();
+
 document.addEventListener("alpine:init", () => {
   Alpine.data("palette", () => ({
     open: false,

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Opportunity · KarbonFM{% endblock %}
+{% block content %}
+<div class="flex items-center gap-2 mb-3 text-[12.5px]">
+  <a class="link link-hover muted" href="/opportunities">Opportunities</a>
+</div>
+{{ summary|safe }}
+<div class="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-5">
+  <div class="min-w-0 space-y-5">
+    <section aria-labelledby="activity-title">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <h2 class="panel-title mr-auto" id="activity-title">Activity <span class="chip">{{ activity_count }}</span></h2>
+        {% for (kind, label, icon) in [("note", "Note", "note"), ("task", "Task", "task"), ("meeting", "Meeting", "video"), ("call", "Call", "phone")] %}
+        <button class="btn btn-sm btn-quiet" hx-get="/activities/new?kind={{ kind }}&amp;party_id={{ party_id|urlencode }}&amp;entity_type_id={{ entity_type }}&amp;entity_id={{ id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-{{ icon }}"/></svg>{{ label }}</button>
+        {% endfor %}
+        <button class="btn btn-sm btn-quiet" hx-get="/email-messages/new?party_id={{ party_id|urlencode }}&amp;entity_type_id={{ entity_type }}&amp;entity_id={{ id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-mail"/></svg>Email</button>
+        <button class="btn btn-sm btn-primary" hx-get="/discussions/new?entity_type_id={{ entity_type }}&amp;entity_id={{ id|urlencode }}" hx-target="#modal-body"><svg class="i i-sm" aria-hidden="true"><use href="#i-comment"/></svg>Start discussion</button>
+      </div>
+      {{ activity|safe }}
+    </section>
+    <section aria-labelledby="contacts-title">
+      <h2 class="panel-title mb-3" id="contacts-title">Contacts</h2>
+      {{ relations|safe }}
+    </section>
+  </div>
+  <aside class="space-y-4" aria-label="Files">
+    {{ files|safe }}
+  </aside>
+</div>
+{% endblock %}

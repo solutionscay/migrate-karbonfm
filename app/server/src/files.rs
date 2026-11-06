@@ -442,12 +442,22 @@ fn row_from(r: &rusqlite::Row, data_dir: Option<&Path>) -> rusqlite::Result<File
 
 /// The files attached to a party, newest first (the party Files panel, customer.html).
 pub fn party_files(conn: &Connection, data_dir: Option<&Path>, party_id: &str) -> rusqlite::Result<Vec<FileRow>> {
+    entity_files(conn, data_dir, EntityType::Party.id(), party_id)
+}
+
+/// The files linked to one record, newest first (a party, or an opportunity's panel on layout 156).
+pub fn entity_files(
+    conn: &Connection,
+    data_dir: Option<&Path>,
+    entity_type_id: i64,
+    entity_id: &str,
+) -> rusqlite::Result<Vec<FileRow>> {
     let sql = format!(
         "{ROW_SQL}, fa.id FROM file_attachment fa JOIN file f ON f.id = fa.attachment_id \
-         WHERE fa.entity_type_id = 10 AND fa.entity_id = ?1 ORDER BY f.creation_timestamp DESC, f.id"
+         WHERE fa.entity_type_id = ?1 AND fa.entity_id = ?2 ORDER BY f.creation_timestamp DESC, f.id"
     );
     let mut stmt = conn.prepare(&sql)?;
-    let rows = stmt.query_map([party_id], |r| {
+    let rows = stmt.query_map(rusqlite::params![entity_type_id, entity_id], |r| {
         let mut row = row_from(r, data_dir)?;
         row.attachment_id = r.get(10)?;
         Ok(row)

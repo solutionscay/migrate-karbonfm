@@ -87,6 +87,8 @@ fn sample(path: &str) -> String {
         "f-001"
     } else if path.starts_with("/attachments/") {
         "fa-001"
+    } else if path.starts_with("/opportunities/") {
+        "o-hp-fitout2"
     } else {
         "p-hp"
     };

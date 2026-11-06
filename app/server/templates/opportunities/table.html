@@ -1,0 +1,54 @@
+{# UI-10 list (layout 153): toolbar, rows by status with subtotals, pager. htmx replaces #opportunity-table with it. #}
+<form class="flex flex-wrap items-center gap-2 px-4 py-3 border-b hairline" role="search"
+      hx-get="/opportunities" hx-target="#opportunity-table" hx-push-url="true" hx-trigger="input changed delay:250ms from:input[name=q]">
+  <label class="flex items-center gap-2 h-8 px-2.5 w-72 rounded-field border hairline bg-base-200/50 focus-within:border-primary">
+    <svg class="i muted" aria-hidden="true"><use href="#i-search"/></svg>
+    <input name="q" value="{{ query.q }}" class="bg-transparent outline-none w-full text-[13px]" placeholder="Name, party or notes" aria-label="Search opportunities" autocomplete="off">
+  </label>
+  <input type="hidden" name="active" value="{{ active }}">
+  {% for (key, label) in [("1", "Show Active"), ("all", "Show All")] %}
+  <a class="filter-chip {% if active == *key %}on{% endif %}" href="{{ query.href(1, key) }}"
+     hx-get="{{ query.href(1, key) }}" hx-target="#opportunity-table" hx-push-url="true" {% if active == *key %}aria-current="true"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</form>
+<div class="overflow-x-auto">
+  <table class="tbl">
+    <thead><tr><th>Name</th><th>Party</th><th>Status</th><th class="r">Value</th><th>Probability</th><th>Active</th><th>Next Task</th></tr></thead>
+    <tbody>
+      {% for line in lines %}
+      {% match line %}
+      {% when Line::Row(o) %}
+      <tr>
+        <td class="font-medium"><a class="link link-hover" href="{{ o.href }}">{{ o.name }}</a></td>
+        <td>{% if o.party_href.is_empty() %}<span class="muted">—</span>{% else %}<a class="link link-hover" href="{{ o.party_href }}">{{ o.party }}</a>{% endif %}</td>
+        <td>{{ o.status }}</td>
+        <td class="r num">{{ o.value }}</td>
+        <td>{{ o.probability }}</td>
+        <td>{% if o.active %}<span class="chip ok"><span class="dot"></span>Active</span>{% else %}<span class="chip"><span class="dot"></span>Inactive</span>{% endif %}</td>
+        <td>{% if let Some(t) = o.next_task %}<a class="link link-hover" href="{{ t.href }}">{{ t.subject }}</a> <span class="text-[12px] muted num">{{ t.date }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+      </tr>
+      {% when Line::Subtotal { status, value } %}
+      <tr class="bg-base-200/50"><td colspan="3" class="font-medium text-[12.5px]">{{ status }} subtotal</td><td class="r num font-medium">{{ value }}</td><td colspan="3"></td></tr>
+      {% endmatch %}
+      {% else %}
+      <tr><td colspan="7" class="text-center muted py-10">{% if query.q.is_empty() %}No opportunities here yet.{% else %}No opportunities match.{% endif %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<nav class="flex items-center gap-3 px-4 py-2.5 border-t hairline text-[12px] muted" aria-label="Pages">
+  <span class="num">{% if matched > 0 %}{{ first }}–{{ last }} of {{ matched }} · {{ total }}{% else %}0 opportunities{% endif %}</span>
+  <div class="ml-auto join">
+    {% if page > 1 %}
+    <a class="join-item btn btn-sm btn-quiet" href="{{ query.href(page - 1, active) }}" hx-get="{{ query.href(page - 1, active) }}" hx-target="#opportunity-table" hx-push-url="true" aria-label="Previous page"><svg class="i i-sm"><use href="#i-chevron-left"/></svg></a>
+    {% else %}
+    <button class="join-item btn btn-sm btn-quiet" disabled aria-label="Previous page"><svg class="i i-sm"><use href="#i-chevron-left"/></svg></button>
+    {% endif %}
+    <span class="join-item btn btn-sm btn-quiet pointer-events-none num">Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}
+    <a class="join-item btn btn-sm btn-quiet" href="{{ query.href(page + 1, active) }}" hx-get="{{ query.href(page + 1, active) }}" hx-target="#opportunity-table" hx-push-url="true" aria-label="Next page"><svg class="i i-sm"><use href="#i-chevron-right"/></svg></a>
+    {% else %}
+    <button class="join-item btn btn-sm btn-quiet" disabled aria-label="Next page"><svg class="i i-sm"><use href="#i-chevron-right"/></svg></button>
+    {% endif %}
+  </div>
+</nav>

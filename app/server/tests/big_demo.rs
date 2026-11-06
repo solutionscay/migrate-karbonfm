@@ -104,12 +104,43 @@ async fn new_data_folder_gets_the_big_demo_and_opens_without_setup() {
         "/activities",
         "/activities?kind=task&status=overdue",
         "/activities?page=3",
+        "/opportunities",
+        "/opportunities?active=all&page=3",
     ] {
         let (status, html) = get(&state, uri).await;
         assert_eq!(status, StatusCode::OK, "{uri}");
         assert!(html.contains(BADGE), "{uri} shows DEMO");
     }
     assert_eq!(get(&state, "/setup").await.0, StatusCode::SEE_OTHER, "setup is done");
+
+    // S6: a pipeline to look at, and its pages under the same limit as the other long lists.
+    let conn = db::open(&db::database_path(&dir), Seed::Reference).unwrap().0;
+    let count = |sql: &str| conn.query_row(sql, [], |r| r.get::<_, i64>(0)).unwrap();
+    assert!(count("SELECT COUNT(*) FROM opportunity WHERE active_ind = 1") > 20, "active opportunities");
+    assert!(count("SELECT COALESCE(SUM(value), 0) FROM opportunity WHERE active_ind = 1") > 0, "a pipeline");
+    assert_eq!(
+        count("SELECT COUNT(*) FROM opportunity WHERE active_ind = 1 AND end_date IS NOT NULL"),
+        0,
+        "608 s108: an active opportunity has no date closed"
+    );
+    let open_id: String = conn
+        .query_row("SELECT id FROM opportunity WHERE active_ind = 1 ORDER BY id LIMIT 1", [], |r| r.get(0))
+        .unwrap();
+    drop(conn);
+    for uri in [
+        "/opportunities".to_owned(),
+        "/opportunities?active=all&page=3".to_owned(),
+        "/opportunities?q=signage&active=all".to_owned(),
+        "/opportunities/status-totals".to_owned(),
+        format!("/opportunities/{open_id}"),
+        format!("/opportunities/{open_id}/edit"),
+    ] {
+        let start = std::time::Instant::now();
+        let (status, _) = get(&state, &uri).await;
+        let took = start.elapsed();
+        assert_eq!(status, StatusCode::OK, "{uri}");
+        assert!(took.as_millis() < 600, "{uri} took {took:?}");
+    }
 
     // 06 "Data-density": a page of a long list renders fast. Some 3,000 activities here; the debug build gets a
     // generous margin over the 200 ms of 06 (a release build is several times faster).

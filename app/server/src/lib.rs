@@ -22,6 +22,7 @@ pub mod invoice;
 pub mod money;
 pub mod net;
 pub mod notifications;
+pub mod opportunities;
 pub mod parties;
 pub mod pdf;
 pub mod reference;

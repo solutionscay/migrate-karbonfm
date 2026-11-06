@@ -338,6 +338,8 @@ struct DetailPage<'a> {
     activity_count: i64,
     /// The Files panel (UI-19, `routes::files::FilesPanel`).
     files: String,
+    /// The Opportunities tab (O12).
+    opportunities: Vec<super::opportunities::OpportunityView>,
 }
 
 /// `GET /parties/{id}` (UI-04). An archived party opens too, marked archived and without edit actions (D3).
@@ -367,6 +369,8 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
     }
     .render()?;
     let files = super::files::FilesPanel::load(&state, &conn, &d.id)?.render()?;
+    let opportunities =
+        crate::opportunities::opportunities_of_party(&conn, &d.id)?.into_iter().map(Into::into).collect();
     render(&DetailPage {
         nav: Nav::Parties,
         demo: crate::db::has_demo_data(&conn)?,
@@ -379,6 +383,7 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
         activity,
         activity_count,
         files,
+        opportunities,
     })
 }
 
