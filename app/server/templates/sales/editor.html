@@ -38,8 +38,8 @@
       </div>
 
       {% for e in self.line_errors() %}<p class="text-error text-[12px] mt-3" role="alert">{{ e }}</p>{% endfor %}
-      <table class="w-full mt-4 text-[13px]">
-        <thead><tr class="text-[11.5px] muted text-left"><th class="font-medium py-2 w-44">Item</th><th class="font-medium py-2">Description</th><th class="font-medium py-2 text-right w-20">Qty</th><th class="font-medium py-2 text-right w-24">Rate</th><th class="font-medium py-2 text-center w-12">Tax</th><th class="font-medium py-2 text-right w-28">Amount</th><th class="w-8"></th></tr></thead>
+      <table class="w-full mt-4 text-[13px] table-fixed">
+        <thead><tr class="text-[11.5px] muted text-left"><th class="font-medium py-2 w-36">Item</th><th class="font-medium py-2">Description</th><th class="font-medium py-2 text-right w-14">Qty</th><th class="font-medium py-2 text-right w-20">Rate</th><th class="font-medium py-2 text-center w-10">Tax</th><th class="font-medium py-2 text-right w-24">Amount</th><th class="w-8"></th></tr></thead>
         <tbody>
           {% for r in rows %}
           <tr class="border-t hairline align-top">
@@ -59,12 +59,12 @@
       </table>
       <button type="button" class="btn btn-sm btn-ghost mt-2 text-primary" hx-put="{{ self.save_path() }}" hx-vals='{"add_line": "true"}' hx-trigger="click"><svg class="i i-sm" aria-hidden="true"><use href="#i-plus"/></svg>Add line</button>
 
-      <div class="flex flex-wrap justify-between gap-6 mt-6">
-        <div class="grow max-w-md space-y-3 text-[12.5px]">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_17rem] gap-6 mt-6">
+        <div class="min-w-0 space-y-3 text-[12.5px]">
           <label class="block"><span class="muted">Message displayed on {% if self.is_invoice() %}invoice{% else %}receipt{% endif %}</span><textarea id="f-memo" name="customer_memo" rows="2" class="textarea textarea-sm w-full mt-1">{{ t.input.customer_memo }}</textarea></label>
           <label class="block"><span class="muted">On statement</span><textarea id="f-note" name="private_note" rows="2" class="textarea textarea-sm w-full mt-1">{{ t.input.private_note }}</textarea></label>
         </div>
-        <dl class="w-80 text-[13px] grid grid-cols-[1fr_auto] gap-y-2 items-center">
+        <dl class="text-[13px] grid grid-cols-[1fr_auto] gap-x-3 gap-y-2 items-center self-start">
           <dt class="muted">Subtotal</dt><dd class="num text-right">{{ self.subtotal_before_retainer() }}</dd>
           <dt class="muted">Sales tax ({{ self.tax_label() }}% on taxable)</dt><dd class="num text-right">{{ t.totals.total_tax }}</dd>
           <dt class="muted"><label for="f-ship">Shipping</label></dt><dd class="text-right"><input id="f-ship" name="ship_amt" value="{{ t.input.ship_amt }}" class="line-input text-right num w-24" aria-label="Shipping">

@@ -109,6 +109,7 @@ async fn new_data_folder_gets_the_big_demo_and_opens_without_setup() {
         "/activities",
         "/activities?kind=task&status=overdue",
         "/activities?page=3",
+        "/reports/sales-by-month",
         "/items",
         "/opportunities",
         "/opportunities?active=all&page=3",
@@ -477,4 +478,45 @@ async fn pdf_matches_totals_big_demo() {
     let took = start.elapsed();
     assert_eq!(status, StatusCode::OK);
     assert!(took.as_millis() < 600, "the PDF took {took:?}");
+}
+
+/// S7: the summary over every period equals independent SQL over the lines, and the screen is fast.
+#[tokio::test]
+async fn monthly_summary_equals_the_lines_at_full_scale() {
+    let tmp = tempfile::tempdir().unwrap();
+    let dir = tmp.path().join("data");
+    std::fs::create_dir_all(&dir).unwrap();
+    assert!(matches!(big_demo::create(&dir).unwrap(), Outcome::Created { .. }));
+    let conn = db::open(&db::database_path(&dir), Seed::Reference).unwrap().0;
+    let by_lines = "SELECT st.period, SUM(sl.amount), COUNT(DISTINCT st.id)
+                    FROM sales_line sl JOIN sales_transaction st ON st.id = sl.sales_transaction_id
+                    LEFT JOIN item it ON it.id = sl.item_id
+                    WHERE st.locked_ind = 1 AND COALESCE(st.deleted, 0) = 0
+                      AND (it.name IS NULL OR it.name <> 'Retainer') AND st.period IS NOT NULL
+                    GROUP BY st.period ORDER BY st.period";
+    let expected: Vec<(i64, i64, i64)> = conn
+        .prepare(by_lines)
+        .unwrap()
+        .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))
+        .unwrap()
+        .collect::<Result<_, _>>()
+        .unwrap();
+    assert!(expected.len() > 24, "{} months", expected.len());
+    let first = karbon_server::reports::Period::parse(&expected[0].0.to_string()).unwrap();
+    let last = karbon_server::reports::Period::parse(&expected[expected.len() - 1].0.to_string()).unwrap();
+    let rows = karbon_server::reports::sales_summary_by_month(&conn, first, last).unwrap();
+    let got: Vec<(i64, i64, i64)> =
+        rows.iter().filter(|r| r.transactions != 0).map(|r| (r.period.key(), r.revenue, r.transactions)).collect();
+    assert_eq!(got, expected);
+    drop(conn);
+
+    let state = AppState::new(db::open(&db::database_path(&dir), Seed::Reference).unwrap().0);
+    let uri = format!("/reports/sales-by-month?from={}&to={}", first.key(), last.key());
+    for uri in ["/reports/sales-by-month", uri.as_str()] {
+        let start = std::time::Instant::now();
+        let (status, _) = get(&state, uri).await;
+        let took = start.elapsed();
+        assert_eq!(status, StatusCode::OK);
+        assert!(took.as_millis() < 600, "{uri} took {took:?}");
+    }
 }

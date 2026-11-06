@@ -29,6 +29,7 @@ pub mod parties;
 pub mod payments;
 pub mod pdf;
 pub mod reference;
+pub mod reports;
 mod routes;
 pub mod sales;
 pub mod sales_list;
