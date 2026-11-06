@@ -201,7 +201,7 @@ Every rule is owned by the Rust command layer (`src/commands/<domain>.rs`), call
 | OP-SALES-07 | `sales_transaction_delete` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-05, AP-07 | creation/modification stamps (BR-PARTY-07) | BR-SALES-05, BR-SALES-11 |
 | OP-SALES-08 | `sales_lines_remove` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-04, AP-05, AP-07 | creation/modification stamps (BR-PARTY-07) | BR-SALES-11 |
 | OP-SALES-09 | `payment_save` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-06 | creation/modification stamps (BR-PARTY-07) | BR-SALES-02, BR-SALES-09, BR-SALES-10 |
-| OP-SALES-10 | `item_save` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01 | creation/modification stamps (BR-PARTY-07) | BR-SALES-16 |
+| OP-SALES-10 | `item_save` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01 | none: `item` has no stamp columns in 04 | BR-SALES-16 |
 | OP-SALES-11 | `sales_summary_by_month` | Rust command layer | read transaction | AP-01 | read only | BR-SALES-17 |
 | OP-SALES-12 | `retainer_apply` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-05 | creation/modification stamps (BR-PARTY-07) | BR-SALES-02, BR-SALES-18 |
 | OP-FILE-01 | `file_add` | Rust command layer | one SQLite transaction (BEGIN IMMEDIATE); single writer | AP-01, AP-09 | creation/modification stamps (BR-PARTY-07) | BR-FILE-01, BR-FILE-02 |

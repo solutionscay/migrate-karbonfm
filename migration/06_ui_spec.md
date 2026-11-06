@@ -275,8 +275,9 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: inventory-only
 - Use case and users: Item list and item card; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/86-Items.txt`, `objects/karbon_kontacts.fmp12/layouts/135-Card_-_Items.txt`, `objects/karbon_kontacts.fmp12/layouts/136-Card_-_UtilityItem.txt`
-- Page: `GET /items` (full page; the same route returns the fragment to htmx)
-- Fragments and actions: `POST /items; PUT /items/{id}` (OP-SALES-10 `item_save`)
+- Page: `GET /items` (`?q=&page=`; full page; the same route returns the fragment to htmx)
+- Fragments and actions: `POST /items; PUT /items/{id}` (OP-SALES-10 `item_save`), `GET /items/new`, `GET /items/{id}/edit` (the card), `GET /pickers/item` (`?q=&selected=`, active items only)
+- Built (I5 S2, 2026-11-06, branch `i5/items`): the list shows Name, SKU, Description, Sales Price/Rate and Active by name, inactive items included (layout 86; kontacts 345). The card has name, SKU, description, unit price, taxable, type, purchase cost and description, qty on hand, track qty, inventory start date, level and Active; the QBO account fields are gone (D-02). Active is checked on a new item. No delete. An item named Retainer keeps its name (BR-SALES-07).
 - Rules shown or enforced: BR-SALES-16
 - States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).

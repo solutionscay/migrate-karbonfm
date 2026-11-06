@@ -150,7 +150,7 @@ impl<T> Page<T> {
     }
 }
 
-fn paging(matched: i64, page: i64, page_size: i64) -> (i64, i64, i64) {
+pub(crate) fn paging(matched: i64, page: i64, page_size: i64) -> (i64, i64, i64) {
     let size = if page_size <= 0 { PAGE_SIZE } else { page_size };
     let pages = ((matched + size - 1) / size).max(1);
     (page.clamp(1, pages), pages, size)

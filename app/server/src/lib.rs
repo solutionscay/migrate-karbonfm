@@ -20,6 +20,7 @@ pub mod files;
 pub mod ids;
 pub mod import;
 pub mod invoice;
+pub mod items;
 pub mod money;
 pub mod net;
 pub mod notifications;

@@ -10,6 +10,7 @@ mod dashboard;
 mod discussions;
 mod email;
 mod files;
+mod items;
 mod parties;
 mod party_forms;
 mod relation_forms;
@@ -98,6 +99,11 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/sales/{doc_number}/invoice.pdf"),
     ("POST", "/sales/{doc_number}/save-pdf"),
     ("POST", "/print"),
+    ("GET", "/items"),
+    ("POST", "/items"),
+    ("GET", "/items/new"),
+    ("GET", "/items/{id}/edit"),
+    ("PUT", "/items/{id}"),
     ("GET", "/setup"),
     ("POST", "/setup"),
     ("GET", "/settings"),
@@ -183,6 +189,10 @@ pub fn router() -> Router<AppState> {
         .route("/sales/{doc_number}/invoice.pdf", get(sales::pdf))
         .route("/sales/{doc_number}/save-pdf", post(sales::save_pdf))
         .route("/print", post(print))
+        .route("/items", get(items::list).post(items::create))
+        .route("/items/new", get(items::new_dialog))
+        .route("/items/{id}/edit", get(items::edit_dialog))
+        .route("/items/{id}", put(items::update))
         .route("/setup", get(setup::page).post(setup::submit))
         .route("/settings", get(settings::page).put(settings::update))
         .route("/settings/backup", post(backup::create))
@@ -255,6 +265,7 @@ pub enum Nav {
     Parties,
     Invoices,
     Payments,
+    Items,
     Templates,
     Files,
     Settings,
