@@ -281,11 +281,16 @@ fn meta(w: &mut Writer, inv: &Invoice) {
     let value = num(Face::Regular, META, CONTENT);
 
     w.text(label, Align::Left, x(0), top, "Bill to");
-    w.text(style(Face::Medium, META, CONTENT), Align::Left, x(0), top + lh, &inv.customer);
-    let mut bottom = top + lh;
-    for (i, l) in inv.bill_to.iter().enumerate() {
-        bottom = top + lh * (i as f32 + 2.0);
-        w.text(label, Align::Left, x(0), bottom, l);
+    // Wrapped to its column: a long name must not run into the dates beside it.
+    let name = style(Face::Medium, META, CONTENT);
+    let mut bottom = top;
+    for l in wrap(name, &inv.customer, col) {
+        bottom += lh;
+        w.text(name, Align::Left, x(0), bottom, &l);
+    }
+    for l in inv.bill_to.iter().flat_map(|l| wrap(label, l, col)) {
+        bottom += lh;
+        w.text(label, Align::Left, x(0), bottom, &l);
     }
 
     let mut pair = |col: usize, y: f32, l: &str, v: &str| {
@@ -466,6 +471,18 @@ mod tests {
         let at = t.iter().position(|s| *s == "Notes for the client").unwrap();
         assert_eq!(t[at + 1], "", "the empty item column");
         assert_eq!(t[at + 2], "$0.00", "then the amount: no Qty, no Rate");
+    }
+
+    #[test]
+    fn a_long_customer_name_wraps_in_its_column() {
+        let long = "Scarborough Development and Waterfront Partners of Greater Portland";
+        let inv = with(invoice("INV-1048"), |i| i.customer = long.into());
+        let pages = layout(&inv);
+        let t = texts(&pages[0]);
+        assert!(!t.contains(&long), "one line would run into the dates");
+        assert!(t.contains(&"Invoice date"));
+        let first = t.iter().position(|s| long.starts_with(*s) && s.len() > 5).expect("the name's first line");
+        assert!(t[first].len() < 32, "{}", t[first]);
     }
 
     #[test]
