@@ -21,8 +21,13 @@ if (window.htmx) {
     const dialog = document.getElementById("modal");
     if (e.detail.target.innerHTML.trim() === "") { dialog.close(); return; }
     if (!dialog.open) dialog.showModal();
-    const first = dialog.querySelector("[autofocus], input, button");
-    if (first) first.focus();
+    const focusFirst = () => {
+      const first = dialog.querySelector("[autofocus], input, button");
+      if (first) first.focus();
+    };
+    focusFirst();
+    // WebKit, the desktop app's view, ignores a focus() in the same task as showModal.
+    requestAnimationFrame(() => { if (!dialog.contains(document.activeElement)) focusFirst(); });
   });
   // Server events sent with the HX-Trigger header.
   document.addEventListener("karbon-close-dialog", () => document.getElementById("modal").close());
