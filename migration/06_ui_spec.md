@@ -264,10 +264,11 @@ Main screens below; every layout has a row in `06_ui_spec_appendix.md`.
 - Readiness: implementation-ready (design/invoice.html ("Record payment" dialog))
 - Use case and users: Payment card with allocations; the single local user (ROLE-OWNER).
 - Source layouts: `objects/karbon_kontacts.fmp12/layouts/85-Card_-_New_Payment.txt`; target design: `design/invoice.html`
-- Page: `GET /payments/new` (full page; the same route returns the fragment to htmx)
+- Built (I5 S4): `GET /payments/new?invoice_id=` and `GET /payments/{id}/edit` return the card for the shared dialog. Each of the customer's unpaid invoices and the payment's own is a row; an amount allocates, and the balance is a button that fills it (kontacts 280). Record payment shows on a posted invoice only (layout 143). A payment on a posted invoice changes only its balance and paid_ind.
+- Page: `GET /payments/new` (fragment)
 - Fragments and actions: `POST /payments; PUT /payments/{id}` (OP-SALES-09 `payment_save`)
 - Rules shown or enforced: BR-SALES-02, BR-SALES-09, BR-SALES-10
-- States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment) / locked (AP-05)
+- States: loading (htmx request indicator) / empty / populated / validation (form re-rendered with field errors, D-25) / error (error fragment)
 - Keyboard/focus/labels: every control labeled; full keyboard operation; good contrast (WCAG AA ratios) (owner, 2026-10-28; D-38).
 - Destructive action confirmation: none
 
