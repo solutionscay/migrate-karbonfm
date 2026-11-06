@@ -10,7 +10,7 @@
 
 use crate::admin::{CommandError, FieldError};
 use crate::audit::{self, Actor, Stamp};
-use crate::invoice::display_date;
+use crate::invoice::{display_date, Invoice};
 use crate::money::usd;
 use crate::reference::ActivityType;
 use regex::Regex;
@@ -37,7 +37,8 @@ pub struct Field {
 /// The fixed list. The recipient is the email's first To (55) party and the sender its first From (54) party: 490
 /// s113-137 resolves each field with "the first activity party with that role". The invoice is the activity's
 /// sales-transaction link (activity_entity, entity type 12). The source names only `<<FirstName>>` and
-/// `<<RecipientName>>` (478 s3, 189 f31); the other names are ours (Q2).
+/// `<<RecipientName>>` (478 s3, 189 f31); the other names are ours (Q2). `InvoiceTotal` is the figure the invoice page
+/// labels "Total", before any retainer credit; `BalanceDue` is what is still owed (owner, 2026-11-06).
 pub const FIELDS: &[Field] = &[
     Field { name: "RecipientName", help: "the recipient's name" },
     Field { name: "FirstName", help: "the recipient's first name" },
@@ -479,23 +480,18 @@ pub fn merge_values(
     }
     let invoice = conn
         .query_row(
-            "SELECT st.doc_number, st.total_amt, st.balance, st.due_date FROM activity_entity ae \
+            "SELECT st.doc_number, st.balance, st.due_date FROM activity_entity ae \
              JOIN sales_transaction st ON st.id = ae.entity_id \
              WHERE ae.activity_id = ?1 AND ae.entity_type_id = 12 ORDER BY ae.rowid LIMIT 1",
             [activity_id],
-            |r| {
-                Ok((
-                    r.get::<_, Option<String>>(0)?,
-                    r.get::<_, Option<i64>>(1)?,
-                    r.get::<_, Option<i64>>(2)?,
-                    r.get::<_, Option<String>>(3)?,
-                ))
-            },
+            |r| Ok((r.get::<_, Option<String>>(0)?, r.get::<_, Option<i64>>(1)?, r.get::<_, Option<String>>(2)?)),
         )
         .optional()?;
-    if let Some((number, total, balance, due)) = invoice {
+    if let Some((number, balance, due)) = invoice {
+        // The page's own model, so the two cannot differ. A document the page cannot show has no Total: no value.
+        let total = number.as_deref().and_then(|n| Invoice::load(conn, n).ok());
+        put(&mut v, "InvoiceTotal", total.map(|i| i.total_before_retainer().to_string()));
         put(&mut v, "InvoiceNumber", number);
-        put(&mut v, "InvoiceTotal", total.map(usd));
         put(&mut v, "BalanceDue", balance.map(usd));
         put(&mut v, "DueDate", due.map(|d| display_date(&d)));
     }
@@ -532,6 +528,54 @@ pub fn template_merge_at(
     }
     let values = merge_values(conn, activity_id, today)?;
     Ok(Merged { subject: substitute(&subject, &values), message: substitute(&message, &values) })
+}
+
+/// A placeholder of a preview that has no value on the chosen email.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MissingField {
+    pub token: String,
+    pub help: &'static str,
+}
+
+/// What the preview shows: the merge, and why a part of it may be empty.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MergePreview {
+    pub merged: Merged,
+    /// The subject and the message are both empty: there was nothing to merge.
+    pub nothing_to_merge: bool,
+    pub missing: Vec<MissingField>,
+}
+
+/// The preview of layout 112: merges this text, which may be unsaved, for an activity. It refuses what
+/// `template_save` refuses (Validation) and writes nothing. A field with no value merges as empty (490 s164), as
+/// [`template_merge`] does, and is named in `missing`.
+pub fn merge_preview(
+    conn: &Connection,
+    activity_id: &str,
+    subject: &str,
+    message: &str,
+    today: &str,
+) -> Result<MergePreview, CommandError> {
+    let exists: bool =
+        conn.query_row("SELECT EXISTS (SELECT 1 FROM activity WHERE id = ?1)", [activity_id], |r| r.get(0))?;
+    if !exists {
+        return Err(CommandError::NotFound);
+    }
+    let subject = subject.trim();
+    let input = TemplateInput { subject: subject.into(), message: message.into(), ..Default::default() };
+    let names = validate(&input)?;
+    let values = merge_values(conn, activity_id, today)?;
+    let missing = names
+        .iter()
+        .filter(|n| !values.contains_key(n.as_str()))
+        .filter_map(|n| FIELDS.iter().find(|f| f.name == n))
+        .map(|f| MissingField { token: token(f.name), help: f.help })
+        .collect();
+    Ok(MergePreview {
+        merged: Merged { subject: substitute(subject, &values), message: substitute(message, &values) },
+        nothing_to_merge: subject.is_empty() && message.trim().is_empty(),
+        missing,
+    })
 }
 
 #[cfg(test)]

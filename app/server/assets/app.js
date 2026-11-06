@@ -224,6 +224,29 @@ window.karbonColor = function (name) {
 })();
 
 document.addEventListener("alpine:init", () => {
+  // The template editor's "Available merge fields" (UI-16). A save swaps the editor, so its fields are new elements:
+  // the field is then found again by name and the caret, now gone, is taken to be at the end of its text.
+  Alpine.data("mergeFieldPicker", () => ({
+    field: null,
+    name: "message", // no Subject or Body focused yet: the end of the Body
+    remember(e) {
+      if (!e.target.matches("[data-merge-target]")) return;
+      this.field = e.target;
+      this.name = e.target.name;
+    },
+    insert(token) {
+      const live = this.field && this.field.isConnected;
+      const el = live ? this.field : this.$root.querySelector(`[data-merge-target][name="${this.name}"]`);
+      if (!el) return;
+      const from = live ? el.selectionStart : el.value.length;
+      const to = live ? el.selectionEnd : el.value.length;
+      el.focus();
+      el.setSelectionRange(from, to);
+      // execCommand keeps Cmd/Ctrl+Z working; setRangeText is for an engine without it.
+      if (!document.execCommand("insertText", false, token)) el.setRangeText(token, from, to, "end");
+    },
+  }));
+
   Alpine.data("palette", () => ({
     open: false,
     q: "",
