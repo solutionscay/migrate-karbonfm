@@ -46,3 +46,10 @@ backup folder, checks it, shows what is in it in a dialog and, after Restore, ke
 `<data folder>/before-restore/` before swapping the backup in. The dev server has no folder dialog: `--backup-folder`
 stands in for it (backups go there; a restore offers the newest one), and `--data-dir` keeps the database in a file.
 Tests: `server/tests/backup.rs`, `server/tests/backup_routes.rs`.
+
+Integrations (I6; OP-INTEG-02..04, AP-12) are on Settings, Integrations, and every one is off on a new install:
+address suggestions (Google Places or SmartyStreets) in the Add/Edit address dialog, and "Look up on FullContact…" in
+a person's More menu. A service turns on only with its key (the keychain, AP-03), and each call goes through
+`net::HttpsClient`, which sends only to the host that `net::OutboundPolicy` allows. Tests: `server/tests/integrations_contract.rs`
+(the real client against a TLS mock on 127.0.0.1, test CA in `server/tests/fixtures/integ_tls`; no real host or key)
+and `server/tests/integrations_routes.rs`.
