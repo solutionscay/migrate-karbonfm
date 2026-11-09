@@ -11,6 +11,8 @@ use super::current_user::CurrentUser;
 use super::secrets_store::StorePanel;
 use super::Nav;
 use crate::admin::{self, CommandError, FieldError, SystemSettings};
+use crate::integrations::{self, AddressProvider};
+use crate::net::Integration;
 use crate::secrets::{SecretError, SecretField, SecretKey, SecretStore, Secrets, StoreKind};
 use crate::web::{is_htmx, render, AppError};
 use crate::AppState;
@@ -22,21 +24,26 @@ use axum::Form;
 use serde::Deserialize;
 
 /// The secrets the page manages: the system email account password (BR-ADMIN-05) and the optional integration keys
-/// (EXT-02, EXT-03; integrations stay off until I6, AP-12).
-const SECRETS: [(SecretKey, &str); 5] = [
+/// (EXT-02, EXT-03). A key alone calls nothing: its integration must also be turned on (AP-12).
+const SECRETS: [(SecretKey, &str); 6] = [
     (SecretKey::SystemSmtpPassword, "SMTP password"),
     (SecretKey::UserSmtpPassword, "Your SMTP password"),
     (SecretKey::GooglePlacesApiKey, "Google Places API key"),
-    (SecretKey::SmartyStreetsApiKey, "SmartyStreets API key"),
+    (SecretKey::SmartyStreetsAuthId, "SmartyStreets auth ID"),
+    (SecretKey::SmartyStreetsApiKey, "SmartyStreets auth token"),
     (SecretKey::FullContactApiKey, "FullContact API key"),
 ];
 
 pub const ENCRYPTION: [&str; 3] = ["None", "STARTTLS", "SSL/TLS"];
 pub const AUTHENTICATION: [&str; 2] = ["None", "Password"];
 
-/// OP-INTEG-04 `accounting_integration_status`: QuickBooks Online is out of scope (D-02); the stub only says so.
-pub fn accounting_integration_status() -> &'static str {
-    "Not implemented"
+/// The UI-17 line of OP-INTEG-04 `accounting_integration_status` (BR-INTEG-03): QuickBooks Online is out of scope (D-02).
+pub fn accounting_line() -> &'static str {
+    if crate::integrations::accounting_integration_status().implemented {
+        "Implemented"
+    } else {
+        "Not implemented"
+    }
 }
 
 /// The form as typed (05: typed form, unknown fields refused). The secret fields are named by `SecretKey::account`.
@@ -68,8 +75,13 @@ pub struct SettingsForm {
     pub user_smtp_authentication: String,
     pub user_smtp_password: String,
     pub google_places: String,
+    pub smartystreets_auth_id: String,
     pub smartystreets: String,
     pub fullcontact: String,
+    /// The address suggestion service (OP-INTEG-02): empty = off, else an `AddressProvider::stored` text (AP-12).
+    pub address_provider: String,
+    /// FullContact enrichment (OP-INTEG-03): "on" or empty (AP-12).
+    pub fullcontact_enabled: String,
 }
 
 impl SettingsForm {
@@ -95,6 +107,8 @@ impl SettingsForm {
             smtp_port: s.smtp_port.map(|p| p.to_string()).unwrap_or_default(),
             smtp_encryption: s.smtp_encryption.clone().unwrap_or_else(|| "STARTTLS".into()),
             smtp_authentication: s.smtp_authentication.clone().unwrap_or_else(|| "Password".into()),
+            address_provider: s.address_provider.map(|p| p.stored().to_owned()).unwrap_or_default(),
+            fullcontact_enabled: if s.fullcontact_enabled { "on".into() } else { String::new() },
             ..Default::default()
         }
     }
@@ -177,6 +191,13 @@ impl SettingsForm {
                 .then_some(())
                 .ok_or_else(|| "Choose an encryption type.".to_owned()),
         );
+        let provider = match self.address_provider.trim() {
+            "" => Ok(None),
+            p => AddressProvider::parse(p)
+                .map(Some)
+                .ok_or_else(|| "Choose Off, Google Places or SmartyStreets.".to_owned()),
+        };
+        check("address_provider", provider.clone().map(drop));
         check(
             "smtp_authentication",
             AUTHENTICATION
@@ -201,6 +222,8 @@ impl SettingsForm {
             smtp_port: port.unwrap_or_default(),
             smtp_encryption: Some(self.smtp_encryption.clone()),
             smtp_authentication: Some(self.smtp_authentication.clone()),
+            address_provider: provider.unwrap_or_default(),
+            fullcontact_enabled: self.fullcontact_enabled == "on",
         })
     }
 
@@ -210,6 +233,7 @@ impl SettingsForm {
             SecretKey::SystemSmtpPassword => &self.system_smtp_password,
             SecretKey::GooglePlacesApiKey => &self.google_places,
             SecretKey::SmartyStreetsApiKey => &self.smartystreets,
+            SecretKey::SmartyStreetsAuthId => &self.smartystreets_auth_id,
             SecretKey::FullContactApiKey => &self.fullcontact,
             SecretKey::UserSmtpPassword => &self.user_smtp_password,
         }
@@ -222,6 +246,7 @@ impl SettingsForm {
             &mut self.user_smtp_password,
             &mut self.google_places,
             &mut self.smartystreets,
+            &mut self.smartystreets_auth_id,
             &mut self.fullcontact,
         ] {
             s.clear();
@@ -243,6 +268,8 @@ pub struct FormView {
     pub errors: Vec<FieldError>,
     pub saved: bool,
     pub accounting: &'static str,
+    /// The address services for the select: (stored text, label).
+    pub providers: Vec<&'static str>,
     /// The rendered `StorePanel`: the no-keychain notice, or "Secrets: local file" (empty with the keychain).
     pub store: String,
     /// Where the integration keys are kept, for the Integrations panel.
@@ -314,7 +341,8 @@ async fn view(
         api_keys,
         errors,
         saved,
-        accounting: accounting_integration_status(),
+        accounting: accounting_line(),
+        providers: AddressProvider::ALL.iter().map(|p| p.stored()).collect(),
     })
 }
 
@@ -372,6 +400,46 @@ pub async fn update(
             return respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None);
         }
     };
+    // An integration turns on only with its keys, saved before or typed now (AP-12, BR-INTEG-02): checked before
+    // anything is written, so a refusal saves nothing.
+    let on: Vec<Integration> = settings
+        .address_provider
+        .map(AddressProvider::integration)
+        .into_iter()
+        .chain(settings.fullcontact_enabled.then_some(Integration::FullContact))
+        .collect();
+    if !on.is_empty() {
+        let typed: Vec<(SecretKey, bool)> =
+            SECRETS.iter().map(|(k, _)| (*k, !form.secret(*k).trim().is_empty())).collect();
+        let store = state.secret_store();
+        let missing = tokio::task::spawn_blocking(move || -> Result<Vec<FieldError>, SecretError> {
+            let mut errors = Vec::new();
+            for i in on {
+                for (key, label) in integrations::required_keys(i) {
+                    let typed_now = typed.iter().any(|(k, t)| k == key && *t);
+                    let saved = matches!(store.has_secret(*key), Ok(true));
+                    if !typed_now && !saved {
+                        let field =
+                            if i == Integration::FullContact { "fullcontact_enabled" } else { "address_provider" };
+                        if !errors.iter().any(|e: &FieldError| e.field == field) {
+                            errors.push(FieldError {
+                                field,
+                                message: format!("Add the {label} below to turn on {}.", i.label()),
+                            });
+                        }
+                    }
+                }
+            }
+            Ok(errors)
+        })
+        .await
+        .map_err(|e| AppError::Internal(format!("keychain task: {e}")))?
+        .map_err(|e| AppError::Internal(e.to_string()))?;
+        if !missing.is_empty() {
+            let view = view(&state, form, missing, false).await?;
+            return respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None);
+        }
+    }
     // Owner first: a bad owner must not leave a half-saved form (secrets saved, settings not).
     let owner_ok = {
         let conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;

@@ -30,16 +30,20 @@ pub enum SecretKey {
     /// The user's own SMTP password (BR-INTEG-01).
     UserSmtpPassword,
     GooglePlacesApiKey,
+    /// SmartyStreets signs a call with an auth ID and an auth token (117 s42-43, System #54, #55); this is the token.
     SmartyStreetsApiKey,
+    /// The SmartyStreets auth ID, kept with its token (a pair of credentials, D-09).
+    SmartyStreetsAuthId,
     FullContactApiKey,
 }
 
 impl SecretKey {
-    pub const ALL: [SecretKey; 5] = [
+    pub const ALL: [SecretKey; 6] = [
         SecretKey::SystemSmtpPassword,
         SecretKey::UserSmtpPassword,
         SecretKey::GooglePlacesApiKey,
         SecretKey::SmartyStreetsApiKey,
+        SecretKey::SmartyStreetsAuthId,
         SecretKey::FullContactApiKey,
     ];
 
@@ -49,6 +53,7 @@ impl SecretKey {
             SecretKey::UserSmtpPassword => "user_smtp_password",
             SecretKey::GooglePlacesApiKey => "google_places",
             SecretKey::SmartyStreetsApiKey => "smartystreets",
+            SecretKey::SmartyStreetsAuthId => "smartystreets_auth_id",
             SecretKey::FullContactApiKey => "fullcontact",
         }
     }

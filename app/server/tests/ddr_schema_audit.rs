@@ -147,8 +147,13 @@ fn tables(conn: &Connection) -> Vec<String> {
 /// Columns the app adds that have no FileMaker field (04 conventions and OD-07-06; the import lineage of D-40).
 const APP_ONLY_TABLES: &[&str] =
     &["app_meta", "import_batch", "import_rejected_row", "import_file", "import_changed_value", "value_list_item"];
-const APP_ONLY_COLUMNS: &[&str] =
-    &["system_setting.singleton", "system_setting.tax_rate_bp", "sales_transaction.tax_rate_bp"];
+const APP_ONLY_COLUMNS: &[&str] = &[
+    "system_setting.singleton",
+    "system_setting.tax_rate_bp",
+    "sales_transaction.tax_rate_bp",
+    "system_setting.address_suggestion_provider",
+    "system_setting.fullcontact_enabled_ind",
+];
 
 #[test]
 fn every_ddr_field_has_exactly_one_register_row() {

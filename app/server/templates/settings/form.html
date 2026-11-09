@@ -104,11 +104,34 @@
 
   <section class="panel" aria-labelledby="s-integrations">
     <div class="panel-head"><h2 id="s-integrations" class="panel-title">Integrations</h2></div>
-    <div class="p-5 space-y-3">
-      <p class="muted text-[12.5px]">{{ keys_note }} Address suggestions and enrichment stay off until they are built.</p>
-      <div class="grid grid-cols-2 gap-3">
-        {% for key in api_keys %}<div>{{ key|safe }}</div>{% endfor %}
-      </div>
+    <div class="p-5 space-y-4">
+      {# AP-12: every integration is off until it is turned on here with its key; a key alone calls nothing. #}
+      <p class="muted text-[12.5px]">{{ keys_note }} Each service is off until you turn it on here and save its key. When it is on, KarbonFM sends it only what you look up: the address you type, or the person's name, emails and phones.</p>
+      <fieldset class="space-y-3">
+        <legend class="text-[13px] font-medium mb-1">Address suggestions</legend>
+        <label class="block max-w-xs">
+          <span class="text-[12px] muted">Service</span>
+          <select name="address_provider" class="select select-sm w-full mt-1" {% if error("address_provider").is_some() %}aria-invalid="true" aria-describedby="err-address_provider"{% endif %}>
+            <option value="" {% if form.address_provider.is_empty() %}selected{% endif %}>Off</option>
+            {% for p in providers %}<option value="{{ p }}" {% if form.address_provider == **p %}selected{% endif %}>{{ p }}</option>{% endfor %}
+          </select>
+          {% if let Some(e) = error("address_provider") %}<span id="err-address_provider" class="text-error text-[12px]">{{ e }}</span>{% endif %}
+        </label>
+        <div class="grid grid-cols-3 gap-3">
+          {% for key in api_keys.iter().take(3) %}<div>{{ key|safe }}</div>{% endfor %}
+        </div>
+      </fieldset>
+      <fieldset class="space-y-3 pt-1">
+        <legend class="text-[13px] font-medium mb-1">Enrichment</legend>
+        <label class="flex items-center gap-2 text-[13px]">
+          <input type="checkbox" name="fullcontact_enabled" class="checkbox checkbox-sm" {% if form.fullcontact_enabled == "on" %}checked{% endif %} {% if error("fullcontact_enabled").is_some() %}aria-invalid="true" aria-describedby="err-fullcontact_enabled"{% endif %}>
+          Look up people with FullContact
+        </label>
+        {% if let Some(e) = error("fullcontact_enabled") %}<span id="err-fullcontact_enabled" class="text-error text-[12px] block">{{ e }}</span>{% endif %}
+        <div class="grid grid-cols-3 gap-3">
+          {% for key in api_keys.iter().skip(3) %}<div>{{ key|safe }}</div>{% endfor %}
+        </div>
+      </fieldset>
       <p class="text-[13px] pt-1"><span class="muted">Accounting:</span> {{ accounting }}</p>
     </div>
   </section>

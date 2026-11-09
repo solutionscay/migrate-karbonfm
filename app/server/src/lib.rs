@@ -19,6 +19,7 @@ pub mod email;
 pub mod files;
 pub mod ids;
 pub mod import;
+pub mod integrations;
 pub mod invoice;
 pub mod items;
 pub mod money;
@@ -100,6 +101,8 @@ pub struct AppState {
     pending_restore: Arc<Mutex<Option<(String, PathBuf)>>>,
     /// A fixed "today" for the pages that read the date (tests, `karbon-dev-server --as-of`); none means the local date.
     today: Option<String>,
+    /// The HTTPS client of the integrations (EXT-02, EXT-03), behind each call's `net::OutboundPolicy`.
+    http: net::HttpsClient,
 }
 
 impl AppState {
@@ -117,6 +120,7 @@ impl AppState {
             data_dir: None,
             pending_restore: Arc::new(Mutex::new(None)),
             today: None,
+            http: net::HttpsClient::new(),
         }
     }
 
@@ -133,6 +137,16 @@ impl AppState {
     }
 
     /// The desktop shell passes its native folder dialog (backup and restore).
+    /// Another HTTPS client: the contract tests' (`HttpsClient::for_contract_tests`), which reaches mock servers only.
+    pub fn with_http(mut self, http: net::HttpsClient) -> Self {
+        self.http = http;
+        self
+    }
+
+    pub fn http(&self) -> &net::HttpsClient {
+        &self.http
+    }
+
     pub fn with_folder_picker(mut self, folder: FolderHook) -> Self {
         self.folder = Some(folder);
         self

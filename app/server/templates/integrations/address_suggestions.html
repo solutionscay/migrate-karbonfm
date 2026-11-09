@@ -1,0 +1,14 @@
+{# GET /address-suggestions?q= (OP-INTEG-02, UI-06): the suggestion list under the address search box. An error is
+   shown here (422, swapped) and the address fields are left as they were. #}
+{% if let Some(message) = error %}
+<div role="alert" class="alert alert-error alert-soft text-[12.5px] py-2">{{ message }}</div>
+{% else if q.is_empty() %}
+{% else if items.is_empty() %}
+<p class="text-[12.5px] muted py-1">No suggestions for “{{ q }}”. Type more of the address, or fill the fields by hand.</p>
+{% else %}
+<ul class="menu menu-sm bg-base-100 rounded-box border hairline p-1 w-full" aria-label="Address suggestions">
+  {% for (text, pick) in items %}
+  <li><button type="button" hx-get="/address-suggestions/pick?{{ pick }}" hx-target="#address-fields" hx-swap="outerHTML" hx-indicator="#address-busy">{{ text }}</button></li>
+  {% endfor %}
+</ul>
+{% endif %}

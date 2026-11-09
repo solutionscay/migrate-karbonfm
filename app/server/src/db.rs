@@ -34,6 +34,8 @@ const SCHEMA_04: &str = include_str!("../migrations/V1__schema_04.sql");
 const V2_DDR_AUDIT: &str = include_str!("../migrations/V2__ddr_audit.sql");
 /// V3: retainer lines are not revenue (BR-SALES-17).
 const V3_SALES_SUMMARY_VIEW: &str = include_str!("../migrations/V3__sales_summary_view.sql");
+/// V4: the integration switches of I6, off by default (AP-12, BR-INTEG-02).
+const V4_INTEGRATION_SETTINGS: &str = include_str!("../migrations/V4__integration_settings.sql");
 const DEMO_SEED: &str = include_str!("../../../migration/04_demo_seed.sql");
 
 /// The stored copies of the demo seed's file rows (B3): small placeholder files, each at its row's container_path
@@ -183,6 +185,7 @@ pub fn migrations() -> Vec<Migration> {
         Migration::unapplied("V1__schema_04", &strip_transaction(SCHEMA_04)).expect("V1 migration name"),
         Migration::unapplied("V2__ddr_audit", V2_DDR_AUDIT).expect("V2 migration name"),
         Migration::unapplied("V3__sales_summary_view", V3_SALES_SUMMARY_VIEW).expect("V3 migration name"),
+        Migration::unapplied("V4__integration_settings", V4_INTEGRATION_SETTINGS).expect("V4 migration name"),
     ]
 }
 

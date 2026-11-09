@@ -267,10 +267,30 @@ fn t_08_02_outbound_default_deny() {
     assert!(enabled.check_https("https://api.fullcontact.com/v3/person.enrich").is_err());
     assert_eq!(enabled.check_https("http://us-autocomplete-pro.api.smarty.com/lookup"), Err(Refused::BadUrl));
 
-    // Outbound calls exist only in Rust behind this policy: the server has no HTTP client crate of its own yet.
+    // Outbound HTTP exists only in Rust behind this policy (I6): reqwest is the one HTTP client crate, it is used in
+    // net.rs only, and HttpsClient::send checks the policy before the request is built. The calls themselves are
+    // tested against mock servers in tests/integrations_contract.rs.
     let manifest = include_str!("../Cargo.toml");
-    for client in ["reqwest", "ureq", "isahc", "curl"] {
-        assert!(!manifest.contains(client), "{client} added: route its calls through net::OutboundPolicy");
+    for client in ["ureq", "isahc", "curl", "hyper-rustls", "attohttpc"] {
+        assert!(!manifest.contains(client), "{client} added: send HTTP through net::HttpsClient");
+    }
+    let net = include_str!("../src/net.rs");
+    let send = net.find("pub async fn send(").expect("HttpsClient::send");
+    let check = send + net[send..].find("policy.check_https(").expect("send checks the policy");
+    let build = send + net[send..].find("self.send_checked(").expect("send builds the request after the check");
+    assert!(check < build, "the policy is checked before the request is built");
+    let src = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    let mut stack = vec![src.clone()];
+    while let Some(dir) = stack.pop() {
+        for entry in std::fs::read_dir(&dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                stack.push(path);
+            } else if path.extension().is_some_and(|e| e == "rs") && path != src.join("net.rs") {
+                let text = std::fs::read_to_string(&path).unwrap();
+                assert!(!text.contains("reqwest"), "{} uses reqwest: send through net::HttpsClient", path.display());
+            }
+        }
     }
     // The SMTP client (lettre, I4) lives in email.rs only, and the send checks the SMTP host first (AP-02).
     let email = include_str!("../src/email.rs");
