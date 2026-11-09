@@ -270,8 +270,17 @@ impl HttpsClient {
             } else {
                 "request failed"
             };
-            // without_url: reqwest's text would carry the URL and its query.
-            HttpError::Failed(format!("{kind} ({})", e.without_url()))
+            // without_url: reqwest's text would carry the URL and its query; the causes (connect, TLS, IO) have none.
+            let e = e.without_url();
+            let mut text = e.to_string();
+            let mut source = std::error::Error::source(&e);
+            while let Some(cause) = source {
+                text.push_str(": ");
+                text.push_str(&cause.to_string());
+                source = cause.source();
+            }
+            let text: String = text.chars().take(240).collect();
+            HttpError::Failed(format!("{kind} ({text})"))
         };
         let mut res = builder.send().await.map_err(failed)?;
         let status = res.status().as_u16();
