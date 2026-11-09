@@ -20,6 +20,18 @@ cargo test && cargo clippy --all-targets -- -D warnings
 cd desktop && cargo tauri build                      # bundles (needs: cargo install tauri-cli --version 2.12.4 --locked)
 ```
 
+The WebDriver smoke test (03 Test strategy, R-03) runs on Windows and Linux in CI (`app.yml`, job `smoke`):
+`karbon-smoke` starts the release binary under tauri-driver on a new temp data folder (big demo), opens the
+dashboard and INV-1048, checks the title and a few demo figures on each, and writes `dashboard.png`,
+`invoice-INV-1048.png`, `summary.txt` and the logs (artifact `smoke-Windows` / `smoke-Linux`). tauri-driver has no
+macOS support: the macOS window stays on the manual checklist. On Linux, with `cargo install tauri-driver --version
+2.1.0 --locked`, `webkit2gtk-driver` and `xvfb`:
+
+```bash
+cargo build --release -p karbon-desktop --features karbon-desktop/custom-protocol -p karbon-smoke
+xvfb-run -a -s "-screen 0 1600x1000x24" ./target/release/karbon-smoke --app target/release/karbonfm --out /tmp/kfm-smoke
+```
+
 | Path | What |
 |---|---|
 | `server/` | routes, templates, embedded assets, database open; no Tauri dependency |
