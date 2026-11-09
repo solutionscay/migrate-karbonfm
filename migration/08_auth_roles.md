@@ -156,7 +156,7 @@ Implemented in I1 (branch `i1/guard`, 2026-10-31), all passing on macOS:
 | T-08-14 | `auth.rs` `t_08_14_only_the_app_window_gets_in`, `guard_over_a_real_socket` | no or wrong cookie 401, cookie of another port 401, foreign Host 421, foreign or missing Origin 403, made-up or spent token 403; refused requests never reach the handler and write no log line, so the log never holds a token or cookie value (`tests/log_guard.rs`, on the migrated database); the same over a real socket. A WKWebView probe (same engine as the window) followed the launch redirect to the dashboard; `document.cookie` is empty (HttpOnly) |
 | T-08-15 | `server/tests/backup_routes.rs` `same_origin_posts_only_and_the_gates_apply`, `a_damaged_backup_is_refused_on_the_panel`, `backup_then_restore_through_the_panel`; `server/tests/backup.rs` (branch `i1/backup`) | the three routes answer 401 without the cookie, 403 for a foreign or missing Origin, 405 for GET, and /setup first on a fresh install, with no dialog shown; a corrupt, tampered (rows removed), incomplete (no manifest, a file missing) or newer-schema backup is refused, the database bytes and file store are unchanged and no safety copy is made; a made-up or spent confirm id is 409; the page never receives the folder path |
 
-Implemented in I6 (branch `i6/integrations`, 2026-11-09), all passing on macOS:
+Implemented in I6 (branch `i6/integrations`, 2026-11-09), all passing on macOS. These tests use mock servers on 127.0.0.1 only; the integrations were never run against the real Google Places, SmartyStreets or FullContact services or with real keys:
 
 | Test id | Where | What it proves |
 |---|---|---|

@@ -53,3 +53,6 @@ a person's More menu. A service turns on only with its key (the keychain, AP-03)
 `net::HttpsClient`, which sends only to the host that `net::OutboundPolicy` allows. Tests: `server/tests/integrations_contract.rs`
 (the real client against a TLS mock on 127.0.0.1, test CA in `server/tests/fixtures/integ_tls`; no real host or key)
 and `server/tests/integrations_routes.rs`.
+These integrations were tested only against local mock servers on 127.0.0.1, never against the real Google Places,
+SmartyStreets or FullContact services, and nobody has tried them with real keys. They stay off by default and are not
+part of the demo.
