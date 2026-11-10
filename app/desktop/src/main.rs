@@ -8,106 +8,136 @@ use std::sync::{mpsc, Arc};
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 fn main() {
+    log_panics();
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
     let builder = builder.menu(history_menu::build).on_menu_event(history_menu::handle);
-    builder
+    let result = builder
         .setup(|app| {
-            // KARBONFM_DATA_DIR (development and checks only) puts the database and the log in another folder, so
-            // a fresh run does not touch the user's karbonfm.db.
-            let override_dir = std::env::var_os("KARBONFM_DATA_DIR").map(std::path::PathBuf::from);
-
-            // The log file in the per-user app log folder (D-30), before anything that can fail.
-            let log_dir = match &override_dir {
-                Some(dir) => dir.join("logs"),
-                None => app.path().app_log_dir()?,
-            };
-            let log_dir = karbon_server::applog::init(log_dir)?;
-
-            // One database in the per-user app data folder (D-17): migrated by refinery, reference-seeded, and in
-            // the demo builds filled with demo data when it is new (03, "Demo seed data").
-            let data_dir = match &override_dir {
-                Some(dir) => dir.clone(),
-                None => app.path().app_data_dir()?,
-            };
-            let db_path = karbon_server::db::database_path(&data_dir);
-            // The shipped build: a folder with no database gets the big demo (under a second in a release build,
-            // before the window opens). An existing database is left as it is.
-            #[cfg(feature = "big-demo")]
-            {
-                let outcome = karbon_server::big_demo::create(&data_dir).inspect_err(|e| {
-                    applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
-                })?;
-                applog::log_write(&applog::Entry::info("start", &format!("big demo: {outcome:?}")));
-            }
-            let seed = if cfg!(feature = "demo") && !cfg!(feature = "big-demo") {
-                Seed::DemoAsOf(karbon_server::demo_dates::local_today())
-            } else {
-                Seed::Reference
-            };
-            let (db, report) = karbon_server::db::open(&db_path, seed).inspect_err(|e| {
-                applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
-            })?;
-            let started = format!(
-                "database {} (migrations applied: {:?}; reference rows: {}; demo seed loaded: {}); log {}",
-                db_path.display(),
-                report.migrations_applied,
-                report.reference_rows_inserted,
-                report.demo_seed_loaded,
-                log_dir.display()
-            );
-            applog::log_write(&applog::Entry::info("start", &started));
-
-            // The local server: 127.0.0.1 on a free port, inside this process.
-            let (listener, addr) = tauri::async_runtime::block_on(karbon_server::bind())?;
-            // AP-13: the window opens the one-time launch URL, which gives it the session cookie; any other
-            // client of the port gets 401.
-            let session = Arc::new(karbon_server::session::Session::new(addr.port()));
-            let launch = session.launch_path().ok_or("session already used")?;
-            // Secrets live in the OS keychain (AP-03); the settings page reads and writes them off the async workers.
-            // Without a keychain (Linux without a Secret Service) this logs why once, and Settings offers the opt-in
-            // secrets.toml (D-09, issue #7).
-            let secrets = karbon_server::secrets::system_store();
-            // Backup and restore (OP-ADMIN-06, OP-ADMIN-07): the server asks for a folder, the shell shows the native
-            // dialog. The page itself never gets a path or file-system access (AP-01).
-            let handle = app.handle().clone();
-            let folder: karbon_server::FolderHook = Arc::new(move |what| pick_folder(&handle, what));
-            // Saving a file (the invoice PDF): the native save dialog, then the system viewer (fix/pdf-view).
-            let handle = app.handle().clone();
-            let save: karbon_server::SaveHook = Arc::new(move |name, bytes| save_file(&handle, name, bytes));
-            // Opening a stored file (UI-19): the server resolves the path inside the file store, the shell hands it
-            // to the system app. The page only names a file id (AP-01).
-            let open: karbon_server::OpenHook = Arc::new(|path| open_in_viewer(&path));
-            let state = karbon_server::AppState::new(db)
-                .with_save(save)
-                .with_open(open)
-                .with_session(session)
-                .with_secrets(secrets)
-                .with_folder_picker(folder)
-                .with_data_dir(&data_dir);
-            tauri::async_runtime::spawn(async move {
-                if let Err(e) = karbon_server::serve(listener, state).await {
-                    applog::log_write(&applog::Entry::error(
-                        "serve",
-                        "Internal",
-                        &format!("local server stopped: {e}"),
-                    ));
-                }
-            });
-
-            // One window on the server URL. The window has no capabilities, so the page cannot call Tauri IPC.
-            #[cfg(target_os = "macos")]
-            app.manage(history_menu::Home(format!("http://{addr}/").parse()?));
-            let url = format!("http://{addr}{launch}").parse()?;
-            WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
-                .title("KarbonFM")
-                .inner_size(1440.0, 900.0)
-                .min_inner_size(1024.0, 640.0)
-                .build()?;
-            Ok(())
+            setup_app(app).inspect_err(|e| {
+                applog::log_write(&applog::Entry::error("start", "Internal", &format!("setup failed: {e}")));
+            })
         })
-        .run(tauri::generate_context!())
-        .expect("error while running KarbonFM");
+        .run(tauri::generate_context!());
+    // A failure here used to end in a bare expect, which a release build on Windows (no console) left unexplained.
+    if let Err(e) = result {
+        applog::log_write(&applog::Entry::error("start", "Internal", &format!("KarbonFM stopped: {e}")));
+        eprintln!("error while running KarbonFM: {e}");
+        std::process::exit(1);
+    }
+}
+
+/// One start-up step in the log, so a start that stops before the window shows how far it got.
+fn step(what: &str) {
+    applog::log_write(&applog::Entry::info("start", &format!("setup: {what}")));
+}
+
+/// Panics go to karbonfm.log too (then to the default hook): a release build on Windows has no console for stderr.
+fn log_panics() {
+    let default = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        applog::log_write(&applog::Entry::error("panic", "Internal", &info.to_string()));
+        default(info);
+    }));
+}
+
+/// The app's setup: log, database (with the big demo in the demo build), local server, then the window.
+fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    // KARBONFM_DATA_DIR (development and checks only) puts the database and the log in another folder, so
+    // a fresh run does not touch the user's karbonfm.db.
+    let override_dir = std::env::var_os("KARBONFM_DATA_DIR").map(std::path::PathBuf::from);
+
+    // The log file in the per-user app log folder (D-30), before anything that can fail.
+    let log_dir = match &override_dir {
+        Some(dir) => dir.join("logs"),
+        None => app.path().app_log_dir()?,
+    };
+    let log_dir = karbon_server::applog::init(log_dir)?;
+
+    // One database in the per-user app data folder (D-17): migrated by refinery, reference-seeded, and in
+    // the demo builds filled with demo data when it is new (03, "Demo seed data").
+    let data_dir = match &override_dir {
+        Some(dir) => dir.clone(),
+        None => app.path().app_data_dir()?,
+    };
+    let db_path = karbon_server::db::database_path(&data_dir);
+    // The shipped build: a folder with no database gets the big demo (under a second in a release build,
+    // before the window opens). An existing database is left as it is.
+    #[cfg(feature = "big-demo")]
+    {
+        let outcome = karbon_server::big_demo::create(&data_dir).inspect_err(|e| {
+            applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
+        })?;
+        applog::log_write(&applog::Entry::info("start", &format!("big demo: {outcome:?}")));
+    }
+    let seed = if cfg!(feature = "demo") && !cfg!(feature = "big-demo") {
+        Seed::DemoAsOf(karbon_server::demo_dates::local_today())
+    } else {
+        Seed::Reference
+    };
+    let (db, report) = karbon_server::db::open(&db_path, seed).inspect_err(|e| {
+        applog::log_write(&applog::Entry::error("start", "Storage", &e.to_string()));
+    })?;
+    let started = format!(
+        "database {} (migrations applied: {:?}; reference rows: {}; demo seed loaded: {}); log {}",
+        db_path.display(),
+        report.migrations_applied,
+        report.reference_rows_inserted,
+        report.demo_seed_loaded,
+        log_dir.display()
+    );
+    applog::log_write(&applog::Entry::info("start", &started));
+
+    // The local server: 127.0.0.1 on a free port, inside this process.
+    step("server bind");
+    let (listener, addr) = tauri::async_runtime::block_on(karbon_server::bind())?;
+    // AP-13: the window opens the one-time launch URL, which gives it the session cookie; any other
+    // client of the port gets 401.
+    step("session");
+    let session = Arc::new(karbon_server::session::Session::new(addr.port()));
+    let launch = session.launch_path().ok_or("session already used")?;
+    // Secrets live in the OS keychain (AP-03); the settings page reads and writes them off the async workers.
+    // Without a keychain (Linux without a Secret Service) this logs why once, and Settings offers the opt-in
+    // secrets.toml (D-09, issue #7).
+    step("secrets: system store");
+    let secrets = karbon_server::secrets::system_store();
+    step("hooks");
+    // Backup and restore (OP-ADMIN-06, OP-ADMIN-07): the server asks for a folder, the shell shows the native
+    // dialog. The page itself never gets a path or file-system access (AP-01).
+    let handle = app.handle().clone();
+    let folder: karbon_server::FolderHook = Arc::new(move |what| pick_folder(&handle, what));
+    // Saving a file (the invoice PDF): the native save dialog, then the system viewer (fix/pdf-view).
+    let handle = app.handle().clone();
+    let save: karbon_server::SaveHook = Arc::new(move |name, bytes| save_file(&handle, name, bytes));
+    // Opening a stored file (UI-19): the server resolves the path inside the file store, the shell hands it
+    // to the system app. The page only names a file id (AP-01).
+    let open: karbon_server::OpenHook = Arc::new(|path| open_in_viewer(&path));
+    let state = karbon_server::AppState::new(db)
+        .with_save(save)
+        .with_open(open)
+        .with_session(session)
+        .with_secrets(secrets)
+        .with_folder_picker(folder)
+        .with_data_dir(&data_dir);
+    step("server start");
+    tauri::async_runtime::spawn(async move {
+        if let Err(e) = karbon_server::serve(listener, state).await {
+            applog::log_write(&applog::Entry::error("serve", "Internal", &format!("local server stopped: {e}")));
+        }
+    });
+
+    // One window on the server URL. The window has no capabilities, so the page cannot call Tauri IPC.
+    #[cfg(target_os = "macos")]
+    app.manage(history_menu::Home(format!("http://{addr}/").parse()?));
+    let url = format!("http://{addr}{launch}").parse()?;
+    step("window build");
+    WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
+        .title("KarbonFM")
+        .inner_size(1440.0, 900.0)
+        .min_inner_size(1024.0, 640.0)
+        .build()?;
+    step("window built");
+    Ok(())
 }
 
 /// The server's folder hook: the native folder dialog on the window, shown on the main thread (rfd needs it there);

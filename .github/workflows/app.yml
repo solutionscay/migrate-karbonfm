@@ -186,6 +186,33 @@ jobs:
       - name: Build the app and the smoke test
         run: cargo build --release --locked -p karbon-desktop --features karbon-desktop/custom-protocol -p karbon-smoke
 
+      # Windows diagnostics: the app on its own (no driver) for 20 s, on its own temp data folder. Says whether it is
+      # still running or how it exited, with its log and stderr in the smoke artifact (direct-*.log).
+      - name: Start the app directly (Windows diagnostics)
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $data = Join-Path $env:RUNNER_TEMP 'direct-data'
+          $out = Join-Path $env:RUNNER_TEMP 'smoke'
+          New-Item -ItemType Directory -Force $data, $out | Out-Null
+          $env:KARBONFM_DATA_DIR = $data
+          $p = Start-Process -FilePath (Resolve-Path 'target\release\karbonfm.exe') -PassThru `
+            -RedirectStandardOutput (Join-Path $out 'direct-stdout.log') -RedirectStandardError (Join-Path $out 'direct-stderr.log')
+          if ($p.WaitForExit(20000)) {
+            "karbonfm.exe EXITED with code $($p.ExitCode) (0x{0:X8}) after {1:N1} s" -f $p.ExitCode, ($p.ExitTime - $p.StartTime).TotalSeconds
+          } else {
+            "karbonfm.exe still RUNNING after 20 s"
+            Get-CimInstance Win32_Process -Filter "Name = 'msedgewebview2.exe'" | Select-Object -First 1 -ExpandProperty CommandLine
+            Stop-Process -Id $p.Id -Force
+          }
+          $log = Join-Path $data 'logs\karbonfm.log'
+          if (Test-Path $log) { Get-Content $log; Copy-Item $log (Join-Path $out 'direct-karbonfm.log') } else { "no karbonfm.log" }
+          Get-Content (Join-Path $out 'direct-stderr.log') -ErrorAction SilentlyContinue
+          Get-WinEvent -FilterHashtable @{ LogName = 'Application'; StartTime = $p.StartTime } -ErrorAction SilentlyContinue |
+            Where-Object { $_.Message -match 'karbonfm|msedgewebview2' } | Select-Object -First 5 TimeCreated, Id, ProviderName, Message |
+            Format-List
+
       - name: Smoke test (Linux, Xvfb)
         if: runner.os == 'Linux'
         env:
