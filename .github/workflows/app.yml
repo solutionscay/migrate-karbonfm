@@ -116,3 +116,93 @@ jobs:
             ${{ matrix.bundle-dir }}/deb/*.deb
           if-no-files-found: error
           retention-days: 14
+
+  # 03 Test strategy (R-03): the desktop window under WebDriver, through tauri-driver. The app starts on a new temp
+  # data folder (big demo), opens the dashboard and invoice INV-1048, checks the title and figures of the demo seed on
+  # each, and uploads a screenshot of both (artifact smoke-<OS>). tauri-driver has no macOS support: the macOS window
+  # stays on the manual checklist. The test itself is app/tools/smoke (karbon-smoke).
+  smoke:
+    name: smoke (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    env:
+      TAURI_DRIVER_VERSION: "2.1.0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Linux webview, WebKitWebDriver and Xvfb
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev webkit2gtk-driver xvfb
+
+      # The WebDriver of the WebView2 runtime the window uses (they must match). Edge's own driver on the runner is
+      # the fallback: Edge and the WebView2 runtime are on the same version on the hosted images.
+      - name: msedgedriver for the WebView2 runtime
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'msedgedriver'
+          try {
+            $key = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+            $version = (Get-ItemProperty -Path $key).pv
+            Write-Host "WebView2 runtime $version"
+            Invoke-WebRequest "https://msedgedriver.microsoft.com/$version/edgedriver_win64.zip" -OutFile "$dir.zip"
+            Expand-Archive "$dir.zip" -DestinationPath $dir -Force
+            $driver = Join-Path $dir 'msedgedriver.exe'
+          } catch {
+            Write-Warning "no msedgedriver download for the WebView2 runtime ($_); using the runner's Edge driver"
+            $driver = Join-Path $env:EDGEWEBDRIVER 'msedgedriver.exe'
+          }
+          & $driver --version
+          "MSEDGEDRIVER=$driver" >> $env:GITHUB_ENV
+
+      - name: Rust toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app
+
+      - name: Cache tauri-driver
+        id: tauri-driver
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/tauri-driver*
+          key: tauri-driver-${{ env.TAURI_DRIVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+      - name: Install tauri-driver
+        if: steps.tauri-driver.outputs.cache-hit != 'true'
+        run: cargo install tauri-driver --version "${TAURI_DRIVER_VERSION}" --locked
+
+      # The binary cargo tauri build bundles (release, frontend served from the binary), without the bundling.
+      - name: Build the app and the smoke test
+        run: cargo build --release --locked -p karbon-desktop --features karbon-desktop/custom-protocol -p karbon-smoke
+
+      - name: Smoke test (Linux, Xvfb)
+        if: runner.os == 'Linux'
+        env:
+          # A precaution: WebKitGTK's DMA-BUF renderer has drawn blank pages on GPU-less X servers. (A local
+          # Ubuntu 24.04 container on Xvfb rendered both pages with and without it.)
+          WEBKIT_DISABLE_DMABUF_RENDERER: "1"
+        run: >-
+          xvfb-run -a -s "-screen 0 1600x1000x24"
+          ./target/release/karbon-smoke --app target/release/karbonfm --out "$RUNNER_TEMP/smoke"
+
+      - name: Smoke test (Windows)
+        if: runner.os == 'Windows'
+        run: >-
+          ./target/release/karbon-smoke.exe --app target/release/karbonfm.exe --native-driver "$MSEDGEDRIVER"
+          --out "$RUNNER_TEMP/smoke"
+
+      # Screenshots of both pages, summary.txt, the app's karbonfm.log and tauri-driver.log; also when a check failed.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-${{ runner.os }}
+          path: ${{ runner.temp }}/smoke
+          if-no-files-found: warn
+          retention-days: 14
