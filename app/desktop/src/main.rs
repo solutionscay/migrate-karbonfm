@@ -27,6 +27,32 @@ fn main() {
     }
 }
 
+/// Under WebDriver (tauri-driver sets TAURI_WEBVIEW_AUTOMATION), the WEBVIEW2_* variables the app got, in the log.
+fn log_webdriver_env() {
+    if std::env::var("TAURI_WEBVIEW_AUTOMATION").as_deref() != Ok("true") {
+        return;
+    }
+    let vars: Vec<String> =
+        std::env::vars().filter(|(k, _)| k.starts_with("WEBVIEW2_")).map(|(k, v)| format!("{k}={v}")).collect();
+    step(&format!(
+        "webdriver: {}",
+        if vars.is_empty() { "no WEBVIEW2_ variables".to_owned() } else { vars.join("; ") }
+    ));
+}
+
+/// Windows under WebDriver: msedgedriver asks WebView2 for its DevTools port (`--remote-debugging-port`) in
+/// WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS, and waits for the port file. wry always passes its own browser arguments
+/// to WebView2, so here they carry msedgedriver's too: wry's defaults plus the variable. Only when tauri-driver
+/// started the app; a normal start keeps wry's arguments as they are.
+#[cfg(windows)]
+fn webdriver_browser_args() -> Option<String> {
+    if std::env::var("TAURI_WEBVIEW_AUTOMATION").as_deref() != Ok("true") {
+        return None;
+    }
+    let extra = std::env::var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS").ok()?;
+    Some(format!("--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection {extra}"))
+}
+
 /// One start-up step in the log, so a start that stops before the window shows how far it got.
 fn step(what: &str) {
     applog::log_write(&applog::Entry::info("start", &format!("setup: {what}")));
@@ -89,6 +115,7 @@ fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     applog::log_write(&applog::Entry::info("start", &started));
 
     // The local server: 127.0.0.1 on a free port, inside this process.
+    log_webdriver_env();
     step("server bind");
     let (listener, addr) = tauri::async_runtime::block_on(karbon_server::bind())?;
     // AP-13: the window opens the one-time launch URL, which gives it the session cookie; any other
@@ -99,7 +126,7 @@ fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     // Secrets live in the OS keychain (AP-03); the settings page reads and writes them off the async workers.
     // Without a keychain (Linux without a Secret Service) this logs why once, and Settings offers the opt-in
     // secrets.toml (D-09, issue #7).
-    step("secrets: system store");
+    step("keychain");
     let secrets = karbon_server::secrets::system_store();
     step("hooks");
     // Backup and restore (OP-ADMIN-06, OP-ADMIN-07): the server asks for a folder, the shell shows the native
@@ -131,11 +158,16 @@ fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     app.manage(history_menu::Home(format!("http://{addr}/").parse()?));
     let url = format!("http://{addr}{launch}").parse()?;
     step("window build");
-    WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
+    let window = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
         .title("KarbonFM")
         .inner_size(1440.0, 900.0)
-        .min_inner_size(1024.0, 640.0)
-        .build()?;
+        .min_inner_size(1024.0, 640.0);
+    #[cfg(windows)]
+    let window = match webdriver_browser_args() {
+        Some(args) => window.additional_browser_args(&args),
+        None => window,
+    };
+    window.build()?;
     step("window built");
     Ok(())
 }

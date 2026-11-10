@@ -223,6 +223,28 @@ jobs:
           xvfb-run -a -s "-screen 0 1600x1000x24"
           ./target/release/karbon-smoke --app target/release/karbonfm --out "$RUNNER_TEMP/smoke"
 
+      # Windows diagnostics while the smoke test runs: every 3 s for 90 s, the command lines of msedgedriver and
+      # the window's WebView2 processes, and any DevToolsActivePort file (smoke artifact, watch.log).
+      - name: Watch the WebDriver session (Windows diagnostics)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $watch = Join-Path $env:RUNNER_TEMP 'watch.ps1'
+          @'
+          $log = Join-Path $env:RUNNER_TEMP 'smoke\watch.log'
+          New-Item -ItemType Directory -Force (Split-Path $log) | Out-Null
+          for ($i = 0; $i -lt 30; $i++) {
+            "--- $(Get-Date -Format HH:mm:ss)" | Add-Content $log
+            Get-CimInstance Win32_Process -Filter "Name = 'msedgedriver.exe' OR Name = 'karbonfm.exe' OR Name = 'msedgewebview2.exe'" |
+              Where-Object { $_.Name -ne 'msedgewebview2.exe' -or $_.CommandLine -match 'webview-exe-name=karbonfm' -and $_.CommandLine -notmatch '--type=' } |
+              ForEach-Object { "$($_.Name) [$($_.ProcessId)]: $($_.CommandLine)" } | Add-Content $log
+            Get-ChildItem -Path $env:LOCALAPPDATA, $env:TEMP -Recurse -Filter DevToolsActivePort -ErrorAction SilentlyContinue |
+              ForEach-Object { "DevToolsActivePort $($_.FullName): $((Get-Content $_.FullName) -join ' ')" } | Add-Content $log
+            Start-Sleep -Seconds 3
+          }
+          '@ | Set-Content $watch
+          Start-Process pwsh -ArgumentList '-NoProfile', '-File', $watch -WindowStyle Hidden
+
       - name: Smoke test (Windows)
         if: runner.os == 'Windows'
         run: >-
