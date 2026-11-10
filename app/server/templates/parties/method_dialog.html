@@ -37,14 +37,21 @@
     <div class="flex gap-4">{% call check("sms", "Takes texts") %}{% call check("fax", "Fax") %}</div>
     {% endif %}
     {% if form.is("address") %}
-    {% call field("line1", "Street", form.line1, "text") %}
-    {% call field("line2", "Line 2", form.line2, "text") %}
-    <div class="grid grid-cols-[1fr_70px_100px] gap-3">
-      {% call field("city", "City", form.city, "text") %}
-      {% call field("state", "State", form.state, "text") %}
-      {% call field("postal_code", "Postal code", form.postal_code, "text") %}
+    {% if let Some(service) = address_search %}
+    {# UI-06 address picker (OP-INTEG-02): only when the user turned a service on (AP-12). A pick fills the fields;
+       nothing is saved until Add or Save. #}
+    <div class="rounded-box border hairline p-3 space-y-2">
+      <label class="block">
+        <span class="text-[12px] muted">Find an address</span>
+        <input type="search" name="q" class="input input-sm w-full mt-1" autocomplete="off" placeholder="Start typing a street address"
+               hx-get="/address-suggestions" hx-trigger="input changed delay:400ms, search" hx-target="#address-suggestions"
+               hx-swap="innerHTML" hx-indicator="#address-busy" hx-sync="this:replace" aria-controls="address-suggestions">
+      </label>
+      <div id="address-suggestions" aria-live="polite"></div>
+      <p class="text-[11.5px] muted flex items-center gap-2"><span id="address-busy" class="loading loading-spinner loading-xs htmx-indicator" aria-hidden="true"></span>Suggestions from {{ service }}. Pick one to fill the fields below.</p>
     </div>
-    {% call field("country", "Country", form.country, "text") %}
+    {% endif %}
+    {% include "parties/address_fields.html" %}
     {% endif %}
     <div class="grid grid-cols-2 gap-3">
       {% call field("label", "Label (optional)", form.label, "text") %}

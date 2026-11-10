@@ -50,6 +50,8 @@ pub struct MethodForm {
     pub state: String,
     pub postal_code: String,
     pub country: String,
+    /// The address search box of the UI-06 picker (OP-INTEG-02): it fills the fields above and is not saved.
+    pub q: String,
 }
 
 impl MethodForm {
@@ -76,6 +78,7 @@ impl MethodForm {
             state: m.state.clone(),
             postal_code: m.postal_code.clone(),
             country: m.country.clone(),
+            q: String::new(),
         }
     }
 
@@ -151,6 +154,17 @@ pub struct MethodDialog {
     pub form: MethodForm,
     pub errors: Vec<FieldError>,
     pub failure: Option<String>,
+    /// The address service when address suggestions are on (OP-INTEG-02, AP-12): the dialog shows the search box.
+    pub address_search: Option<&'static str>,
+}
+
+/// The address service the address dialog offers, if the user turned one on (AP-12). Reads no key.
+fn address_search(conn: &rusqlite::Connection, kind: &str) -> Result<Option<&'static str>, AppError> {
+    if kind != MethodKind::Address.key() {
+        return Ok(None);
+    }
+    let settings = crate::admin::settings_get(conn)?;
+    Ok(crate::integrations::address_integration(&settings).map(|p| p.stored()))
 }
 
 impl MethodDialog {
@@ -175,7 +189,7 @@ fn dialog(view: impl Template, status: StatusCode) -> Result<Response, AppError>
 /// The party header after a change: out of band (after a dialog, which closes) or as the answer itself.
 fn header_response(conn: &rusqlite::Connection, party_id: &str, oob: bool, text: &str) -> Result<Response, AppError> {
     let d = crate::parties::party_get(conn, party_id).map_err(|e| page_error("party_get", e))?;
-    let html = Header { oob, ..Header::new(&d) }.render()?;
+    let html = Header { oob, ..Header::for_party(conn, &d)? }.render()?;
     Ok(([("HX-Trigger", toast(text, oob))], Html(html)).into_response())
 }
 
@@ -191,8 +205,12 @@ pub async fn new_dialog(
     Path(party_id): Path<String>,
     Query(q): Query<NewQuery>,
 ) -> Result<Response, AppError> {
-    crate::parties::party_get(&*lock(&state)?, &party_id).map_err(|e| page_error("party_get", e))?;
     let kind = MethodKind::parse(&q.kind).unwrap_or(MethodKind::Phone);
+    let search = {
+        let conn = lock(&state)?;
+        crate::parties::party_get(&conn, &party_id).map_err(|e| page_error("party_get", e))?;
+        address_search(&conn, kind.key())?
+    };
     dialog(
         MethodDialog {
             action: format!("{}/contact-methods", party_href(&party_id)),
@@ -200,6 +218,7 @@ pub async fn new_dialog(
             form: MethodForm { kind: kind.key().into(), ..Default::default() },
             errors: Vec::new(),
             failure: None,
+            address_search: search,
         },
         StatusCode::OK,
     )
@@ -226,18 +245,19 @@ pub async fn create(
     CurrentUser(actor): CurrentUser,
     Form(form): Form<MethodForm>,
 ) -> Result<Response, AppError> {
+    let mut conn = lock(&state)?;
     let view = MethodDialog {
         action: format!("{}/contact-methods", party_href(&party_id)),
         edit: false,
         form: form.clone(),
         errors: Vec::new(),
         failure: None,
+        address_search: address_search(&conn, &form.kind)?,
     };
     let input = match form.input() {
         Ok(i) => i,
         Err(errors) => return save_error(view, CommandError::Validation(errors), "contact_method_save"),
     };
-    let mut conn = lock(&state)?;
     match contacts::contact_method_create(&mut conn, &party_id, &input, &actor) {
         Ok(_) => header_response(&conn, &party_id, true, "Added"),
         Err(e) => save_error(view, e, "contact_method_save"),
@@ -246,7 +266,12 @@ pub async fn create(
 
 /// `GET /contact-methods/{id}/edit`: the Edit dialog, filled.
 pub async fn edit_dialog(State(state): State<AppState>, Path(id): Path<String>) -> Result<Response, AppError> {
-    let m = contacts::method(&*lock(&state)?, &id)?.ok_or(AppError::NotFound)?;
+    let (m, search) = {
+        let conn = lock(&state)?;
+        let m = contacts::method(&conn, &id)?.ok_or(AppError::NotFound)?;
+        let search = address_search(&conn, m.kind.key())?;
+        (m, search)
+    };
     dialog(
         MethodDialog {
             action: method_href(&m.id),
@@ -254,6 +279,7 @@ pub async fn edit_dialog(State(state): State<AppState>, Path(id): Path<String>) 
             form: MethodForm::from_method(&m),
             errors: Vec::new(),
             failure: None,
+            address_search: search,
         },
         StatusCode::OK,
     )
@@ -266,13 +292,19 @@ pub async fn update(
     CurrentUser(actor): CurrentUser,
     Form(form): Form<MethodForm>,
 ) -> Result<Response, AppError> {
-    let view =
-        MethodDialog { action: method_href(&id), edit: true, form: form.clone(), errors: Vec::new(), failure: None };
+    let mut conn = lock(&state)?;
+    let view = MethodDialog {
+        action: method_href(&id),
+        edit: true,
+        form: form.clone(),
+        errors: Vec::new(),
+        failure: None,
+        address_search: address_search(&conn, &form.kind)?,
+    };
     let input = match form.input() {
         Ok(i) => i,
         Err(errors) => return save_error(view, CommandError::Validation(errors), "contact_method_save"),
     };
-    let mut conn = lock(&state)?;
     match contacts::contact_method_update(&mut conn, &id, &input, &actor) {
         Ok(()) => {
             let party = contacts::method(&conn, &id)?.ok_or(AppError::NotFound)?.party_id;

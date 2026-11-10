@@ -237,9 +237,17 @@ pub struct Header<'a> {
     pub initials: String,
     pub color: usize,
     pub subtitle: String,
+    /// Shows "Look up on FullContact…" (OP-INTEG-03): a person, not archived, with enrichment turned on (AP-12).
+    pub enrich: bool,
 }
 
 impl<'a> Header<'a> {
+    /// The header with its integration actions as the settings say (reads no key: the call checks it).
+    pub fn for_party(conn: &rusqlite::Connection, d: &'a PartyDetail) -> Result<Self, AppError> {
+        let on = crate::integrations::enrich_on(&crate::admin::settings_get(conn)?);
+        Ok(Header { enrich: on && d.person.is_some() && !d.archived, ..Header::new(d) })
+    }
+
     pub fn new(d: &'a PartyDetail) -> Self {
         let mut parts: Vec<String> = vec![if d.organization { "Organization".into() } else { "Person".into() }];
         if let Some(p) = &d.person {
@@ -265,6 +273,7 @@ impl<'a> Header<'a> {
             initials: initials(&d.name),
             color: color(&d.id),
             subtitle: parts.join(" · "),
+            enrich: false,
         }
     }
     pub fn icon(&self, m: &Method) -> &'static str {
@@ -359,7 +368,7 @@ pub async fn detail(State(state): State<AppState>, Path(id): Path<String>) -> Re
         }
         None => (Vec::new(), 0),
     };
-    let header = Header::new(&d).render()?;
+    let header = Header::for_party(&conn, &d)?.render()?;
     let relations = Relations { d: &d, oob: false }.render()?;
     let q =
         crate::activities::ListQuery { party_id: Some(d.id.clone()), today: Some(today.clone()), ..Default::default() };

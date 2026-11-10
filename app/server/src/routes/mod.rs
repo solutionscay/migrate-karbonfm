@@ -10,6 +10,7 @@ mod dashboard;
 mod discussions;
 mod email;
 mod files;
+mod integrations;
 mod items;
 mod opportunities;
 mod parties;
@@ -59,6 +60,11 @@ pub const ROUTES: &[(&str, &str)] = &[
     ("GET", "/parties/{id}/archive"),
     ("POST", "/parties/{id}/archive"),
     ("POST", "/parties/{id}/roles"),
+    ("POST", "/parties/{id}/enrich"),
+    ("POST", "/parties/{id}/enrich/apply"),
+    ("GET", "/address-suggestions"),
+    ("GET", "/address-suggestions/pick"),
+    ("GET", "/integrations/accounting"),
     ("GET", "/parties/{id}/contact-methods/new"),
     ("POST", "/parties/{id}/contact-methods"),
     ("GET", "/contact-methods/{id}/edit"),
@@ -178,6 +184,11 @@ pub fn router() -> Router<AppState> {
         .route("/parties/{id}/edit", get(party_forms::edit))
         .route("/parties/{id}/archive", get(party_forms::archive_dialog).post(party_forms::archive))
         .route("/parties/{id}/roles", post(party_forms::add_role))
+        .route("/parties/{id}/enrich", post(integrations::enrich))
+        .route("/parties/{id}/enrich/apply", post(integrations::enrich_apply))
+        .route("/address-suggestions", get(integrations::suggest))
+        .route("/address-suggestions/pick", get(integrations::pick))
+        .route("/integrations/accounting", get(integrations::accounting))
         .route("/parties/{id}/contact-methods/new", get(contact_forms::new_dialog))
         .route("/parties/{id}/contact-methods", post(contact_forms::create))
         .route("/contact-methods/{id}/edit", get(contact_forms::edit_dialog))

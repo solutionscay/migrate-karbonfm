@@ -969,7 +969,9 @@ CREATE TABLE system_setting (
   initial_setup_done_ind NUMERIC, -- #65
   logo_path TEXT, -- #67 path of the copied file, relative to the app data folder (owner, 2026-10-28; D-17)
   system_email_sender TEXT, -- #72
-  ms_graph_tennent_id TEXT -- #73
+  ms_graph_tennent_id TEXT, -- #73
+  address_suggestion_provider TEXT, -- new (V4, I6): NULL = off; 'Google Places' or 'SmartyStreets' (Picker::AddressServiceProvider; AP-12)
+  fullcontact_enabled_ind NUMERIC -- new (V4, I6): 1 = FullContact person enrichment on; NULL or 0 = off (AP-12)
 );
 
 -- Source: objects/karbon_data.fmp12/tables/150-Task.txt

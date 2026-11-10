@@ -390,7 +390,7 @@ pub async fn update(
     match parties::party_update(&mut conn, &id, &fields, &form.comments, &actor) {
         Ok(()) => {
             let d = parties::party_get(&conn, &id).map_err(|e| page_error("party_get", e))?;
-            let header = Header { oob: true, ..Header::new(&d) }.render()?;
+            let header = Header { oob: true, ..Header::for_party(&conn, &d)? }.render()?;
             Ok(([("HX-Trigger", toast("Saved", true))], Html(header)).into_response())
         }
         Err(CommandError::Validation(errors)) => {
@@ -478,7 +478,7 @@ pub async fn add_role(
     match parties::party_role_add(&mut conn, &id, role, &actor) {
         Ok(_) => {
             let d = parties::party_get(&conn, &id).map_err(|e| page_error("party_get", e))?;
-            let header = Header::new(&d).render()?;
+            let header = Header::for_party(&conn, &d)?.render()?;
             let text = format!("{} is now a {}", d.name, role.label().to_lowercase());
             Ok(([("HX-Trigger", toast(&text, false))], Html(header)).into_response())
         }

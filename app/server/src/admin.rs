@@ -223,6 +223,10 @@ pub struct SystemSettings {
     pub smtp_port: Option<i64>,
     pub smtp_encryption: Option<String>,
     pub smtp_authentication: Option<String>,
+    /// The address suggestion service (OP-INTEG-02), `None` = off (AP-12; V4).
+    pub address_provider: Option<crate::integrations::AddressProvider>,
+    /// FullContact person enrichment (OP-INTEG-03), off by default (AP-12; V4).
+    pub fullcontact_enabled: bool,
 }
 
 pub fn settings_get(conn: &Connection) -> rusqlite::Result<SystemSettings> {
@@ -231,7 +235,8 @@ pub fn settings_get(conn: &Connection) -> rusqlite::Result<SystemSettings> {
             "SELECT owner_id, COALESCE(tax_rate_bp, 0), default_tax_code_id, country_code, CAST(area_code AS INTEGER),
                     COALESCE(automatically_format_phone_numbers_ind, 0), system_email_address, system_email_full_name,
                     system_email_user_name, system_email_smtp_server, CAST(system_email_smtp_server_port AS INTEGER),
-                    system_email_smtp_server_encryption_type, system_email_smtp_server_authentication
+                    system_email_smtp_server_encryption_type, system_email_smtp_server_authentication,
+                    address_suggestion_provider, COALESCE(fullcontact_enabled_ind, 0)
              FROM system_setting WHERE singleton = 1",
             [],
             |r| {
@@ -249,6 +254,10 @@ pub fn settings_get(conn: &Connection) -> rusqlite::Result<SystemSettings> {
                     smtp_port: r.get(10)?,
                     smtp_encryption: r.get(11)?,
                     smtp_authentication: r.get(12)?,
+                    address_provider: r
+                        .get::<_, Option<String>>(13)?
+                        .and_then(|p| crate::integrations::AddressProvider::parse(&p)),
+                    fullcontact_enabled: r.get::<_, i64>(14)? == 1,
                 })
             },
         )
@@ -352,7 +361,8 @@ pub fn settings_update(conn: &mut Connection, s: &SystemSettings, actor: &Actor)
            area_code = ?5, automatically_format_phone_numbers_ind = ?6, system_email_address = ?7,
            system_email_full_name = ?8, system_email_user_name = ?9, system_email_smtp_server = ?10,
            system_email_smtp_server_port = ?11, system_email_smtp_server_encryption_type = ?12,
-           system_email_smtp_server_authentication = ?13
+           system_email_smtp_server_authentication = ?13, address_suggestion_provider = ?14,
+           fullcontact_enabled_ind = ?15
          WHERE singleton = 1",
         params![
             s.owner_id,
@@ -368,6 +378,8 @@ pub fn settings_update(conn: &mut Connection, s: &SystemSettings, actor: &Actor)
             s.smtp_port,
             s.smtp_encryption,
             s.smtp_authentication,
+            s.address_provider.map(|p| p.stored()),
+            i64::from(s.fullcontact_enabled),
         ],
     )?;
     if changed != 1 {

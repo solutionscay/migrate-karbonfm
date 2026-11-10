@@ -1,0 +1,42 @@
+{# POST /parties/{id}/enrich (OP-INTEG-03, kontacts 865): what FullContact found for a person, with a Keep box per
+   value (the source's FullContactPersonKeep* fields). The call changed nothing; "Keep selected" writes the checked
+   values (POST /parties/{id}/enrich/apply). A value the party already has is unchecked: what was typed wins (393). #}
+<form hx-post="{{ href }}/enrich/apply" hx-target="#modal-body" x-data>
+  <div class="px-5 pt-4 pb-3 border-b hairline flex items-center">
+    <h2 id="modal-title" class="font-semibold text-[15px]">FullContact: {{ name }}</h2>
+    <button type="button" class="icon-btn ml-auto" aria-label="Close" @click="$el.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="p-5 space-y-3">
+    {% if let Some(message) = error %}
+    <div role="alert" class="alert alert-error alert-soft text-[13px] py-2">{{ message }}</div>
+    <p class="text-[12.5px] muted">Nothing was changed.</p>
+    {% else if rows.is_empty() %}
+    <p class="text-[13px]">FullContact has no match for {{ name }}. Nothing was changed.</p>
+    {% else %}
+    {% if !found_name.is_empty() %}<p class="text-[12.5px] muted">Match: {{ found_name }}</p>{% endif %}
+    <fieldset class="space-y-2.5">
+      <legend class="text-[12px] muted mb-1">Keep</legend>
+      {% for r in rows %}
+      <label class="flex items-start gap-2.5 text-[13px]">
+        <input type="checkbox" name="keep_{{ r.field }}" class="checkbox checkbox-sm mt-0.5" {% if r.checked %}checked{% endif %}>
+        <input type="hidden" name="{{ r.field }}" value="{{ r.found }}">
+        <span class="min-w-0">
+          <span class="font-medium">{{ r.label }}</span>
+          <span class="block [overflow-wrap:anywhere]">{{ r.found }}</span>
+          {% if !r.current.is_empty() %}<span class="block text-[12px] muted [overflow-wrap:anywhere]">Now: {{ r.current }}</span>{% endif %}
+        </span>
+      </label>
+      {% endfor %}
+    </fieldset>
+    <button type="button" class="btn btn-xs btn-quiet" @click="$root.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = true)">Select all</button>
+    {% endif %}
+  </div>
+  <div class="px-5 py-3 border-t hairline flex justify-end gap-2">
+    {% if error.is_none() && !rows.is_empty() %}
+    <button type="button" class="btn btn-sm btn-quiet" @click="$el.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-sm btn-primary">Keep selected</button>
+    {% else %}
+    <button type="button" class="btn btn-sm btn-primary" @click="$el.closest('dialog').close()">Close</button>
+    {% endif %}
+  </div>
+</form>
