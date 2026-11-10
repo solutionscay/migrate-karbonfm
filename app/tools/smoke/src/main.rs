@@ -87,6 +87,16 @@ fn missing<'a>(text: &str, expect: &[&'a str]) -> Vec<&'a str> {
     expect.iter().copied().filter(|e| !text.contains(e)).collect()
 }
 
+/// `\\?\D:\a\app.exe` -> `D:\a\app.exe`: canonicalize gives Windows' verbatim form, which the app path then
+/// carries into msedgedriver and WebView2. A drive path without the prefix is the same file.
+fn plain(path: PathBuf) -> PathBuf {
+    let s = path.to_string_lossy();
+    match s.strip_prefix(r"\\?\") {
+        Some(rest) if rest.as_bytes().get(1) == Some(&b':') => PathBuf::from(rest),
+        _ => path,
+    }
+}
+
 /// `http://127.0.0.1:1234/session/abc` -> `http://127.0.0.1:1234`.
 fn origin(url: &str) -> Option<&str> {
     let after_scheme = url.find("://")? + 3;
@@ -128,8 +138,8 @@ fn main() {
 /// Ok(true) when every check passed; Err when the app could not be started at all.
 fn run(args: &Args) -> Result<bool, String> {
     std::fs::create_dir_all(&args.out).map_err(|e| format!("{}: {e}", args.out.display()))?;
-    let out = args.out.canonicalize().map_err(|e| format!("{}: {e}", args.out.display()))?;
-    let app = args.app.canonicalize().map_err(|e| format!("--app {}: {e}", args.app.display()))?;
+    let out = plain(args.out.canonicalize().map_err(|e| format!("{}: {e}", args.out.display()))?);
+    let app = plain(args.app.canonicalize().map_err(|e| format!("--app {}: {e}", args.app.display()))?);
 
     // A new, empty data folder: the app creates the big demo in it (03 "Demo seed data"). One that already holds a
     // database is refused, so the test can never open (or change) a real one.
@@ -264,6 +274,16 @@ mod tests {
         assert!(args(&["--out", "o"]).unwrap_err().contains("--app is required"));
         assert!(args(&["--app"]).unwrap_err().contains("--app needs a value"));
         assert!(args(&["--app", "a", "--out", "o", "--bogus"]).unwrap_err().contains("unknown argument"));
+    }
+
+    #[test]
+    fn verbatim_drive_paths_lose_their_prefix() {
+        assert_eq!(plain(PathBuf::from(r"\\?\D:\a\karbonfm.exe")), PathBuf::from(r"D:\a\karbonfm.exe"));
+        assert_eq!(plain(PathBuf::from(r"\\?\UNC\server\share\a.exe")), PathBuf::from(r"\\?\UNC\server\share\a.exe"));
+        assert_eq!(
+            plain(PathBuf::from("/src/app/target/release/karbonfm")),
+            PathBuf::from("/src/app/target/release/karbonfm")
+        );
     }
 
     #[test]

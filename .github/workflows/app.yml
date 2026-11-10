@@ -138,7 +138,11 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev webkit2gtk-driver xvfb
+          # WebKitWebDriver: webkit2gtk-driver up to Ubuntu 24.04, webkitgtk-webdriver from 26.04 (ubuntu-latest).
+          driver=webkit2gtk-driver
+          if apt-cache show webkitgtk-webdriver > /dev/null 2>&1; then driver=webkitgtk-webdriver; fi
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev "$driver" xvfb
+          command -v WebKitWebDriver
 
       # The WebDriver of the WebView2 runtime the window uses (they must match). Edge's own driver on the runner is
       # the fallback: Edge and the WebView2 runtime are on the same version on the hosted images.
@@ -197,6 +201,20 @@ jobs:
         run: >-
           ./target/release/karbon-smoke.exe --app target/release/karbonfm.exe --native-driver "$MSEDGEDRIVER"
           --out "$RUNNER_TEMP/smoke"
+
+      # What the window left behind when the session failed: the WebView2 DevTools port files and the processes.
+      - name: Smoke diagnostics (Windows, on failure)
+        if: failure() && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path $env:LOCALAPPDATA, $env:TEMP -Recurse -Filter DevToolsActivePort -ErrorAction SilentlyContinue |
+            ForEach-Object { "$($_.FullName): $(Get-Content $_.FullName -Raw)" }
+          Get-ChildItem -Path (Join-Path $env:LOCALAPPDATA 'com.solutionscay.karbonfm') -Recurse -Depth 2 -ErrorAction SilentlyContinue |
+            Select-Object -First 40 FullName
+          Get-Process karbonfm, msedgewebview2, msedgedriver, tauri-driver -ErrorAction SilentlyContinue |
+            Select-Object Name, Id, StartTime, Path | Format-Table -AutoSize
+          Get-CimInstance Win32_Process -Filter "Name = 'msedgewebview2.exe'" -ErrorAction SilentlyContinue |
+            Select-Object -First 3 -ExpandProperty CommandLine
 
       # Screenshots of both pages, summary.txt, the app's karbonfm.log and tauri-driver.log; also when a check failed.
       - uses: actions/upload-artifact@v4
