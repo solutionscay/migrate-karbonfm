@@ -24,7 +24,7 @@ if [ ! -x "$bin" ] || [ "$(sha256 "$bin")" != "$sum" ]; then
   mkdir -p tools/bin
   echo "build-css: downloading Tailwind CLI $TAILWIND_VERSION ($plat)"
   # Retries: a dropped connection to GitHub releases once failed CI (curl exit 56).
-  curl -fsSL --retry 5 --retry-all-errors --retry-delay 5 --connect-timeout 30 --max-time 300 -o "$bin.part" "https://gh.ali360.cloudns.ch/tailwindlabs/tailwindcss/releases/download/v$TAILWIND_VERSION/tailwindcss-$plat"
+  curl -fsSL --retry 5 --retry-all-errors --retry-delay 5 --connect-timeout 30 --max-time 300 -o "$bin.part" "https://github.com/tailwindlabs/tailwindcss/releases/download/v$TAILWIND_VERSION/tailwindcss-$plat"
   got="$(sha256 "$bin.part")"
   if [ "$got" != "$sum" ]; then echo "build-css: checksum mismatch for $plat: $got" >&2; rm -f "$bin.part"; exit 1; fi
   mv "$bin.part" "$bin"; chmod +x "$bin"

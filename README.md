@@ -2,7 +2,7 @@
 
 # migrate-karbonfm
 
-A demo of migrating [KarbonFM](https://gh.ali360.cloudns.ch/karbonfm/karbonfm), an open-source FileMaker CRM, to a desktop app for macOS, Windows and Linux.
+A demo of migrating [KarbonFM](https://github.com/karbonfm/karbonfm), an open-source FileMaker CRM, to a desktop app for macOS, Windows and Linux.
 
 The repo holds the original FileMaker source, the full migration plan, clickable mockups, and the rebuilt app in [app/](app/).
 
@@ -10,7 +10,7 @@ The repo holds the original FileMaker source, the full migration plan, clickable
 
 ## How it was made
 
-The plan was written with the [migrate-filemaker](https://gh.ali360.cloudns.ch/solutionscay/migrate-filemaker) skill. The skill takes FileMaker's Database Design Report (DDR) apart into one text file per object, reads every object, and writes the plan from what the objects say.
+The plan was written with the [migrate-filemaker](https://github.com/solutionscay/migrate-filemaker) skill. The skill takes FileMaker's Database Design Report (DDR) apart into one text file per object, reads every object, and writes the plan from what the objects say.
 
 The run:
 
@@ -26,7 +26,7 @@ There are no installers. Build the app from source.
 Prerequisites: the Rust toolchain ([rustup](https://rustup.rs); `app/rust-toolchain.toml` pins Rust 1.90.0) and the Tauri 2 system dependencies for your OS ([Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)). Node and pnpm are not needed: the built CSS is in the repo.
 
 ```bash
-git clone https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm.git
+git clone https://github.com/solutionscay/migrate-karbonfm.git
 cd migrate-karbonfm/app
 cargo run -p karbon-desktop
 ```
@@ -122,10 +122,10 @@ Visual direction: a dark sidebar with a warm, light work area, an orange accent,
 - **Users:** a single user on one computer. The local server listens on 127.0.0.1 only.
 - **Dropped:** QuickBooks Online and Twilio SMS. The Messages screen is a static mock.
 - **Out of scope:** the developer tooling files (`karbon_Generator`, `karbon_Build`, `karbon_tester`, `karbon_dev`).
-- **Out of scope for the demo (2026-11-12):** the import screen UI-18 ([#8](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/8)), tests of the integrations against the real services ([#9](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/9)), and installers ([#10](https://gh.ali360.cloudns.ch/solutionscay/migrate-karbonfm/issues/10)). Each is an open issue that anyone can take.
+- **Out of scope for the demo (2026-11-12):** the import screen UI-18 ([#8](https://github.com/solutionscay/migrate-karbonfm/issues/8)), tests of the integrations against the real services ([#9](https://github.com/solutionscay/migrate-karbonfm/issues/9)), and installers ([#10](https://github.com/solutionscay/migrate-karbonfm/issues/10)). Each is an open issue that anyone can take.
 
 ## Original source and license
 
-KarbonFM was made by Geist Interactive (EOW, Inc.). The upstream repository is [karbonfm/karbonfm](https://gh.ali360.cloudns.ch/karbonfm/karbonfm).
+KarbonFM was made by Geist Interactive (EOW, Inc.). The upstream repository is [karbonfm/karbonfm](https://github.com/karbonfm/karbonfm).
 
 [KarbonFm-Source/](KarbonFm-Source/) holds the original release: its README, logo and [LICENSE.txt](KarbonFm-Source/LICENSE.txt) (MIT). The FileMaker `.fmp12` files are no longer tracked in this repo. Get them from the upstream release.
