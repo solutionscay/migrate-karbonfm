@@ -126,6 +126,8 @@ Visual direction: a dark sidebar with a warm, light work area, an orange accent,
 
 ## Original source and license
 
+The code in this repo is MIT licensed. See [LICENSE](LICENSE). Copyright (c) 2026 Solutions Cay LLC.
+
 KarbonFM was made by Geist Interactive (EOW, Inc.). The upstream repository is [karbonfm/karbonfm](https://github.com/karbonfm/karbonfm).
 
-[KarbonFm-Source/](KarbonFm-Source/) holds the original release: its README, logo and [LICENSE.txt](KarbonFm-Source/LICENSE.txt) (MIT). The FileMaker `.fmp12` files are no longer tracked in this repo. Get them from the upstream release.
+[KarbonFm-Source/](KarbonFm-Source/) holds the original release: its README, logo and license. Those files keep their own MIT license, [KarbonFm-Source/LICENSE.txt](KarbonFm-Source/LICENSE.txt) (EOW, Inc., DBA Geist Interactive). The FileMaker `.fmp12` files are no longer tracked in this repo. Get them from the upstream release.
