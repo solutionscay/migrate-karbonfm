@@ -136,6 +136,40 @@ fn built_css_has_the_daisyui_components_and_karbon_themes() {
     }
 }
 
+/// A dialog must not change the page size or layout. DaisyUI's modal scroll lock sets `overflow: hidden` and
+/// `scrollbar-gutter: stable` on `:root` while a `.modal` is open (in `@layer base`). The root never scrolls in the app
+/// shell, so that gutter narrowed the whole page by a scrollbar's width (seen in the Ep07 promo). karbon.css undoes it
+/// with an unlayered `:root` rule, which beats every layered rule whatever its specificity: so it must stay outside
+/// any `@layer` block of the built CSS.
+#[test]
+fn built_css_keeps_the_root_gutter_when_a_dialog_opens() {
+    let css = include_str!("../assets/app.css");
+    assert!(css.contains("scrollbar-gutter:stable"), "DaisyUI's modal rule is still there (what the override undoes)");
+    let mut depth = 0usize;
+    let mut found = false;
+    let mut i = 0;
+    let bytes = css.as_bytes();
+    while i < bytes.len() {
+        match bytes[i] {
+            b'{' => depth += 1,
+            b'}' => depth -= 1,
+            _ => {}
+        }
+        if depth == 0 && css[i..].starts_with(":root{") {
+            let body = &css[i + 6..i + 6 + css[i + 6..].find('}').unwrap()];
+            if body.contains("scrollbar-gutter:auto") && body.contains("overflow:visible") {
+                found = true;
+                break;
+            }
+        }
+        i += 1;
+    }
+    assert!(
+        found,
+        "app.css has no unlayered :root {{ overflow: visible; scrollbar-gutter: auto }}; run tools/build-css.sh"
+    );
+}
+
 #[tokio::test]
 async fn origin_guard_refuses_other_hosts_and_cross_site_writes() {
     const ORIGIN: &str = "http://127.0.0.1:4321";

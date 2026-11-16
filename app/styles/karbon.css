@@ -101,6 +101,13 @@
 }
 
 html, body { height: 100%; }
+/* A dialog, sheet, popover or menu must not change the page size or layout. DaisyUI's modal scroll lock puts
+   overflow: hidden and scrollbar-gutter: stable on :root while any .modal is open (or a drawer toggle is checked).
+   The root never scrolls here (the shell is 100vh and scrolls inside .content), so that gutter is an empty strip
+   added from nothing: with classic scrollbars (headless Chromium, WebView2) the whole page got ~15px narrower and
+   every header button and the right column moved left until the dialog closed. The root keeps the same overflow
+   and gutter whether a dialog is open or not. Unlayered, so it wins over DaisyUI's @layer base rules. */
+:root { overflow: visible; scrollbar-gutter: auto; }
 body {
   font-family: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 13.5px;
