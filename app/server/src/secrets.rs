@@ -134,7 +134,7 @@ pub trait SecretStore: Send + Sync {
             Err(SecretError::Unavailable(_)) => (false, false),
             Err(e) => return Err(e),
         };
-        Ok(SecretField { name: key.account(), label, has_secret, available, error: None })
+        Ok(SecretField { name: key.account(), label, has_secret, available, unreadable: false, error: None })
     }
 }
 
@@ -538,7 +538,8 @@ impl SecretStore for Secrets {
 }
 
 /// What a template gets for a secret: the field name, its label and whether a value is saved. `available` is false
-/// when no store can keep it (the input is disabled); `error` is a field error of the last save.
+/// when no store can keep it (the input is disabled); `unreadable` is true when the store failed to say whether one
+/// is saved; `error` is a field error of the last save or read.
 #[derive(Clone, Debug, askama::Template)]
 #[template(path = "partials/secret_field.html")]
 pub struct SecretField {
@@ -546,6 +547,7 @@ pub struct SecretField {
     pub label: &'static str,
     pub has_secret: bool,
     pub available: bool,
+    pub unreadable: bool,
     pub error: Option<String>,
 }
 

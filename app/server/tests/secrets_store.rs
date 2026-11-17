@@ -7,7 +7,7 @@ use axum::http::{header, HeaderMap, Request, StatusCode};
 use http_body_util::BodyExt;
 use karbon_server::db::{self, Seed};
 use karbon_server::secrets::{
-    secrets_path, FileStore, MemoryStore, NoKeychain, Secret, SecretKey, SecretStore, SECRETS_FILE,
+    secrets_path, FileStore, MemoryStore, NoKeychain, Secret, SecretError, SecretKey, SecretStore, SECRETS_FILE,
 };
 use karbon_server::session::Session;
 use karbon_server::{backup, router, AppState};
@@ -21,6 +21,8 @@ const PASSWORD: &str = "Fi1e-sm7p-pa55-4417";
 const NOTICE: &str =
     "KarbonFM keeps passwords and API keys in your system keychain, and this computer doesn't have one running.";
 const DISABLED: &str = "Needs a keychain or the file option";
+const READ_FAILED: &str = "Could not read this from the secret store. The log has the details.";
+const WRITE_FAILED: &str = "Not saved: the secret store refused it. The log has the details.";
 
 struct App {
     router: axum::Router,
@@ -44,6 +46,22 @@ async fn start(data: &Path, keychain: Arc<dyn SecretStore>) -> App {
 
 fn no_keychain() -> Arc<dyn SecretStore> {
     Arc::new(NoKeychain::new("test double: no Secret Service on the session bus"))
+}
+
+/// A keychain that is there but refuses every call (locked, or the user denied the OS prompt): `Failed`, not
+/// `Unavailable`.
+struct RefusingKeychain;
+
+impl SecretStore for RefusingKeychain {
+    fn get(&self, key: SecretKey) -> Result<Option<Secret>, SecretError> {
+        Err(SecretError::Failed(format!("keychain: the user denied access (entry {})", key.account())))
+    }
+    fn set(&self, key: SecretKey, _value: &Secret) -> Result<(), SecretError> {
+        Err(SecretError::Failed(format!("keychain: the user denied access (entry {})", key.account())))
+    }
+    fn delete(&self, key: SecretKey) -> Result<(), SecretError> {
+        Err(SecretError::Failed(format!("keychain: the user denied access (entry {})", key.account())))
+    }
 }
 
 async fn send(router: &axum::Router, req: axum::http::request::Builder) -> (StatusCode, HeaderMap, String) {
@@ -386,4 +404,64 @@ async fn a_failed_request_shows_an_error_toast() {
     assert!(css.contains(".k-toast-error"), "app.css was rebuilt with the error style");
     let (_, _, html) = app.get("/settings").await;
     assert!(html.contains(r#"<symbol id="i-alert""#));
+}
+
+/// A store that fails in another way than "no keychain" (a refused keychain): Settings still opens and saves the rest,
+/// and a typed secret is a 422 field error, never a 500 and never "saved" (issue #7).
+#[tokio::test]
+async fn a_failing_keychain_never_gives_a_500() {
+    let tmp = tempfile::tempdir().unwrap();
+    let app = start(tmp.path(), Arc::new(RefusingKeychain)).await;
+
+    let (status, _, html) = app.get("/settings").await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(html.contains(READ_FAILED), "the field says it could not be read");
+    let input = input_tag(&html, "system_smtp_password");
+    assert!(!input.contains("disabled") && input.contains("Could not be read. Type a value to replace it."), "{input}");
+    assert!(!html.contains("Saved. Type a new value") && !html.contains(NOTICE));
+
+    let (status, headers, html) = app.write("PUT", "/settings", &settings_body(&[("tax_rate", "6.25")])).await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(headers.get("HX-Trigger").is_some_and(|v| v.to_str().unwrap().contains("Settings saved")));
+    assert_eq!(app.tax_rate_bp(), 625);
+
+    let body = settings_body(&[("tax_rate", "7"), ("system_smtp_password", PASSWORD)]);
+    let (status, headers, html) = app.write("PUT", "/settings", &body).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{html}");
+    assert!(html.contains(WRITE_FAILED));
+    assert!(!html.contains("Settings saved") && headers.get("HX-Trigger").is_none());
+    assert!(!html.contains(PASSWORD), "a typed secret is never echoed");
+    assert!(input_tag(&html, "system_smtp_password").contains(r#"aria-invalid="true""#));
+    assert_eq!(app.tax_rate_bp(), 625, "the settings row was not saved either");
+    assert!(!app.file().exists(), "no silent fallback to a file");
+
+    // Validation errors stay 422 with a failing store too.
+    let (status, _, html) = app.write("PUT", "/settings", &settings_body(&[("tax_rate", "abc")])).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{html}");
+    assert!(html.contains("Check the fields marked below. Nothing was saved."));
+}
+
+/// A `secrets.toml` that cannot be parsed: Settings opens, says where secrets are kept, and never quotes the file.
+#[tokio::test]
+async fn a_broken_secrets_file_never_gives_a_500() {
+    let tmp = tempfile::tempdir().unwrap();
+    let app = start(tmp.path(), no_keychain()).await;
+    std::fs::write(app.file(), "system_smtp_password = \"hunter2").unwrap();
+
+    let (status, _, html) = app.get("/settings").await;
+    assert_eq!(status, StatusCode::OK, "{html}");
+    assert!(html.contains("local file (no system keychain)"));
+    assert!(html.contains(READ_FAILED));
+    assert!(!html.contains("hunter2"), "the file content never reaches the page");
+
+    let body = settings_body(&[("system_smtp_password", PASSWORD)]);
+    let (status, _, html) = app.write("PUT", "/settings", &body).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY, "{html}");
+    assert!(html.contains(WRITE_FAILED) && !html.contains("Settings saved"));
+    assert!(!html.contains(PASSWORD) && !html.contains("hunter2"));
+    assert_eq!(
+        std::fs::read_to_string(app.file()).unwrap(),
+        "system_smtp_password = \"hunter2",
+        "the file is untouched"
+    );
 }

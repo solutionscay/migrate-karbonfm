@@ -5,12 +5,14 @@
 //!
 //! Without a keychain (D-09, issue #7) the page still opens: the secret fields are disabled, a notice offers the
 //! opt-in `secrets.toml` (`secrets_store.rs`), and a secret typed anyway is a field error (422), never a 500 and
-//! never "Settings saved".
+//! never "Settings saved". A store that fails another way (a locked or refused keychain, a broken `secrets.toml`) is
+//! logged with its cause and shown on the field: the page opens, and a typed secret it refused is a 422 field error.
 
 use super::current_user::CurrentUser;
 use super::secrets_store::StorePanel;
 use super::Nav;
 use crate::admin::{self, CommandError, FieldError, SystemSettings};
+use crate::applog::{log_write, Entry};
 use crate::integrations::{self, AddressProvider};
 use crate::net::Integration;
 use crate::secrets::{SecretError, SecretField, SecretKey, SecretStore, Secrets, StoreKind};
@@ -292,22 +294,45 @@ struct SettingsPage {
     backup: String,
 }
 
+/// The field error of a secret the store could not read (a locked or refused keychain, a broken `secrets.toml`).
+const READ_FAILED: &str = "Could not read this from the secret store. The log has the details.";
+/// The field error of a typed secret the store refused. Not "saved", and not a 500 (issue #7).
+const WRITE_FAILED: &str = "Not saved: the secret store refused it. The log has the details.";
+
+/// Logs a store failure with its real cause (the text names the entry, never the value).
+fn log_store_failure(operation: &str, e: &SecretError) {
+    let message = e.to_string();
+    log_write(&Entry::error(operation, "Keychain", &message));
+}
+
 /// The `SecretField`s and the store notice, read off the async workers. A field error of `errors` goes on its field.
+/// A secret the store cannot read is logged and shown as a field error, so the page still opens (issue #7).
 async fn secret_fields(store: Secrets, errors: Vec<FieldError>) -> Result<(Vec<SecretField>, StorePanel), AppError> {
     tokio::task::spawn_blocking(move || {
         let fields = SECRETS
             .iter()
             .map(|(k, label)| {
-                let mut field = store.field(*k, label)?;
-                field.error = errors.iter().find(|e| e.field == field.name).map(|e| e.message.clone());
-                Ok(field)
+                let mut field = store.field(*k, label).unwrap_or_else(|e| {
+                    log_store_failure("settings_get", &e);
+                    SecretField {
+                        name: k.account(),
+                        label,
+                        has_secret: false,
+                        available: true,
+                        unreadable: true,
+                        error: Some(READ_FAILED.into()),
+                    }
+                });
+                if let Some(e) = errors.iter().find(|e| e.field == field.name) {
+                    field.error = Some(e.message.clone());
+                }
+                field
             })
-            .collect::<Result<Vec<_>, SecretError>>()?;
-        Ok((fields, StorePanel::for_store(&store, None)))
+            .collect::<Vec<_>>();
+        (fields, StorePanel::for_store(&store, None))
     })
     .await
-    .map_err(|e| AppError::Internal(format!("keychain task: {e}")))?
-    .map_err(|e: SecretError| AppError::Internal(e.to_string()))
+    .map_err(|e| AppError::Internal(format!("keychain task: {e}")))
 }
 
 async fn view(
@@ -468,7 +493,14 @@ pub async fn update(
             let view = view(&state, form, errors, false).await?;
             return respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None);
         }
-        Err((_, e)) => return Err(AppError::Internal(e.to_string())),
+        // The store failed (a locked or refused keychain, a broken file): the real cause goes to the log, the field
+        // says it was not saved, and the settings row is not saved either.
+        Err((key, e)) => {
+            log_store_failure("settings_update", &e);
+            let errors = vec![FieldError { field: key.account(), message: WRITE_FAILED.into() }];
+            let view = view(&state, form, errors, false).await?;
+            return respond(&state, &headers, view, StatusCode::UNPROCESSABLE_ENTITY, None);
+        }
     }
     let result = {
         let mut conn = state.db.lock().map_err(|e| AppError::Internal(e.to_string()))?;
